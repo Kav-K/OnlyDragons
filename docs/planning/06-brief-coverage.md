@@ -17,8 +17,10 @@ policy are accepted at `705de34`; [exact evidence](evidence/t04-suite.md) retain
 their boundaries. PR #48 integrated the bounded proc coordinator and T02b catalog
 at `3c35a85` after the full 21-case cohort, independent replay/review and CI;
 [combined evidence](evidence/catalog-procs-suite.md). Bounded M0 is explicitly
-accepted. Lead-dispatched T06 and planned T08a/T08b/T08c still require production
-firing, controls, ranking and loot-simulation evidence; M1–M5 remain unaccepted.
+accepted. PR #52 integrates T06 firing/physical claims at `25891c0` after the
+complete 24-case cohort and independent acceptance; [exact evidence](evidence/t06-suite.md).
+T08 accounting and planned T08a/T08b/T08c controls, ranking and loot simulation
+still require their production evidence; M1–M5 remain unaccepted.
 PR #50 integrated T09e at `7b8ff0f` after the complete 23-case cohort and
 independent acceptance; [generic restart evidence](evidence/t09e-suite.md)
 does not certify T08a managed-encounter recovery.
@@ -27,10 +29,10 @@ does not certify T08a managed-encounter recovery.
 
 | Intended behavior | Owning tasks | Automated acceptance and actual coverage | Remaining gate |
 | --- | --- | --- | --- |
-| Explainable stats, one ultimate per bow, immutable source/shot values | T00, T01a/T01b, T02; T06 integrates shot capture | Accepted `contract-consumers`, `stats-resolver`, `item-codec`, `equipment-service` and `equipment-player`; native shot capture must still preserve those values | Equipment service evidence does not establish firing-time snapshots |
-| No-Strength offense, crits, caps, separate HP and ghost/contribution damage | T03; T05, T06 and T08 integrate actual hits | `combat-services` and `bounded-procs` are accepted; `firing-input`, P01/P08/P09/P13 require feature integration. Keep fast independent numeric boundary tests and compare real-Paper production outputs | Final ferocity HP balance and unchosen optional enchant formulas remain explicit calibration/design choices |
-| One physical hit authority, native damage suppression and measured dragon parts/phases | T04, T06, T08, T08a | T04 shooterless/player-owned observations and scoped policy accepted in PR #31; P02/P04 remain production requirements, with expected event absence/valid misses retained | Actual production enforcement remains pending; no semantic-head or all-phase claim |
-| Native drawn bows, shortbow cadence, ammo, offhand deduplication and Duplex identity | T06 with T09d primitives; T08 connects combat/procs | `firing-input`, P08/P09/P13 and T06 `automated-multiplayer-firing`; actual parameterized packets and observed Paper effects. Full accounting attribution remains required at T08/M3 | Fixed select/draw/release/quit calibration cannot prove all inputs; subjective feel remains human |
+| Explainable stats, one ultimate per bow, immutable source/shot values | T00, T01a/T01b, T02; T06 integrates shot capture | Accepted `contract-consumers`, `stats-resolver`, `item-codec`, `equipment-service` and `equipment-player`; T06's production native shot capture preserves immutable values across delayed emission and equipment changes | T08 must consume those captured values once when connecting combat/procs |
+| No-Strength offense, crits, caps, separate HP and ghost/contribution damage | T03; T05, T06 and T08 integrate actual hits | `combat-services`, `bounded-procs` and T06 `firing-input` are accepted; P01/P08/P09/P13 still require accounting integration. Keep fast independent numeric boundary tests and compare real-Paper production outputs | Final ferocity HP balance and unchosen optional enchant formulas remain explicit calibration/design choices |
+| One physical hit authority, native damage suppression and measured dragon parts/phases | T04, T06, T08, T08a | T04 observations/policy accepted in PR #31; production P02/P04 accepted in T06, including terminal retirement, veto and unsupported-phase controls | T08 HP/result composition remains pending; no semantic-head or all-phase claim |
+| Native drawn bows, shortbow cadence, ammo, offhand deduplication and Duplex identity | T06 with T09d primitives; T08 connects combat/procs | T06 `firing-input` and `automated-multiplayer-firing` accepted using parameterized packets and production Paper effects; P08/P09/P13 and full accounting attribution remain required at T08/M3 | Subjective input feel and authenticated-client compatibility remain human observations |
 | Tracer radius/steering, real pre-spawn UUID continuity and bounded capacity | T07, T10 | P03/P05/P06/P07/P10/P11/P12/P14: real flight, obstruction/miss controls, simultaneous hits, revisions and load/cleanup | Measured player/arrow envelope; preserve M3's human visual prefire rehearsal |
 | One extensible test-dragon definition and inert table bindings | T02b / #38 | Accepted `dragon-definition-catalog`, `sample-loot-table-bindings` through PR #48: whole-candidate validation, retained selections and real production-loader/abort checks | One initial test dragon only; test definitions do not approve later content or production drop numbers |
 | Reusable persisted configuration and same-world restart validation | T09e / #49, complete through PR #50 at `7b8ff0f` | Accepted `same-profile-restart`: two actual boots, saved configuration, independent phase plans/reports, connected commands and exact positive/abort outcomes in the [23-case cohort](evidence/t09e-suite.md) | T08a must still prove its own managed-dragon disable/start recovery; human/client gates remain separate |
