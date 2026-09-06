@@ -25,6 +25,8 @@ class RestartContracts(unittest.TestCase):
                        'startedAtEpochMs': 100, 'completedAtEpochMs': 1000,
                        'pins': {'minecraftVersion': '26.2'}, 'profile': {'world': 'agent-world-' + self.parent_id},
                        'artifacts': {'productionSha256': 'c' * 64}, 'playerBuild': {'jars': {'client.jar': 'd' * 64}},
+                       'build': {'wrapperInvoked': True, 'unitTests': {'tests': 1, 'failures': 0, 'errors': 0, 'skipped': 0},
+                                 'companionUnitTests': {'tests': 2, 'failures': 0, 'errors': 0, 'skipped': 0}},
                        'stagedArtifacts': {'server.jar': 'e' * 64}, 'phases': []}
         (self.root / 'config-initial.yml').write_text('initial')
         self.parent['initialConfigSha256'] = runner.sha256(self.root / 'config-initial.yml')
@@ -47,7 +49,7 @@ class RestartContracts(unittest.TestCase):
                      'playerStopStartedAtEpochMs': first + 60, 'playerStopCompletedAtEpochMs': first + 70,
                      'cleanup': {'exitCode': 0, 'forced': False, 'clean': True},
                      'passed': True, 'error': None, 'status': {'version': {'name': '26.2'}}}
-            for key in ('profile', 'artifacts', 'playerBuild'):
+            for key in ('profile', 'artifacts', 'playerBuild', 'build'):
                 phase[key] = copy.deepcopy(self.parent[key])
             phase['artifactsBefore'] = phase['artifactsAfter'] = copy.deepcopy(self.parent['stagedArtifacts'])
             for side, text in [('before', 'initial' if index == 1 else 'saved'), ('after', 'saved' if index == 1 else 'initial')]:
@@ -252,17 +254,45 @@ class FullRestartReplayTests(unittest.TestCase):
         f.json(f.reports/'result.json',parent)
         self.record=copy.deepcopy(f.record);self.record.update(caseId=self.name,scenarioId=self.name)
         restart.capture(suite,f.root,f.reports,self.record)
-        for kind in ['production','player']:
+        for kind in ['production','companion','player']:
             path=f.suite_root/self.name/kind/'TEST-Sample.xml'
-            f.write(path,'<testsuite tests="1" failures="0" errors="0" skipped="0"><testcase classname="Sample" name="boundary"/></testsuite>')
-        self.record['testEvidence']=[{'kind':kind,'path':(f.suite_root/self.name/kind/'TEST-Sample.xml').relative_to(f.root).as_posix(),'sha256':runner.sha256(f.suite_root/self.name/kind/'TEST-Sample.xml')} for kind in ['production','player']]
+            f.write(path, f.COMPANION_XML if kind == 'companion' else '<testsuite tests="1" failures="0" errors="0" skipped="0"><testcase classname="Sample" name="boundary"/></testsuite>')
+        self.record['testEvidence']=[{'kind':kind,'path':(f.suite_root/self.name/kind/'TEST-Sample.xml').relative_to(f.root).as_posix(),'sha256':runner.sha256(f.suite_root/self.name/kind/'TEST-Sample.xml')} for kind in ['production','companion','player']]
         self.case={'scenarioId':self.name,'expectation':'positive','testPlayer':'protocol-actions-v1','scenarioTimeout':60}
 
     def verify(self):
         with patch.object(self.suite,'process_cleanup'):
             return self.suite.verify_case(self.f.root,self.record,self.case,self.descriptor,self.f.source,self.f.suite_root)
 
-    def test_full_nested_replay_passes(self): self.assertGreater(self.verify()['assertions'],0)
+    def test_full_nested_replay_passes(self):
+        verified = self.verify()
+        self.assertGreater(verified['assertions'], 0)
+        self.assertEqual(verified['unitTests']['tests'], 1)
+        self.assertEqual(verified['companionUnitTests']['tests'], 2)
+        self.assertEqual([phase['companionUnitTests']['tests'] for phase in verified['phases']], [2, 2])
+
+    def test_restart_replays_shared_companion_evidence_for_both_boots(self):
+        original = copy.deepcopy(self.parent)
+        for index in (0, 1):
+            with self.subTest(phase=index + 1):
+                self.parent = copy.deepcopy(original)
+                self.parent['phases'][index]['build']['companionUnitTests']['tests'] = 3
+                self.refresh()
+                with self.assertRaisesRegex(runner.ValidationError, 'restart build evidence'):
+                    self.verify()
+        self.parent = copy.deepcopy(original)
+        self.parent['build'].pop('companionUnitTests')
+        for phase in self.parent['phases']:
+            phase['build'].pop('companionUnitTests')
+        self.refresh()
+        with self.assertRaisesRegex(runner.ValidationError, 'Companion JUnit totals'):
+            self.verify()
+        self.parent = original
+        self.refresh()
+        item = next(item for item in self.record['testEvidence'] if item['kind'] == 'companion')
+        (self.f.root / item['path']).write_bytes(b'changed XML after capture')
+        with self.assertRaisesRegex(runner.ValidationError, 'Missing/mutated evidence'):
+            self.verify()
 
     def refresh(self):
         f = self.f

@@ -171,6 +171,15 @@ hashes, pins, Java version, status response, memory check, profile, validation,
 and cleanup. Keep a durable summary of accepted findings in the task/PR and
 planning context; do not commit raw logs, worlds, or generated artifacts.
 
+When a scenario exception interrupts its required assertions, inspect
+`scenario.json`'s `observations.scenarioException` for the exception class,
+message, source frames and cause chain. These diagnostics have explicit size
+limits and report truncation; they do not replace the original failed
+`scenario_exception` assertion or change cleanup and acceptance rules.
+Production and companion unit results are captured and replayed as separate
+JUnit categories; protocol scenarios also retain the client category. Report
+their actual counts separately, including failures, errors and skips.
+
 The companion writes JSON atomically, off the server thread after freezing
 the report. It must contain the exact run/scenario/mechanic IDs, completion
 state, actual server version, timestamps, a nonempty unique assertion list,

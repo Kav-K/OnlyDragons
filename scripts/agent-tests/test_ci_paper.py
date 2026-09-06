@@ -250,7 +250,8 @@ class HostedPaperTests(unittest.TestCase):
                     f'build/reports/agent-paper/{RUN}/server.log',
                     f'build/reports/agent-paper/{RUN}/build.log',
                     f'build/reports/agent-paper-suites/{SUITE}/receipt.json',
-                    f'build/reports/agent-paper-suites/{SUITE}/positive/production/TEST-Core.xml']
+                    f'build/reports/agent-paper-suites/{SUITE}/positive/production/TEST-Core.xml',
+                    f'build/reports/agent-paper-suites/{SUITE}/positive/companion/TEST-Diagnostics.xml']
         profile = f'run/agent-tests/{RUN}/'
         required += [profile + value for value in ('server.jar', 'server.properties', 'whitelist.json',
                      'player-plan.json', 'plugins/OnlyDragons.jar', 'plugins/OnlyDragonsGameTests.jar',

@@ -1,6 +1,7 @@
 package com.kaveenk.onlydragons.gametests;
 
 import com.kaveenk.onlydragons.OnlyDragonsPlugin;
+import com.kaveenk.onlydragons.gametests.fixtures.ExceptionDiagnostics;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -81,7 +82,14 @@ public final class ScenarioContext {
     public void fail(Throwable failure) {
         if (finished) return;
         assertions.add(Map.of("id", "scenario_exception", "expected", "no exception", "observed", failure.toString(), "passed", false));
-        finish();
+        try {
+            observations.put("scenarioException", ExceptionDiagnostics.describe(failure));
+        } catch (RuntimeException | AssertionError unavailable) {
+            // Diagnostics must not prevent owned cleanup or replace the original failure assertion.
+            observations.put("scenarioException", Map.of("diagnosticsUnavailable", true));
+        } finally {
+            finish();
+        }
     }
     public void finish() {
         if (finished) return;

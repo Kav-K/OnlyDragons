@@ -352,6 +352,60 @@ finally:
                 process.wait()
 
 
+class BuildEvidenceTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.project = Path(self.temp.name).resolve()
+        self.reports = self.project / 'build/reports/fixture'
+        self.reports.mkdir(parents=True)
+        self.main = self.project / 'build/libs/OnlyDragons.jar'
+        self.companion = self.project / 'dev/game-tests/build/libs/OnlyDragonsGameTests.jar'
+        for path in (self.main, self.companion):
+            path.parent.mkdir(parents=True)
+            path.write_bytes(b'fixture artifact')
+        (self.project / 'build/plugin-artifact.txt').write_text(str(self.main))
+        for directory, count in [('build/test-results/test', 1), ('dev/game-tests/build/test-results/test', 2)]:
+            path = self.project / directory / 'TEST-Sample.xml'
+            path.parent.mkdir(parents=True)
+            path.write_text(self.xml(count))
+        self.companion_xml = self.project / 'dev/game-tests/build/test-results/test/TEST-Sample.xml'
+
+    @staticmethod
+    def xml(count, failure=None):
+        counts = {'failures': 0, 'errors': 0, 'skipped': 0}
+        if failure:
+            counts[failure] = 1
+        tag = {'failures': 'failure', 'errors': 'error', 'skipped': 'skipped'}.get(failure)
+        cases = ''.join('<testcase classname="Sample" name="case' + str(i) + '">'
+                        + ('<' + tag + '/>' if tag and i == 0 else '') + '</testcase>' for i in range(count))
+        return '<testsuite tests="' + str(count) + '" ' + ' '.join(key + '="' + str(value) + '"' for key, value in counts.items()) + '>' + cases + '</testsuite>'
+
+    def build(self):
+        # No JVM: emulate successful wrapper exits to exercise the evidence gate itself.
+        with patch.object(runner.subprocess, 'run', return_value=Mock(returncode=0)):
+            return runner.build_artifacts(self.project, self.project / 'java', self.reports)
+
+    def test_successful_build_records_distinct_production_and_companion_counts(self):
+        main, companion, evidence = self.build()
+        self.assertEqual((main, companion), (self.main, self.companion))
+        self.assertEqual(evidence, {'wrapperInvoked': True,
+                                  'unitTests': {'tests': 1, 'failures': 0, 'errors': 0, 'skipped': 0},
+                                  'companionUnitTests': {'tests': 2, 'failures': 0, 'errors': 0, 'skipped': 0}})
+
+    def test_successful_gradle_exit_cannot_hide_missing_companion_xml(self):
+        self.companion_xml.unlink()
+        with self.assertRaisesRegex(runner.ValidationError, 'Companion JUnit evidence is missing'):
+            self.build()
+
+    def test_successful_production_tests_cannot_hide_failed_skipped_or_empty_companion_tests(self):
+        for failure in ('failures', 'errors', 'skipped', None):
+            with self.subTest(failure=failure):
+                self.companion_xml.write_text(self.xml(2 if failure else 0, failure))
+                with self.assertRaisesRegex(runner.ValidationError, 'Companion tests failed, aborted, or skipped'):
+                    self.build()
+
+
 class PaperLogPolicyTests(unittest.TestCase):
     def test_console_and_file_error_formats_are_both_rejected(self):
         for line in ('[01:24:14 ERROR]: Failed to request yggdrasil public key',

@@ -383,6 +383,7 @@
         "dev/game-tests/suites.json",
         "dev/game-tests/acceptance.json",
         "dev/game-tests/src/main/resources/*",
+        "dev/game-tests/src/test/java/*",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/Scenario.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/ScenarioContext.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/RestartPhase.java",
