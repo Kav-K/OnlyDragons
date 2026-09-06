@@ -360,6 +360,7 @@
         "dev/game-tests/src/main/resources/*",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/Scenario.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/ScenarioContext.java",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/RestartPhase.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/Json.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/GameTestsPlugin.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/CalibrationScenario.java",
