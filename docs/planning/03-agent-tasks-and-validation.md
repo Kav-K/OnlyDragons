@@ -7,23 +7,24 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 ## Current delivery status
 
 Baseline reconciled **5 September 2026** from the checked-in source. The plugin
-still supplies starter status/reload commands and welcome messages; its four
-main Java classes do not implement the planned domain, projectile, or encounter
-systems. The previous setup validation passed 11 starter tests and built the
-artifacts on Linux. That is tooling evidence, not evidence for T00–T12 or M0–M5.
-The existing lab is available; the proposed gameplay runner does not yet exist.
+still supplies starter status/reload commands and welcome messages. T00 adds
+immutable shared domain contracts in review; the planned stat resolver, combat
+engine, and encounter systems remain to be implemented. The isolated Linux/WSL
+Paper runner and companion are integrated through T09a. The current T00 branch
+passes 21 production tests and its 29-assertion real-Paper contract scenario;
+these bounded checks do not establish the later gameplay or milestone gates.
 
 GitHub authentication is configured and the source/shared context is published
 on main. Fourteen issues now define the execution backlog. Symphony is prepared
 for three parallel coding workers and draft PR handoff; the lead may merge
 reviewed/tested PRs under the user's authorization. Actual Paper tests are
-serialized through the isolated runner being delivered in T09a. Local delegated
-agents started T00 and T09a; the automated Symphony issue-to-PR path remains to
+serialized through the integrated T09a runner. Local delegated agents delivered
+T09a and have T00 in review; the automated Symphony issue-to-PR path remains to
 be exercised. See [execution order](04-execution-backlog.md).
 
 | Task | Implementation state | Owner / issue / PR | Remaining acceptance gate |
 | --- | --- | --- | --- |
-| T00 — Contracts | In review | [#1](https://github.com/Kav-K/OnlyDragons/issues/1), [PR #15](https://github.com/Kav-K/OnlyDragons/pull/15) | Domain contracts/build reviewed at d363c5a; 21 tests pass, 0 skips. Actual Paper contract fixture pending T09a. |
+| T00 — Contracts | In review | [#1](https://github.com/Kav-K/OnlyDragons/issues/1), [PR #15](https://github.com/Kav-K/OnlyDragons/pull/15) | Independent review and Windows/Linux CI pass at 53f7e20; 21 production tests, no skips, and all 29 real-Paper contract assertions pass. Final context CI and lead integration remain; see [evidence](../../dev/agent-paper-tests.md#foundation-contract-evidence). |
 | T01 — Stats | Planned | Unassigned | Resolver, snapshot, and equipment provenance acceptance cases. |
 | T02 — Items | Planned | Unassigned | PDC/schema/identity and one-ultimate validation cases. |
 | T03 — Combat/ledger | Planned | Unassigned | Numeric fixtures, one impact authority, health/score/death invariants. |
@@ -32,13 +33,13 @@ be exercised. See [execution order](04-execution-backlog.md).
 | T06 — Firing/Duplex | Planned | Unassigned | Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence. |
 | T07 — Tracer/continuity | Planned | Unassigned | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |
 | T08 — Practice tools | Planned | Unassigned | Repeatable player procedure, permissions, and explained damage. |
-| T09 — Gameplay validation | In progress (T09a environment) | [#2](https://github.com/Kav-K/OnlyDragons/issues/2) | Runner/companion under development; required positive and deliberate-failure real-Paper checks remain gates. Feature scenario suite extends as features land. |
+| T09 — Gameplay validation | In progress (T09a integrated) | [#2](https://github.com/Kav-K/OnlyDragons/issues/2), [PR #16](https://github.com/Kav-K/OnlyDragons/pull/16) | Environment controls passed and merged; see [positive/negative calibration](../../dev/agent-paper-tests.md#accepted-calibration-evidence). Feature scenarios and human/client gates remain as features land. |
 | T10 — Prefire/performance | Planned | Unassigned | Integrated traces, human rehearsal, and measured load/cleanup gates. |
 | T11 — Eight-eye lifecycle | Planned, later | Unassigned | M3 accepted, then transaction, spawn, cancellation, and recovery gates. |
 | T12 — Variants/progression | Planned, later | Unassigned | T11 plus separately agreed roster, rewards, and acquisition scope. |
 
-No milestone M0–M5 is accepted yet. The next focus remains T00 and the
-operator-supported T04 feasibility work, followed by M1 dependencies. A task's
+No milestone M0–M5 is accepted yet. The next focus is T00 integration and the
+T01/T02/T04 foundation dependencies. A task's
 full acceptance criteria below remain authoritative; this table is a summary.
 
 Use **Planned**, **In progress**, **In review**, **Blocked**, or **Complete** for
@@ -107,7 +108,8 @@ design sections above are the current summary; this record explains changes.
 | 2026-09-05 | Shared-context setup; user request | Made the three planning documents required project context and added an agent maintenance/handoff protocol. | Starter-only source inventory reconciled; all gameplay tasks remain planned. Shared reading routes are in AGENTS.md, Cursor rules, and WORKFLOW.md. |
 | 2026-09-05 | Shared agent tooling; user request | Bundled three Minecraft skills with references/provenance; configured Context7 and project-scoped Serena for Cursor, Codex, and isolated Symphony workers. | All three skill validators passed; Windows/Linux MCP initialize/tool-list and Java-symbol checks passed. A fresh Linux issue clone discovered all three skills, connected Context7 (2 tools) and Serena (8), queried Paper docs and production lifecycle symbols. Direct Codex from a nested directory also connected. Five bridge tests and scaffold skill-preservation checks passed. No gameplay milestone advanced; see dev/agent-tools.md. |
 | 2026-09-05 | User-confirmed execution policy | Authorized feature agents to test against isolated real Minecraft, parallel coding, and lead merges of reviewed/tested PRs into main. Reuse existing local EULA acceptance; preserve human worlds and serialize JVM tests. | Existing managed dev server stopped cleanly with user permission. Fourteen issues created; T00/T09a agents started in separate clones. Bridge tests include the narrow shared lease directory (6 pass); client/milestone gates remain distinct. |
-| 2026-09-05 | T00 / #1 / PR #15 | Established shared immutable domain contracts without introducing resolver/combat engines or choosing unresolved balance rules. | d363c5a WSL Java25 wrapper build: 21 tests, no failures/errors/skips; API isolation and independent code review passed. Real Paper contract-consumer fixture pending before merge. |
+| 2026-09-05 | T09a / #2 / PR #16 | Integrated an isolated Linux/WSL runner and same-Paper companion with a shared lease, memory admission, strict reports, and owned-process cleanup. | Merged into main at 140f11c. Clean 946858d positive and deliberate-failure controls produced the expected outcomes and clean shutdown; [calibration evidence](../../dev/agent-paper-tests.md#accepted-calibration-evidence). Broader T09 gameplay and human gates remain. |
+| 2026-09-05 | T00 / #1 / PR #15 | Established shared immutable domain contracts without introducing resolver/combat engines or choosing unresolved balance rules. | Clean 53f7e20: 21 production tests, no failures/errors/skips; API isolation, independent review, and Windows/Linux CI passed. Real Paper passed all 29 contract assertions with clean unforced shutdown; [versions, hashes, and scope](../../dev/agent-paper-tests.md#foundation-contract-evidence). Final context CI and integration remain. |
 
 ## 1. Team operating contract
 
@@ -284,9 +286,9 @@ Use fake clocks and injectable random sequences, not real sleeps or flaky probab
 | P13 | Cancellation/other-plugin simulation | Cancelled launch/hit causes neither a grant of damage nor double consumption; one adapter owns native suppression. |
 | P14 | Config revision switch | Old airborne shot unchanged; new encounter adopts new profile. |
 
-The report should contain `schemaVersion`, `runId`, `scenarioId`, actual versions, seed, profile revision, assertion results, expected/observed counts, health/score totals, and failure reasons. Store JSON and a concise readable summary under `build/reports/gameplay/<runId>/`. Use a terminal completion signal tied to that run ID, then validate the JSON rather than trusting a generic success log line.
+Feature reports should contain `schemaVersion`, `runId`, `scenarioId`, actual versions, seed where applicable, profile revision, assertion results, expected/observed counts, health/score totals where applicable, and failure reasons. The integrated runner stores `result.json`, `scenario.json`, and logs under `build/reports/agent-paper/<runId>/`. It validates the companion JSON against that run and scenario's required assertions. Keep accepted findings in checked-in context as well as the ignored raw report.
 
-The existing `mcdev smoke` verifies startup/status/commands and clean shutdown. It does not currently prove gameplay or log in a player. T09 extends the pipeline with a **proposed** `scripts/Test-Gameplay.ps1` command that uses the same lab lifecycle and supplies the test companion. Add a clearly named Cursor task after that runner exists.
+The existing Windows `mcdev smoke` verifies startup/status/commands and clean shutdown; human play and Cursor lab tasks retain their Windows workflow. Agents use the integrated Linux/WSL `scripts/agent-tests/paper_test.py` runner and separate `dev/game-tests` companion against the same pinned Paper build. See [agent Paper tests](../../dev/agent-paper-tests.md) for approved EULA reuse, shared resource coordination, commands, report validation, and feature registration. These automated scenarios do not log in a player or establish client/input/visual acceptance.
 
 ## 6. Human testing procedure after M2/M3
 
