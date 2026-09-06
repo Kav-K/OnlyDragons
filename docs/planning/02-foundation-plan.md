@@ -433,7 +433,7 @@ in the accepted ledger. Bounded diagnostic retention remains an adapter concern.
 Accepted through PR #57 at `3505d6c` after the complete 28-case cohort,
 independent raw replay/review, actual-main task checkpoints and current CI.
 [Exact five requirements, evidence and limits](evidence/t08-suite.md). T08a/#39
-is lead-assigned and awaiting dispatch to extend this shared backend; M1–M5 remain unaccepted.
+is implementing the dispatched development backend; M1–M5 remain unaccepted.
 
 `ManagedCombatService` owns the plugin-lifetime settled-hit receiver. Each target
 has one `CombatEncounter`, bounded `ProcCoordinator`, exact activated session
@@ -465,6 +465,41 @@ healing, no-drop/no-XP death, and player cleanup. Dummy commands use uncapped fu
 0.25 reduced or zero-HP ferocity calibration profiles; `scenario` labels an explicit
 four-sample fractional cycle. No production ferocity balance is selected.
 [Production-only Windows player procedure](../../dev/combat-play.md).
+
+### T08a development backend (GH-39, implementation in progress)
+
+The production `DevelopmentDragonService` owns one explicit configured development
+cube and delegates every hit/proc/result to `ManagedCombatService`. `DragonBackend`
+implements the existing native projection: native HOVER, normalized
+200 native HP, one lethal `setHealth(0)` after frozen domain completion, and native
+AI enabled for the death animation. The complete immutable catalog Selection is
+retained in the encounter/result. The T06 part/phase policy is unchanged.
+
+`dev dragon setup <world-key> <x> <y> <z> <radius> <test_dragon>` validates a loaded
+namespaced world, finite coordinates, radius 16–48 and world height/border before
+atomic config.yml replacement/adoption. Missing arena keys stay unconfigured;
+invalid candidates and failed persistence retain the previous arena and unrelated
+legacy settings. `spawn`, `status`, `reset [generation]` and `result [generation]`
+require `onlydragons.practice`; omitted tokens address only the current development
+generation. Explicit stale tokens and duplicate active/reset operations reject.
+The arena projection is read-only, and setup cannot replace an active encounter.
+[Production-only Cursor procedure](../../dev/dragon-play.md).
+
+Combat admission closes at domain defeat. Native ownership and a distinct shared
+broker demand persist until removal; the existing T06 native guard consults that
+retained ownership. The immediate removal event and public removal reason are
+separate from liveness, and subscription retirement runs once on every removal
+path, including the reason-only fallback. Real death drops/XP are cleared without cancelling death.
+Native outcome/animation are separate from domain zero; ordinary defeat notification
+requires the frozen result and confirmed uncancelled native death. The bounded
+`subscribe(generation, consumer)` API emits that same result plus native UUID and
+outcome once, including proc lethals. Consumers are read-only and isolated;
+delivery/reset/removal/disable releases subscriptions. Cancelled or administrative
+native death permanently disqualifies notification for that completion. Ranking
+and its announcements remain T08b-owned. Cancelled/revived
+native death keeps diagnostic completion, never retries lethal damage, and remains
+protected until explicit reset. Reset/abort/disable do not mint results or rewards.
+The backend supplies T10's future target projection, not countdown/prefire or M3.
 
 ### Managed health
 

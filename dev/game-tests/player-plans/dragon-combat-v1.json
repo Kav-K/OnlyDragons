@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "planId": "dragon-combat-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "setup",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon setup minecraft:overworld 0 100 0 24 test_dragon"
+              }
+            },
+            {
+              "id": "spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "ordinary-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "ordinary-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "status",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon status"
+              }
+            },
+            {
+              "id": "stale-token",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset 00000000-0000-0000-0000-000000000000"
+              }
+            },
+            {
+              "id": "active-setup",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon setup minecraft:overworld 4 100 0 24 test_dragon"
+              }
+            },
+            {
+              "id": "hit0-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit0-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "hit1-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit1-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "hit2-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit2-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "hit3-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit3-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "hit4-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit4-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "hit5-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit5-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "hit6-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit6-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "late-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "late-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "hit7-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit7-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "hit8-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit8-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "result",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon result"
+              }
+            },
+            {
+              "id": "spawn-again",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "repeat",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "failed0",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "failed1",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "failed2",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "proc-spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "proc-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "proc-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "animation-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "cancel-spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "cancel-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "cancel-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "cancel-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "removal-spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "removal-held-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "removal-held-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "removal-lethal-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "removal-lethal-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

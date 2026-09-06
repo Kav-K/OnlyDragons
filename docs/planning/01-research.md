@@ -239,6 +239,21 @@ These are OnlyDragons calibration fixtures, not Hypixel measurements, native
 physical-hit proof or authenticated-client evidence. Gravity/Overload formulas
 and ferocity health coefficients remain unresolved; no upstream claim changed.
 
+### T08a native dragon initialization and terminal ownership (Paper 121)
+
+**Observed in pinned Paper fixtures, 6 September 2026:** AI-disabled native
+multipart geometry remained near origin even with the parent at arena y=100.
+Native HOVER with AI enabled updates parts and advances native death animation;
+this is a development projection, not custom flight or a Hypixel movement claim.
+
+[Pinned Paper CraftEntity source](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java)
+confirms `isValid()` includes liveness. HP zero/ANIMATING does not prove removal.
+The backend uses the immediate public removal event plus `getRemovalReason()`;
+fixtures independently verify retained ownership/tickets during animation and
+actual UUID disappearance after reset/restart. [Exact results and superseded
+iterations](evidence/t08a-focused-paper.md) preserve the earlier failed validity
+assumptions. Full-suite and human acceptance remain pending in [T08a status](03-agent-tasks-and-validation.md#t08a--managed-real-dragon-backend-and-development-controls).
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

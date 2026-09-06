@@ -13,15 +13,18 @@ public final class DevCommand implements CommandExecutor, TabCompleter {
     private final OnlyDragonsPlugin plugin;
     private final StatsCommand stats;
     private final PracticeCommand practice;
+    private final DragonCommand dragons;
 
     public DevCommand(OnlyDragonsPlugin plugin) {
         this.plugin = plugin;
         this.stats = new StatsCommand(plugin.equipment());
         this.practice = new PracticeCommand(plugin);
+        this.dragons = new DragonCommand(plugin.dragons());
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (dragons.handles(args)) { dragons.execute(sender, args); return true; }
         if (args.length > 0 && practice.handles(args)) { practice.execute(sender, args); return true; }
         String action = args.length == 0 ? "status" : args[0].toLowerCase(Locale.ROOT);
         switch (action) {
@@ -55,7 +58,7 @@ public final class DevCommand implements CommandExecutor, TabCompleter {
             options = available;
         } else {
             var combined = new java.util.ArrayList<>(stats.complete(sender, args));
-            combined.addAll(practice.complete(sender, args)); options = combined;
+            combined.addAll(practice.complete(sender, args)); combined.addAll(dragons.complete(sender, args)); options = combined;
         }
         String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
         return options.stream().filter(option -> option.startsWith(prefix)).toList();

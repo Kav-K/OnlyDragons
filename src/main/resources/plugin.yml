@@ -29,5 +29,5 @@ permissions:
     description: Inspect your last combat hit and captured inputs.
     default: true
   onlydragons.practice:
-    description: Grant practice kits and create or reset your practice target.
+    description: Grant practice kits, manage your dummy, and configure/spawn/reset the development dragon.
     default: op

@@ -59,6 +59,7 @@ public final class ManagedCombatService implements AutoCloseable {
     private final LinkedHashMap<UUID, Explanation> last = new LinkedHashMap<>();
     private final LinkedHashMap<UUID, EncounterResult> completions = new LinkedHashMap<>();
     private final List<Consumer<SettledHit>> observers = new ArrayList<>();
+    private final java.util.function.Predicate<UUID> protection = this::ownsEntity;
     private final Consumer<SettledHit> receiver = this::receive;
     private final EnchantEffects effects = EnchantEffects.calibration();
     private BukkitTask task;
@@ -67,13 +68,20 @@ public final class ManagedCombatService implements AutoCloseable {
     public ManagedCombatService(JavaPlugin plugin, OwnedBowService bows) { this.plugin = plugin; this.bows = bows; }
     public void start() {
         check(); if (task != null) throw new IllegalStateException("Already started");
-        bows.receiver(receiver); task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);
+        bows.receiver(receiver); bows.retainedProtection(protection); task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);
     }
     /** Observation only, after production processing; it cannot replace the accounting receiver. */
     public Observation observeSettled(Consumer<SettledHit> observer) {
         check(); Objects.requireNonNull(observer);
         if (observers.size() >= 8) throw new IllegalStateException("Observer capacity reached");
         observers.add(observer); return () -> { mutation(); observers.remove(observer); };
+    }
+    /** Shared control entry points must check before native allocation or persistence. */
+    public void requireMutable() { check(); }
+    public void requireMutationAllowed() { mutation(); }
+    public void readOnlyNotification(Runnable notification) {
+        mutation(); notifying = true;
+        try { notification.run(); } finally { notifying = false; }
     }
     public UUID open(UUID owner, TargetBackend backend, BoundingBox bounds, double hp, double defense,
                      String variant, CombatProfile profile, Optional<DragonCatalog.Selection> selection,
@@ -117,6 +125,12 @@ public final class ManagedCombatService implements AutoCloseable {
             if (old != null) f.procs.clearSession(old);
             reconcile(f);
         }
+    }
+    public void nativeDeathObserved(UUID entity, boolean cancelled) {
+        mutation(); for (Fight f : List.copyOf(fights.values())) if (f.entityId.equals(entity)) f.backend.deathObserved(cancelled);
+    }
+    public void nativeRemoved(UUID entity, org.bukkit.event.entity.EntityRemoveEvent.Cause cause) {
+        mutation(); for (Fight f : List.copyOf(fights.values())) if (f.entityId.equals(entity)) f.backend.removed(cause);
     }
     public void entityEnded(UUID entity) {
         mutation(); for (Fight f : List.copyOf(fights.values()))
@@ -221,7 +235,7 @@ public final class ManagedCombatService implements AutoCloseable {
             EncounterResult frozen = result.get();
             if (!completions.containsKey(frozen.completionId())) {
                 putBounded(completions, frozen.completionId(), frozen, 64);
-                frozen.participants().keySet().forEach(owner -> tell(owner, "Practice complete " + frozen.completionId()
+                if (f.backend.announcesImmediately()) frozen.participants().keySet().forEach(owner -> tell(owner, "Practice complete " + frozen.completionId()
                         + " | HP=" + frozen.participants().get(owner).actualHealthDamage()
                         + " credit=" + frozen.participants().get(owner).contributionDamage()));
             }
@@ -270,7 +284,7 @@ public final class ManagedCombatService implements AutoCloseable {
                 try { terminate(f); } catch (RuntimeException failure) { diagnostic("Fight cleanup failed: " + failure); }
             }
         } finally {
-            bows.clearReceiver(receiver); observers.clear(); history.clear(); last.clear(); completions.clear(); fights.clear();
+            bows.clearReceiver(receiver); bows.clearRetainedProtection(protection); observers.clear(); history.clear(); last.clear(); completions.clear(); fights.clear();
         }
     }
     private static void thread() { if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Managed combat requires server thread"); }

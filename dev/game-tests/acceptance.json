@@ -1042,6 +1042,115 @@
         "tracer-cleanup-abort"
       ],
       "scope": "Deliberate abort with live production shared ticket demand and service cleanup."
+    },
+    "dragon-combat": {
+      "assertions": [
+        "real_dragon_initialized",
+        "selection_retained",
+        "cancelled_hit_zero_credit",
+        "owned_arrow_exact_damage",
+        "physical_owner_and_retirement",
+        "native_suppression_observed",
+        "one_lethal_frozen_result",
+        "native_death_separate_from_domain",
+        "terminal_work_closed",
+        "native_animation_advances",
+        "one_native_death_removal",
+        "delayed_rewards_suppressed",
+        "frozen_after_late_ticks",
+        "death_releases_owned_tickets",
+        "native_xp_observer_positive_control",
+        "stale_reset_rejected",
+        "reset_no_ordinary_result",
+        "repeat_reset_no_extra_completion",
+        "proc_lethal_native_boundary",
+        "animation_reset_keeps_frozen_no_rewards",
+        "cancelled_death_is_diagnostic",
+        "cancelled_death_not_retried",
+        "cancelled_death_cleanup",
+        "native_death_rewards_cleared",
+        "failed_spawn_cleanup_0",
+        "failed_spawn_cleanup_1",
+        "failed_spawn_cleanup_2",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "three_real_arrows_held_before_lethal",
+        "same_tick_lethal_order",
+        "late_arrow_retired_without_claim",
+        "revived_terminal_native_guard",
+        "native_completion_subscription",
+        "proc_lethal_subscription",
+        "cancelled_death_no_notification",
+        "settled_close_rejected_without_poisoning",
+        "later_native_death_cannot_publish_cancelled_result",
+        "unrelated_entity_preserved",
+        "subscriptions_return_to_baseline",
+        "native_mob_drops_enabled",
+        "connected_stale_and_active_setup_reject",
+        "stale_subscription_handle_preserves_new_generation",
+        "repeated_handle_preserves_equal_registration",
+        "nonordinary_removal_before_delivery_disqualifies",
+        "retirement_callback_cleanup"
+      ],
+      "caseIds": [
+        "dragon-combat"
+      ],
+      "scope": "Production managed dragon commands, lifecycle and immutable accounting on pinned Paper; offline actor, no authentication/visual/prefire acceptance."
+    },
+    "dragon-restart-fresh": {
+      "assertions": [
+        "production_idle_on_boot",
+        "legacy_settings_preserved",
+        "loaded_arena_before_setup",
+        "production_real_dragon_active",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-restart-fresh"
+      ],
+      "scope": "Production managed dragon commands, lifecycle and immutable accounting on pinned Paper; offline actor, no authentication/visual/prefire acceptance."
+    },
+    "dragon-restart-legacy": {
+      "assertions": [
+        "production_idle_on_boot",
+        "legacy_settings_preserved",
+        "loaded_arena_before_setup",
+        "production_real_dragon_active",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "legacy_extra_preserved"
+      ],
+      "caseIds": [
+        "dragon-restart-legacy"
+      ],
+      "scope": "Production managed dragon commands, lifecycle and immutable accounting on pinned Paper; offline actor, no authentication/visual/prefire acceptance."
+    },
+    "dragon-restart-animation": {
+      "assertions": [
+        "production_idle_on_boot",
+        "legacy_settings_preserved",
+        "loaded_arena_before_setup",
+        "production_real_dragon_active",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-restart-animation"
+      ],
+      "scope": "Production shutdown during actual owned-arrow native death animation, followed by loaded old-chunk UUID absence and new generation controls; no simulated disable."
     }
   },
   "requirements": {
@@ -1361,9 +1470,14 @@
     },
     "managed-dragon-development": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Shared T08 lifecycle plus T06 physical claims on a real managed test dragon: supported phase/native damage boundary, one completion, permission-gated controls, reset/failure cleanup and no real rewards.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-combat",
+        "dragon-restart-fresh",
+        "dragon-restart-legacy",
+        "dragon-restart-animation"
+      ]
     },
     "frozen-damage-ranking": {
       "kind": "automated",

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "planId": "dragon-restart-2-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "status",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon status"
+              }
+            },
+            {
+              "id": "spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "repeat",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

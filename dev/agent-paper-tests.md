@@ -363,7 +363,7 @@ world resets or inter-boot configuration regeneration.
 The parent result contains ordered `phases`. `phase-1/` and `phase-2/` contain
 result/scenario/player JSON, server/player logs, context and plan bytes plus
 `config-before.yml` and `config-after.yml`; `config-initial.yml` is staged from
-the production JAR once. Replay verifies file hashes, public production config
+the production JAR once, unless the descriptor declares the bounded seed below. Replay verifies file hashes, public production config
 observations, actual world UUID, phase invocation/process windows, ordinary
 assertions/messages/journals, exact intended abort and both JVM cleanups. The
 export allowlist adds only the declared restart profile's final
@@ -380,3 +380,14 @@ to carry immutable expected native identities/chunk coordinates between boots.
 The context does not reset production state. T08a/#39 must leave its production
 encounter active before shutdown, then load those chunks and assert old native
 UUID absence, production idle and successful new spawn/reset itself.
+
+T08a adds optional `initialConfig: {"path": "dev/game-tests/config-seeds/dragon-legacy.yml", "sha256": "<exact file hash>"}`
+to the same catalog descriptor. The seed must be tracked, resolve without symlinks,
+match `dev/game-tests/config-seeds/[a-z0-9-]+.yml`, be at most 64 KiB, and decode as
+UTF-8. Validation and replay verify its exact hash; it is staged only before boot
+one. Omitting it retains the production-JAR default. No inter-boot write or new
+launcher is introduced. `dragon-restart-fresh`, `dragon-restart-legacy` and
+`dragon-restart-animation` use this route to verify production setup/readback and
+old native UUID removal. Their fixture cleanup never resets the first-boot
+production encounter. [Focused feature evidence](../docs/planning/evidence/t08a-focused-paper.md)
+and [human operator workflow](dragon-play.md) remain distinct.

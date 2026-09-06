@@ -1,0 +1,3 @@
+welcome-enabled: false
+welcome-message: 'Legacy hello {player}'
+legacy-extra: keep-me
