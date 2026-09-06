@@ -9,7 +9,7 @@ import org.bukkit.entity.EnderDragon;
 /** Real disposable dragon projection shared with future hatch controls. Own until native removal. */
 public final class DragonBackend implements TargetBackend {
     private EnderDragon entity;
-    private boolean lethal, announced, issuingLethal, disqualified, confirmed, removed;
+    private boolean lethal, announced, issuingLethal, disqualified, confirmed, removed, retired;
     private final java.util.function.Consumer<EncounterResult> completion;
     private final java.util.function.Consumer<DragonBackend> retirement;
     private String outcome = "ALIVE";
@@ -50,7 +50,7 @@ public final class DragonBackend implements TargetBackend {
             if (!confirmed) { disqualified = true; if (!outcome.equals("DEATH_CANCELLED")) outcome = "NATIVE_MISMATCH"; }
         } else entity.setHealth(200 * state.currentHealth() / state.maxHealth());
     }
-    public void defeated(EncounterResult result) { this.result = result; if (disqualified) retirement.accept(this); else announce(); }
+    public void defeated(EncounterResult result) { this.result = result; if (disqualified) retire(); else announce(); }
     public boolean announcesImmediately() { return false; }
     public String outcome() { return outcome; }
     public void deathObserved(boolean cancelled) {
@@ -62,11 +62,16 @@ public final class DragonBackend implements TargetBackend {
     public void removed(org.bukkit.event.entity.EntityRemoveEvent.Cause cause) {
         removed = true;
         if (cause != org.bukkit.event.entity.EntityRemoveEvent.Cause.DEATH) disqualified = true;
-        outcome = "REMOVED_" + cause; retirement.accept(this);
+        outcome = "REMOVED_" + cause; retire();
     }
     private void announce() {
         if (announced || disqualified || !confirmed || result == null || !outcome.equals("ANIMATING") || actuallyRemoved() || entity.getHealth() != 0) return;
         announced = true; completion.accept(result);
+    }
+    private void retire() {
+        if (retired) return;
+        retired = true;
+        retirement.accept(this);
     }
     private boolean actuallyRemoved() {
         // The event arrives before Paper assigns its removal reason; retain both observations.
@@ -74,12 +79,12 @@ public final class DragonBackend implements TargetBackend {
     }
     public boolean released() {
         // isValid() also tests liveness: a zero-HP dragon still owns its native animation.
-        if (actuallyRemoved()) { tickets.endArena(ticketOwner); return true; }
+        if (actuallyRemoved()) { tickets.endArena(ticketOwner); retire(); return true; }
         return false;
     }
     public boolean lethalRequested() { return lethal; }
     public void close() {
         try { if (entity != null && !actuallyRemoved()) { disqualified = true; outcome = "RESET"; entity.remove(); removed = true; } }
-        finally { tickets.endArena(ticketOwner); retirement.accept(this); }
+        finally { tickets.endArena(ticketOwner); retire(); }
     }
 }
