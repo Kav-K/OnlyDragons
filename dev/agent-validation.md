@@ -98,8 +98,22 @@ task, rather than only the changed-area checks. Without `--automated`, a valid
 local receipt returns exit 2 while external review/CI gates are pending. Local
 JSON booleans cannot approve a merge. The optional `--snapshot` accepts a fresh,
 sanitized GitHub issue-state export to detect closed-but-incomplete tasks and
-dispatch across unmet prerequisites; its schema is documented by `--help` and
-the checkpoint's tests. Refresh the export instead of reusing stale live state.
+dispatch across unmet prerequisites. Include exactly every mapped task issue,
+using this shape; `capturedAtEpochMs` must be an actual capture time no older
+than fifteen minutes. Refresh the export instead of reusing stale live state.
+
+```json
+{
+  "schemaVersion": 1,
+  "repository": "Kav-K/OnlyDragons",
+  "capturedAtEpochMs": 0,
+  "issues": [{"number": 1, "state": "closed", "labels": []}]
+}
+```
+
+The zero timestamp and one-row list above illustrate the shape only and will
+fail validation. Issue state is `open` or `closed`; labels are names, including
+`symphony` when dispatched. Do not include issue bodies, tokens or credentials.
 
 The integration lead separately reviews behavior against the foundation plan,
 checks current-main compatibility and CI on the latest PR head, and merges one
