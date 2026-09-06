@@ -37,12 +37,21 @@ projectile shot-time capture, and the practice dummy are later tasks.
    compiled item/stat catalogs require a restart.
 7. After edits use `.\mcdev restart`, reconnect, then finish with `.\mcdev stop`.
 
+The Windows operator ran the exact default Cursor **Minecraft: Build and test**
+target on clean main `73a8cc8`: `powershell.exe -NoProfile -ExecutionPolicy Bypass
+-File scripts/Dev.ps1 Build` exited 0 with `BUILD SUCCESSFUL` in 16 seconds.
+Parsed JUnit recorded 82 tests with zero failures/errors/skips; see
+[build evidence](game-tests/findings/t09c-baseline.md#build-review-and-ci-evidence).
+
 Record the tested commit, client/version, account permission setup and observed
-chat/lore/input feel. **Windows Play/smoke, human visuals, authenticated account
-and multiplayer checks are pending** until an operator records them. Objective
-real-player command/equipment/lifecycle assertions are implemented in
-`equipment-player` under [#28](https://github.com/Kav-K/OnlyDragons/issues/28);
-their final integrated suite and review remain pending, rather than requiring manual proof alone.
+chat/lore/input feel. **Windows Play/smoke, human visuals and input feel, authenticated
+account and multiplayer checks are pending** until an operator records them. Objective
+real-player command/equipment/lifecycle acceptance is complete in
+[PR #32](https://github.com/Kav-K/OnlyDragons/pull/32), merged at `73a8cc8`: the full shared baseline passed
+47 `equipment-player-v2` assertions and eight required actual received-message checks.
+See [durable evidence](game-tests/findings/t09c-baseline.md). This uses a disposable
+offline protocol player and scoped server API controls; it does not establish
+authenticated play, human visuals/input feel, or multiplayer.
 MockBukkit events and synthetic Paper inventory/command senders do not establish
 real-player gates. The shared suite includes `equipment-stats`, `item-identity`
 and `equipment-player`; follow [the agent validation guide](agent-validation.md).

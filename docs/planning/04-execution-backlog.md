@@ -22,9 +22,9 @@ part of the worker's scope.
 | T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Resumed after T09b merged at 5b0e030; partial PR #22 integrated at 586a170 | Shooterless arrow/dragon findings are partial. Full acceptance still requires player-owned native suppression and semantic head/native-damage evidence; #9 stays blocked. |
 | T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | Complete: PR #27 merged at 5b0e030 | Final 1dd6ffe positive/early-exit/timeout calibration verified with dual reports and client/server cleanup; independent review and final-head CI passed. [Evidence](../../dev/agent-paper-tests.md#protocol-player-evidence). This does not accept the feature-specific T04 gates. |
 | T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | Complete: PR #26 merged at 9092fbe | Clean 633d81c passed 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions with clean shutdown; independent review and final-head CI passed. [Evidence](03-agent-tasks-and-validation.md#t03-combat-validation). |
-| T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | Playable PR #29 merged at a48ebd4; connected acceptance in #28 | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
+| T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | Complete: playable PR #29 at a48ebd4; objective connected acceptance in PR #32 at 73a8cc8 | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
 | T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Draft PR #30 in review; current-main/shared suite pending | Bounded procs and enchant state. |
-| T09c | [#28](https://github.com/Kav-K/OnlyDragons/issues/28) | T00/T09a/T09b integrated; lead-delegated work | Shared regression suites, connected-player equipment fixture, and evidence/dependency checkpoints. No duplicate Symphony dispatch. |
+| T09c | [#28](https://github.com/Kav-K/OnlyDragons/issues/28) | Complete: PR #32 merged at 73a8cc8 | Shared regression suites, connected-player equipment/message fixture, actor lock-cycle regression/40-second soak, and evidence/dependency checkpoints. All 15 baseline cases met their declared outcomes; [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). P01–P14 and M0–M5 remain pending. |
 | T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b, T02, fully accepted T04; blocked | Bow/shortbow/Duplex capture and owned projectiles. Merging partial PR #22 or passing T09b alone does not release this gate. |
 | T07 | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | T04, T06 | Tracer steering and arrow continuity. |
 | T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | T01b, T03, T05, T06 | Playable dummy combat and explanations. |
@@ -34,7 +34,7 @@ part of the worker's scope.
 
 Symphony has three coding slots. Label only tasks whose prerequisites are
 integrated into main and whose manual gates are satisfied. #6 and #20 are merged,
-#7 is merged pending connected acceptance in #28. Drafts #30/#31 await current-main/shared-suite reconciliation; #9 must remain undispatched. Issue/PR state owns live claims;
+#7 and #28 are complete after PR #32 at `73a8cc8`; objective connected-player equipment acceptance is verified. Drafts #30/#31 await current-main/shared-suite reconciliation; #9 must remain undispatched. Issue/PR state owns live claims;
 the lead reconciles this summary after each serial merge.
 All server scenarios share one lease and obey the memory gate, regardless of
 how many agents are coding. A ready branch is not a satisfied dependency.
@@ -91,8 +91,9 @@ These issues and their PRs are closed after review, validation and merge.
 
 ## Human pull-and-play path
 
-The default branch is `main`. Once the stats inspection slice (#7) is integrated,
-pull main into the existing Cursor checkout, run **Minecraft: Build and test**,
+The default branch is `main`; the stats inspection slice (#7) and objective connected-player acceptance are integrated. The operator ran the exact default Cursor **Minecraft: Build and test** target on clean main `73a8cc8`: exit 0, `BUILD SUCCESSFUL` in 16 seconds, 82 production tests and zero failures/errors/skips. [Build evidence](../../dev/game-tests/findings/t09c-baseline.md#build-review-and-ci-evidence). Windows Play/smoke and authenticated/multiplayer/visual/feel checks remain unrun.
+
+For subsequent work, pull main into the existing Cursor checkout and run **Minecraft: Build and test**,
 then **Minecraft: Play (build + start server)** or **Minecraft: Run local Paper**.
 The feature PR must supply a short matching-client command sequence to inspect
 stats and grant calibration gear. Later combat/prefire PRs extend that sequence.

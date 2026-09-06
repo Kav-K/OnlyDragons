@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "Kav-K/OnlyDragons",
-  "baselineRevision": "a48ebd40c8f1efa8a2ae92f193f824929734e486",
+  "baselineRevision": "73a8cc8637d8044a1687dff67eab50cab057b5c1",
   "notice": "Historical integrated state and durable references only. Fresh machine evidence, independent review and current CI are checked separately. No milestone is accepted.",
   "tasks": {
     "T00": {
@@ -49,9 +49,23 @@
       }
     },
     "T09c": {
-      "status": "active",
-      "completedRequirements": [],
-      "evidence": {}
+      "status": "complete",
+      "completedRequirements": [
+        "suite-baseline",
+        "checkpoint-unit-checks"
+      ],
+      "evidence": {
+        "suite-baseline": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/32",
+          "revision": "73a8cc8637d8044a1687dff67eab50cab057b5c1"
+        },
+        "checkpoint-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/32",
+          "revision": "73a8cc8637d8044a1687dff67eab50cab057b5c1"
+        }
+      },
+      "mergedRevision": "73a8cc8637d8044a1687dff67eab50cab057b5c1",
+      "notice": "PR #32 integrated the reviewed full 15-case baseline and strict suite/checkpoint validation. Durable evidence: dev/game-tests/findings/t09c-baseline.md. The Windows operator Cursor Build target passed on clean main 73a8cc8 with 82 production tests and zero failures/errors/skips. Windows Play/smoke, authenticated multiplayer, human visuals and input feel remain unrun; no gameplay milestone is accepted."
     },
     "T01a": {
       "status": "complete",
@@ -111,17 +125,23 @@
       }
     },
     "T01b": {
-      "status": "partial",
+      "status": "complete",
       "completedRequirements": [
-        "equipment-service"
+        "equipment-service",
+        "equipment-player"
       ],
       "evidence": {
         "equipment-service": {
           "url": "https://github.com/Kav-K/OnlyDragons/pull/29",
           "revision": "4c28474b54e2a2aa25d6242d12525f8783c4ea1b"
+        },
+        "equipment-player": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/32",
+          "revision": "73a8cc8637d8044a1687dff67eab50cab057b5c1"
         }
       },
-      "notice": "Playable equipment/commands merged at a48ebd4; connected-player acceptance awaits T09c full suite/review."
+      "notice": "PR #29 equipment/service evidence is retained. PR #32 completes objective connected-player equipment, permission, received command text and lifecycle acceptance; see dev/game-tests/findings/t09c-baseline.md. The Windows operator Cursor Build target passed on clean main 73a8cc8 with 82 production tests. Windows Play/smoke and authenticated/multiplayer/visual/feel observations remain separate and unrun.",
+      "mergedRevision": "73a8cc8637d8044a1687dff67eab50cab057b5c1"
     },
     "T05": {
       "status": "in-review",
