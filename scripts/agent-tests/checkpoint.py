@@ -289,6 +289,10 @@ def validate_no_weakening(project, base, validated):
     if previous is not None:
         require(set(previous) <= set(current_scenarios), 'Previously registered scenario removed')
         for key, value in previous.items():
+            if 'phases' in value or 'catalogMode' in value:
+                require(value.get('catalogMode') == current_scenarios[key].get('catalogMode')
+                        and value.get('phases') == current_scenarios[key].get('phases'),
+                        'Previously bound restart phases changed: ' + key)
             require(set(value['requiredAssertions']) <= set(current_scenarios[key]['requiredAssertions']),
                     'Previously required scenario assertion removed: ' + key)
             messages = {item['id']: item for item in current_scenarios[key].get('requiredPlayerMessages', [])}

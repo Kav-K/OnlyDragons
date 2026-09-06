@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "planId": "restart-phase-1-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "reload",
+              "action": "command",
+              "args": {
+                "command": "onlydragons reload"
+              }
+            },
+            {
+              "id": "status",
+              "action": "command",
+              "args": {
+                "command": "onlydragons status"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "reload",
+              "action": "command",
+              "args": {
+                "command": "onlydragons reload"
+              }
+            },
+            {
+              "id": "status",
+              "action": "command",
+              "args": {
+                "command": "onlydragons status"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

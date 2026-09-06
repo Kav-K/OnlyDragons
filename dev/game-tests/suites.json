@@ -86,6 +86,18 @@
       "expectation": "cleanup-abort",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 60
+    },
+    "same-profile-restart": {
+      "scenarioId": "same-profile-restart",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 60
+    },
+    "same-profile-restart-abort": {
+      "scenarioId": "same-profile-restart-abort",
+      "expectation": "cleanup-abort",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 60
     }
   },
   "suites": {
@@ -101,7 +113,8 @@
       "equipment-player",
       "protocol-player-soak",
       "projectile-player-feasibility",
-      "headless-player-primitives"
+      "headless-player-primitives",
+      "same-profile-restart"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -109,7 +122,8 @@
       "projectile-cleanup-abort",
       "protocol-player-early-exit",
       "protocol-player-idle",
-      "headless-player-cleanup-abort"
+      "headless-player-cleanup-abort",
+      "same-profile-restart-abort"
     ],
     "all": [
       "lifecycle-calibration",
@@ -129,7 +143,9 @@
       "protocol-player-soak",
       "projectile-player-feasibility",
       "headless-player-primitives",
-      "headless-player-cleanup-abort"
+      "headless-player-cleanup-abort",
+      "same-profile-restart",
+      "same-profile-restart-abort"
     ]
   },
   "areas": {
@@ -176,7 +192,9 @@
         "protocol-player-soak",
         "projectile-player-feasibility",
         "headless-player-primitives",
-        "headless-player-cleanup-abort"
+        "headless-player-cleanup-abort",
+        "same-profile-restart",
+        "same-profile-restart-abort"
       ],
       "affects": [
         "stats",
@@ -337,7 +355,9 @@
         "protocol-player-soak",
         "projectile-player-feasibility",
         "headless-player-primitives",
-        "headless-player-cleanup-abort"
+        "headless-player-cleanup-abort",
+        "same-profile-restart",
+        "same-profile-restart-abort"
       ],
       "affects": []
     },

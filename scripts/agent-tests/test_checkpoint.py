@@ -128,6 +128,16 @@ class CheckpointTests(unittest.TestCase):
         self.change(BACKLOG, lambda value: next(task for task in value['tasks'] if task['id'] == 'T00')['dependsOn'].append('T01a'))
         self.reject_plan('dependency cycle')
 
+    def test_restart_phase_bindings_cannot_be_removed_or_weakened(self):
+        previous = {SCENARIOS: self.read(SCENARIOS)}
+        for mutation in (lambda phase: phase['requiredAssertions'].pop(),
+                         lambda phase: phase['requiredActorMessages'].pop(),
+                         lambda phase: phase.update(playerActionPlan='dev/game-tests/player-plans/cleanup-abort-v1.json')):
+            self.write(SCENARIOS, previous[SCENARIOS])
+            self.change(SCENARIOS, lambda value: mutation(value['same-profile-restart']['phases'][1]))
+            with self.assertRaisesRegex(checkpoint.CheckpointError, 'restart phases changed'):
+                self.baseline(previous)
+
     def test_issue_mapping_drift_rejected(self):
         self.change(MAPPING, lambda value: value.pop('T04'))
         self.reject_plan('issue mapping drift')

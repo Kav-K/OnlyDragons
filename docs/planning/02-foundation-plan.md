@@ -557,6 +557,26 @@ behavior before T08 connects combat/procs; full HP/ghost-score attribution stays
 required at T08 and M3. This keeps the service consumer out of its producer's
 completion prerequisites. M3 still requires the requested human visual prefire rehearsal.
 
+### T09e fixed restart validation contract (GH-49)
+
+Adopted within lead-assigned validation maintenance: `same-profile-restart-v1`
+executes exactly two catalog-bound boots in one disposable profile/world/port,
+with one staged binary cohort and shared lease. Each boot receives fresh memory
+admission, nonce, separately hashed action plan, process windows and ordinary
+scenario/client evidence. Nonces retain the parent's ten-character actor prefix;
+the declared actor order and whitelist remain unchanged. Saved configuration
+bytes pass unchanged from the first clean shutdown to the second startup.
+
+`ScenarioContext.restartPhase()` exposes parent/index/nonce and the preceding
+immutable scenario report for later consumers. Its observations may retain native
+UUID/chunk coordinates; it never resets production state. T08a/#39 must leave its
+production encounter active before shutdown, load its old chunks after restart,
+and prove the native UUID absent plus production idle and new spawn/reset. T09e's
+starter greeting/configuration and connected reload/status calibration does not
+satisfy that future feature gate. Human profiles and single-boot contracts remain
+unchanged; [runner details](../../dev/agent-paper-tests.md#same-profile-restart-fixtures)
+define the fixed evidence envelope.
+
 ## 13. Milestones and completion gates
 
 | Milestone | Playable outcome | Exit gate |

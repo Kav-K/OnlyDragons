@@ -264,6 +264,12 @@
       "reviewedRevision": "3047a56b0ed0c634034841b776752e71b55ac857",
       "notice": "Implementation and all five automated requirements verified: full 17-case hosted suite, independent unchanged-artifact replay and task checkpoint, 82 production/28 client tests, 238 Linux runner/checkpoint tests and passing current-runtime CI. Exact evidence: docs/planning/evidence/t09d-suite.md. PR #44 merged at 9def91f75d655caaccd6c7fa01313e4ba3a0ea54; the reviewed runtime evidence remains unchanged. Downstream dispatch still requires each task's remaining prerequisites and owner-applied label. Generic calibration does not complete production multiplayer firing/accounting, T04, P01-P14, human authentication/visual/feel checks or any milestone.",
       "mergedRevision": "9def91f75d655caaccd6c7fa01313e4ba3a0ea54"
+    },
+    "T09e": {
+      "status": "in-review",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Implementation in progress on GH-49; focused actual Paper and independent full-cohort acceptance pending. No gameplay or milestone acceptance."
     }
   },
   "milestones": {
