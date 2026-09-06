@@ -2,7 +2,8 @@
 
 Bounded continuation of [GH-11](https://github.com/Kav-K/OnlyDragons/issues/11#issuecomment-5560209249)
 in [draft PR #57](https://github.com/Kav-K/OnlyDragons/pull/57). T08 remains In review;
-this evidence does not accept T07, T08 or a milestone. The original T08 focused
+this focused evidence does not accept T08 or a milestone. T07 was subsequently
+accepted separately by the lead and merged through PR #56. The original T08 focused
 cohort remains in [its evidence archive](t08-focused.md).
 
 ## Integration and preserved contracts
@@ -33,10 +34,13 @@ that is an oracle check, separate from the fresh runtime results below.
 
 All five cases ran at clean `dacc6e7ee2ec8fa59562689898d076f10da396d2` on pinned
 Minecraft 26.2 / Paper 121 / JDK 25.0.4.1, through `paper_test.py`, existing EULA,
-disposable loopback profiles and the shared lease/memory gate. Current main
-`89d584fab675ed111a1a1d733f667b3a1f3cbf53` is integrated; the post-run normal main
-merge reported already up to date. T07's candidate is a reviewed peer, not yet
-claimed as accepted main here.
+disposable loopback profiles and the shared lease/memory gate. The initial
+cohort includes main `89d584fab675ed111a1a1d733f667b3a1f3cbf53`. After the lead
+accepted T07, normal merge `26684af819f22d57dde633a8538b44f1d88535dc` integrates
+actual main `2c0be584247a0fbaa409e21565f7289cc27daa06`. Every runtime/scenario
+file hash, mode and Git input tree matches the tested `dacc6e7` cohort exactly.
+All five raw cases were independently replayed again after that merge; no input
+change required a new server run. Static plan and changed-area selection pass.
 
 | Case | Run ID | Verified outcome |
 | --- | --- | --- |
@@ -72,10 +76,11 @@ No earlier different-artifact receipt was reused as current evidence.
 ## Remaining integration gates
 
 Per dispatch, the lead owns the complete combined hosted cohort, independent
-suite replay/T08 acceptance checkpoint, current CI and serial merge. The worker
-will normally merge the lead's accepted T07 main update when notified, inspect
-changed inputs and rerun affected checks; unchanged relevant inputs require
-explicit identity verification rather than a new gameplay claim.
+suite replay/T08 acceptance checkpoint, current CI and serial merge. Actual T07 main
+is normally integrated and its unchanged inputs are explicitly verified above.
+The focused replay after main is retained beside the case review as
+`actual-main-replay.json`; it preserves the original tested revision and raw
+records. Subsequent documentation-only commits do not create new Paper evidence.
 
 Windows Cursor Build/Play, authenticated-client compatibility, visuals/feel and
 performance remain unrun. The [production-only player procedure](../../../dev/combat-play.md)

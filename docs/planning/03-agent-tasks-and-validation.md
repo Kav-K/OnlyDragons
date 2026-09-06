@@ -482,9 +482,10 @@ from satisfying last-hit inspection. Every parent fixture/assertion remains inta
 inputs, artifacts, case replay and cleanup; [original T08 evidence](evidence/t08-focused.md)
 retains the previous cohort and superseded iterations. All 269 Python tests and
 static 28-case plan checks pass. The lead retains the complete combined hosted
-cohort, independent replay/T08 acceptance checkpoint, CI and merge. Accepted T07
-main integration is pending notification; no focused result accepts a requirement
-or milestone. Windows Build/Play, authentication, visuals and performance remain
+cohort, independent replay/T08 acceptance checkpoint, CI and merge. Lead-accepted T07 main `2c0be58` is normally integrated at
+`26684af`; complete relevant input identities match tested `dacc6e7`, and all five
+raw cases replay successfully after that merge. No focused result accepts T08
+or a milestone. Windows Build/Play, authentication, visuals and performance remain
 unrun. #39/#40 consume the published backend and frozen provenance contracts.
 
 ### T08a — Managed real-dragon backend and development controls
