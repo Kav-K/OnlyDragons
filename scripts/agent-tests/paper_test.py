@@ -534,15 +534,20 @@ def build_artifacts(project, java_home, report_root):
     require(main.is_relative_to(project / 'build') and main.is_file(), 'Production artifact is missing or outside this checkout build directory')
     companion = project / 'dev/game-tests/build/libs/OnlyDragonsGameTests.jar'
     require(companion.is_file(), 'Game-test companion is missing')
-    tests = list((project / 'build/test-results/test').glob('TEST-*.xml'))
-    require(tests, 'Production JUnit evidence is missing')
-    counts = {key: 0 for key in ('tests', 'failures', 'errors', 'skipped')}
-    for file in tests:
-        suite = ET.parse(file).getroot()
-        for key in counts:
-            counts[key] += int(suite.attrib.get(key, '0'))
-    require(counts['tests'] > 0 and not any(counts[key] for key in ('failures', 'errors', 'skipped')), 'Production tests failed, aborted, or skipped')
-    return main, companion, {'wrapperInvoked': True, 'unitTests': counts}
+    evidence = {'wrapperInvoked': True}
+    for label, directory, key in [('Production', 'build/test-results/test', 'unitTests'),
+                                  ('Companion', 'dev/game-tests/build/test-results/test', 'companionUnitTests')]:
+        tests = list((project / directory).glob('TEST-*.xml'))
+        require(tests, label + ' JUnit evidence is missing')
+        counts = {name: 0 for name in ('tests', 'failures', 'errors', 'skipped')}
+        for file in tests:
+            suite = ET.parse(file).getroot()
+            for name in counts:
+                counts[name] += int(suite.attrib.get(name, '0'))
+        require(counts['tests'] > 0 and not any(counts[name] for name in ('failures', 'errors', 'skipped')),
+                label + ' tests failed, aborted, or skipped')
+        evidence[key] = counts
+    return main, companion, evidence
 
 
 def stage_artifact(source, destination, expected_sha256):

@@ -20,6 +20,10 @@ import paper_suite as suite
 
 
 class ReceiptFixture:
+    COMPANION_XML = ('<testsuite tests="2" failures="0" errors="0" skipped="0">'
+                     '<testcase classname="Diagnostics" name="location"/>'
+                     '<testcase classname="Diagnostics" name="boundedCauses"/></testsuite>')
+
     def __init__(self, root):
         self.root = root
         self.run_id, self.suite_id = 'a' * 32, 'b' * 32
@@ -67,6 +71,8 @@ class ReceiptFixture:
         self.write(self.reports / 'build.log', 'BUILD SUCCESSFUL\n')
         test_path = self.suite_root / 'fixture/production/TEST-Sample.xml'
         self.write(test_path, '<testsuite tests="1" failures="0" errors="0" skipped="0"><testcase classname="Sample" name="boundary"/></testsuite>')
+        companion_test_path = self.suite_root / 'fixture/companion/TEST-Diagnostics.xml'
+        self.write(companion_test_path, self.COMPANION_XML)
         self.scenario = {'schemaVersion': 1, 'runId': self.run_id, 'scenarioId': 'fixture', 'mechanicRevision': 'fixture-v1',
                          'state': 'complete', 'syntheticActors': True, 'passed': True,
                          'startedAtEpochMs': self.start + 2000, 'completedAtEpochMs': self.end - 2000,
@@ -83,10 +89,12 @@ class ReceiptFixture:
                                    'authentication': 'authenticated', 'testPlayerMode': None},
                        'artifacts': {'productionSha256': suite.runner.sha256(self.profile / 'plugins/OnlyDragons.jar'),
                                      'gameTestsSha256': suite.runner.sha256(self.profile / 'plugins/OnlyDragonsGameTests.jar')},
-                       'build': {'wrapperInvoked': True, 'unitTests': {'tests': 1, 'failures': 0, 'errors': 0, 'skipped': 0}}}
+                       'build': {'wrapperInvoked': True, 'unitTests': {'tests': 1, 'failures': 0, 'errors': 0, 'skipped': 0},
+                                 'companionUnitTests': {'tests': 2, 'failures': 0, 'errors': 0, 'skipped': 0}}}
         self.record = {'caseId': 'fixture', 'scenarioId': 'fixture', 'runId': self.run_id, 'exitCode': 0,
                        'startedAtEpochMs': self.start, 'completedAtEpochMs': self.end,
-                       'testEvidence': [{'kind': 'production', 'path': test_path.relative_to(root).as_posix(), 'sha256': suite.runner.sha256(test_path)}]}
+                       'testEvidence': [{'kind': kind, 'path': path.relative_to(root).as_posix(), 'sha256': suite.runner.sha256(path)}
+                                        for kind, path in [('production', test_path), ('companion', companion_test_path)]]}
         self.receipt = {'schemaVersion': 1, 'kind': 'paper-suite-receipt', 'suiteRunId': self.suite_id, 'state': 'complete', 'passed': True,
                         'startedAtEpochMs': self.start, 'completedAtEpochMs': self.end, 'source': self.source,
                         'selection': suite.selection(root), 'cases': [self.record]}
@@ -115,6 +123,7 @@ class ReceiptFixture:
             self.record[key + 'Path'] = path.relative_to(self.root).as_posix()
             self.record[key + 'Sha256'] = suite.runner.sha256(path)
         self.record['verified'] = {'assertions': len(self.scenario['assertions']), 'unitTests': self.result['build']['unitTests'],
+                                   'companionUnitTests': self.result['build'].get('companionUnitTests'),
                                    'artifacts': self.result['artifacts'], 'client': None, 'expectedOutcome': 'positive'}
         self.json(self.path, self.receipt)
 
@@ -231,6 +240,53 @@ class EvidenceTests(unittest.TestCase):
     def test_duplicate_test_evidence_cannot_inflate_test_counts(self):
         self.rejected(lambda: self.fixture.record['testEvidence'].append(self.fixture.record['testEvidence'][0]))
 
+    def test_companion_totals_are_replayed_separately_from_production(self):
+        verified = self.fixture.validate()['cases'][0]['verified']
+        self.assertEqual(verified['unitTests'], {'tests': 1, 'failures': 0, 'errors': 0, 'skipped': 0})
+        self.assertEqual(verified['companionUnitTests'], {'tests': 2, 'failures': 0, 'errors': 0, 'skipped': 0})
+
+    def test_missing_companion_category_file_or_build_summary_cannot_pass(self):
+        f = self.fixture
+        evidence = copy.deepcopy(f.record['testEvidence'])
+        self.rejected(lambda: f.record.update(testEvidence=evidence[:1]))
+        f.record['testEvidence'] = evidence
+        path = f.root / evidence[1]['path']
+        self.rejected(path.unlink)
+        f.write(path, f.COMPANION_XML)
+        self.rejected(lambda: f.result['build'].pop('companionUnitTests'))
+
+    def test_companion_summary_cannot_borrow_production_counts_or_boolean_totals(self):
+        f = self.fixture
+        for counts in (f.result['build']['unitTests'], {'tests': 2, 'failures': False, 'errors': 0, 'skipped': 0}):
+            with self.subTest(counts=counts):
+                self.rejected(lambda: f.result['build'].update(companionUnitTests=counts))
+
+    def test_companion_xml_bytes_and_category_location_are_bound(self):
+        f = self.fixture
+        item = f.record['testEvidence'][1]
+        path = f.root / item['path']
+        self.rejected(lambda: f.write(path, f.COMPANION_XML.replace('location', 'different')), refresh=False)
+        f.write(path, f.COMPANION_XML)
+        self.rejected(lambda: item.update(kind='production'))
+        item['kind'] = 'companion'
+        self.rejected(lambda: f.record['testEvidence'].append(copy.deepcopy(item)))
+
+    def test_companion_failures_skips_empty_or_forged_xml_cannot_pass_even_with_new_hash(self):
+        f = self.fixture
+        item = f.record['testEvidence'][1]
+        path = f.root / item['path']
+        for tag, summary in [('failure', 'failures'), ('error', 'errors'), ('skipped', 'skipped')]:
+            for declared in (0, 1):
+                with self.subTest(tag=tag, declared=declared):
+                    xml = f.COMPANION_XML.replace('name="location"/>', 'name="location"><' + tag + '/></testcase>')
+                    xml = xml.replace(summary + '="0"', summary + '="' + str(declared) + '"')
+                    f.write(path, xml)
+                    item['sha256'] = suite.runner.sha256(path)
+                    self.rejected(lambda: None)
+        f.write(path, '<testsuite tests="0" failures="0" errors="0" skipped="0"/>')
+        item['sha256'] = suite.runner.sha256(path)
+        self.rejected(lambda: f.result['build']['companionUnitTests'].update(tests=0))
+
     def test_runtime_resource_markdown_invalidates_receipt(self):
         f = self.fixture
         f.write('src/main/resources/help.md', 'Changed packaged bytes\n')
@@ -270,6 +326,42 @@ class EvidenceTests(unittest.TestCase):
             f.validate()
 
 
+class CapturedTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name).resolve()
+        self.suite_root = self.root / 'build/reports/agent-paper-suites' / ('c' * 32)
+        self.roots = {'production': self.root / 'build/test-results/test',
+                      'companion': self.root / 'dev/game-tests/build/test-results/test',
+                      'player': self.root / 'dev/player-client/build/test-results/test'}
+        self.contents = {}
+        for kind, directory in self.roots.items():
+            directory.mkdir(parents=True)
+            self.contents[kind] = ('<testsuite tests="1" failures="0" errors="0" skipped="0">'
+                                   '<testcase classname="' + kind + '" name="boundary"/></testsuite>').encode()
+            (directory / 'TEST-Sample.xml').write_bytes(self.contents[kind])
+
+    def test_capture_preserves_exact_xml_and_separate_categories_after_build_reports_change(self):
+        evidence = suite.capture_tests(self.root, self.suite_root, 'actor-case', True)
+        self.assertEqual([row['kind'] for row in evidence], ['production', 'companion', 'player'])
+        for row in evidence:
+            (self.roots[row['kind']] / 'TEST-Sample.xml').write_bytes(b'next build')
+            path = suite.checked_file(self.root, row, 'path', 'sha256')
+            self.assertEqual(path.read_bytes(), self.contents[row['kind']])
+            self.assertEqual(suite.junit_counts([path])['tests'], 1)
+        # A non-player case must still capture both plugin build categories.
+        for kind, directory in self.roots.items():
+            (directory / 'TEST-Sample.xml').write_bytes(self.contents[kind])
+        evidence = suite.capture_tests(self.root, self.suite_root, 'server-case', False)
+        self.assertEqual([row['kind'] for row in evidence], ['production', 'companion'])
+
+    def test_successful_build_without_companion_xml_cannot_be_captured(self):
+        (self.roots['companion'] / 'TEST-Sample.xml').unlink()
+        with self.assertRaisesRegex(suite.ValidationError, 'companion JUnit evidence is missing'):
+            suite.capture_tests(self.root, self.suite_root, 'server-case', False)
+
+
 class SelectionTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -301,6 +393,11 @@ class SelectionTests(unittest.TestCase):
     def test_restart_phase_alone_requires_every_catalog_case(self):
         catalog, _ = suite.load_catalog(self.root)
         path = 'dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/RestartPhase.java'
+        self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, [path])))
+
+    def test_companion_unit_tests_require_full_baseline_including_negative_controls(self):
+        catalog, _ = suite.load_catalog(self.root)
+        path = 'dev/game-tests/src/test/java/com/kaveenk/onlydragons/gametests/ExceptionDiagnosticsTest.java'
         self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, [path])))
 
     def test_every_tracked_companion_java_file_has_scenario_coverage(self):
