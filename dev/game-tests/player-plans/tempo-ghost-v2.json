@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "planId": "tempo-ghost-v2",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "denied",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn training"
+              }
+            },
+            {
+              "id": "setup",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon setup minecraft:overworld 0 100 0 24 test_dragon"
+              }
+            },
+            {
+              "id": "spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn training"
+              }
+            },
+            {
+              "id": "status",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon status"
+              }
+            },
+            {
+              "id": "duplex-slot",
+              "action": "selectSlot",
+              "args": {
+                "slot": 1
+              }
+            },
+            {
+              "id": "veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "p08-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "p08-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "tempo-slot",
+              "action": "selectSlot",
+              "args": {
+                "slot": 0
+              }
+            },
+            {
+              "id": "tempo-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "tempo-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "swap-slot",
+              "action": "selectSlot",
+              "args": {
+                "slot": 1
+              }
+            },
+            {
+              "id": "buffed-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "buffed-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "expired-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "expired-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "lethal-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "ordinary",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "reset-again",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "calibration",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn calibration"
+              }
+            },
+            {
+              "id": "calibration-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

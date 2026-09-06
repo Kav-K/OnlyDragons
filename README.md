@@ -14,9 +14,11 @@ Only open issues labeled `symphony` are eligible. See [the setup and credential 
 Main includes [equipment stats and calibration gear](dev/stats-play.md), the
 [practice combat loop](dev/combat-play.md), and [managed test-dragon controls with
 post-kill ranking](dev/dragon-play.md). The next planned [checkpoint](docs/planning/07-checkpoint-two.md)
-adds dragon health UI/motion, stronger Tracer volleys, revised Tempo ghost damage,
+adds dragon health UI/motion, stronger Tracer volleys,
 held-fire loadouts and ten-enchant XP-cost books. These additions are not implemented
-yet; armor effects and real rewards remain out of the current scope. See the
+yet; level-based Tempo proc HP and explicit standard/training/calibration dragon
+spawn modes are implemented in this checkout. Armor effects and real rewards
+remain out of the current scope. See the
 [foundation plan](docs/planning/02-foundation-plan.md), [mechanic research](docs/planning/01-research.md)
 and [delivery ledger](docs/planning/03-agent-tasks-and-validation.md) for exact acceptance and remaining gates.
 

@@ -20,7 +20,7 @@
               "id": "unconfigured",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {
@@ -48,7 +48,7 @@
               "id": "spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {
@@ -62,7 +62,7 @@
               "id": "duplicate",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {

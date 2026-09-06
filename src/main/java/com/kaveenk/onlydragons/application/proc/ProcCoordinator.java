@@ -106,11 +106,12 @@ public final class ProcCoordinator implements AutoCloseable {
         // Validate all timing before physical damage can commit, including the latest possible child.
         Math.addExact(impact.tick(), Math.max(60L, 5L * limits.spacingTicks()));
         int level = EnchantEffects.level(shot.enchantments(), "fatal_tempo", 5);
-        double effective = Ferocity.effective(shot.stats().effective(StatKey.FEROCITY), tempoBonus(capturedSession, now));
+        TempoState active = live(capturedSession) ? tempo.getOrDefault(capturedSession.ownerId(), new TempoState(0, 0)) : new TempoState(0, 0);
+        double effective = Ferocity.effective(shot.stats().effective(StatKey.FEROCITY), active.bonusPercent());
         // Preflight injected randomness before the physical authority can commit damage.
         // A rejected candidate may consume a fractional draw but never admits children.
         int count = Ferocity.count(effective, random);
-        var damage = encounter.physical(shot, impact, modifiers, effective, adapterRejection);
+        var damage = encounter.physical(shot, impact, modifiers, effective, adapterRejection, active);
         if (!damage.accepted()) return new PhysicalResult(damage, Admission.PHYSICAL_REJECTED, 0, List.of());
         buildTempo(capturedSession, level);
         if (count == 0) return new PhysicalResult(damage, Admission.NO_CHILDREN, 0, List.of());
@@ -127,7 +128,8 @@ public final class ProcCoordinator implements AutoCloseable {
         for (int index = 1; index <= count; index++) {
             var command = new ProcCommand(childId(damage.impactId(), index), damage.impactId(), damage.origin(),
                     damage.ownerId(), damage.shotId(), now + (long) index * limits.spacingTicks(),
-                    damage.amounts().mitigatedDamage(), damage.crit(), damage.mechanic(), level);
+                    damage.amounts().mitigatedDamage(), damage.crit(), damage.mechanic(), level,
+                    Optional.of(encounter.procHealthSnapshot(damage.impactId())));
             commands.add(command);
             queue.add(new Pending(command, capturedSession));
         }

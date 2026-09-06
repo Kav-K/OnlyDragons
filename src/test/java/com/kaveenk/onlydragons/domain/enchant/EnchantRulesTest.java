@@ -41,7 +41,7 @@ class EnchantRulesTest {
         assertEquals(200, state.bonusAt(69));
         assertEquals(0, state.bonusAt(70));
         assertEquals(0, state.bonusAt(71));
-        assertEquals(new TempoState(firstBonus, 130), state.hit(level, 70));
+        assertEquals(new TempoState(firstBonus, 130, level), state.hit(level, 70));
     }
 
     @Test void mixedLevelsShareOnePoolAndExpiredStateDoesNotReturn() {
