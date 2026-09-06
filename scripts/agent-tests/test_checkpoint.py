@@ -108,7 +108,7 @@ class CheckpointTests(unittest.TestCase):
         self.reject_plan('Duplicate JSON key')
 
     def test_task_dependency_cycle_rejected(self):
-        self.change(BACKLOG, lambda value: value['tasks'][0]['dependsOn'].append('T01a'))
+        self.change(BACKLOG, lambda value: next(task for task in value['tasks'] if task['id'] == 'T00')['dependsOn'].append('T01a'))
         self.reject_plan('dependency cycle')
 
     def test_issue_mapping_drift_rejected(self):
@@ -273,7 +273,7 @@ class CheckpointTests(unittest.TestCase):
 
     def test_dependency_and_changed_area_coverage_cannot_silently_shrink(self):
         previous_backlog = self.read(BACKLOG)
-        previous_backlog['tasks'][0]['dependsOn'].append('T09a')
+        next(task for task in previous_backlog['tasks'] if task['id'] == 'T00')['dependsOn'].append('T09a')
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'Task dependency removed'):
             self.baseline({BACKLOG: previous_backlog})
         current = self.read(SUITES)
