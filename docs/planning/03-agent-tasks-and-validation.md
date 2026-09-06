@@ -121,7 +121,7 @@ checks in `item-codec-v3`: all eight byte-round-tripped loadouts must resolve
 through the production snapshot factory to damage 100/crit damage 50 and their
 explicit crit/ferocity totals. An edited enchant/roll item must resolve to
 crit chance 5/ferocity 3 without doubled contributions. Final integrated evidence
-is pending below; prior v2 evidence remains scoped to its recorded revision.
+is recorded below; prior v2 evidence remains scoped to its recorded revision.
 
 
 GH-4 final verification revision `2f66cc4bc54ed1131c6c13f65253b928726e4efe` was clean
@@ -174,6 +174,23 @@ the provisioned accepted EULA, shared lease and memory admission. Run
   reload/restart persistence, anti-duplication or performance claim is made.
   Lead review/merge precedes dependent #7/#9 integration; milestone gates remain
   unaccepted. Follow-up context-only commits retain this exact runtime artifact.
+
+
+
+#### Integrated stats and item evidence
+
+Clean runtime revision `bba2ea154381f30745633ad654eaa3174e98ee4d` integrates
+stats main `1efa7d`. Run `da51644d5f484ef4bb44d745495b459f` passed all 34
+`item-codec-v3` assertions on Paper 26.2 build 121, plus 54 production tests
+with zero failures/errors/skips. All eight serialized calibration loadouts
+resolved through the production snapshot factory to damage 100/crit damage 50
+and their expected crit/ferocity totals. The edited enchant/roll item resolved
+to crit chance 5/ferocity 3. All cleanup assertions passed; server exit 0,
+clean=true, forced=false. This covers codec-to-resolver integration with
+synthetic inventories, not equipment events, client input or visuals.
+
+Production SHA256 `103efd337f5c6a109d3199581d5f9e19317df471c1a11304bdab2f883b426547`.
+Companion SHA256 `4d3e96c6961e4d398d32976830f1cba2b6b97377654294835308c799e584a569`.
 
 ### T01a resolver validation
 
