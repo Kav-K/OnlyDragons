@@ -1577,6 +1577,60 @@
         "same-profile-restart-abort"
       ],
       "description": "Fixed two-boot shared-profile config continuity, phase provenance and intended abort cleanup; no managed dragon proof."
+    },
+    "dragon-bossbar": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Authoritative domain HP/max/percent in one owned received boss bar per managed dragon generation, with two-player visibility and all lifecycle cleanup; credited/ghost damage never drives bar health.",
+      "fixtures": []
+    },
+    "combat-presentation": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Readable shared stat/combat/leaderboard formatting with exact numerical/recipient/permission semantics and machine diagnostics preserved; actual received output plus component-style checks.",
+      "fixtures": []
+    },
+    "bounded-dragon-flight": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Versioned public-API native dragon motion and actual multipart containment within explicit arena margins, supported phases and lifecycle/ticket cleanup; stationary calibration remains available.",
+      "fixtures": []
+    },
+    "moving-dragon-tracer": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Real moving-target Tracer flight, native physical collision and original pre-spawn projectile identity under a separately reviewed v2 profile; unenchanted/blocked/out-of-range controls and received motion evidence.",
+      "fixtures": []
+    },
+    "fatal-tempo-ghost-scaling": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Versioned player-wide Tempo/Ferocity with independent eligible impact rolls; active level HP shares100/90/80/70/60/50 percent for none/I/II/III/IV/V and full100percent credit. Separate active policy provenance from captured refresh eligibility, preserve legacy profiles and verify levels/expiry/mixed-order/swaps/lethal/late physical results.",
+      "fixtures": []
+    },
+    "expanded-bow-enchantments": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Named Overload and Gravity profiles, trusted levels/compatibility and captured/inherited decisions; deterministic boundaries and actual managed physical HP/credit/provenance with no unresolved effect advertised as active.",
+      "fixtures": []
+    },
+    "held-shortbow-loadouts": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Actual repeated firing while held with shared attack-speed cadence, explicit drawn/instant loadouts, separate ultimate combinations and stop/cancellation/ammo/moving-Tracer controls. Received help and lore explain the selected profile.",
+      "fixtures": []
+    },
+    "enchant-books-anvil": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Ten validated custom enchanted-book types and XP-cost application through real placed anvils, exact-once consumption/metadata preservation and effective equipped behavior. Invalid/denied/stale/close/shift paths conserve resources; armor architecture only.",
+      "fixtures": []
+    },
+    "quiver-flame-integration": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Captured Infinite Quiver ammo chance through the existing reservation/refund authority and bounded owned Flame DOT through existing HP/credit/defeat authority, including immunity/refresh/expiry/multiowner/terminal/no-recursion controls.",
+      "fixtures": []
     }
   },
   "tasks": {
@@ -1682,6 +1736,31 @@
     ],
     "T09e": [
       "same-profile-restart"
+    ],
+    "T08d": [
+      "dragon-bossbar",
+      "combat-presentation"
+    ],
+    "T08e": [
+      "bounded-dragon-flight",
+      "moving-dragon-tracer"
+    ],
+    "T05b": [
+      "fatal-tempo-ghost-scaling",
+      "P08",
+      "P09"
+    ],
+    "T03b": [
+      "expanded-bow-enchantments"
+    ],
+    "T06b": [
+      "held-shortbow-loadouts"
+    ],
+    "T02c": [
+      "enchant-books-anvil"
+    ],
+    "T06c": [
+      "quiver-flame-integration"
     ]
   },
   "paperCases": {

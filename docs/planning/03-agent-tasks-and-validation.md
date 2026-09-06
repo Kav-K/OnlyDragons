@@ -6,6 +6,12 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
+[Checkpoint 2](07-checkpoint-two.md) registers T08d/T08e/T05b/T03b/T06c/T06b/T02c
+as issues #64–#70 for the user's next gameplay feedback. All are planned, with nine
+new deferred requirements and no completed evidence. T05b also owns still-deferred
+P08/P09. Lead assignment and integrated dependencies control dispatch; existing
+accepted tasks, evidence and milestone states below remain unchanged.
+
 Baseline reconciled **6 September 2026** after PR #62 merged at
 `114916905c68f5574b2ee437b8db5bd2a187e390`: T08b's frozen ranking and received
 presentation are accepted through exactly `frozen-damage-ranking`; [full evidence](evidence/t08b-suite.md).
@@ -659,7 +665,7 @@ visuals/feel remain unrun. T08a still owns managed-encounter recovery.
 
 ### T10 — Integrated prefire rehearsal and performance gate
 
-**Owner:** integration lead with validation agent. **Dependencies:** retain T04–T09 and additionally require integrated T08a. **Files:** practice encounter coordinator, rehearsal fixtures, integration reports. **Milestone:** M3.
+**Owner:** integration lead with validation agent. **Dependencies:** retain T04–T09 and integrated T08a; additionally require T08d, T08e, T05b and T06b (transitively T03b/T06c) from [checkpoint 2](07-checkpoint-two.md). **Files:** practice encounter coordinator, rehearsal fixtures, integration reports. **Milestone:** M3.
 
 Integrate countdown and atomic hatch through T08a's shared backend, target registration, continuous arrows, collision, health/score, and teardown. Run timing sweeps and the human checklist below. Exercise several shooters and worst-case configured ferocity. Tune visual cues and homing only through versioned parameters and recorded traces.
 
