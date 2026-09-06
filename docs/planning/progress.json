@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "Kav-K/OnlyDragons",
-  "baselineRevision": "9092fbe233319aab7d4933eea011d78089d7c07c",
+  "baselineRevision": "a48ebd40c8f1efa8a2ae92f193f824929734e486",
   "notice": "Historical integrated state and durable references only. Fresh machine evidence, independent review and current CI are checked separately. No milestone is accepted.",
   "tasks": {
     "T00": {
@@ -111,9 +111,17 @@
       }
     },
     "T01b": {
-      "status": "active",
-      "completedRequirements": [],
-      "evidence": {}
+      "status": "partial",
+      "completedRequirements": [
+        "equipment-service"
+      ],
+      "evidence": {
+        "equipment-service": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/29",
+          "revision": "4c28474b54e2a2aa25d6242d12525f8783c4ea1b"
+        }
+      },
+      "notice": "Playable equipment/commands merged at a48ebd4; connected-player acceptance awaits T09c full suite/review."
     },
     "T05": {
       "status": "active",
