@@ -1,7 +1,12 @@
 # Execution backlog and integration
 
+The next user-requested [checkpoint 2](07-checkpoint-two.md) registers seven
+planned tasks as #64–#70. T08d/T08e and the now-recorded T05b contract can receive
+lead assignment first; the linked dependency table controls later integration.
+No new requirement or milestone is accepted by this registration.
+
 T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md).
-T08b/#40 is accepted through [PR #62](https://github.com/Kav-K/OnlyDragons/pull/62) at `1149169`; [full ranking evidence](evidence/t08b-suite.md). The first human checkpoint is next; T08c remains planned and undispatched pending that checkpoint and lead assignment.
+T08b/#40 is accepted through [PR #62](https://github.com/Kav-K/OnlyDragons/pull/62) at `1149169`; [full ranking evidence](evidence/t08b-suite.md). The user has reported first-checkpoint feedback, which now drives checkpoint 2. T08c remains planned and undispatched pending lead sequencing; no M3 or other milestone is accepted by that feedback.
 
 PR #57 integrated T08 at `3505d6c` after the complete 28-case cohort,
 independent raw replay/review, original/latest-main checkpoints and current CI.
@@ -21,7 +26,7 @@ T08's prerequisites are integrated. After context PR #54 merged at `1331ccf`,
 the lead dispatched [T08/#11](https://github.com/Kav-K/OnlyDragons/issues/11#issuecomment-5559836724)
 and [T07/#10](https://github.com/Kav-K/OnlyDragons/issues/10#issuecomment-5559839786)
 to parallel Symphony workers. T07 and T08 are now integrated through their
-separately reviewed cohorts; T08a and T08b are also integrated. The immediate next step is the first human checkpoint.
+separately reviewed cohorts; T08a and T08b are also integrated. The immediate next work is checkpoint 2 from the user's reported play feedback.
 
 PR #50 integrated T09e at `7b8ff0f` after the reviewed 23-case cohort,
 independent replay/task checkpoints and current CI. [Restart acceptance](evidence/t09e-suite.md).
@@ -72,14 +77,14 @@ part of the worker's scope.
 | T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | Complete: PR #57 merged at `3505d6c`; [evidence](evidence/t08-suite.md) | Connected dummy combat, explanations and shared backend/provenance accepted; human/client observations remain separate. |
 | T08a | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | Complete: PR #60 merged at `889a3db` | One real test-dragon backend, controls and restart/removal evidence; [acceptance](evidence/t08a-suite.md). |
 | T08b | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | Complete: PR #62 merged at `1149169` | Frozen credited-damage ranking including ghost/overkill, unique placements and received output; [accepted evidence](evidence/t08b-suite.md). |
-| T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b/T08b integrated; planned, not dispatched pending first human checkpoint and lead assignment | Personal rank-based simulation with hard item locks; arbitrary labeled sample policies and no real grants. |
-| T10 | [#12](https://github.com/Kav-K/OnlyDragons/issues/12) | T04, T05, T06, T07, T08, T08a | Integrated real-dragon prefire and load evidence through the shared backend. |
+| T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b/T08b integrated; planned, not dispatched; checkpoint 2 has priority pending lead sequencing | Personal rank-based simulation with hard item locks; arbitrary labeled sample policies and no real grants. |
+| T10 | [#12](https://github.com/Kav-K/OnlyDragons/issues/12) | T04, T05, T06, T07, T08, T08a, T08d, T08e, T05b, T06b | Integrated real-dragon prefire and load evidence through the shared backend; T06b transitively brings T03b/T06c. |
 | T11 | [#13](https://github.com/Kav-K/OnlyDragons/issues/13) | T10 plus accepted human M3 evidence | Later eight-eye encounter. |
 | T12 | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus agreed roster/reward/acquisition scope | Later bounded content/progression planning. |
 
 Symphony has three coding slots. Label only tasks whose prerequisites are
 integrated into main and whose manual gates are satisfied. #6 and #20 are merged,
-#7 and #28 are complete after PR #32 at `73a8cc8`; objective connected-player equipment acceptance is verified. PR #31 is accepted and merged; T02b/T05 integrated through PR #48 and T06 through PR #52. T07/T08 are integrated through PR #56/#57; T08a/#39 and T08b/#40 are accepted through PR #60/#62. T08c is undispatched pending the first human checkpoint and lead assignment. Issue/PR state owns live claims;
+#7 and #28 are complete after PR #32 at `73a8cc8`; objective connected-player equipment acceptance is verified. PR #31 is accepted and merged; T02b/T05 integrated through PR #48 and T06 through PR #52. T07/T08 are integrated through PR #56/#57; T08a/#39 and T08b/#40 are accepted through PR #60/#62. T08c remains undispatched while the lead prioritizes checkpoint 2 from reported human feedback. Issue/PR state owns live claims;
 the lead reconciles this summary after each serial merge.
 All server scenarios share one lease and obey the memory gate, regardless of
 how many agents are coding. A ready branch is not a satisfied dependency.

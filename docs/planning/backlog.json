@@ -125,7 +125,7 @@
       "coordination": "Issue #41. Await integrated T02b/T08b. Keep sample qualification, weights and item references visibly calibration-only and separate from later T12 rules. T11 eye provenance and T12 durable real rewards/acquisition remain gated; this task neither consumes eyes nor bypasses M3 or economy acceptance."
     },
     {
-      "id": "T10", "title": "Integrate real-dragon prefire rehearsal and measured load gates", "dependsOn": ["T04", "T05", "T06", "T07", "T08", "T08a"],
+      "id": "T10", "title": "Integrate real-dragon prefire rehearsal and measured load gates", "dependsOn": ["T04", "T05", "T06", "T07", "T08", "T08a", "T08d", "T08e", "T05b", "T06b"],
       "scope": "Countdown/marker, atomic real dragon hatch, same-projectile continuity, combat integration, teardown and versioned scenario reports. Sweep timing/angle/obstruction controls and measure representative load.",
       "acceptance": "Successful arrows existed before hatch; early/off-angle/blocked controls miss; simultaneous hits are retained; no post-death score; repeated reset returns state to baseline. Record actual performance envelope. Human visual timing and multiplayer gates remain unaccepted until independently observed.",
       "coordination": "Serialize server/load scenarios and respect memory gate. M3 acceptance requires recorded human evidence even if automated-ready code is merged."
@@ -153,6 +153,85 @@
       "scope": "Disable only supported optional remote-plugin synchronization on subsequent Symphony app-server launches. Preserve required repository skills, reviewed MCP configuration, host github_api, model/auth settings, sandbox and active sessions. Require issue/API refresh before expensive verification and clean committed final runtime evidence.",
       "acceptance": "Generated worker command uses the supported remote_plugin=false setting; bridge protocol/sandbox regressions pass. An isolated no-model app-server discovers required skills and MCP tools and exits cleanly. Personal/global configuration and unrelated sessions are unchanged.",
       "coordination": "Complete: issue #18 and PR #21 are closed; reviewed/validated maintenance merged at e72fb2a. No Symphony dispatch or duplicate implementation; no gameplay milestone advanced."
+    },
+    {
+      "id": "T08d",
+      "title": "Show persistent dragon health and polished combat presentation",
+      "dependsOn": [
+        "T08a",
+        "T08b"
+      ],
+      "scope": "User feedback requires a top-screen dragon health bar visible regardless of aim, plus readable combat/stat/result messages. Add one owned Adventure boss bar per managed generation showing authoritative HP/max/percent (never credited/ghost damage). Lead default: visible to online players in the configured dragon world while alive and through its native death animation; reconcile join/reconnect/world change, then remove on actual retirement/reset/disable. No duplicate bars/stale viewers/native loot effects. Improve compact headings, names, numeric formatting and colors for stats, combat explanations and leaderboard while keeping machine diagnostics available. Retain full-precision ranking and exact existing scope. Own a reusable presentation formatter and dragon UI adapter; coordinate bootstrap/service lifecycle additions with T08e. Item/book lore will consume this formatter in T02c, so publish that boundary early. Paper acceptance must observe HP updates including ghost-only/no-HP events, full received bar identity/percent/title and lifecycle for two protocol actors, no duplicates, reset/restart/quit/world transfer cleanup, and received formatted command/result output. Add bounded boss-bar packet observation if needed; no general fixture refactor.",
+      "acceptance": "Actual two-actor boss-bar identity/title/HP-percent updates, ghost-only/no-HP controls, once-only viewing, join/world/quit/reset/restart/disable cleanup and received formatted stats/combat/ranking output. Preserve precise diagnostic data and full-precision ranking.",
+      "coordination": "Issue #64. Own reusable presentation formatter and dragon UI adapter; publish formatting API for T02c/T06b. Coordinate DragonBackend/DevelopmentDragonService/bootstrap lifecycle with T08e; add only necessary boss-bar packet evidence."
+    },
+    {
+      "id": "T08e",
+      "title": "Move the test dragon within its arena and integrate real Tracer volleys",
+      "dependsOn": [
+        "T08a",
+        "T07"
+      ],
+      "scope": "Replace the human test target's stationary-only experience with a versioned smooth bounded flight mode. Preserve an explicit stationary calibration mode for existing deterministic tests. Choose a public-API route/steering adapter with safe margins so the parent and actual multipart hitboxes remain within the configured cube and supported phase policy; real collisions and current target geometry must follow motion. Never move arrows directly onto the dragon or substitute automatic hits. Reuse the live T07 ArrowContinuity/Tracer engine. Retain the accepted v1 calibration unchanged; propose a separately versioned v2 acquisition/steering profile for the requested visible cloud volleys, using issue65 comment5561944060 calibration (acquisition8/16/24/32/40, retention+8, turn18degrees,3tick original-group grace and lost-LOS release), still pending measured validation. Do not present the near-hit v1 profile as acceptance of that new experience. Verify Tracer-enabled arrows curve toward a moving dragon and original pre-spawn arrows can acquire it, while unenchant/obstructed/out-of-range controls remain honest. Publish backend motion/ticket/phase ownership for bossbar T08d and later shortbow/T10 composition. Required real Paper evidence: sustained bounded motion with actual parts, native-positive and owned suppression/collision checks during motion, endpoint/margin and smallest/largest arena controls, no drift on reset/disable/death, parent+projectile chunk-ticket cleanup, and measurable curved-path/received entity-motion observations. No new dragon types, attacks, eyes or rewards.",
+      "acceptance": "Actual native multipart bounds/motion at both arena size limits, physical collision/suppression during movement, received entity movement, curved native Tracer paths and original pre-spawn UUID acquisition. Unenchanted/obstructed/out-of-range controls reject honestly; motion/tickets clean up on death/reset/disable. New v2 profile values require measured review.",
+      "coordination": "Issue #65. Own bounded dragon motion/phase/geometry and coordinated T07 v2 profile. Publish motion/ticket/lifecycle boundary to T08d/T06b/T10; do not compete for shared backend edits or alter accepted v1 fixtures."
+    },
+    {
+      "id": "T05b",
+      "title": "Make Ferocity ghost damage scale with Fatal Tempo level",
+      "dependsOn": [
+        "T05",
+        "T08a",
+        "T08b"
+      ],
+      "scope": "Implement the confirmed versioned player-wide Tempo/Ferocity policy. Each eligible ordinary, Duplex and Fatal Tempo physical impact independently resolves Ferocity against the effective player-wide bonus; only captured Fatal Tempo sources retain refresh/build eligibility. Proc HP share is 100% with no active Tempo and 90/80/70/60/50% for active Fatal Tempo I/II/III/IV/V, with full 100% credited damage. Record active buff and proc-policy source identity separately from fatalTempoSourceLevel, which already means refresh eligibility; never repurpose that field or consult a later held bow to rewrite provenance. Preserve the 1%-per-point integer/remainder rule, cap500, bounded nonrecursive procs, actual-HP/credit separation and no post-death credit. Keep previous calibration profiles and immutable old shots/results intact. The recorded contract samples active bonus/HP policy before the impact; after commit, an eligible captured FT source (including approved FT children) adds 10L capped at +200%, refreshes expiry by60ticks and adopts its level even if lower. Children retain the pre-hit immutable policy and never recurse. Expire before an impact at the boundary: the first newly admitted physical FT hit after expiry is unbuffed/100%HP. Authoritative contract: https://github.com/Kav-K/OnlyDragons/issues/66#issuecomment-5561937297. Test all levels, bonus expiry/swapping, zero/fractional/capped Ferocity, simultaneous/lethal/late impacts, source identities and unique ranking through actual physical/proc integration; make the playable profile and explanations explicit.",
+      "acceptance": "Independent deterministic counts/HP-credit/provenance at all Tempo levels and expiry/order boundaries, plus real eligible ordinary/Duplex/FT impacts, swaps, lethal/late outcomes and frozen ranking. Bind existing deferred P08/P09 only when their full physical contracts are proven; historical profile results remain unchanged.",
+      "coordination": "Issue #66. Own proc/Tempo profile and provenance changes through the shared accounting boundary; follow recorded issue66 comment5561937297 for mixed-level/order policy. Publish stable profile/result API to T03b/T06c; preserve fatalTempoSourceLevel refresh meaning."
+    },
+    {
+      "id": "T03b",
+      "title": "Implement Overload and Gravity in the shared bow pipeline",
+      "dependsOn": [
+        "T05b",
+        "T06"
+      ],
+      "scope": "Implement the newly requested Overload and Gravity alongside the six already supported bow enchants. Publish explicit versioned OnlyDragons calibration tables/max levels before implementation; do not claim unverified Hypixel parity. Overload must preserve raw crit chance above100, capture one mega-crit decision per primary shot, and let Duplex/procs inherit that decision without rerolling. Gravity is a named airborne-target attack modifier with actual supported target classification. Register all ten approved IDs and stable compatibility/max-level descriptors in coordination with T06c (Infinite Quiver/Flame) and T02c (books); unsupported effects must remain visibly unavailable until their consumers merge. Define explicit handling for legitimate existing calibration bows while preserving trusted PDC identity and immutable old shots. Own combat/snapshot/effect and trusted-catalog files, with coordinated minimal T06 firing touchpoints. Pure random/math/level boundaries plus actual Paper physical damage must verify effect/non-effect controls, native suppression, captured provenance, swapping, multiplier order, caps, full-credit/HP accounting and terminal behavior. No ammo/fire implementation in this ticket; that is T06c.",
+      "acceptance": "Versioned Overload/Gravity tables and legal levels, captured critical decisions inherited without reroll, independent target/math/random boundaries and actual physical damage, suppression, swaps, caps, separate HP/credit and terminal controls. Catalog compatibility and existing-item treatment are explicit.",
+      "coordination": "Issue #67. Own combat/snapshot/effect and trusted-catalog files. Publish all-ten-enchant descriptors and explicit availability/max-level/compatibility contracts to T06c/T02c; coordinate minimal firing changes. Unsupported consumers are not advertised active."
+    },
+    {
+      "id": "T06b",
+      "title": "Expose held-fire shortbow tiers and useful combined enchant test loadouts",
+      "dependsOn": [
+        "T03b",
+        "T08e",
+        "T06c"
+      ],
+      "scope": "The user wants instant arrows repeatedly while right-click is held, with attack-speed cadence, and visible large Tracer volleys. Reuse the existing SHORTBOW firing authority; provide clearly named drawn/instant tiers and useful separate-ultimate combinations such as Tracer+Duplex and Tracer+Fatal Tempo. Include an ordinary/25-Ferocity comparison and explicitly labeled level100 guarantee. Publish cooldown/attack-speed/arrow-count defaults as calibration; preserve one ultimate per item and swapping. Ensure release, item change, inventory opening, target/arena exit, death/quit/reset and disable stop held input correctly; clicks/holds/left/right combinations cannot bypass one shared cooldown or duplicate ammo. Inspect actual client hold semantics rather than assuming repeated test packets equal a human hold. Add readable firing mode/rate/enchant descriptions, quick grant/list/help UX and a concise first-use command flow that configures/spawns before teleporting. Reuse existing input fixtures, adding only bounded missing hold/release observation. Test actual sustained protocol input, stopped input, crossbow-swap, ammo/capacity/cancellation, moving Tracer attraction and supported effects. Coordinate formatter/lore with T08d/T02c.",
+      "acceptance": "Real sustained native/protocol hold versus release, common cooldown and capacity/ammo conservation; item/inventory/session/arena/death/reset cleanup; moving Tracer/enchant integration, separate-ultimate loadouts and received help/lore. Repeated synthetic uses alone do not prove held input.",
+      "coordination": "Issue #68. Wait for T03b/T08e/T06c integration. Own held-input/loadout UX and necessary firing changes; coordinate OwnedBowService with T06c and formatter/lore with T08d/T02c."
+    },
+    {
+      "id": "T02c",
+      "title": "Apply all supported custom enchant books through XP-cost anvils",
+      "dependsOn": [
+        "T03b",
+        "T08d",
+        "T06c"
+      ],
+      "scope": "User requests a book for each of the ten supported custom enchants, available via development commands, with anvil XP costs. Armor content/effects are explicitly deferred; prepare item-category/slot-aware architecture without enabling unidentified armor bonuses. Enforce current max levels, compatibility and one ultimate; define readable book/combine/apply/rename cost calibration and duplicate/no-op/conflicting inputs. Use a real placed vanilla anvil path and public Paper APIs. Preserve the left item's instance UUID, durability, custom rename, foreign metadata and applicable native enchants: the existing encode-new-BOW function is insufficient for anvil edits. Preview must not mutate/charge; output extraction revalidates the exact inputs/session/cost and atomically consumes inputs/XP once. Reject stale/cancelled/insufficient-XP/full-inventory/unsupported gestures safely, preserve ordinary vanilla anvils and handle disconnect/close/shift-click/replay without duplication or loss. Include valid custom books with generated polished lore/glint; renamed ordinary books cannot grant behavior. Narrowly extend the protocol fixture to actual anvil containers/rename/output collection with client state IDs and item conservation if required; do not refactor generic infrastructure. Pure recipe/compatibility/cost and real player/anvil tests must prove received preview, normal+shift collection, XP conservation, metadata survival and immediate effect on a subsequently fired managed bow.",
+      "acceptance": "Pure versioned recipe/cost/compatibility boundaries and real placed-anvil input, received preview, ordinary/right/shift extraction, exact XP/item conservation and effective subsequent firing. Preserve UUID/durability/rename/foreign/native metadata; reject forgery/stale/denied/full-inventory paths without loss or duplication; close/quit cleanup. Armor is architecture-only.",
+      "coordination": "Issue #69. Wait for T03b/T08d/T06c integration. Own book/apply metadata and anvil transaction paths; share existing formatter and authoritative effect registry. Only narrow anvil container/rename/collection fixture additions; no new general framework or active armor stats."
+    },
+    {
+      "id": "T06c",
+      "title": "Implement Infinite Quiver ammunition and owned Flame damage",
+      "dependsOn": [
+        "T03b"
+      ],
+      "scope": "Implement the user-requested Infinite Quiver and Flame against the trusted descriptors/profile contract published by T03b. Infinite Quiver uses one captured seeded/random chance through the existing authoritative ammo reservation/debit boundary for both drawn and short bows; preserve Duplex's no-extra-ammo rule, exact-once refunds on cancellation and unrelated inventories. Flame uses bounded captured-owner/source/target/generation damage-over-time through the existing health/credit/defeat authority. Publish an explicit versioned level/duration/damage/stack-or-refresh policy, including native fire immunity and the previously deferred Duplex fire-vulnerability interaction; no uncontrolled native fire or attribution via latest held item. Queued DOT must not roll recursive Ferocity or refresh Tempo without an explicitly agreed source rule. Actual real-client survival inventory plus physical collisions must establish ammo conservation/chance boundaries/denials, owned fire activation/refresh/expiry, multiple shooters, native suppression, lethal/late/reset/quit/disable and no reward effects. Reuse the existing fixture and only add feature-specific observations. Coordinate shared OwnedBowService and effect interfaces with T03b/T06b; no second combat listener or broad fixture refactor.",
+      "acceptance": "Real survival ammo inventories with one captured Quiver chance and exact cancellation/refund/child rules; independently observed owned Flame activation, refresh/expiry, multiowner/source/generation identity, immunity/native suppression and lethal/late/reset/quit/disable outcomes. No recursive procs, unauthorized Tempo refresh or real rewards.",
+      "coordination": "Issue #70. Wait for T03b descriptors. Own ammo/fire effect integration; coordinate OwnedBowService with T03b/T06b and proc-source contracts with T05b. Reuse the single physical/combat authority and feature-specific fixtures."
     }
   ]
 }

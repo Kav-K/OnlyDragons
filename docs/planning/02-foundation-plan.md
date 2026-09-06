@@ -8,6 +8,11 @@ for implementation and validation state. Agents update affected design sections
 with scoped changes and record material decisions under the
 [context update protocol](03-agent-tasks-and-validation.md#shared-context-update-protocol).
 
+The user's next scoped work is [checkpoint 2](07-checkpoint-two.md): dragon health
+UI/motion, Tracer volleys, revised Tempo ghost policy, held shortbows and ten-enchant
+XP-cost books. Its recorded v2 contracts are planned implementation; preserve the
+accepted v1 profiles below. Armor effects and real rewards remain disabled/deferred.
+
 The first playable milestone is a reliable stats-and-bow combat sandbox. A player can equip a test bow, inspect their stats, shoot a target, and see an explanation of critical hits, ferocity, boss-health damage, and contribution. The next milestone adds real dragon tracing and prefire. The eight-eye ritual, complete dragon roster, loot, and progression follow those proofs.
 
 Companion documents: [research and sources](01-research.md), [agent work packages and test gates](03-agent-tasks-and-validation.md). Researched numbers live in the research document; all additional algorithm choices below are proposed OnlyDragons rules.

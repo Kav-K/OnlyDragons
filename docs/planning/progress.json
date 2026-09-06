@@ -411,6 +411,48 @@
       "mergedRevision": "7b8ff0f5eaa57800e8b7d1d08ea02e5aa79afe05",
       "reviewedRevision": "b6c8cf49b3666276b1dd8851d0089df748b5bf1e",
       "notice": "PR #50 merged at 7b8ff0f5eaa57800e8b7d1d08ea02e5aa79afe05 after the fresh 23-case hosted cohort, independent raw replay/review, T09e/T04/T02b/T05 checkpoints against actual main 3c35a85 and current Windows/Linux CI. Exact evidence: docs/planning/evidence/t09e-suite.md. Generic two-boot persisted starter configuration and connected commands only; managed-dragon recovery, T06 production firing and M1-M5 remain unaccepted. Earlier focused/cohort results retain their original identities and checkpoint disposition."
+    },
+    "T08d": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+    },
+    "T08e": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+    },
+    "T05b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. The mixed-level/order contract is recorded in issue66 comment5561937297; lead assignment remains required. Real rewards remain disabled; existing milestone gates are unchanged."
+    },
+    "T03b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+    },
+    "T06b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+    },
+    "T02c": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+    },
+    "T06c": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
     }
   },
   "milestones": {
