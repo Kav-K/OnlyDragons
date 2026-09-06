@@ -184,6 +184,12 @@ T04/M0. Preserve natural-End-cycle/all-phase automation, production claim/veto/
 retirement/phase rejection, and separate human/authenticated/visual/multiplayer/
 performance gates. #9 remains blocked until lead acceptance.
 
+The lead requested blocker handoff while PR #35 finishes its baseline and
+establishes the reviewed comparison base. Current evidence head `e05283f`
+passed Windows/Linux CI and receipt replay. Resume the existing PR after the
+lead redispatches with the exact integrated main; rerun required changed-input
+checks and corrected acceptance. No old receipt is a pass for changed inputs.
+
 ## Earlier verification
 
 Clean runtime revision **`7b3a172751a3ea4ce809b23b68d26f0eb4b28e15`** includes main

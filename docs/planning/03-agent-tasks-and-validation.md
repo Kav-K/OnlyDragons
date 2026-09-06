@@ -101,6 +101,19 @@ This instruction does not authorize implementing unassigned work packages.
 
 ### Context change record
 
+T04 handoff pending reviewed base (2026-09-05, PR #31): the lead requested
+normal blocker handoff while [PR #35](https://github.com/Kav-K/OnlyDragons/pull/35)
+finishes its shared Paper baseline. Current-base work is complete and pushed;
+head `e05283f` passed Windows/Linux CI, 45 focused checkpoint regressions, and
+receipt replay. No implementation or test failure remains to investigate here.
+The T04 acceptance checkpoint still rejects deferred P02/P04 under the current
+mapping. Next action: lead merges PR #35 and reapplies only the dispatch label
+with the exact new main revision; resume this same branch/PR, merge normally,
+and run the corrected checkpoint and required changed-input verification.
+The reviewed 16-case cohort below remains exact historical evidence for
+`696fa1e`; it is not proof for future changed inputs. T04 stays partial/In review,
+#9 blocked and M0 unaccepted. No work is unshared.
+
 T04 reconciliation resumed (2026-09-05, PR #31): PR #34 remediated the
 previous protected-skill merge failure. Ordinary integration of main `5e8cfbf`
 now updates the tracked skill successfully; content conflicts were reconciled
