@@ -46,16 +46,19 @@ public final class ScenarioContext {
     public void tickChunk(Chunk chunk) {
         requireActive();
         if (!chunk.isForceLoaded()) {
-            chunk.setForceLoaded(true);
             chunks.add(chunk);
+            chunk.setForceLoaded(true);
         }
     }
     public void later(long ticks, Step action) {
         requireActive();
-        tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        BukkitTask[] handle = new BukkitTask[1];
+        handle[0] = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            tasks.remove(handle[0]); // A completed/current one-shot is no longer pending work.
             if (finished) return;
             try { action.run(); } catch (Exception | AssertionError failure) { fail(failure); }
-        }, ticks));
+        }, ticks);
+        tasks.add(handle[0]);
     }
     public void fail(Throwable failure) {
         if (finished) return;

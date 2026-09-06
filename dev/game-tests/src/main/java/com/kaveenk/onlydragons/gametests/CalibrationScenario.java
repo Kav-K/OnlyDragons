@@ -33,8 +33,19 @@ public final class CalibrationScenario implements Scenario {
         var world = Bukkit.getWorlds().getFirst();
         var start = world.getSpawnLocation().clone().add(0, 20, 0);
         context.tickChunk(start.getChunk());
-        // Force-loading reaches entity-ticking state on a subsequent server tick.
-        context.later(4, () -> launch(context, start));
+        // Chunk generation/loading is asynchronous; a fixed short delay is not readiness evidence.
+        context.later(1, () -> awaitTicking(context, start, 200));
+    }
+
+    private void awaitTicking(ScenarioContext context, org.bukkit.Location start, int remaining) {
+        if (start.getChunk().getLoadLevel() == org.bukkit.Chunk.LoadLevel.ENTITY_TICKING) {
+            context.observe("chunkReadinessWaitTicks", 200 - remaining);
+            launch(context, start);
+        } else if (remaining == 0) {
+            throw new IllegalStateException("Test chunk did not reach ENTITY_TICKING: " + start.getChunk().getLoadLevel());
+        } else {
+            context.later(1, () -> awaitTicking(context, start, remaining - 1));
+        }
     }
 
     private void launch(ScenarioContext context, org.bukkit.Location start) {
