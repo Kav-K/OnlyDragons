@@ -652,6 +652,10 @@ completion prerequisites. M3 still requires the requested human visual prefire r
 
 ### T09e fixed restart validation contract (GH-49)
 
+Integrated through PR #50 at `7b8ff0f` after the complete 23-case cohort,
+independent replay/review, task checkpoint and current CI. [Accepted evidence](evidence/t09e-suite.md). This completes generic restart
+validation; managed-encounter recovery remains T08a work.
+
 Adopted within lead-assigned validation maintenance: `same-profile-restart-v1`
 executes exactly two catalog-bound boots in one disposable profile/world/port,
 with one staged binary cohort and shared lease. Each boot receives fresh memory

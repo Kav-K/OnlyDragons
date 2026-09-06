@@ -19,6 +19,9 @@ at `3c35a85` after the full 21-case cohort, independent replay/review and CI;
 [combined evidence](evidence/catalog-procs-suite.md). Bounded M0 is explicitly
 accepted. Lead-dispatched T06 and planned T08a/T08b/T08c still require production
 firing, controls, ranking and loot-simulation evidence; M1–M5 remain unaccepted.
+PR #50 integrated T09e at `7b8ff0f` after the complete 23-case cohort and
+independent acceptance; [generic restart evidence](evidence/t09e-suite.md)
+does not certify T08a managed-encounter recovery.
 
 ## Brief to delivery and evidence
 
@@ -30,7 +33,7 @@ firing, controls, ranking and loot-simulation evidence; M1–M5 remain unaccepte
 | Native drawn bows, shortbow cadence, ammo, offhand deduplication and Duplex identity | T06 with T09d primitives; T08 connects combat/procs | `firing-input`, P08/P09/P13 and T06 `automated-multiplayer-firing`; actual parameterized packets and observed Paper effects. Full accounting attribution remains required at T08/M3 | Fixed select/draw/release/quit calibration cannot prove all inputs; subjective feel remains human |
 | Tracer radius/steering, real pre-spawn UUID continuity and bounded capacity | T07, T10 | P03/P05/P06/P07/P10/P11/P12/P14: real flight, obstruction/miss controls, simultaneous hits, revisions and load/cleanup | Measured player/arrow envelope; preserve M3's human visual prefire rehearsal |
 | One extensible test-dragon definition and inert table bindings | T02b / #38 | Accepted `dragon-definition-catalog`, `sample-loot-table-bindings` through PR #48: whole-candidate validation, retained selections and real production-loader/abort checks | One initial test dragon only; test definitions do not approve later content or production drop numbers |
-| Reusable persisted configuration and same-world restart validation | T09e / #49 after integrated T09a/T09b/T09c/T09d | `same-profile-restart`: fixed two-boot runner, independent phase plans/reports, saved bytes and positive/abort generic calibration | In review in PR #50; [focused Paper/replay passed](evidence/t09e-focused-paper.md), lead whole-cohort acceptance pending; T08a managed-dragon recovery remains separate |
+| Reusable persisted configuration and same-world restart validation | T09e / #49, complete through PR #50 at `7b8ff0f` | Accepted `same-profile-restart`: two actual boots, saved configuration, independent phase plans/reports, connected commands and exact positive/abort outcomes in the [23-case cohort](evidence/t09e-suite.md) | T08a must still prove its own managed-dragon disable/start recovery; human/client gates remain separate |
 | Managed real dragon plus spawn/status/reset/result inspection | T08a / #39 after shared T08/T06 path | `managed-dragon-development`: native and domain death observations, permissions/output, failed spawn, repeated reset and one completion | No engine clone; no real grants; direct spawning does not accept prefire or the altar |
 | Post-kill damage ranking including ghost damage and overkill | T08b / #40 | `frozen-damage-ranking`: unique placements, strict-increase commit provenance, same-tick ordinal ties, no late credit and actual distinct-player attribution/messages | Cosmetic presentation and authenticated full-client compatibility remain separate |
 | Personal placement-based rolls, improved chances and hard item locks | T08c / #41 | `personal-loot-preview`: seeded sample policies, hard exclusion, per-player/type isolation, visible simulation and no inventory/XP/currency/grant side effects | Real rewards always disabled; sample probabilities and items are not production balance |
