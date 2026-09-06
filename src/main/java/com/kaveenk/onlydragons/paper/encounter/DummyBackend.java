@@ -12,7 +12,7 @@ public final class DummyBackend implements TargetBackend {
     public DummyBackend(Location location) {
         entity = location.getWorld().spawn(location, Cow.class, cow -> {
             cow.setAI(false); cow.setGravity(false); cow.setPersistent(false);
-            cow.setRemoveWhenFarAway(false); cow.setSilent(true); cow.setCollidable(false);
+            cow.setRemoveWhenFarAway(false); cow.setSilent(true);
             cow.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20);
             cow.setHealth(20); cow.setCustomNameVisible(true);
         });

@@ -1194,7 +1194,8 @@
       "same_tick_lethal_two_owner_order",
       "lethal_overkill_and_ghost_totals",
       "frozen_participant_commit_stamps",
-      "one_completion_per_generation"
+      "one_completion_per_generation",
+      "asymmetric_child_owner_parent_shot"
     ],
     "requiredActorMessages": [
       {
@@ -1251,7 +1252,48 @@
           "HP removed=0.0 credit=100.0",
           "total HP=100.0 credit=200.0"
         ]
+      },
+      {
+        "actor": "beta",
+        "session": "s1",
+        "id": "crit-inspection",
+        "containsAll": [
+          "Captured weapon=crit",
+          "ferocity=0.0"
+        ]
       }
+    ]
+  },
+  "practice-lifecycle": {
+    "mechanicRevision": "practice-lifecycle-v1",
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/practice-lifecycle-v1.json",
+    "requiredAssertions": [
+      "old_arrow_live_before_reconnect",
+      "new_session_does_not_reactivate_old",
+      "old_arrow_physical_only_after_reconnect",
+      "old_arrow_identity_and_token_frozen",
+      "queued_child_cleared_on_real_death",
+      "queued_child_cleared_on_actual_quit",
+      "captured_two_owner_totals_after_reconnect",
+      "queued_child_cleared_on_arena_exit",
+      "reset_has_real_pending_arrow",
+      "command_reset_retires_old_generation",
+      "new_encounter_online_activation_without_relog",
+      "real_late_arrow_pending_before_lethal",
+      "proc_lethal_independent_health_credit",
+      "proc_lethal_parent_stamp_and_completion",
+      "late_arrow_retired_without_credit",
+      "proc_completion_frozen_once",
+      "two_pending_lethal_claims_one_commit",
+      "competing_lethal_overkill_and_owner",
+      "competing_completion_and_cleanup_once",
+      "repeat_cleanup_no_live_fights",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "owned_listeners_removed",
+      "owned_resources_released"
     ]
   }
 }

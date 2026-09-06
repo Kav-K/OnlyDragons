@@ -443,6 +443,11 @@ partial outcome for legacy callers.
 ordinal atomically with health, credit and participant stamps. Accepted zeros and
 rounded-away additions consume ordinals without changing a last-strict-increase
 stamp. First-successful-participation provenance survives zero-to-positive changes.
+Adapter Views retain at most 64 recent impacts and explicitly report total accepted
+and omitted counts; domain idempotency and ordinal history are not pruned. Captured
+parent diagnostics are released when no queued child needs them. Read-only claim
+observers cannot mutate the service during notification; subscriber failures do
+not interrupt later claims. Cleanup attempts every owned resource independently.
 `EncounterResult` freezes these stamps, terminal ordinal and optional full catalog
 Selection; legacy constructors explicitly have absent provenance. This supplies
 #40's ranking inputs without implementing ranking. #39 extends the native backend;

@@ -186,9 +186,9 @@ public final class ManagedCombatService implements AutoCloseable {
         if (closed) return;
         long now = Integer.toUnsignedLong(Bukkit.getCurrentTick());
         for (Fight f : List.copyOf(fights.values())) {
-            if (f.state != State.ACTIVE) { if (f.backend.released()) release(f); continue; }
-            if (!f.backend.entity().isValid() || f.backend.entity().isDead()) { terminate(f); continue; }
             try {
+                if (f.state != State.ACTIVE) { if (f.backend.released()) release(f); continue; }
+                if (!f.backend.entity().isValid() || f.backend.entity().isDead()) { terminate(f); continue; }
                 reconcile(f);
                 var drain = f.procs.tickOutcomes(now);
                 for (var result : drain.results()) explain(f, result, f.shots.get(result.parentImpactId().orElse(result.impactId())),
@@ -233,7 +233,9 @@ public final class ManagedCombatService implements AutoCloseable {
     }
     private void failed(Fight f, RuntimeException failure) {
         // A callback/projection failure cannot erase a committed result or invite a retry.
-        try { synchronize(f); } finally {
+        try { synchronize(f); }
+        catch (RuntimeException recoveryFailure) { diagnostic("Recovery projection failed: " + recoveryFailure); }
+        finally {
             tell(f.owner, "Practice stopped: " + failure.getMessage() + "; committed accounting retained.");
             terminate(f);
         }

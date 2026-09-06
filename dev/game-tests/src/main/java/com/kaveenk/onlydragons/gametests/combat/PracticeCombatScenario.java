@@ -37,7 +37,7 @@ public final class PracticeCombatScenario implements Scenario, Listener {
         World w=players.player("alpha").getWorld();
         for(int x=-2;x<=2;x++)for(int z=-2;z<=2;z++)c.tickChunk(w.getChunkAt(x,z));
         for(String actor:List.of("alpha","beta")) {
-            Player p=players.player(actor);p.setGameMode(GameMode.SURVIVAL);p.setAllowFlight(true);p.setFlying(true);p.setInvulnerable(true);
+            Player p=players.player(actor);p.setGameMode(GameMode.SURVIVAL);p.setAllowFlight(true);p.setFlying(true);p.setInvulnerable(true);p.setCollidable(false);
             p.getInventory().clear();p.getInventory().setHeldItemSlot(0);position(actor);
         }
         c.check("two_real_actors",true,!players.identity("alpha").equals(players.identity("beta")));
@@ -70,7 +70,7 @@ public final class PracticeCombatScenario implements Scenario, Listener {
     void ordinary() {
         kit("alpha","ordinary");draw("alpha","ordinary",()->settled(1,()->{
             totals("ordinary",900,100,0,1);command("alpha","last",()->{
-                kit("beta","crit");draw("beta","crit",()->settled(2,()->{totals("critical",750,100,150,2);ferocity(0);}));
+                kit("beta","crit");draw("beta","crit",()->settled(2,()->{totals("critical",750,100,150,2);command("beta","last-crit",()->ferocity(0));}));
             });
         }));
     }
@@ -111,15 +111,26 @@ public final class PracticeCombatScenario implements Scenario, Listener {
         });
     }
     void volley() {
-        for(String actor:List.of("alpha","beta")){kit(actor,"ferocity_100");position(actor);players.request(actor,"volley-use");}
+        for(String actor:List.of("alpha","beta")){
+            kit(actor,actor.equals("alpha")?"ferocity_100":"crit");
+            if(actor.equals("beta"))c.production().equipment().bonus(players.player(actor),com.kaveenk.onlydragons.domain.stats.StatKey.FEROCITY,100);
+            position(actor);players.request(actor,"volley-use");
+        }
         players.await("both volley bows",60,()->players.player("alpha").isHandRaised()&&players.player("beta").isHandRaised(),()->c.later(22,()->{
             int count=settlements.size();players.request("alpha","volley-release");players.request("beta","volley-release");
             settled(count+2,()->c.later(5,()->{
                 var hits=settlements.subList(count,settlements.size());
                 c.check("simultaneous_two_owner_physical_commits",true,hits.size()==2&&hits.stream().map(SettledHit::collisionTick).distinct().count()==1&&hits.stream().map(h->h.projectile().shot().ownerId()).distinct().count()==2);
-                totals("reduced_two_owner",250,200,200,4);
-                c.check("reduced_hp_credit_separate",true,view().contributions().values().stream().allMatch(t->t.actualHealthDamage()==125&&t.contributionDamage()==200));
-                lethalVolley();
+                totals("reduced_two_owner",187.5,200,300,4);
+                c.check("reduced_hp_credit_separate",true,view().contributions().get(players.identity("alpha")).actualHealthDamage()==125&&view().contributions().get(players.identity("beta")).actualHealthDamage()==187.5);
+                c.check("asymmetric_child_owner_parent_shot",true,view().impacts().stream().filter(r->r.kind()==DamageResult.Kind.FEROCITY).allMatch(child->{
+                    var parent=view().impacts().stream().filter(r->r.impactId().equals(child.parentImpactId().orElseThrow())).findFirst().orElseThrow();
+                    double expected=parent.ownerId().equals(players.identity("alpha"))?100:150;
+                    return child.ownerId().equals(parent.ownerId())&&child.shotId().equals(parent.shotId())&&child.origin().equals(parent.origin())
+                            &&child.crit()==parent.crit()&&child.amounts().contributionDamage()==expected&&child.amounts().actualHealthDamage()==expected*.25
+                            &&nativeOwners.get(parent.origin().projectileId()).equals(parent.ownerId());
+                }));
+                c.production().equipment().clearBonuses(players.identity("beta"));lethalVolley();
             }));
         }));
     }
@@ -130,8 +141,8 @@ public final class PracticeCombatScenario implements Scenario, Listener {
             settled(before+2,()->{
                 var v=view();var r=v.completion().orElseThrow();var hits=settlements.subList(before,settlements.size());
                 c.check("same_tick_lethal_two_owner_order",true,hits.size()==2&&hits.stream().map(SettledHit::collisionTick).distinct().count()==1
-                        &&r.completedOrdinal()==6&&v.impacts().get(4).amounts().actualHealthDamage()==150&&v.impacts().get(5).amounts().actualHealthDamage()==100);
-                c.check("lethal_overkill_and_ghost_totals",true,r.participants().size()==2&&r.participants().values().stream().allMatch(t->t.contributionDamage()==350)
+                        &&r.completedOrdinal()==6&&v.impacts().get(4).amounts().actualHealthDamage()==150&&v.impacts().get(5).amounts().actualHealthDamage()==37.5);
+                c.check("lethal_overkill_and_ghost_totals",true,r.participants().size()==2&&r.participants().get(players.identity("alpha")).contributionDamage()==350&&r.participants().get(players.identity("beta")).contributionDamage()==450
                         &&r.participants().values().stream().mapToDouble(EncounterResult.Contribution::actualHealthDamage).sum()==500);
                 c.check("frozen_participant_commit_stamps",true,r.participants().values().stream().map(t->t.lastCreditIncrease().orElseThrow().ordinal()).sorted().toList().equals(List.of(5L,6L))
                         &&r.participants().values().stream().allMatch(t->t.lastCreditIncrease().orElseThrow().tick()==r.completedTick()));
@@ -182,11 +193,22 @@ public final class PracticeCombatScenario implements Scenario, Listener {
         c.check(label+"_beta",beta,v.contributions().getOrDefault(players.identity("beta"),new EncounterResult.Contribution(0,0,0,false)).contributionDamage());
         c.check(label+"_impacts",impacts,v.impacts().size());
     }
-    void position(String actor){players.setupPosition(actor,new Location(players.player(actor).getWorld(),actor.equals("alpha")?.35:.65,100,.5,0,2));}
+    void position(String actor){
+        Player player=players.player(actor);var location=new Location(player.getWorld(),actor.equals("alpha")?-.7:.7,100,.5,0,2);
+        if(target!=null&&target.isValid()){
+            double dx=target.getLocation().getX()-location.getX(),dz=target.getLocation().getZ()-location.getZ();
+            location.setYaw((float)Math.toDegrees(Math.atan2(-dx,dz)));
+            location.setPitch((float)Math.toDegrees(Math.atan2(location.getY()+player.getEyeHeight()-target.getLocation().getY()-1,Math.hypot(dx,dz))));
+        }
+        player.setVelocity(new org.bukkit.util.Vector());players.setupPosition(actor,location);
+    }
     void kit(String actor,String id){players.setupItem(actor,0,c.production().equipment().createLoadout(id));players.setupItem(actor,9,new ItemStack(Material.ARROW,64));position(actor);}
     void command(String actor,String step,Runnable next){int before=commands.getOrDefault(players.identity(actor),0);players.request(actor,step);players.await("command "+step,60,()->commands.getOrDefault(players.identity(actor),0)>before,()->c.later(2,next::run));}
     void draw(String actor,String step,Runnable next){int before=releases.getOrDefault(players.identity(actor),0);players.request(actor,step+"-use");players.await("bow use "+step,60,()->players.player(actor).isHandRaised(),()->c.later(22,()->{players.request(actor,step+"-release");players.await("bow release "+step,60,()->releases.getOrDefault(players.identity(actor),0)>before,next::run);}));}
-    void settled(int count,Runnable next){players.await("settled physical count "+count,100,()->settlements.size()>=count,()->c.later(1,next::run));}
+    void settled(int count,Runnable next){
+        c.later(80,()->{ if(settlements.size()<count){c.observe("failedBowTrace",c.production().bows().trace().stream().map(t->Map.of("kind",t.kind(),"projectile",t.projectileId().toString(),"tick",t.tick(),"detail",t.detail())).toList());
+            c.observe("failedGeometry",Map.of("target",target.getLocation().toVector().toString(),"bounds",target.getBoundingBox().toString(),"nativeHits",collisions.toString(),"nativeOwners",nativeOwners.toString()));}});
+        players.await("settled physical count "+count,100,()->settlements.size()>=count,()->c.later(1,next::run));}
     @EventHandler(priority=EventPriority.MONITOR) public void command(PlayerCommandPreprocessEvent e){commands.merge(e.getPlayer().getUniqueId(),1,Integer::sum);}
     @EventHandler(priority=EventPriority.MONITOR) public void bow(EntityShootBowEvent e){if(e.getEntity() instanceof Player p){releases.merge(p.getUniqueId(),1,Integer::sum);if(swap)p.getInventory().setItemInMainHand(c.production().equipment().createLoadout("crit"));}}
     @EventHandler(priority=EventPriority.MONITOR) public void launch(ProjectileLaunchEvent e){if(e.getEntity() instanceof Arrow arrow&&arrow.getShooter() instanceof Player p){nativeOwners.put(arrow.getUniqueId(),p.getUniqueId());if(nativeDamage)arrow.setDamage(2);}}

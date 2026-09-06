@@ -246,6 +246,13 @@
               "args": {}
             },
             {
+              "id": "last-crit",
+              "action": "command",
+              "args": {
+                "command": "onlydragons combat last"
+              }
+            },
+            {
               "id": "guard-use",
               "action": "useItem",
               "args": {

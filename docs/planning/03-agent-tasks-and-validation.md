@@ -466,7 +466,9 @@ combat/proc/native backend lifecycle, kit/dummy/scenario/last-hit commands and
 atomic participant/completion provenance. Starting doctor was ready; plan was
 valid with acceptance false. The first wrapper build after adapter regressions
 passes 194 production tests with no skipped tests. New two-player Paper scenarios
-and receipt mappings are being implemented; no Paper acceptance is claimed.
+and receipt mappings are implemented; focused verification is in progress.
+[Iteration evidence and unrun gates](evidence/t08-focused.md) retain failed runs;
+no Paper acceptance is claimed.
 The lead owns the complete final hosted baseline, independent replay/checkpoint,
 CI and merge per issue dispatch. Focused clean Paper evidence is worker-owned.
 Windows Build/Play, authenticated-client compatibility and visuals remain pending.

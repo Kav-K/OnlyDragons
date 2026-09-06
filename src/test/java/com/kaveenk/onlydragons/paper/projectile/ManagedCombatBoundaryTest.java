@@ -146,4 +146,35 @@ class ManagedCombatBoundaryTest {
         plugin.onDisable();assertEquals(0,bows.taskCount());assertEquals(0,plugin.equipment().sessionCount());
     }
 
+    @Test void repeatedProjectionFailureCannotEscapeReceiverAndStarveOtherFight() {
+        open(1000,1);var w=b.getWorld();b.teleport(new Location(w,2500,100,0));Cow broken=w.spawn(b.getLocation(),Cow.class);
+        int[] calls={0};var backend=new TargetBackend(){
+            public LivingEntity entity(){return broken;}public boolean airborne(){return false;}
+            public void synchronize(TargetState t){if(calls[0]++>0)throw new IllegalStateException("projection fixture");}
+            public void defeated(EncounterResult r){}public boolean released(){return !broken.isValid();}public void close(){broken.remove();}
+        };
+        UUID other=plugin.combat().open(b.getUniqueId(),backend,new BoundingBox(2400,0,-100,2600,200,100),1000,0,"dummy",CombatProfile.calibration(),Optional.empty(),()->0);
+        int[] observed={0};plugin.combat().observeSettled(hit->observed[0]++);
+        bows.hit(new ProjectileHitEvent(shoot(b,"ordinary"),broken,null,null));impact(shoot(a,"ordinary"));
+        assertDoesNotThrow(()->server.getScheduler().performOneTick());
+        assertEquals(2,observed[0]);assertEquals(900,plugin.combat().view(id).orElseThrow().target().currentHealth());
+        assertEquals(1,plugin.combat().view(other).orElseThrow().acceptedImpacts());assertEquals(ManagedCombatService.State.TERMINATED,plugin.combat().view(other).orElseThrow().state());
+        assertFalse(broken.isValid());assertEquals(0,bows.pendingClaims());
+    }
+    @Test void terminalReleaseProbeFailureDoesNotStarveOtherFightProcTick() {
+        open(1000,1);var w=b.getWorld();b.teleport(new Location(w,2500,100,0));Cow broken=w.spawn(b.getLocation(),Cow.class);
+        boolean[] fail={false};var backend=new TargetBackend(){
+            public LivingEntity entity(){return broken;}public boolean airborne(){return false;}
+            public void synchronize(TargetState t){}public void defeated(EncounterResult r){}
+            public boolean released(){if(fail[0])throw new IllegalStateException("release probe fixture");return false;}
+            public void close(){broken.remove();}
+        };
+        UUID other=plugin.combat().open(b.getUniqueId(),backend,new BoundingBox(2400,0,-100,2600,200,100),50,0,"dummy",CombatProfile.calibration(),Optional.empty(),()->0);
+        bows.hit(new ProjectileHitEvent(shoot(b,"ordinary"),broken,null,null));impact(shoot(a,"ferocity_100"));server.getScheduler().performOneTick();
+        var result=plugin.combat().view(other).orElseThrow().completion().orElseThrow();fail[0]=true;
+        server.getScheduler().performTicks(2);assertEquals(800,plugin.combat().view(id).orElseThrow().target().currentHealth());
+        assertSame(result,plugin.combat().view(other).orElseThrow().completion().orElseThrow());assertFalse(broken.isValid());
+        assertEquals(1,plugin.combat().completions().size());assertEquals(1,plugin.combat().activeCount());
+    }
+
 }

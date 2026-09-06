@@ -79,4 +79,12 @@ class CombatProvenanceTest {
         assertFalse(r.accepted()); assertEquals(before,c.contributions()); assertEquals(1,c.acceptedOrdinal());
         c.end(); assertFalse(hit(c,b,100,13).accepted()); assertTrue(c.completion().isEmpty());
     }
+    @Test void completionRetainsFullSelectedDefinitionAndRejectsMismatchedIdentity() {
+        var selection=com.kaveenk.onlydragons.domain.encounter.definition.DragonCatalogLoader.calibration(CalibrationLoadouts.registry()).select("test_dragon");
+        var c=new CombatEncounter(new TargetState(generation,target,1000,1000,0),"test_dragon",profile,Optional.of(selection));
+        hit(c,a,1000,10);var result=c.completion().orElseThrow();
+        assertSame(selection,result.selection().orElseThrow());assertEquals(1,result.completedOrdinal());
+        assertThrows(IllegalArgumentException.class,()->new CombatEncounter(new TargetState(generation,target,999,999,0),"test_dragon",profile,Optional.of(selection)));
+    }
+
 }

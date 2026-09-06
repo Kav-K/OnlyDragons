@@ -35,6 +35,10 @@ public final class PracticeCommand {
             var s = e.shot();
             say(sender, "Captured weapon=" + s.weapon().definitionId() + " stats=" + s.stats().revision()
                     + " draw=" + s.drawScale() + " projectile=" + s.projectileScale() + " ferocity=" + e.damage().effectiveFerocity());
+            say(sender, "Captured damage=" + s.stats().effective(com.kaveenk.onlydragons.domain.stats.StatKey.WEAPON_DAMAGE)
+                    + " crit chance=" + s.stats().effective(com.kaveenk.onlydragons.domain.stats.StatKey.CRIT_CHANCE)
+                    + " crit damage=" + s.stats().effective(com.kaveenk.onlydragons.domain.stats.StatKey.CRIT_DAMAGE)
+                    + " base ferocity=" + s.stats().effective(com.kaveenk.onlydragons.domain.stats.StatKey.FEROCITY));
             say(sender, "Profile=" + e.damage().mechanic() + " collision tick=" + e.collisionTick() + " commit tick=" + e.damage().tick()
                     + " procs=" + e.admission() + " modifiers=" + e.damage().modifierBreakdown());
             return;
