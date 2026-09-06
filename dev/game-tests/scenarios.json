@@ -6,5 +6,39 @@
   "deliberate-failure": {
     "mechanicRevision": "harness-v1",
     "requiredAssertions": ["server_thread", "production_enabled", "production_command_registered", "production_service_initialized", "paper_item_pdc_roundtrip", "test_chunk_entity_ticking", "native_arrow_still_valid", "native_arrow_uuid_continuous", "server_ticks_advanced", "native_arrow_moved", "deliberate_failure", "owned_entities_removed", "owned_tasks_cancelled", "owned_chunk_tickets_removed"]
+  },
+  "foundation-contracts": {
+    "mechanicRevision": "contract-fixture-v1",
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "contracts_loaded_from_production",
+      "test_chunk_entity_ticking",
+      "native_arrow_valid",
+      "native_arrow_uuid_captured",
+      "server_ticks_advanced",
+      "native_arrow_moved",
+      "snapshot_revision_retained",
+      "weapon_damage_capture_immutable",
+      "raw_crit_retained_above_100",
+      "ordinary_crit_probability_capped",
+      "source_provenance_retained",
+      "captured_enchants_survive_swap",
+      "snapshot_map_read_only",
+      "snapshot_provenance_read_only",
+      "shot_enchants_read_only",
+      "one_ultimate_enforced",
+      "nonfinite_stat_rejected",
+      "ordinary_critical_fixture_210",
+      "ferocity_requested_hp_52_5",
+      "ferocity_actual_hp_20",
+      "ferocity_contribution_210",
+      "ferocity_parent_retained",
+      "rejected_hit_cannot_earn_score",
+      "zero_hp_target_is_dead",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ]
   }
 }
