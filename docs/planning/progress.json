@@ -171,10 +171,44 @@
       "notice": "PR #48 merged at 3c35a85bfa5d6bf6788af7c26d59891cfb852175 after the complete 21-case hosted suite, independent raw replay/review, task checkpoints and current CI. Exact evidence: docs/planning/evidence/catalog-procs-suite.md. Bounded captured-snapshot proc coordinator and scheduler/session cleanup; physical P08/P09 and T08 composition remain later integration. Historical worker evidence retains its recorded inputs; earlier pending or held acceptance is not relabeled as passing."
     },
     "T06": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "Draft PR #52, In review. Clean 49fa9ae passes 115 feature Paper assertions and 182 production/28 client tests. Combined 92d4a37 includes main 92147a2 and reviewed Git-test cleanup; 257 Python tests and current CI pass. Hosted34035343529 failed its Paper job; the lead owns retained-artifact diagnosis, remediation and full receipt/T06 checkpoint after worker handoff. No T06 acceptance; see evidence/t06-firing.md."
+      "status": "complete",
+      "completedRequirements": [
+        "firing-input",
+        "P02",
+        "P04",
+        "headless-player-primitives",
+        "headless-damage-primitives",
+        "automated-multiplayer-firing"
+      ],
+      "evidence": {
+        "firing-input": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34036927572",
+          "revision": "f4178ba53f4db1d75ff7d58503411a8bfe44d943"
+        },
+        "P02": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34036927572",
+          "revision": "f4178ba53f4db1d75ff7d58503411a8bfe44d943"
+        },
+        "P04": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34036927572",
+          "revision": "f4178ba53f4db1d75ff7d58503411a8bfe44d943"
+        },
+        "headless-player-primitives": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34036927572",
+          "revision": "f4178ba53f4db1d75ff7d58503411a8bfe44d943"
+        },
+        "headless-damage-primitives": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34036927572",
+          "revision": "f4178ba53f4db1d75ff7d58503411a8bfe44d943"
+        },
+        "automated-multiplayer-firing": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34036927572",
+          "revision": "f4178ba53f4db1d75ff7d58503411a8bfe44d943"
+        }
+      },
+      "reviewedRevision": "f4178ba53f4db1d75ff7d58503411a8bfe44d943",
+      "mergedRevision": "25891c0f1c04a9df5ec796d8ba972f62c8c9cd50",
+      "notice": "PR #52 merged at 25891c0 after the complete 24-case f4178ba cohort, independent raw replay/review, actual-main T06/combined task checkpoints and current CI. Owned firing passed 115 assertion rows; the repaired equipment case passed 25. See evidence/t06-suite.md for exact identities and preserved failed iteration. Bounded firing/physical claims are complete; T08 accounting, successor dispatch and M1–M5 remain separate."
     },
     "T07": {
       "status": "blocked",

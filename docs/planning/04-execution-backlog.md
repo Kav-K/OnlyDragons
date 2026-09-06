@@ -1,11 +1,17 @@
 # Execution backlog and integration
 
+PR #52 integrated T06 at `25891c0` after the reviewed 24-case cohort,
+independent replay/task checkpoints, raw/source review and current CI.
+[Firing acceptance and single-consumer boundary](evidence/t06-suite.md).
+T08's prerequisites are integrated; T08 and optional parallel T07 remain
+undispatched until the lead records their next assignment.
+
 PR #50 integrated T09e at `7b8ff0f` after the reviewed 23-case cohort,
 independent replay/task checkpoints and current CI. [Restart acceptance](evidence/t09e-suite.md).
 T08a now has its generic restart prerequisite; its T08 combat prerequisite
 and managed-dragon recovery evidence remain outstanding.
 
-PR #48 integrated T02b/T05 at `3c35a85`; bounded M0 contracts/feasibility is explicitly accepted. [Combined evidence](evidence/catalog-procs-suite.md). M1–M5 and all later feature gates remain unaccepted. T05 satisfies only one T08 prerequisite; T06 is still required. Catalog completion alone does not release T08a/T08c.
+PR #48 integrated T02b/T05 at `3c35a85`; bounded M0 contracts/feasibility retains its explicit acceptance. [Combined evidence](evidence/catalog-procs-suite.md). M1–M5 and all later feature gates remain unaccepted. T08 still needs its own connected combat/proc evidence. Catalog completion alone does not release T08a/T08c.
 
 The three original planning documents remain required shared context. This file
 tracks execution order; `backlog.json` contains each bounded task specification
@@ -45,7 +51,7 @@ part of the worker's scope.
 | T09c | [#28](https://github.com/Kav-K/OnlyDragons/issues/28) | Complete: PR #32 merged at 73a8cc8 | Shared regression suites, connected-player equipment/message fixture, actor lock-cycle regression/40-second soak, and evidence/dependency checkpoints. All 15 baseline cases met their declared outcomes; [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). P01–P14 remain pending; M0 was later separately accepted through PR #48, while M1–M5 remain unaccepted. |
 | T09d | [#43](https://github.com/Kav-K/OnlyDragons/issues/43) | Complete: PR #44 merged at `9def91f75d655caaccd6c7fa01313e4ba3a0ea54` | Reviewed `3047a56`: all 17 hosted suite outcomes, independent raw replay/task checkpoint and runtime CI passed; final documentation-head CI passed at `9c669ad`. [Evidence](evidence/t09d-suite.md). Reusable player/damage primitives and verified offline bootstrap are integrated; other task prerequisites and dispatch labels still apply. No duplicate Symphony dispatch or generic-to-feature acceptance substitution. |
 | T09e | [#49](https://github.com/Kav-K/OnlyDragons/issues/49) | Complete: PR #50 merged at `7b8ff0f` | Fixed two-boot Paper fixture and generic persisted starter configuration; accepted 23-case cohort, independent replay/review, actual-main checkpoint and CI. [Evidence](evidence/t09e-suite.md). Managed-dragon recovery remains T08a work. |
-| T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | In progress: lead-dispatched after PR #48 | T01b/T02/T04 integrated; physical firing/claims and multiplayer feature acceptance remain pending. |
+| T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | Complete: PR #52 merged at `25891c0`; [evidence](evidence/t06-suite.md) | Owned firing, native suppression, terminal claims, captured Duplex and bounded multiplayer firing accepted; T08 connects accounting through the published receiver. |
 | T07 | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | T04, T06 | Tracer steering and arrow continuity. |
 | T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | T01b, T03, T05, T06, T09d | Playable dummy combat and explanations with shared headless fixtures. |
 | T08a | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | T08, T02b, T09e; planned, not dispatched | Shared real-dragon backend and development controls using T06 claims/T08 combat; published for T10. |
@@ -57,7 +63,7 @@ part of the worker's scope.
 
 Symphony has three coding slots. Label only tasks whose prerequisites are
 integrated into main and whose manual gates are satisfied. #6 and #20 are merged,
-#7 and #28 are complete after PR #32 at `73a8cc8`; objective connected-player equipment acceptance is verified. PR #31 is accepted and merged; PR #30 still awaits its reconciliation. #9 is eligible for the lead's label after reading the accepted T04 policy. Issue/PR state owns live claims;
+#7 and #28 are complete after PR #32 at `73a8cc8`; objective connected-player equipment acceptance is verified. PR #31 is accepted and merged; T02b/T05 integrated through PR #48 and T06 through PR #52. T08/#11 and optional T07/#10 are the next eligible work, with dispatch still lead-managed. Issue/PR state owns live claims;
 the lead reconciles this summary after each serial merge.
 All server scenarios share one lease and obey the memory gate, regardless of
 how many agents are coding. A ready branch is not a satisfied dependency.

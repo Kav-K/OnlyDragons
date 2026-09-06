@@ -358,8 +358,9 @@ Do not require a native damage event: zero-damage/seated impacts and simultaneou
 physical hits can omit it. [Player-owned evidence](../../dev/game-tests/findings/projectile-player-feasibility.md)
 records the positive controls and limits. These scoped decisions revise the
 unsupported semantic/phase assumptions; production end-to-end claim, veto,
-retirement and phase-rejection tests remain assigned to later adapter tasks.
-T04 is accepted and merged at `705de34`; [final evidence and separate policy review](evidence/t04-suite.md) record the decision. T06/#9 is lead-dispatched after PR #48. Bounded M0 contracts/feasibility is explicitly accepted through the [combined cohort and separate policy review](evidence/catalog-procs-suite.md); M1–M5 remain unaccepted.
+retirement and phase-rejection tests are separately accepted under T06 in
+PR #52 at `25891c0`; [T06 evidence](evidence/t06-suite.md).
+T04 is accepted and merged at `705de34`; [final evidence and separate policy review](evidence/t04-suite.md) record the decision. Bounded M0 contracts/feasibility retains its acceptance through the [combined cohort and separate policy review](evidence/catalog-procs-suite.md); T08 accounting and M1–M5 remain unaccepted.
 No production adapter is introduced by the feasibility scenario.
 
 A proposed simple damage model is:
@@ -538,14 +539,17 @@ Support a native drawn bow first. Capture its real arrow and force through the b
 
 For Duplex, emit one physical secondary per eligible primary arrow with separate UUID and a recorded parent. Proposed default is a one-tick emission offset and the captured launch transform. This preserves provenance even if the player swaps before the child appears. Child damage scales with enchant level; ammo cost is per accepted trigger, with no extra charge for the Duplex child. Verify spawn obstruction and cleanup if the owner exits during emission.
 
-### T06 implementation contract (in progress)
+### T06 implementation contract
 
 The [bounded firing API and calibration note](evidence/t06-firing.md) records
 the additive owned registry, independent encounter admission/target registration,
 launch-session UUID, and single settled-hit consumer. T00 DTOs stay unchanged;
 accounting receives settlement time separately from collision time. Native ammo
 already debited by Paper is distinct from shortbow-owned reservation. The
-reviewed part/phase policy above remains unchanged; feature acceptance is pending.
+reviewed part/phase policy above remains unchanged. PR #52 merged at `25891c0`
+after the complete current-input cohort, independent replay/review, T06 checkpoint
+and CI; [accepted firing/physical-claim evidence](evidence/t06-suite.md). T08
+still owns the combat/proc receiver and managed health/result integration.
 
 ### Homing update
 
@@ -647,7 +651,7 @@ profiles remain authenticated. PR #32 supplies reviewed catalog-declared actor
 admission, connected equipment assertions and a delayed-quit soak. T04's separate
 player-owned damage/phase evidence and scoped policy are now accepted in PR #31;
 [final evidence](evidence/t04-suite.md) distinguishes those observations from
-calibration and the still-deferred production adapter.
+calibration and T06's separately accepted production firing/physical-claim adapter.
 
 T09d implements reusable multi-player/action and damage-observation primitives plus
 verified offline bootstrap. Its [brief coverage and fixture contract](06-brief-coverage.md)
@@ -687,7 +691,7 @@ define the fixed evidence envelope.
 
 | Milestone | Playable outcome | Exit gate |
 | --- | --- | --- |
-| M0: contracts and feasibility — accepted | Written rules plus a small real-Paper collision experiment | Multipart hits, native suppression, simultaneous arrows, and despawn control have an evidenced implementation path; [explicit PR48-cohort acceptance](evidence/catalog-procs-suite.md). Production enforcement remains later work. |
+| M0: contracts and feasibility — accepted | Written rules plus a small real-Paper collision experiment | Multipart hits, native suppression, simultaneous arrows, and despawn control have an evidenced implementation path; [explicit PR48-cohort acceptance](evidence/catalog-procs-suite.md). Production enforcement is separately evidenced under T06. |
 | M1: stats and combat | Inspectable stats, tagged test bow, dummy, crits, ferocity, separate ledgers | Deterministic math tests and real-target hit reports agree; vanilla damage is not added twice. |
 | M2: enchant and arrow sandbox | Tracer, Duplex, Fatal Tempo, Snipe, shortbow; Power/Vicious and Overload hooks | Physical projectile identity, input cadence, swap/expiry, and proc bounds pass. |
 | M3: prefire rehearsal | Repeatable countdown and real dragon hatch | A human and automated trace prove pre-spawn arrows can hit, with valid misses remaining misses. |

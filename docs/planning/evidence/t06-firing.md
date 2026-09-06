@@ -1,9 +1,15 @@
 # T06 owned firing boundary (GH-9)
 
-Implementation is in review in [draft PR #52](https://github.com/Kav-K/OnlyDragons/pull/52)
-on `symphony/gh-9`. Ordinary merge `7b8d1da` integrates main
+**Accepted 6 September 2026 through [PR #52](https://github.com/Kav-K/OnlyDragons/pull/52)
+at `25891c0f1c04a9df5ec796d8ba972f62c8c9cd50`.** The [final 24-case cohort and
+acceptance evidence](t06-suite.md) record exact source/artifact identities,
+independent replay/review, task checkpoint and CI. The consumer API below remains
+the T08/T07 integration contract; subsequent sections retain earlier iterations.
+
+At the earlier handoff, implementation was in review on `symphony/gh-9`.
+Ordinary merge `7b8d1da` integrated main
 `92147a25c7dfd6f761f502bdbac0d00ffa261ef8`, preserving all 24 selected cases
-and accepted T02b/T05/M0 context. No T06 acceptance is claimed yet.
+and accepted T02b/T05/M0 context. No T06 acceptance was claimed at that stage.
 
 ## Consumer contract
 
