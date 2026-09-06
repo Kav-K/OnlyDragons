@@ -596,7 +596,18 @@ class CheckpointTests(unittest.TestCase):
             checkpoint.validate_plan(self.project, snapshot, now_ms=1_000_000)
 
     def test_dispatch_and_stale_snapshot_rejected(self):
+        # This scenario deliberately dispatches a planned task. The living ledger
+        # may already have T06 active/complete and accepted downstream milestones.
+        self.block_dependent_fixture_tasks('T06')
+        progress = self.read(PROGRESS)
+        progress['tasks']['T06'] = {
+            'status': 'planned', 'completedRequirements': [], 'evidence': {},
+        }
+        for milestone in progress['milestones'].values():
+            milestone.update(status='not-accepted', evidence={})
+        self.write(PROGRESS, progress)
         snapshot = self.snapshot()
+        self.assertTrue(checkpoint.validate_plan(self.project, snapshot, now_ms=1_000_000)['summary']['planValid'])
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'Stale/future'):
             checkpoint.validate_plan(self.project, snapshot, now_ms=2_000_000)
         number = self.read(MAPPING)['T06']['number']

@@ -1,11 +1,11 @@
-# T05 reconciliation and pending runtime acceptance
+# T05 accepted integration and historical worker evidence
 
-[PR #30](https://github.com/Kav-K/OnlyDragons/pull/30), [issue #8](https://github.com/Kav-K/OnlyDragons/issues/8), remains In review.
+[Issue #8](https://github.com/Kav-K/OnlyDragons/issues/8) implementation from [PR #30](https://github.com/Kav-K/OnlyDragons/pull/30) was integrated through [PR #48](https://github.com/Kav-K/OnlyDragons/pull/48) at `3c35a85`. The complete 21-case `e38334e` cohort, independent raw replay/review, supported task checkpoints and current CI establish bounded T05 completion. [Combined evidence and exact identities](../../../docs/planning/evidence/catalog-procs-suite.md).
 The bounded production coordinator and additive suites/acceptance mappings are
 preserved. Full physical firing/Duplex/two-bow P08/P09 remain later integration;
 production composition wiring belongs to lead-coordinated T08/#11.
 
-## Lead integration, runtime acceptance pending
+## Lead integration, accepted through PR48
 
 The lead branch combines main `705de34cfbe497d970067a1ddebaef2a85d75125`,
 handed-back PR #30 head `bc9eaba396a4f6a82e7df9c51d4cdbd707d7c143`, the corrected
@@ -13,11 +13,11 @@ T04 completion ledger `91911d7a5f946118cab4c125d7e299a9d53a3084`, and PR #46 hea
 `2613ba46b94dc390d2ea6a637c070908234beac4`. The catalog preserves all 18 main
 cases, `enchants-procs` and both dragon-definition cases (21 total), including
 T04 player-owned observations, T09d actions and every declared control.
-Proc implementation is unchanged. T04 is complete; T02b/T05 remain In review
-until the lead verifies the fresh combined suite and both task checkpoints.
-The checks below retain their original worker inputs.
+Proc implementation is unchanged. T02b/T05 are complete after the accepted
+21-case cohort. The checks below are historical worker evidence and retain
+their original inputs and then-pending or held acceptance; they are not the final receipt.
 
-## Worker source reconciliation
+## Historical worker source reconciliation before PR48
 
 The 6 September bounded resume integrates main
 `4cfb7b9525a186c1f6591173a550565fed3efd53` (PR44 plus PR45) through an ordinary

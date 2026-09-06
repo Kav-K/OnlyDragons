@@ -59,7 +59,7 @@ same-tick zero participants and zero-to-positive transitions.
 | T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b, T08b | Personal rank-based loot evaluation with hard locks and actual grants disabled. |
 
 Task registration began planned with deferred automated requirements; the current
-ledger records later implementation/evidence. Only integrated prerequisites plus
+ledger now records T02b complete through PR #48 and T08a/T08b/T08c still planned. [Combined evidence](evidence/catalog-procs-suite.md). Only integrated prerequisites plus
 lead assignment permit dispatch. T10 additionally consumes
 T08a's shared backend. Original T10 dependencies and all T11/M3/T12 gates remain.
 
@@ -67,9 +67,9 @@ T08a's shared backend. Original T10 dependencies and all T11/M3/T12 gates remain
 
 - Production commands provide status/reload, stats explanation and calibration loadout/bonus/clear. There is no managed dragon spawn/reset/completion command or player-facing leaderboard.
 - `CombatEncounter` owns one target/generation on its construction thread, tracks distinct actual-health and contribution totals, and freezes one immutable `EncounterResult` at lethal managed damage. Late impacts cannot add score. It does not prove physical collision, suppress native damage, synchronize an entity, or publish a death notification.
-- `EncounterResult` contains completion/encounter IDs, `variantId`, mechanic revision and UUID-keyed contributions. This is not ranked presentation or durable result storage. `variantId` is only a nonblank string; T02b now supplies a separate immutable resolved selection on its implementation branch (see document 02), pending automated evidence and merge. A live result consumer must retain that selection explicitly.
+- `EncounterResult` contains completion/encounter IDs, `variantId`, mechanic revision and UUID-keyed contributions. This is not ranked presentation or durable result storage. `variantId` is only a nonblank string; T02b now supplies a separate immutable resolved selection integrated through PR #48 (see document 02 and the combined evidence). A live result consumer must retain that selection explicitly.
 - `eyesPlaced` exists in the contribution DTO, but `CombatEncounter` currently always writes zero. Eye-only placers are not represented by that combat ledger. No placement transactions, loot resolver or reward-grant persistence exists.
-- T04's measured collision/native-damage policy and T05's proc implementation must finish their current-main review/acceptance. #9/T06 then supplies production firing/ownership and the required physical boundary. Existing standalone fixtures are evidence of their stated scope, not a playable managed encounter.
+- T04's measured collision/native-damage policy and T05's bounded proc implementation are accepted. Lead-dispatched #9/T06 supplies production firing/ownership and the required physical boundary; that production behavior is not yet accepted. Existing standalone fixtures are evidence of their stated scope, not a playable managed encounter.
 - Keep public Paper APIs, one composition root, one physical-impact authority, server-thread entity access, immutable snapshots across asynchronous boundaries, and owned cleanup. Do not add a second independent damage listener or a new framework/database service merely to scaffold these tasks.
 - The integration lead owns bootstrap, descriptors, shared DTO changes and registration. Keep published history ordinary and integrate prerequisites before dispatch. Each feature extends the shared scenario/suite/acceptance mappings and verifies the exact clean source cohort before handoff.
 
@@ -157,7 +157,7 @@ Retain the existing dependency chain through T04/T05/T06/T07/T08 and the added T
 
 **Scope:** the planned eight distinct slots and single final-placement transition, validated tagged-eye input, inventory reservation/consumption, ownership and explicit abort/recovery states. Define who may place/remove eyes, per-player limits, charging lock, refunds, failures, disconnects and restart recovery before implementation. “Hypixel-like” does not choose these rules. Animation invokes the shared lifecycle; it does not own arrows or scoring. Valuable acquired eyes require the agreed durable transaction path.
 
-**Automated acceptance:** actual item/inventory and block interaction; wrong/stale/malformed schema, insufficient quantity, both hands, duplicate clicks/transactions, concurrent final placements, attempted removal during charge, spawn failure, disconnect/reset, chunk/world interruption and restart. Exactly the approved number of consumed/refunded eyes and at most one encounter must result. The present fixed actor does not send altar block interactions; extend it narrowly or keep that objective gate pending. Recovery tests must exercise real stored transactions rather than only calling the same method twice in memory.
+**Automated acceptance:** actual item/inventory and block interaction; wrong/stale/malformed schema, insufficient quantity, both hands, duplicate clicks/transactions, concurrent final placements, attempted removal during charge, spawn failure, disconnect/reset, chunk/world interruption and restart. Exactly the approved number of consumed/refunded eyes and at most one encounter must result. T09d now supplies client-originated block and bounded inventory interactions, but their generic calibration does not certify altar behavior; add the actual feature scenario and retain that gate until it passes. Recovery tests must exercise real stored transactions rather than only calling the same method twice in memory.
 
 **Human/design gates:** altar placement/location, visual egg/charging/hatch sequence, interaction feel, permissions and the unchosen refund/ownership rules. No acquisition source is implied.
 
