@@ -317,9 +317,18 @@ Process an impact on the server thread:
 **T04 scoped refinement (Paper 121):** use `ProjectileHitEvent` as the sole
 physical-impact candidate source. Real shooterless dragon collisions can omit the
 damage event entirely, so that event is an optional native-damage/cancellation
-guard, not an impact prerequisite. Finalization must still honor later external
-damage cancellation when it occurs and distinguish it from the adapter's own
-suppression. Zero native arrow damage/critical randomness before managed flight;
+guard, not an impact prerequisite. Reserve one terminal claim at the first
+managed collision, then settle after synchronous handlers finish and honor the
+final externally cancelled `ProjectileHitEvent`. Do not cancel that event for
+owned native suppression. Retire the projectile on acceptance or rejection,
+including veto and unsupported phase; later multipart callbacks cannot create
+another claim or impact ordinal. Preserve any native cancellation observed before
+owned suppression as an additional veto. A single cancellation boolean cannot
+reveal arbitrary later setter provenance once our guard sets it; integrations
+requiring a guaranteed veto must use the physical-hit boundary. This explicit
+lead clarification replaces the earlier unsupported later-native-veto promise.
+Recheck encounter generation and target liveness before committing the claim.
+Zero native arrow damage/critical randomness before managed flight;
 centralize residual native managed-target damage suppression. The player-owned
 continuation supports this path on Paper 121: native positive
 controls lose HP, while hit cancellation, damage cancellation and zero native

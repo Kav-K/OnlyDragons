@@ -167,12 +167,13 @@ semantic part identifier was established. See [identities, geometry, exact
 artifacts and limits](../../dev/game-tests/findings/projectile-player-feasibility.md).
 This is Paper evidence, not a Hypixel mechanic or human/authenticated-client pass.
 
-The current-main continuation at clean `696fa1e` reproduced all 52 player
-assertions and the preserved 34 shooterless assertions within a complete
-16-case suite. Native controls again lost 3.25/2 HP, suppression controls zero,
-and three same-tick impacts emitted one damage event. The shared delayed-quit
-soak passed. [Fresh receipt and geometry identities](../../dev/game-tests/findings/projectile-player-feasibility.md#integrated-continuation-verification)
-retain bounded phase/part conclusions and unsupported cases.
+The recovery continuation at clean `77c94a2` reproduced all 52 player
+assertions and the preserved 34 shooterless assertions in a complete 16-case
+suite. Native controls lost 2.75/2 HP, suppression controls zero, and three
+same-tick impacts emitted one damage event. Delayed quit and the separate
+feature early-exit control met their declared outcomes. [Fresh receipt, geometry
+identities and scope](../../dev/game-tests/findings/projectile-player-feasibility.md#recovery-verification-on-current-main)
+retain unsupported semantic/all-phase conclusions and historical results.
 
 ### T01b measured equipment boundary (Paper 121)
 

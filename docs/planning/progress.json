@@ -110,7 +110,7 @@
         }
       },
       "mergedRevision": "586a170",
-      "notice": "PR31 continuation at clean 696fa1e passed the complete 16-case suite 558f9bd2d44e4840999ac1dad6d6602d and replay, plus separate expected projectile early-exit; see projectile-player findings. Reviewed uniform 1.0 part/three-phase policy is recorded in the foundation plan. T04 remains partial and In review; checkpoint rejects deferred P02/P04 circular mapping pending separate lead reconciliation. No milestone or dependent dispatch is accepted."
+      "notice": "PR31 recovery at clean 77c94a2 includes main 799c01d. Fresh full 16-case suite bf523a75bc114b89ae70e6e9da4b5869, replay, separate expected feature early-exit and T04 automated checkpoint passed; see current projectile-player findings. Runtime-head Windows/Linux CI and 136 Python tests passed. The former comparison-base/infrastructure blockers are resolved. Lead terminal-claim/veto clarification and uniform 1.0 part/three-phase policy are recorded in the foundation plan. External current-input/policy acceptance remains with the lead; P02/P04 remain deferred T06/M1 work. T04 stays partial/In review, #9 blocked and M0 unaccepted."
     },
     "T03": {
       "status": "complete",

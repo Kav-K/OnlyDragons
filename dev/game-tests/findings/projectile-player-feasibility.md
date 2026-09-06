@@ -39,7 +39,7 @@ impact geometry, event priority/order/cancellation, damage amounts, health, actu
 phases, arrow motion/fire and failed intended aim mappings. Thirty chunk
 force-loads, listeners, tasks and entities belong to `ScenarioContext` cleanup.
 
-## Observations on the clean final runtime revision
+## Observations on the original clean runtime revision
 
 | Case | Observed native result |
 | --- | --- |
@@ -105,6 +105,90 @@ Only HOVER, CIRCLING and SEARCH_FOR_BREATH_ATTACK_TARGET impacts are initially
 admitted by the reviewed calibration design, including managed seated hits;
 other phases require an explicit unsupported-phase rejection until measured.
 Production enforcement remains pending in assigned adapter tasks.
+
+## Recovery verification on current main
+
+Clean runtime **`77c94a2b648039921aa60bd8e756dc8833d66ddc`** ordinarily merges
+main **`799c01dd5e9da35cf17bf29ddb671ebc66ab4b3b`**. A final fetch confirmed
+that main remained integrated. The former infrastructure/comparison-base blockers
+are resolved; no credential or sandbox workaround was used. Actual worker doctor
+returned `ready`: 16 readable context/fixture files, JDK 25.0.4.1, existing EULA
+readable, shared lease writable/available, 2816 MiB required versus 9589 guest /
+5793 effective host available, with empty errors/waiting. This is access preflight.
+
+The changed-area plan selected all **16 cases**. Fresh suite
+`bf523a75bc114b89ae70e6e9da4b5869` and independent replay passed: eleven positive cases and
+five intended failures, with clean owned-process/resource cleanup. Every case
+used fresh wrapper builds and exact pinned Paper. Builds passed **82 production
+and 7 client tests**, zero failures/errors/skips; **136 Python tests** passed.
+Runtime-head [Windows/Linux PR CI](https://github.com/Kav-K/OnlyDragons/actions/runs/34023600571)
+and branch CI passed. The feature-specific early-exit control below is additional.
+
+| Case | Run ID | Assertions / declared outcome |
+| --- | --- | --- |
+| lifecycle-calibration | `c64ddf10c0c649abb4733bc62d005797` | 14 / positive |
+| foundation-contracts | `dd455f231c4e4bc6b5910f4dd9927098` | 30 / positive |
+| stats-resolution | `e07b4bf99f814d028a8526bbef217234` | 19 / positive |
+| item-identity | `99450df5283f4046aab0a22a93d47ed5` | 35 / positive |
+| combat-accounting | `9ca970cd1395477093fef72ad513e0b4` | 31 / positive |
+| projectile-feasibility | `0cff3820768840a8b421f71fc5ee2ae5` | 34 / positive |
+| protocol-player-calibration | `cee00f8d78be451b97c88106d7adbb37` | 25 / positive |
+| deliberate-failure | `fd1fb5ce3a174bf48777381ff58ff2e9` | 15 / deliberate-failure |
+| projectile-cleanup-failure | `5a59daa74fdf427d968c52a2ed650315` | 5 / cleanup-failure |
+| projectile-cleanup-abort | `95ae9fb24645400197449e7e703c7c29` | 5 / cleanup-abort |
+| protocol-player-early-exit | `93995faa054e40ad9ae381a6ffd65530` | 14 / player-early-exit |
+| protocol-player-idle | `2e3dd58835fb46efad1a29c76394e0a4` | 14 / player-idle |
+| equipment-stats | `f1a44e4db2d04a469f15b71a1c9cad2c` | 23 / positive |
+| equipment-player | `8d7f733ecb4143a79cccb44ff2cc33f3` | 47 / positive |
+| protocol-player-soak | `50f1815031f5479c806cd05a69785e4f` | 27 / positive |
+| projectile-player-feasibility | `b6600672637042a18eef71fcb354ede0` | 52 / positive |
+
+Receipt: `build/reports/agent-paper-suites/bf523a75bc114b89ae70e6e9da4b5869/receipt.json`.
+Receipt SHA256: `fe78b4e9b77e4aec09b1461f65120e592e71f238fa40e51289be7cdc1bbc4ff1`.
+Relevant input SHA256: `261ce633a773482e929a92fa3520ff918274bc1ec80a08e1a81113686630ae3c`.
+Production/companion/client hashes match the explicitly recorded historical
+integrated artifacts below; each fresh receipt independently rehashes its own
+staged bytes and archives its JUnit evidence. No historical receipt was substituted.
+
+Fresh player run `b6600672637042a18eef71fcb354ede0` passed **52/52 assertions**.
+The unmodified native critical client arrow lost **2.75 HP** (variable native
+critical damage); the API native control lost **2 HP**. Hit cancellation, damage
+cancellation and zero native base damage each lost **0 HP**. Small/large actual
+geometry lost **4/2 HP**, CIRCLING lost **2 HP**, and the measured seated phase
+lost **0 HP**, emitted no damage event and retained a burning rebound. Three
+arrows collided at tick **266**, but only one damage event removed **2 HP**.
+The cancelled-hit arrow crossed four actual part UUIDs at ticks 136/139/142/143.
+Player UUID: `3802ef6e-70f1-3d8d-9df3-5255c6421554`.
+
+| Impact box min → max | Arrow UUID | Actual part UUID | Parent UUID |
+| --- | --- | --- | --- |
+| `(0,99,5.5)` → `(1,100,6.5)` | `542d3cc0-3631-466e-8fe2-dcff094cab61` | `711a99cd-ad1f-4a61-91dd-9a67bbc084db` | `9c214d63-ef47-47d0-bab9-f7cec1947836` |
+| `(-2,100,9.5)` → `(3,103,14.5)` | `51febc10-9c85-43a7-a222-b9de983eb249` | `f778c4c6-e74b-418c-abe6-9ed809d2bf86` | `e00a0731-e91a-45f1-9c45-8f9a62990d48` |
+
+Separate feature early-exit run `12b0e9781f6a433484944f2130191681` used the same
+clean runtime and artifacts. Expected exit **1**: required assertions missing,
+failed expected quit, no client actions, and `Deliberate early client exit`.
+All four owned-resource counters were zero; Paper exit 0 and client exit 1 were
+clean/unforced, and loopback port 42787 was confirmed closed. This does not count
+as a positive gameplay result or broaden shared negative-policy admission.
+
+`checkpoint.py acceptance --project . --base origin/main --receipt <receipt>
+--automated --task T04` returned exit **0**, `automated-ready`, with
+`acceptanceApproved=false`. Main's reviewed split now binds bounded player
+observations exactly once, retains external impact-policy review, and leaves
+production P02/P04 under T06/M1. T04 stays In review, #9 blocked and M0 unaccepted
+until lead acceptance. Natural End-cycle/all-phase automation and production
+claim/veto/retirement/phase rejection remain pending, as do Windows live smoke,
+human input/visual/feel, authenticated multiplayer and performance gates.
+
+The [lead's current handoff clarification](https://github.com/Kav-K/OnlyDragons/issues/5#issuecomment-5558364649)
+requires one terminal claim at the first collision, final external hit veto,
+retirement on acceptance or rejection and generation/liveness recheck. Native
+cancellation observed before owned suppression can be an additional veto; a
+single boolean cannot reveal arbitrary later setter provenance. Guaranteed
+external vetoes use the physical-hit boundary. This is a scoped production
+contract clarification, not an assertion that this observation fixture implements
+or verifies the later T06/T08 adapter.
 
 ## Integrated continuation verification
 
@@ -184,11 +268,10 @@ T04/M0. Preserve natural-End-cycle/all-phase automation, production claim/veto/
 retirement/phase rejection, and separate human/authenticated/visual/multiplayer/
 performance gates. #9 remains blocked until lead acceptance.
 
-The lead requested blocker handoff while PR #35 finishes its baseline and
-establishes the reviewed comparison base. Current evidence head `e05283f`
-passed Windows/Linux CI and receipt replay. Resume the existing PR after the
-lead redispatches with the exact integrated main; rerun required changed-input
-checks and corrected acceptance. No old receipt is a pass for changed inputs.
+Historically, the lead requested blocker handoff pending PR #35's reviewed
+comparison base. Evidence head `e05283f` passed Windows/Linux CI and receipt
+replay. That blocker is resolved by the fresh recovery verification above;
+this older receipt retains its original inputs and checkpoint result.
 
 ## Earlier verification
 
