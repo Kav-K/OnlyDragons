@@ -14,8 +14,8 @@ Only open issues labeled `symphony` are eligible. See [the setup and credential 
 Main includes [equipment stats and calibration gear](dev/stats-play.md), the
 [practice combat loop](dev/combat-play.md), and [managed test-dragon controls with
 post-kill ranking](dev/dragon-play.md). The next planned [checkpoint](docs/planning/07-checkpoint-two.md)
-adds dragon motion, stronger Tracer volleys, held-fire loadouts and ten-enchant
-XP-cost books. Persistent domain-health bars, shared combat/stat/result formatting,
+adds held-fire loadouts and ten-enchant XP-cost books. Bounded dragon flight,
+returning Tracer volleys, persistent health bars, shared combat/stat/result formatting,
 level-based Tempo proc HP and explicit standard/training/calibration spawn modes
 are implemented in this integration candidate. Remaining checkpoint additions
 and combined acceptance are pending. Armor effects and real rewards remain

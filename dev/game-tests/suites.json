@@ -195,6 +195,12 @@
       "expectation": "positive",
       "scenarioTimeout": 180,
       "testPlayer": "protocol-actions-v1"
+    },
+    "dragon-restart-moving": {
+      "scenarioId": "dragon-restart-moving",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
     }
   },
   "suites": {
@@ -227,7 +233,8 @@
       "dragon-presentation",
       "dragon-motion-experiment",
       "dragon-flight",
-      "moving-tracer"
+      "moving-tracer",
+      "dragon-restart-moving"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -278,7 +285,8 @@
       "dragon-presentation",
       "dragon-motion-experiment",
       "dragon-flight",
-      "moving-tracer"
+      "moving-tracer",
+      "dragon-restart-moving"
     ]
   },
   "areas": {
@@ -345,7 +353,8 @@
         "dragon-presentation",
         "dragon-motion-experiment",
         "dragon-flight",
-        "moving-tracer"
+        "moving-tracer",
+        "dragon-restart-moving"
       ],
       "affects": [
         "stats",
@@ -549,7 +558,8 @@
         "dragon-presentation",
         "dragon-motion-experiment",
         "dragon-flight",
-        "moving-tracer"
+        "moving-tracer",
+        "dragon-restart-moving"
       ],
       "affects": []
     },
@@ -651,7 +661,8 @@
         "tempo-ghost",
         "dragon-motion-experiment",
         "dragon-flight",
-        "moving-tracer"
+        "moving-tracer",
+        "dragon-restart-moving"
       ],
       "affects": []
     },

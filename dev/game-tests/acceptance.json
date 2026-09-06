@@ -1118,7 +1118,7 @@
       "caseIds": [
         "dragon-restart-fresh"
       ],
-      "scope": "Production orbit active before shutdown (mandatory phase1 moving_at_first_shutdown), removed across real process restart, with saved config and fresh-generation controls; no authenticated or visual acceptance."
+      "scope": "Production managed dragon commands, lifecycle and immutable accounting on pinned Paper; offline actor, no authentication/visual/prefire acceptance."
     },
     "dragon-restart-legacy": {
       "assertions": [
@@ -1332,6 +1332,23 @@
         "moving-tracer"
       ],
       "scope": "Production moving dragon volleys and honest controls, separate targetless T07 admission and original-arrow collision."
+    },
+    "dragon-restart-moving": {
+      "assertions": [
+        "production_idle_on_boot",
+        "legacy_settings_preserved",
+        "loaded_arena_before_setup",
+        "production_real_dragon_active",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-restart-moving"
+      ],
+      "scope": "Production orbit active before shutdown (mandatory phase1 moving_at_first_shutdown), removed across real process restart, with saved config and fresh-generation controls; no authenticated or visual acceptance."
     }
   },
   "requirements": {
@@ -1445,7 +1462,8 @@
         "enchants-procs",
         "dragon-motion-experiment",
         "dragon-flight",
-        "moving-tracer"
+        "moving-tracer",
+        "dragon-restart-moving"
       ]
     },
     "equipment-service": {
@@ -1741,7 +1759,8 @@
       "fixtures": [
         "dragon-presentation",
         "dragon-restart-fresh",
-        "dragon-restart-animation"
+        "dragon-restart-animation",
+        "dragon-restart-moving"
       ]
     },
     "combat-presentation": {
@@ -1759,7 +1778,7 @@
       "fixtures": [
         "dragon-flight",
         "moving-tracer",
-        "dragon-restart-fresh"
+        "dragon-restart-moving"
       ]
     },
     "moving-dragon-tracer": {

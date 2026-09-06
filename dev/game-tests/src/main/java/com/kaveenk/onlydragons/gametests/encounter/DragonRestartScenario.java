@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 public final class DragonRestartScenario implements Scenario, Listener {
     private final boolean legacy;
     private final boolean animation;
+    private final boolean motion;
     private ScenarioContext c;
     private PlayerFixture players;
     private DevelopmentDragonService dragons;
@@ -22,9 +23,13 @@ public final class DragonRestartScenario implements Scenario, Listener {
     private byte[] initial;
     private RestartPhase phase;
     public DragonRestartScenario(boolean legacy) { this(legacy, false); }
-    public DragonRestartScenario(boolean legacy, boolean animation) { this.legacy = legacy; this.animation = animation; }
+    public DragonRestartScenario(boolean legacy, boolean animation) { this(legacy, animation, false); }
+    public DragonRestartScenario(boolean legacy, boolean animation, boolean motion) {
+        if(motion&&(legacy||animation))throw new IllegalArgumentException("Moving restart is a separate variant");
+        this.legacy = legacy; this.animation = animation; this.motion = motion;
+    }
     public void start(ScenarioContext context) throws Exception {
-        c = context; c.mechanicRevision("dragon-restart-v1"); dragons = c.production().dragons();
+        c = context; c.mechanicRevision(motion ? "dragon-restart-motion-v1" : "dragon-restart-v1"); dragons = c.production().dragons();
         phase = Objects.requireNonNull(c.restartPhase()); var world = Bukkit.getWorlds().getFirst();
         c.observe("restart", Map.of("parentRunId", phase.parentRunId(), "index", phase.index(), "nonce", phase.nonce()));
         c.observe("restartWorld", Map.of("uuid", world.getUID().toString(), "name", world.getName()));
@@ -109,7 +114,7 @@ public final class DragonRestartScenario implements Scenario, Listener {
                 // Do not own/reset the production dragon in fixture cleanup. onDisable must remove it.
                 c.check("active_at_first_shutdown", true, nativeDragon.isValid() && c.production().combat().activeCount() == 1);
                 if(animation) prepareAnimationShutdown(nativeDragon);
-                else if(!legacy) c.later(40,()->{
+                else if(motion) c.later(40,()->{
                     c.check("moving_at_first_shutdown",true,dragons.motion().orElseThrow().state().equals("MOVING")
                             &&dragons.motion().orElseThrow().steps()>20&&nativeDragon.getLocation().distance(dragons.arena().orElseThrow().location())>.1);
                     quit();
