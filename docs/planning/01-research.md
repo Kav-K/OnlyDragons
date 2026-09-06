@@ -241,26 +241,18 @@ and ferocity health coefficients remain unresolved; no upstream claim changed.
 
 ### T08a native dragon initialization and terminal ownership (Paper 121)
 
-**Observed in dirty GH-39 iterations, 6 September 2026:** disabling AI in the
-spawn consumer left native multipart geometry near the origin while the parent
-was at the configured y=100; the first owned-arrow claim timed out with complete
-cleanup (`c6520c55fe894404956ff589c11261cd`). Native HOVER with AI enabled updated
-the real parts and passed 36 combat assertions in iteration
-`d93caa45689d49ff9d121e9d2c093ab3`, including same-tick/lethal claims, native
-animation/removal and an unmanaged native XP positive control. This selects
-native HOVER for development initialization; it is not custom flight AI or a
-Hypixel movement claim. New subscription/failure cases and final clean-input
-acceptance remain pending in [T08a status](03-agent-tasks-and-validation.md#t08a--managed-real-dragon-backend-and-development-controls).
+**Observed in pinned Paper fixtures, 6 September 2026:** AI-disabled native
+multipart geometry remained near origin even with the parent at arena y=100.
+Native HOVER with AI enabled updates parts and advances native death animation;
+this is a development projection, not custom flight or a Hypixel movement claim.
 
-The clean `713f859` combat run `e84e6b1c0d9a4cb6a37ab69b49e669ff`
-failed notification checks and exposed premature terminal release: the native
-result reported HP zero and ANIMATING while `isValid()` returned false.
 [Pinned Paper CraftEntity source](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java)
-confirms that validity includes liveness. It cannot prove removal during dragon
-death animation. The backend now tracks the public removal event; strengthened
-fixtures require retained ownership/tickets during animation and actual UUID
-absence after reset. The earlier `!isValid()` reset assertions are superseded,
-not accepted removal evidence.
+confirms `isValid()` includes liveness. HP zero/ANIMATING does not prove removal.
+The backend uses the immediate public removal event plus `getRemovalReason()`;
+fixtures independently verify retained ownership/tickets during animation and
+actual UUID disappearance after reset/restart. [Exact results and superseded
+iterations](evidence/t08a-focused-paper.md) preserve the earlier failed validity
+assumptions. Full-suite and human acceptance remain pending in [T08a status](03-agent-tasks-and-validation.md#t08a--managed-real-dragon-backend-and-development-controls).
 
 ## Decisions still open
 

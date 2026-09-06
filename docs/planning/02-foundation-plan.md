@@ -487,7 +487,9 @@ The arena projection is read-only, and setup cannot replace an active encounter.
 
 Combat admission closes at domain defeat. Native ownership and a distinct shared
 broker demand persist until removal; the existing T06 native guard consults that
-retained ownership. Real death drops/XP are cleared without cancelling death.
+retained ownership. The immediate removal event and public removal reason are
+separate from liveness, and subscription retirement runs once on every removal
+path, including the reason-only fallback. Real death drops/XP are cleared without cancelling death.
 Native outcome/animation are separate from domain zero; ordinary defeat notification
 requires the frozen result and confirmed uncancelled native death. The bounded
 `subscribe(generation, consumer)` API emits that same result plus native UUID and
