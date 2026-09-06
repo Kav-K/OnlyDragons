@@ -36,8 +36,7 @@ missing JUnit evidence cannot proceed.
 The default server heap is 1536 MiB, with a configurable 1024–2048 MiB bound.
 All agent Paper runs share an exclusive file lease, including cleanup. Before
 starting Java, the runner requires the requested heap plus 1024 MiB of available
-memory in Linux. Under WSL, it also preserves 1024 MiB of Windows free memory
-and requires Windows free memory plus a conservatively discounted guest-cache
+memory in Linux. Under WSL, it also requires Windows free memory plus a conservatively discounted guest-cache
 allowance to meet that same total. The allowance is half the smaller of
 `MemAvailable - MemFree` and `Buffers + Cached + SReclaimable - Shmem`, bounded
 at zero. This credits some already resident Linux cache that Java can reuse
@@ -73,7 +72,8 @@ forced termination fails validation. It never finds JVMs by name or PID lists.
   Paper, deserializes it, and checks the key round-trip.
 - Spawns a real native Arrow with a recorded UUID and velocity, waits eight
   server ticks, and checks its identity, validity, and displacement.
-- Removes the owned entity and cancels scenario tasks before writing results.
+- Keeps its test chunk entity-ticking without a player, then removes the owned
+  entity, cancels scenario tasks, and releases its chunk force-load before writing results.
 
 These are **synthetic test actors**. This calibrates the environment and report
 path; it does not establish OnlyDragons' planned stats, item codec, damage,
@@ -85,13 +85,14 @@ assertion with expected `1`, observed `0`. This must return exit **1**, with
 clean server shutdown and a failed scenario report:
 
 ```bash
-# Reuse only the unchanged artifacts immediately built and verified above.
-python3 scripts/agent-tests/paper_test.py --scenario deliberate-failure --reuse-build
+python3 scripts/agent-tests/paper_test.py --scenario deliberate-failure
 ```
 
 The runner never treats deliberate failure as a pass. A caller testing this
 negative control checks both its nonzero exit and its exact failed assertion.
-`--reuse-build` records reuse explicitly; it does not claim a new build was run.
+Every run invokes both wrapper builds with Gradle input tracking; there is no
+skip-build option. The exact staged JARs are rehashed immediately before launch
+so a rebuild during a resource wait cannot invalidate their recorded identity.
 
 ## Reports and extension contract
 
@@ -118,6 +119,11 @@ assertions, delayed steps, owned entities, and completion. Keep API operations
 on the owning server thread; pass only frozen data to report I/O. Extend the
 context explicitly when a scenario needs ownership of listeners, chunk tickets,
 or other resources; do not bypass cleanup with unmanaged scheduled work.
+Set `context.mechanicRevision("feature-fixture-v1")` to match the catalog for a
+feature scenario. Include `owned_entities_removed`, `owned_tasks_cancelled`,
+and `owned_chunk_tickets_removed` in its required assertion list. Use
+`tickChunk` for synthetic entity tests without players; it preserves existing
+force-load state and releases only tickets created by this scenario.
 Production behavior should be exercised through its real service/API path,
 not duplicated inside the test companion.
 

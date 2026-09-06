@@ -32,6 +32,14 @@ public final class CalibrationScenario implements Scenario {
 
         var world = Bukkit.getWorlds().getFirst();
         var start = world.getSpawnLocation().clone().add(0, 20, 0);
+        context.tickChunk(start.getChunk());
+        // Force-loading reaches entity-ticking state on a subsequent server tick.
+        context.later(4, () -> launch(context, start));
+    }
+
+    private void launch(ScenarioContext context, org.bukkit.Location start) {
+        var world = start.getWorld();
+        context.check("test_chunk_entity_ticking", "ENTITY_TICKING", start.getChunk().getLoadLevel().name());
         Arrow arrow = context.own(world.spawn(start, Arrow.class));
         arrow.setGravity(false);
         arrow.setPersistent(false);

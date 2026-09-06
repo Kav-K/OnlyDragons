@@ -114,6 +114,13 @@ class ReportContractTests(unittest.TestCase):
             with self.assertRaisesRegex(runner.ValidationError, 'after its deadline'):
                 runner.wait_for_report(self.path, self.expected, self.now, 10, Mock())
 
+    def test_exponent_overflow_is_rejected_in_assertions_and_nested_observations(self):
+        self.write()
+        for text in ('{"observations":{"nested":[1e999]}}', '{"expected":1e999,"observed":1e999}', '{"number":NaN}'):
+            self.path.write_text(text)
+            with self.assertRaisesRegex(runner.ValidationError, 'Non-finite'):
+                runner.strict_json(self.path)
+
 
 class LifecycleContractTests(unittest.TestCase):
     def setUp(self):
@@ -156,13 +163,12 @@ class LifecycleContractTests(unittest.TestCase):
         self.assertEqual(result['effectiveHostAvailableMiB'], 4550)
         self.assertLess(result['windowsAvailableMiB'], result['requiredMiB'])
 
-    def test_wsl_real_combined_shortage_or_host_reserve_shortage_waits(self):
+    def test_wsl_real_combined_shortage_or_guest_shortage_waits(self):
         linux = {'MemAvailable': 3000, 'MemFree': 2800, 'Buffers': 10, 'Cached': 200, 'SReclaimable': 20, 'Shmem': 30}
         with self.assertRaises(runner.ResourceBusy):
             runner.assess_memory(1536, linux, 1400)
         cached = dict(linux, MemAvailable=8000, Cached=7000)
-        with self.assertRaises(runner.ResourceBusy):
-            runner.assess_memory(1536, cached, 900)
+        self.assertGreaterEqual(runner.assess_memory(1536, cached, 900)['effectiveHostAvailableMiB'], 2560)
         with self.assertRaises(runner.ResourceBusy):
             runner.assess_memory(1536, dict(linux, MemAvailable=2000), 10000)
 
@@ -176,6 +182,16 @@ class LifecycleContractTests(unittest.TestCase):
         with patch.object(runner.subprocess, 'run', side_effect=OSError('probe unavailable')):
             with self.assertRaisesRegex(runner.ValidationError, 'Cannot verify Windows'):
                 runner.windows_available_memory()
+
+    def test_changed_build_bytes_cannot_be_deployed_with_old_hash(self):
+        source, destination = self.root / 'build.jar', self.root / 'deployed.jar'
+        source.write_bytes(b'verified build')
+        expected = runner.sha256(source)
+        runner.stage_artifact(source, destination, expected)
+        self.assertEqual(runner.sha256(destination), expected)
+        source.write_bytes(b'rebuilt while waiting')
+        with self.assertRaisesRegex(runner.ValidationError, 'Artifact changed after build validation'):
+            runner.stage_artifact(source, destination, expected)
 
     @unittest.skipUnless(sys.platform == 'linux', 'Linux owned process lifecycle')
     def test_failure_cleanup_stops_owned_child_preserves_unrelated_process(self):

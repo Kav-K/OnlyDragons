@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -20,10 +21,17 @@ public final class ScenarioContext {
     private final Map<String, Object> observations = new LinkedHashMap<>();
     private final List<Entity> entities = new ArrayList<>();
     private final List<BukkitTask> tasks = new ArrayList<>();
+    private final List<Chunk> chunks = new ArrayList<>();
+    private String mechanicRevision = "harness-v1";
     private boolean finished;
 
     ScenarioContext(GameTestsPlugin plugin, String id) { this.plugin = plugin; this.id = id; }
     public GameTestsPlugin harness() { return plugin; }
+    public void mechanicRevision(String revision) {
+        requireActive();
+        if (revision == null || !revision.matches("[A-Za-z0-9._-]{1,64}")) throw new IllegalArgumentException("Invalid mechanic revision");
+        mechanicRevision = revision;
+    }
     public OnlyDragonsPlugin production() {
         return (OnlyDragonsPlugin) Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("OnlyDragons"));
     }
@@ -34,6 +42,14 @@ public final class ScenarioContext {
     }
     public void observe(String name, Object value) { requireActive(); observations.put(name, value); }
     public <T extends Entity> T own(T entity) { requireActive(); entities.add(entity); return entity; }
+    /** Make a fresh test chunk tick without players; release only force-loads owned by this scenario. */
+    public void tickChunk(Chunk chunk) {
+        requireActive();
+        if (!chunk.isForceLoaded()) {
+            chunk.setForceLoaded(true);
+            chunks.add(chunk);
+        }
+    }
     public void later(long ticks, Step action) {
         requireActive();
         tasks.add(Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -61,14 +77,21 @@ public final class ScenarioContext {
             catch (RuntimeException ignored) { retained++; }
         }
         entities.clear();
+        int retainedChunks = 0;
+        for (Chunk chunk : chunks) {
+            try { chunk.setForceLoaded(false); if (chunk.isForceLoaded()) retainedChunks++; }
+            catch (RuntimeException ignored) { retainedChunks++; }
+        }
+        chunks.clear();
         check("owned_entities_removed", 0, retained);
         check("owned_tasks_cancelled", 0, uncancelled);
+        check("owned_chunk_tickets_removed", 0, retainedChunks);
         finished = true;
         var report = new LinkedHashMap<String, Object>();
         report.put("schemaVersion", 1);
         report.put("runId", plugin.runId());
         report.put("scenarioId", id);
-        report.put("mechanicRevision", "harness-v1");
+        report.put("mechanicRevision", mechanicRevision);
         report.put("state", "complete");
         report.put("passed", assertions.stream().allMatch(row -> Boolean.TRUE.equals(row.get("passed"))));
         report.put("startedAtEpochMs", started);

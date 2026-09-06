@@ -7,6 +7,7 @@ from contextlib import contextmanager
 import ctypes
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -50,6 +51,10 @@ def atomic_json(path, value):
 
 
 def strict_json(path):
+    def finite_number(value):
+        number = float(value)
+        require(math.isfinite(number), f'Non-finite JSON number: {value}')
+        return number
     def unique(pairs):
         result = {}
         for key, value in pairs:
@@ -59,7 +64,7 @@ def strict_json(path):
     require(path.is_file(), f'Missing scenario report: {path}')
     require(path.stat().st_size <= 1024 * 1024, 'Scenario report exceeds 1 MiB')
     try:
-        return json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=unique,
+        return json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=unique, parse_float=finite_number,
                           parse_constant=lambda value: (_ for _ in ()).throw(ValidationError(f'Non-finite JSON: {value}')))
     except (ValueError, UnicodeError) as error:
         raise ValidationError(f'Malformed scenario report: {error}') from error
@@ -71,7 +76,7 @@ def validate_report(path, expected, issued_ms, deadline_ms, now_ms=None):
     require(isinstance(report, dict), 'Scenario report must be an object')
     for key in ('runId', 'scenarioId', 'mechanicRevision'):
         require(report.get(key) == expected[key], f'Wrong/stale {key}')
-    require(report.get('schemaVersion') == 1, 'Unsupported scenario schema')
+    require(type(report.get('schemaVersion')) is int and report['schemaVersion'] == 1, 'Unsupported scenario schema')
     require(report.get('state') == 'complete', 'Scenario is incomplete')
     require(report.get('syntheticActors') is True, 'Synthetic actor disclosure is missing')
     start, end = report.get('startedAtEpochMs'), report.get('completedAtEpochMs')
@@ -159,10 +164,10 @@ def assess_memory(memory_mib, linux, windows_available=None):
         reclaimable = min(max(0, linux['MemAvailable'] - linux['MemFree']),
                           max(0, linux['Buffers'] + linux['Cached'] + linux['SReclaimable'] - linux['Shmem']))
         allowance = reclaimable // 2
-        result.update({'windowsAvailableMiB': windows_available, 'windowsReserveMiB': 1024,
+        result.update({'windowsAvailableMiB': windows_available, 'combinedReserveMiB': 1024,
                        'wslReclaimableEstimateMiB': reclaimable, 'wslDiscountedAllowanceMiB': allowance,
                        'effectiveHostAvailableMiB': windows_available + allowance})
-        enough = enough and windows_available >= 1024 and windows_available + allowance >= required
+        enough = enough and windows_available + allowance >= required
     if not enough:
         raise ResourceBusy('Busy: not enough available memory for isolated Paper: ' + json.dumps(result))
     return result
@@ -332,15 +337,14 @@ def fetch_paper(project, pins, supplied):
     return artifact
 
 
-def build_artifacts(project, java_home, report_root, reuse):
+def build_artifacts(project, java_home, report_root):
     env = dict(os.environ, JAVA_HOME=str(java_home), GRADLE_USER_HOME=str(project / '.gradle/agent-home'))
     env['PATH'] = str(java_home / 'bin') + os.pathsep + env.get('PATH', '')
-    if not reuse:
-        with (report_root / 'build.log').open('w', encoding='utf-8') as log:
-            for args in (['build'], ['-p', 'dev/game-tests', 'build']):
-                result = subprocess.run(['bash', str(project / 'gradlew'), *args, '--console=plain'], cwd=project, env=env,
-                                        stdout=log, stderr=subprocess.STDOUT, timeout=900)
-                require(result.returncode == 0, 'Gradle failed; see build.log')
+    with (report_root / 'build.log').open('w', encoding='utf-8') as log:
+        for args in (['build'], ['-p', 'dev/game-tests', 'build']):
+            result = subprocess.run(['bash', str(project / 'gradlew'), *args, '--console=plain'], cwd=project, env=env,
+                                    stdout=log, stderr=subprocess.STDOUT, timeout=900)
+            require(result.returncode == 0, 'Gradle failed; see build.log')
     receipt = project / 'build/plugin-artifact.txt'
     require(receipt.is_file(), 'Production artifact receipt is missing')
     main = Path(receipt.read_text().strip()).resolve()
@@ -355,7 +359,12 @@ def build_artifacts(project, java_home, report_root, reuse):
         for key in counts:
             counts[key] += int(suite.attrib.get(key, '0'))
     require(counts['tests'] > 0 and not any(counts[key] for key in ('failures', 'errors', 'skipped')), 'Production tests failed, aborted, or skipped')
-    return main, companion, {'reused': reuse, 'unitTests': counts}
+    return main, companion, {'wrapperInvoked': True, 'unitTests': counts}
+
+
+def stage_artifact(source, destination, expected_sha256):
+    shutil.copyfile(source, destination)
+    require(sha256(destination) == expected_sha256, 'Artifact changed after build validation: ' + destination.name)
 
 
 def execute(args):
@@ -384,7 +393,7 @@ def execute(args):
                         'pins': pins, 'javaVersion': release['JAVA_VERSION'].strip('"')})
         print(f'RUN {run_id}: {args.scenario}; reports: {report_root}', flush=True)
         # Build before acquiring the scarce server slot. Caches remain in this issue checkout.
-        main, companion, build = build_artifacts(project, java_home, report_root, args.reuse_build)
+        main, companion, build = build_artifacts(project, java_home, report_root)
         outcome['build'] = build
         outcome['artifacts'] = {'productionSha256': sha256(main), 'gameTestsSha256': sha256(companion)}
         paper = fetch_paper(project, pins, args.paper_jar)
@@ -394,9 +403,9 @@ def execute(args):
             directory.mkdir(parents=True, exist_ok=False)
             plugins = directory / 'plugins'
             plugins.mkdir()
-            shutil.copyfile(main, plugins / 'OnlyDragons.jar')
-            shutil.copyfile(companion, plugins / 'OnlyDragonsGameTests.jar')
-            shutil.copyfile(paper, directory / 'server.jar')
+            stage_artifact(main, plugins / 'OnlyDragons.jar', outcome['artifacts']['productionSha256'])
+            stage_artifact(companion, plugins / 'OnlyDragonsGameTests.jar', outcome['artifacts']['gameTestsSha256'])
+            stage_artifact(paper, directory / 'server.jar', pins['paperSha256'])
             shutil.copyfile(args.eula_file, directory / 'eula.txt')
             port = free_port()
             settings = properties(project / 'dev/server.properties')
@@ -472,7 +481,6 @@ def main():
     parser.add_argument('--scenario-timeout', type=bounded(1, 300), default=60)
     parser.add_argument('--lease-timeout', type=bounded(1, 1800), default=600)
     parser.add_argument('--resource-timeout', type=bounded(1, 1800), default=600)
-    parser.add_argument('--reuse-build', action='store_true', help='Use existing artifacts and JUnit evidence; reports explicitly record reuse')
     args = parser.parse_args()
     def interrupted(signum, frame):
         raise KeyboardInterrupt(f'Interrupted by signal {signum}')
