@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bind worker tools and permit only issue Git metadata plus the shared test lease."""
+"""Bind worker tools and permit issue Git/skill metadata plus the shared test lease."""
 import copy
 import json
 import os
@@ -58,7 +58,23 @@ def validate_workspace(workspace, source):
     git_dir = workspace / '.git'
     if git_dir.is_symlink() or not git_dir.is_dir() or git_dir.resolve(strict=True).parent != workspace:
         raise ValueError('Worker requires a real local .git directory.')
+    validate_agents(workspace)
     return workspace
+
+
+def validate_agents(workspace):
+    # Codex protects .agents even inside workspaceWrite. Grant the directory
+    # itself: a nested .agents/skills root leaves a read-only ancestor in bwrap.
+    # Keep the original anchor so replacing the checkout between turns cannot
+    # redirect this grant to another clone. Missing skills are an invalid worker
+    # preparation, not permission to create or follow a replacement directory.
+    workspace = Path(workspace)
+    agents_dir = workspace / '.agents'
+    if (not workspace.is_absolute() or workspace.resolve(strict=True) != workspace
+            or agents_dir.is_symlink() or not agents_dir.is_dir()
+            or agents_dir.resolve(strict=True) != agents_dir):
+        raise ValueError('Worker requires a real local .agents directory.')
+    return agents_dir
 
 
 def validate_coordination(source):
@@ -78,7 +94,8 @@ def transform_message(message, workspace, coordination=None):
     policy = params.get('sandboxPolicy')
     if not isinstance(policy, dict) or policy.get('type') != 'workspaceWrite':
         return message
-    workspace = Path(workspace).resolve(strict=True)
+    workspace = Path(workspace)
+    agents_dir = validate_agents(workspace)
     requested_cwd = params.get('cwd', str(workspace))
     if not isinstance(requested_cwd, str) or not Path(requested_cwd).is_absolute() or Path(requested_cwd).resolve(strict=True) != workspace:
         raise ValueError('Turn cwd does not match the issue workspace.')
@@ -88,7 +105,7 @@ def transform_message(message, workspace, coordination=None):
     roots = policy.get('writableRoots', [])
     if not isinstance(roots, list) or not all(isinstance(root, str) for root in roots):
         raise ValueError('Invalid writable roots in turn policy.')
-    additions = [str(git_dir)]
+    additions = [str(git_dir), str(agents_dir)]
     if coordination is not None:
         coordination = Path(coordination)
         if coordination.is_symlink() or coordination.resolve(strict=True) != coordination:
