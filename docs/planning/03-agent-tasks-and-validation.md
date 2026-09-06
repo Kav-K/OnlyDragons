@@ -30,7 +30,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T02 — Items | Complete | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Final clean 7ebaa6b after main 586a170: 54 production tests and 35 item-codec-v4 Paper assertions passed, including real serialized loadouts through production snapshots and four cleanup checks. [Evidence](#t02-item-validation-evidence). Merged at 7c6d843 after independent review and final-head CI; authenticated inventory/visual checks are separate. #7 equipment/grants and #9 firing integrate later. |
 | T03 — Combat/ledger | In review | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [draft PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Independent code/evidence review passed; final-head CI and lead merge remain. Physical adapter/native suppression and human checks are separate. |
 | T04 — Paper feasibility | In progress (player-owned follow-up resumed) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). T09b merged at 5b0e030, allowing the lead to resume #5. Player-owned native dragon damage suppression and semantic head/native-damage classification still require their own experiments; #9 remains blocked and M0 unaccepted. |
-| T05 — Enchants/procs | In review | [#8](https://github.com/Kav-K/OnlyDragons/issues/8), [draft PR #30](https://github.com/Kav-K/OnlyDragons/pull/30), `symphony/gh-8` | Clean a7a8cd7 on integrated T03 main 9092fbe passed 128 production tests and 38 enchants-procs Paper assertions. #28 shared suite/checkpoint, CI and lead review remain pending; see [T05 evidence](#t05-enchant-and-proc-validation). |
+| T05 — Enchants/procs | In review | [#8](https://github.com/Kav-K/OnlyDragons/issues/8), [draft PR #30](https://github.com/Kav-K/OnlyDragons/pull/30), `symphony/gh-8` | Clean a7a8cd7 on integrated T03 main 9092fbe passed 128 production tests and 38 enchants-procs Paper assertions. Current-main integration is blocked by the worker sandbox read-only skill path; shared suite/checkpoint, final CI and lead review remain pending; see [T05 evidence](#t05-enchant-and-proc-validation). |
 | T06 — Firing/Duplex | Blocked | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | Wait for T01b/T02 and accepted T04 impact/native-damage evidence. Partial PR #22 and a passing T09b calibration alone cannot satisfy this gate. Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence remain required. |
 | T07 — Tracer/continuity | Planned | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |
 | T08 — Practice tools | Planned | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | Repeatable player procedure, permissions, and explained damage. |
@@ -166,19 +166,38 @@ All four owned cleanup counters were zero; Paper exited 0 with `forced=false`
 and `clean=true`. The port closed and no Java process for that run remained.
 Raw reports stay ignored under `build/reports/agent-paper/<runId>/`.
 
-Draft PR #30 is In review. **Final acceptance is blocked on the lead-owned
-GH-28 suite/checkpoint dependency.** At handoff, a fresh fetch still has main
-`9092fbe`, and no shared suite/checkpoint scripts or merged GH-28 delivery exist.
-This worker cannot complete that new required gate within its owned files.
-The implementation and evidence above are committed and pushed; no useful work
-is unshared. Next action: the lead integrates GH-28 and reapplies GH-8's dispatch
-label; resume this branch, merge current main normally, run the new shared suite
-and checkpoint plus affected build/Paper checks, and update PR #30. Dispatch is
-removed under the blocker workflow, leaving the issue and draft PR open. Windows smoke,
-authenticated input/visual/multiplayer and performance are unrun;
-composition-root/equipment/physical adapter integration remains assigned to its
-owners. No milestone is accepted. Later evidence-only documentation commits do
-not change the tested runtime inputs; relevant integration changes require reruns.
+Draft PR #30 remains In review. **Resume blocker (2026-09-05): current-main
+integration cannot complete in this worker sandbox.** PR #32 and context PR #33
+are now merged; fetched `origin/main` is
+`8f5069ce35741dc66d5678f36f48293246f7bac1`. The former missing-GH-28 blocker is
+resolved. From clean `3477ed0`, ordinary `git merge origin/main --no-edit`
+failed with `unable to unlink old '.agents/skills/paper-runtime-validation/SKILL.md':
+Read-only file system`; the configured sandbox explicitly mounts `.agents`
+read-only. No merge commit or MERGE_HEAD was created. No permissions or protected
+files were changed. The 19 untracked files left by the failed merge were removed
+only after byte-for-byte comparison with origin/main; original tracked work is
+preserved. This entry is an evidence-only update, not main integration.
+
+The main-version `doctor.py` left by that merge attempt was run inside the actual
+worker sandbox before cleanup, with the branch's existing runner. It returned
+exit 0 / `state: ready`: 16 shared context/fixture files readable, JDK 25.0.4.1,
+existing EULA readable, shared lease writable and available, no errors or waits.
+The memory snapshot reported 7045 MiB guest available and 4712 MiB effective host
+available against a 2816 MiB requirement (1536 Paper + 256 client + 1024 reserve).
+This proves that limited access preflight only; the mixed, failed-merge checkout
+is not an integrated fixture baseline or runtime acceptance result. No new build,
+Paper server, suite receipt, checkpoint plan/acceptance or final-head CI was run.
+
+Next action: the lead completes the ordinary main merge on this same branch in
+an authorized environment that can update the tracked skill, preserving all
+additive scenario/context changes, then redispatches GH-8. Resume PR #30, add T05
+coverage to suites.json and acceptance.json, rerun doctor and checkpoint plan,
+inspect changed-area selection, execute the required suite from clean committed
+current-main source, and replay automated T05 acceptance plus final-head CI.
+Full physical firing/Duplex/two-bow P08/P09 production integration stays with its
+later adapter tickets; service fixtures do not accept it. Windows smoke,
+authenticated-client/visual/multiplayer and performance observations remain
+separate and unrun. No milestone is accepted.
 
 ### T03 combat validation
 
