@@ -1,6 +1,6 @@
 # Checkpoint 2: combat feedback, volleys and enchant books
 
-**6 September 2026 — registered work, not implementation or acceptance.**
+**6 September 2026 — implementation started; new feature acceptance remains pending.**
 
 The first managed dragon/ranking slice is integrated on main `36b420c`.
 The user now prioritizes a persistent dragon health bar, smoother bounded flight,
@@ -22,10 +22,10 @@ T11/T12 gates, and it accepts no M1–M5 milestone or unobserved human outcome.
 | T06b / [#68](https://github.com/Kav-K/OnlyDragons/issues/68) | T03b, T08e, T06c | Actual held-fire tiers and useful separate-ultimate loadouts; `held-shortbow-loadouts`. |
 | T02c / [#69](https://github.com/Kav-K/OnlyDragons/issues/69) | T03b, T08d, T06c | Metadata-safe books, recipes and real anvil transactions; `enchant-books-anvil`. |
 
-T08d/T08e can start first; T05b's contract is recorded below, so its existing
-prerequisites also permit lead assignment. Registration alone is not dispatch.
+T08d/T08e/T05b are assigned and active in Symphony after the registration merged
+through PR #71 at `a4e9210`; their prerequisites are integrated.
 T03b then T06c establish effects before T06b/T02c expose the complete experience.
-All seven task progress entries start planned with empty evidence/completed requirements;
+Those three task entries are active and the remaining four stay planned, all with empty evidence/completed requirements;
 all nine new automated requirements and P08/P09 remain deferred until feature proof.
 
 T10 retains every prior dependency and additionally consumes T08d, T08e, T05b
