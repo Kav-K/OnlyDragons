@@ -601,8 +601,12 @@ bounded flight18 and preserved-v1 Tracer58 assertions, moving restart18/13 phase
 assertions, and the intended abort cleanup control. Builds passed238 production,
 6 companion and31 client tests; Python274 and Windows/Linux CI passed.
 [Exact artifacts, failed iterations and focused evidence](evidence/t08e-motion-tracer.md).
-The follow-up fixture split gives moving restart its own registration/flag and
-preserves the original stationary fresh case; its focused verification is pending.
+Final code candidate `778b425` gives moving restart its own registration/flag and
+preserves the original stationary fresh case. Clean moving restart0221c074 passed
+18/13 phase assertions; stationary fresh07e04373 passed17/13. Both boots in both
+runs exited cleanly. Production/client bytes match `eab1c01`; the companion changed
+only for the explicit restart variant/registration. Windows/Linux CI passes at
+`778b425`. The final follow-up commit records evidence only.
 
 Per the [lead's integration assignment](https://github.com/Kav-K/OnlyDragons/issues/65#issuecomment-5562281395),
 the lead combines #64/#65 histories after #66 and owns the complete combined-main
