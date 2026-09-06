@@ -469,7 +469,7 @@ four-sample fractional cycle. No production ferocity balance is selected.
 ### T08a development backend
 
 T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md).
-T08b/#40 is dispatched and implementing the ranked presentation below; acceptance remains pending.
+T08b/#40 is accepted through [PR #62](https://github.com/Kav-K/OnlyDragons/pull/62) at `1149169`; [full ranking evidence](evidence/t08b-suite.md). Human observations and M1–M5 remain separate.
 
 The production `DevelopmentDragonService` owns one explicit configured development
 cube and delegates every hit/proc/result to `ManagedCombatService`. `DragonBackend`
@@ -506,8 +506,12 @@ The backend supplies T10's future target projection, not countdown/prefire or M3
 
 ### T08b frozen ranking and presentation
 
-Implemented on the GH-40 branch; [focused Paper evidence](evidence/t08b-focused-paper.md)
-passes on clean `bdde815`. Full cohort/lead acceptance remains pending.
+Accepted through PR #62 at `1149169` after the complete 33-case hosted cohort,
+independent raw/source review, strict replay, actual-main checkpoint and current CI;
+[full evidence](evidence/t08b-suite.md). The [focused archive](evidence/t08b-focused-paper.md)
+preserves clean `bdde815` and earlier iterations. Exactly `frozen-damage-ranking`
+completes; T08c remains undispatched pending the first human checkpoint and lead assignment.
+
 `RankedEncounterResult` retains the exact immutable `EncounterResult`, full Selection,
 and contribution/stamp values. It validates complete participant
 provenance, rejects ordinal ownership/tick conflicts and backdated stamps, then
