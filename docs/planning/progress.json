@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "repository": "Kav-K/OnlyDragons",
+  "baselineRevision": "73a8cc8637d8044a1687dff67eab50cab057b5c1",
+  "notice": "Historical integrated state and durable references only. Fresh machine evidence, independent review and current CI are checked separately. No milestone is accepted.",
+  "tasks": {
+    "T00": {
+      "status": "complete",
+      "mergedRevision": "be920d0",
+      "completedRequirements": [
+        "contract-consumers"
+      ],
+      "evidence": {
+        "contract-consumers": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/15",
+          "revision": "be920d0"
+        }
+      }
+    },
+    "T09a": {
+      "status": "complete",
+      "mergedRevision": "140f11c",
+      "completedRequirements": [
+        "runner-lifecycle",
+        "runner-negative"
+      ],
+      "evidence": {
+        "runner-lifecycle": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/16",
+          "revision": "140f11c"
+        },
+        "runner-negative": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/16",
+          "revision": "140f11c"
+        }
+      }
+    },
+    "T09b": {
+      "status": "complete",
+      "mergedRevision": "5b0e030",
+      "completedRequirements": [
+        "protocol-input"
+      ],
+      "evidence": {
+        "protocol-input": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/27",
+          "revision": "5b0e030"
+        }
+      }
+    },
+    "T09c": {
+      "status": "complete",
+      "completedRequirements": [
+        "suite-baseline",
+        "checkpoint-unit-checks"
+      ],
+      "evidence": {
+        "suite-baseline": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/32",
+          "revision": "73a8cc8637d8044a1687dff67eab50cab057b5c1"
+        },
+        "checkpoint-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/32",
+          "revision": "73a8cc8637d8044a1687dff67eab50cab057b5c1"
+        }
+      },
+      "mergedRevision": "73a8cc8637d8044a1687dff67eab50cab057b5c1",
+      "notice": "PR #32 integrated the reviewed full 15-case baseline and strict suite/checkpoint validation. Durable evidence: dev/game-tests/findings/t09c-baseline.md. The Windows operator Cursor Build target passed on clean main 73a8cc8 with 82 production tests and zero failures/errors/skips. Windows Play/smoke, authenticated multiplayer, human visuals and input feel remain unrun; no gameplay milestone is accepted."
+    },
+    "T01a": {
+      "status": "complete",
+      "mergedRevision": "1efa7d0",
+      "completedRequirements": [
+        "stats-resolver"
+      ],
+      "evidence": {
+        "stats-resolver": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/23",
+          "revision": "1efa7d0"
+        }
+      }
+    },
+    "T02": {
+      "status": "complete",
+      "mergedRevision": "7c6d843",
+      "completedRequirements": [
+        "item-codec"
+      ],
+      "evidence": {
+        "item-codec": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/24",
+          "revision": "7c6d843"
+        }
+      }
+    },
+    "T04": {
+      "status": "partial",
+      "completedRequirements": [
+        "projectile-observations",
+        "listener-cleanup"
+      ],
+      "evidence": {
+        "projectile-observations": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/22",
+          "revision": "586a170"
+        },
+        "listener-cleanup": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/22",
+          "revision": "586a170"
+        }
+      },
+      "mergedRevision": "586a170"
+    },
+    "T03": {
+      "status": "complete",
+      "mergedRevision": "9092fbe",
+      "completedRequirements": [
+        "combat-services"
+      ],
+      "evidence": {
+        "combat-services": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/26",
+          "revision": "9092fbe"
+        }
+      }
+    },
+    "T01b": {
+      "status": "complete",
+      "completedRequirements": [
+        "equipment-service",
+        "equipment-player"
+      ],
+      "evidence": {
+        "equipment-service": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/29",
+          "revision": "4c28474b54e2a2aa25d6242d12525f8783c4ea1b"
+        },
+        "equipment-player": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/32",
+          "revision": "73a8cc8637d8044a1687dff67eab50cab057b5c1"
+        }
+      },
+      "notice": "PR #29 equipment/service evidence is retained. PR #32 completes objective connected-player equipment, permission, received command text and lifecycle acceptance; see dev/game-tests/findings/t09c-baseline.md. The Windows operator Cursor Build target passed on clean main 73a8cc8 with 82 production tests. Windows Play/smoke and authenticated/multiplayer/visual/feel observations remain separate and unrun.",
+      "mergedRevision": "73a8cc8637d8044a1687dff67eab50cab057b5c1"
+    },
+    "T05": {
+      "status": "in-review",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Draft PR30 reviewed at3477ed0; current-main/T09c integration and affected-suite/current CI remain pending."
+    },
+    "T06": {
+      "status": "blocked",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T07": {
+      "status": "blocked",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T08": {
+      "status": "blocked",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T10": {
+      "status": "blocked",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T11": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T12": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "MAINT-17": {
+      "status": "complete",
+      "mergedRevision": "6f0ccfb",
+      "completedRequirements": [
+        "runner-unit-checks"
+      ],
+      "evidence": {
+        "runner-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/19",
+          "revision": "6f0ccfb"
+        }
+      }
+    },
+    "MAINT-18": {
+      "status": "complete",
+      "mergedRevision": "e72fb2a",
+      "completedRequirements": [
+        "bridge-unit-checks"
+      ],
+      "evidence": {
+        "bridge-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/21",
+          "revision": "e72fb2a"
+        }
+      }
+    }
+  },
+  "milestones": {
+    "M0": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M1": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M2": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M3": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M4": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M5": {
+      "status": "not-accepted",
+      "evidence": {}
+    }
+  }
+}

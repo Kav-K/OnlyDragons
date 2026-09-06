@@ -27,7 +27,7 @@ class PlayerActorContractTests(unittest.TestCase):
                        'minecraftVersion': pinned['minecraftVersion'], 'protocolVersion': pinned['protocolVersion'],
                        'startedAtEpochMs': self.now, 'completedAtEpochMs': self.now,
                        'loginReceived': True, 'playerLoadedSent': True, 'teleportsAcknowledged': 1,
-                       'actions': ['select', 'draw', 'release', 'quit'], 'disconnected': True,
+                       'actions': ['select', 'draw', 'release', 'quit'], 'messages': [], 'disconnected': True,
                        'passed': True, 'error': ''}
 
     def validate(self, report):
@@ -41,15 +41,28 @@ class PlayerActorContractTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(runner.ValidationError):
                 runner.player_pins(dict(self.pins, **mutation))
 
-    def test_only_explicit_named_scenario_can_enable_player_mode(self):
-        self.assertFalse(runner.player_mode(None, 'foundation-contracts', 'calibrate'))
-        self.assertTrue(runner.player_mode('protocol-calibration', 'protocol-player-calibration', 'calibrate'))
-        for args in ((None, 'protocol-player-calibration', 'calibrate'),
-                     ('protocol-calibration', 'foundation-contracts', 'calibrate'),
-                     (None, 'foundation-contracts', 'early-exit'),
-                     ('unrestricted', 'protocol-player-calibration', 'calibrate')):
+    def test_only_explicit_catalog_declared_scenarios_can_enable_player_mode(self):
+        catalog = {'plain': {}, 'calibration': {'testPlayerMode': 'protocol-calibration'},
+                   'equipment': {'testPlayerMode': 'protocol-calibration'}}
+        self.assertFalse(runner.player_mode(None, 'plain', 'calibrate', catalog))
+        for scenario in ('calibration', 'equipment'):
+            self.assertTrue(runner.player_mode('protocol-calibration', scenario, 'calibrate', catalog))
+            with self.assertRaises(runner.ValidationError):
+                runner.player_mode(None, scenario, 'calibrate', catalog)
+        for args in (('protocol-calibration', 'plain', 'calibrate'),
+                     (None, 'plain', 'early-exit'),
+                     ('unrestricted', 'calibration', 'calibrate'),
+                     (None, 'missing', 'calibrate')):
             with self.subTest(args=args), self.assertRaises(runner.ValidationError):
-                runner.player_mode(*args)
+                runner.player_mode(*args, catalog)
+        for malformed in (None, False, '', 'unknown', [], {}):
+            with self.subTest(declaration=malformed), self.assertRaises(runner.ValidationError):
+                runner.player_mode(None, 'bad', 'calibrate', {'bad': {'testPlayerMode': malformed}})
+        with self.assertRaises(runner.ValidationError):
+            runner.player_mode(None, 'bad', 'calibrate', {'bad': []})
+        actual = runner.strict_json(Path(__file__).resolve().parents[2] / 'dev/game-tests/scenarios.json')
+        for scenario in ('protocol-player-calibration', 'equipment-player'):
+            self.assertTrue(runner.player_mode('protocol-calibration', scenario, 'calibrate', actual))
 
     def test_default_authenticated_settings_and_input_are_preserved(self):
         source = {'online-mode': 'true', 'server-ip': '0.0.0.0', 'level-name': 'human-world'}
@@ -76,6 +89,42 @@ class PlayerActorContractTests(unittest.TestCase):
 
     def test_complete_player_evidence_passes(self):
         self.assertTrue(self.validate(self.report)['passed'])
+
+    def test_missing_malformed_or_unbounded_received_messages_fail(self):
+        absent = dict(self.report)
+        del absent['messages']
+        with self.assertRaises(runner.ValidationError):
+            self.validate(absent)
+        for messages in (None, {}, 'text', [True], [''], ['x' * 2049], ['x'] * 129, ['OD_PLAYER:forged']):
+            with self.subTest(messages=messages), self.assertRaises(runner.ValidationError):
+                self.validate(dict(self.report, messages=messages))
+
+    def test_real_equipment_command_requirements_reject_missing_or_wrong_output(self):
+        catalog = runner.strict_json(Path(__file__).resolve().parents[2] / 'dev/game-tests/scenarios.json')
+        descriptor = catalog['equipment-player']
+        expected = descriptor['requiredPlayerMessages']
+        messages = [item.get('exact', ' '.join(item.get('containsAll', []))) for item in expected]
+        runner.validate_player_messages({'messages': messages}, descriptor)
+        for index, item in enumerate(expected):
+            with self.subTest(missing=item['id']), self.assertRaises(runner.ValidationError):
+                runner.validate_player_messages({'messages': messages[:index] + messages[index + 1:]}, descriptor)
+        for old, new in (('raw=3.0', 'raw=500.0'), ('Granted ordinary;', 'Granted wrong;'),
+                         ('do not have permission', 'have permission')):
+            with self.subTest(wrong=new), self.assertRaises(runner.ValidationError):
+                runner.validate_player_messages({'messages': [message.replace(old, new) for message in messages]}, descriptor)
+        # Fragments in unrelated messages cannot be assembled into a false match.
+        with self.assertRaises(runner.ValidationError):
+            runner.validate_player_messages({'messages': ['Main hand: ordinary ', 'Offhand inactive']},
+                                            {'requiredPlayerMessages': [{'id': 'hands', 'containsAll': ['Main hand:', 'Offhand']}]})
+
+    def test_message_catalog_rejects_malformed_or_duplicate_matchers(self):
+        valid = {'id': 'message', 'exact': 'text'}
+        for requirements in (None, {}, [None], [{'id': 'message'}], [dict(valid, containsAll=['text'])],
+                             [dict(valid, exact=True)], [dict(valid, id='')], [valid, valid],
+                             [{'id': 'message', 'containsAll': []}], [{'id': 'message', 'containsAll': [False]}],
+                             [{'id': 'message', 'containsAll': ['x' * 257]}], [valid] * 33):
+            with self.subTest(requirements=requirements), self.assertRaises(runner.ValidationError):
+                runner.validate_player_messages({'messages': ['text']}, {'requiredPlayerMessages': requirements})
 
     def test_sent_actions_alone_or_forged_types_cannot_pass(self):
         mutations = ({'loginReceived': False}, {'disconnected': False}, {'disconnected': 1},

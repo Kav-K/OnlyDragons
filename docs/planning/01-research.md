@@ -156,6 +156,19 @@ head-hit pass. See the [bounded findings and remaining gates](../../dev/game-tes
 These observations are OnlyDragons test evidence, not Hypixel mechanics or
 player-owned dragon damage proof.
 
+### T01b measured equipment boundary (Paper 121)
+
+**Observed locally, GH-7, 2026-09-05:** production equipment inspection on pinned
+Paper resolved all eight native byte-round-tripped calibration bows to damage
+100 / crit damage 50 and their declared crit/ferocity totals. Validated edits
+preserving UUID changed cached enchant/roll contributions; repeated refreshes
+and inactive offhand bows did not add weapon stats. Previously returned snapshots
+remained unchanged. These are synthetic inventory/UUID and command-sender tests,
+with MockBukkit event tests recorded separately. The unchanged protocol-player
+calibration also passed with this bootstrap, but does not establish equipment
+command/input or authenticated visual acceptance. See [T01b evidence and scope](03-agent-tasks-and-validation.md#t01b-equipment-validation-gh-7).
+No upstream Hypixel claim or combat timing decision changes here.
+
 ### T09b measured protocol-player boundary (Paper 121)
 
 **Observed on exact pin, 2026-09-05:** the timestamped MCProtocolLib 26.2 /

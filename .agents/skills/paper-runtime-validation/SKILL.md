@@ -22,7 +22,7 @@ authority to run a scenario.
 - Use ordinary Java tests for domain behavior and supported MockBukkit APIs for plugin adapters. Read failure and skipped-test counts; MockBukkit can abort tests for unimplemented operations. A skipped test provides no validation of that behavior.
 - Build with the repository wrapper and documented Java selection. Inspect the selected main artifact; source, fixture, and test-harness JARs are not deployable plugin artifacts.
 - For loading, server API semantics, persistence, or dependency integration, exercise a real isolated development server with named scenarios and explicit expected results. A successful boot proves only startup.
-- For player-visible behavior, add an authenticated player/client scenario or state that it remains untested. Console assertions do not prove inventories, movement, visuals, permissions for ordinary players, or multiplayer timing.
+- For objective player behavior, use the project's isolated protocol actors and real Paper player/command/event assertions where available. Console checks or synthetic UUID service calls alone do not prove player inventories, event wiring or permissions. Automate those checks instead of assigning them to a human by default. Keep human visual/feel assessment, authenticated-client compatibility and actual multiplayer scope distinct from the packets and server behavior covered by each fixture.
 
 Use the existing lab when `mcdev.cmd`, `scripts/Lab.ps1`, and `versions.properties` are present. Read [the mcdev workflow](references/mcdev.md) for its commands and effects. For another project, inspect and use that project's equivalent; do not install this lab as an incidental part of testing.
 
@@ -35,5 +35,11 @@ Use clean server restarts after plugin changes. Do not rely on server-wide reloa
 Select scenarios from the changed behavior: command permission denial, malformed configuration, missing optional dependencies, disconnect/reconnect, delayed callbacks, persistence after restart, and shutdown cleanup. Run only scenarios relevant to the task, recording what actually happened.
 
 Collect build/test results, assertion outcomes, server exceptions, and shutdown results. Report compilation, tests passed/failed/skipped, runtime scenarios passed/failed/not run, and player testing separately. Reuse a passing result only if the relevant inputs have not changed. Fix demonstrated failures within the requested scope; do not obscure environmental failures by changing dependency versions or claiming success.
+
+For OnlyDragons, use `dev/agent-validation.md` for shared suites, changed-area
+coverage and the evidence checkpoint. Every issue checkout has access to the
+same committed fixtures. Include boundary, rejection, lifecycle and cross-feature
+cases with new behavior. A static plan, busy resource gate, closed issue or higher
+test count does not establish runtime acceptance or milestone progress.
 
 For performance claims, use a representative workload and before/after measurements, such as the project's spark workflow. Simpler code alone does not establish lower tick time.

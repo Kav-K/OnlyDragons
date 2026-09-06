@@ -144,6 +144,14 @@ than creating duplicate commits, comments, or pull requests.
    Before final verification, fetch origin and merge origin/main into the issue
    branch, resolve conflicts without losing others' work, and rerun affected
    build and Paper checks. Keep history ordinary; never force-push a rebase.
+   Follow dev/agent-validation.md for the shared suite and checkpoint commands.
+   All committed fixtures are available within this ticket's authorization. Add
+   the feature's coverage/acceptance mapping, exercise affected cross-feature
+   regressions and intended failure controls, then attach the complete suite
+   receipt. Run the checkpoint at start, after main integration and before
+   handoff. Static plan validity does not mean runtime or milestone acceptance;
+   busy, missing, skipped or stale evidence is an outstanding gate. An objectively
+   automatable behavior must not be deferred merely as a human check.
 6. Review the diff for scope, correctness, generated files, credentials, worlds,
    and logs. Update the affected planning context under document 03's maintenance
    protocol: research in 01, design/contract changes in 02, status/evidence and
