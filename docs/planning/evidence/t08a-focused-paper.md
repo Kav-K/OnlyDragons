@@ -1,4 +1,4 @@
-# T08a focused validation — GH-39
+# T08a focused validation — GH-39 / draft PR #60
 
 Final runtime: `abb906c24307fa25ec2448b649c80392fba90422`, clean, with main
 `706ab412e62645da2357e73cadfb2c020fec64fb` fetched and normally merged (already
@@ -10,6 +10,11 @@ assigns the full current-head hosted cohort and final checkpoint to the lead.
 The final delta makes subscription retirement idempotent, including removal
 observed through the public removal-reason API. Combat was rerun on that head;
 the other checks retain their actual earlier revision, not relabeled evidence.
+
+[Draft PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) contains this implementation.
+[Independent source review](https://github.com/Kav-K/OnlyDragons/issues/39#issuecomment-5560992869)
+is clear at final runtime `abb906c`; current-head CI and combined-suite acceptance
+remain separate pending gates.
 
 ## Checks on 6 September 2026
 
