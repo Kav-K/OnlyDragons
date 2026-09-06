@@ -1,7 +1,10 @@
 # T07 Tracer and continuous arrows (GH-10)
 
-Implementation in review in [draft PR #56](https://github.com/Kav-K/OnlyDragons/pull/56)
-on `symphony/gh-10`; no gameplay acceptance yet.
+**Accepted through [PR #56](https://github.com/Kav-K/OnlyDragons/pull/56), merged
+at `2c0be584247a0fbaa409e21565f7289cc27daa06`.** The complete `576e394` cohort,
+independent replay/review, T07 checkpoint and current CI establish P07/P10;
+[final evidence and remaining gates](t07-suite.md). The validation sections below
+preserve their earlier iteration/focused status; they are not the final cohort.
 T06's accepted registry/physical-hit contract remains authoritative. T07 adds
 pure homing rules and an attachment owned by the existing `OwnedBowService`
 tick/retirement lifetime, without a second registry, receiver or scheduler.
@@ -52,7 +55,7 @@ Retirement releases arrow demand; encounter reset releases all generation demand
 and reservation; close releases everything. No budget policy deletes accepted
 arrows to make room for new shots.
 
-## Validation status
+## Earlier validation status
 
 Initial doctor ready (JDK 25.0.4.1, accepted EULA/lease/memory accessible); starting
 plan checkpoint valid with gameplay readiness false. The initial domain build
@@ -83,7 +86,7 @@ visual rehearsal belong to T10/M3. Windows Play/smoke, authenticated clients,
 visual/weapon feel and performance remain separate unrun gates. The lead owns
 independent shared-lifecycle review and the final hosted baseline/feature cohort.
 
-## Final focused evidence — 6 September 2026
+## Final focused evidence before full-cohort acceptance — 6 September 2026
 
 Clean runtime/scenario revision `fc0b9b9ac3bea768028015f04de52e82de60c80a`
 includes main `89d584fab675ed111a1a1d733f667b3a1f3cbf53`; the final fetch/merge
@@ -123,9 +126,11 @@ the lead owns the complete hosted cohort, current CI, independent lifecycle revi
 and T07 acceptance checkpoint. P07/P10 and all other previously pending gates stay
 unaccepted. Human gates listed above remain unrun.
 
+## Pending T08 integration
+
 Integration dependency: T08 is developing a plugin-lifetime production receiver
 and read-only settled-hit observer. On integration, migrate the Tracer fixture's
 current T06-style receiver observation to that seam alongside the existing firing
 fixture; never install a competing production receiver. T08 accounting is not
 claimed by these physical-hit assertions. The shared broker/admission additions
-require lead review before merge; no separate registry or scheduler was added.
+passed lead review with PR #56; no separate registry or scheduler was added.

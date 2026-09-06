@@ -211,9 +211,24 @@
       "notice": "PR #52 merged at 25891c0 after the complete 24-case f4178ba cohort, independent raw replay/review, actual-main T06/combined task checkpoints and current CI. Owned firing passed 115 assertion rows; the repaired equipment case passed 25. See evidence/t06-suite.md for exact identities and preserved failed iteration. Bounded firing/physical claims are complete; T08 accounting, successor dispatch and M1–M5 remain separate."
     },
     "T07": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {}
+      "status": "complete",
+      "completedRequirements": [
+        "P07",
+        "P10"
+      ],
+      "evidence": {
+        "P07": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34041763855",
+          "revision": "576e394181a2dde740ed5b4c5ceac231afaedf81"
+        },
+        "P10": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34041763855",
+          "revision": "576e394181a2dde740ed5b4c5ceac231afaedf81"
+        }
+      },
+      "reviewedRevision": "576e394181a2dde740ed5b4c5ceac231afaedf81",
+      "mergedRevision": "2c0be584247a0fbaa409e21565f7289cc27daa06",
+      "notice": "PR #56 merged at 2c0be58 after the complete 26-case 576e394 cohort, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions and its cleanup control met the exact expected abort; retained firing passed 115. See evidence/t07-suite.md. Exactly P07/P10 are accepted; T08 accounting, T10 rehearsal and M1–M5 remain separate."
     },
     "T08": {
       "status": "active",
