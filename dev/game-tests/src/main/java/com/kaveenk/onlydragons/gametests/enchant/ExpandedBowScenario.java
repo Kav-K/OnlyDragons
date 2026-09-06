@@ -76,7 +76,8 @@ public final class ExpandedBowScenario implements Scenario, Listener {
                 "shortbow_v1_v3",List.of(0d,50d,0d)));
         expected.put("overload_v3",List.of(200d,55d,0d));
         expected.put("gravity_v3",List.of(0d,50d,0d));
-        c.check("expanded_all_preset_ids",expected.keySet(),CalibrationLoadouts.expandedRegistry().definitions().keySet());
+        c.check("expanded_all_preset_ids",List.copyOf(expected.keySet()),
+                CalibrationLoadouts.expandedRegistry().definitions().keySet().stream().sorted().toList());
         boolean expandedRoundtrips=true;
         for (var entry:expected.entrySet()) {
             var original=catalog.create(entry.getKey());
