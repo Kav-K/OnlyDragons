@@ -10,6 +10,9 @@ definition, managed-dragon, ranking and simulation components below. Registratio
 alone does not dispatch them. Their automated requirements remain deferred until
 implemented and evidenced; all prior dependency/milestone gates remain in force.
 Real reward delivery is disabled throughout this testing scope.
+The [original-brief coverage and fixture contract](06-brief-coverage.md) registers
+T09d for reusable headless players, damage observations and offline bootstrap.
+A plan-valid registration is not proof of worker network or dispatch recovery.
 
 The user authorized parallel implementation, real Minecraft integration tests
 in isolated agent environments, and integration-lead merges of reviewed/tested
@@ -33,9 +36,10 @@ part of the worker's scope.
 | T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | Complete: playable PR #29 at a48ebd4; objective connected acceptance in PR #32 at 73a8cc8 | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
 | T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Draft PR #30 in review; current-main/shared suite pending | Bounded procs and enchant state. |
 | T09c | [#28](https://github.com/Kav-K/OnlyDragons/issues/28) | Complete: PR #32 merged at 73a8cc8 | Shared regression suites, connected-player equipment/message fixture, actor lock-cycle regression/40-second soak, and evidence/dependency checkpoints. All 15 baseline cases met their declared outcomes; [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). P01–P14 and M0–M5 remain pending. |
+| T09d | [#43](https://github.com/Kav-K/OnlyDragons/issues/43) | Completed T09a/T09b/T09c; planned, lead-owned | Reusable player/damage primitives and verified offline Paper bootstrap. No duplicate Symphony dispatch; generic calibration is separate from feature multiplayer proof. |
 | T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b, T02, fully accepted T04; blocked | Bow/shortbow/Duplex capture and owned projectiles. Merging partial PR #22 or passing T09b alone does not release this gate. |
 | T07 | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | T04, T06 | Tracer steering and arrow continuity. |
-| T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | T01b, T03, T05, T06 | Playable dummy combat and explanations. |
+| T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | T01b, T03, T05, T06, T09d | Playable dummy combat and explanations with shared headless fixtures. |
 | T08a | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | T08, T02b; planned, not dispatched | Shared real-dragon backend and development controls using T06 claims/T08 combat; published for T10. |
 | T08b | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | T08a; planned, not dispatched | Frozen credited-damage ranking including ghost/overkill, unique placement and actual multi-identity presentation. |
 | T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b, T08b; planned, not dispatched | Personal rank-based simulation with hard item locks; arbitrary labeled sample policies and no real grants. |
@@ -49,6 +53,16 @@ integrated into main and whose manual gates are satisfied. #6 and #20 are merged
 the lead reconciles this summary after each serial merge.
 All server scenarios share one lease and obey the memory gate, regardless of
 how many agents are coding. A ready branch is not a satisfied dependency.
+
+T06 keeps its current coding prerequisites, but final input acceptance must use
+the integrated T09d actions and `automated-multiplayer-firing`: real distinct
+players, production firing/registry/physical ownership, cancellation and cleanup.
+The full `automated-multiplayer-attribution` accounting/proc gate remains on T08
+and M3, after T08 connects the shared services; it is not an upstream prerequisite
+for building that connection. T08 additionally
+waits for T09d; T08a/T08b/T08c/T10 inherit it. Neutral altar-interaction primitives
+do not release T11's M3 gate. Any pending worker network/bootstrap/dispatch
+recovery needs actual checkout evidence before resuming the affected worker.
 
 ### Protocol actor dependency boundary
 

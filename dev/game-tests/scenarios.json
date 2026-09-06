@@ -291,14 +291,42 @@
     "mechanicRevision": "equipment-player-v2",
     "testPlayerMode": "protocol-calibration",
     "requiredPlayerMessages": [
-      {"id": "permission-denial", "exact": "You do not have permission to use calibration tools."},
-      {"id": "ordinary-grant", "exact": "Granted ordinary; equip it in your main hand and use /onlydragons stats explain."},
-      {"id": "offhand-grant", "exact": "Granted ferocity_500; equip it in your main hand and use /onlydragons stats explain."},
-      {"id": "equipped-hand-labels", "containsAll": ["Main hand: ordinary ", "enchants={vicious=3}", " | Offhand (inactive): ferocity_500 "]},
-      {"id": "weapon-damage-values", "exact": "weapon_damage: raw=100.0 effective=100.0"},
-      {"id": "ferocity-values", "exact": "ferocity: raw=3.0 effective=3.0"},
-      {"id": "vicious-source-explanation", "exact": "    enchant:vicious FLAT 3.0"},
-      {"id": "bonus-replacement", "exact": "Session bonus replaced for ferocity. Clears on death, quit or dev clear."}
+      {
+        "id": "permission-denial",
+        "exact": "You do not have permission to use calibration tools."
+      },
+      {
+        "id": "ordinary-grant",
+        "exact": "Granted ordinary; equip it in your main hand and use /onlydragons stats explain."
+      },
+      {
+        "id": "offhand-grant",
+        "exact": "Granted ferocity_500; equip it in your main hand and use /onlydragons stats explain."
+      },
+      {
+        "id": "equipped-hand-labels",
+        "containsAll": [
+          "Main hand: ordinary ",
+          "enchants={vicious=3}",
+          " | Offhand (inactive): ferocity_500 "
+        ]
+      },
+      {
+        "id": "weapon-damage-values",
+        "exact": "weapon_damage: raw=100.0 effective=100.0"
+      },
+      {
+        "id": "ferocity-values",
+        "exact": "ferocity: raw=3.0 effective=3.0"
+      },
+      {
+        "id": "vicious-source-explanation",
+        "exact": "    enchant:vicious FLAT 3.0"
+      },
+      {
+        "id": "bonus-replacement",
+        "exact": "Session bonus replaced for ferocity. Clears on death, quit or dev clear."
+      }
     ],
     "requiredAssertions": [
       "server_thread",
@@ -382,5 +410,131 @@
       "player_soak_elapsed"
     ],
     "testPlayerMode": "protocol-calibration"
+  },
+  "headless-player-primitives": {
+    "mechanicRevision": "headless-primitives-v1",
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/primitives-v1.json",
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "two_distinct_real_players",
+      "loopback_nonop_players",
+      "packet_permission_denial_no_grant",
+      "packet_command_granted_managed_item",
+      "three_real_command_events",
+      "deployed_stats_api_exact_weapon_damage",
+      "real_selected_slot",
+      "real_look_and_movement",
+      "real_swing_event",
+      "real_swap_hands_events",
+      "real_drop_inventory_delta",
+      "real_block_interaction_effect",
+      "real_cancelled_damage_observed",
+      "cancelled_damage_preserves_health",
+      "accepted_damage_health_matches_final_event",
+      "two_player_damage_attribution",
+      "real_bow_release_and_projectile_damage",
+      "projectile_damage_health_matches_event",
+      "damage_probe_event_sequence",
+      "damage_probe_cohort_membership",
+      "damage_probe_dispatch_health",
+      "damage_probe_observed_health",
+      "damage_probe_fields_and_tick_boundaries",
+      "real_death_and_packet_respawn",
+      "reconnect_same_uuid_new_player",
+      "all_actor_sessions_cleanly_quit",
+      "production_sessions_cleared",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "inventory_cursor_0",
+      "inventory_cursor_1",
+      "inventory_cursor_2",
+      "inventory_cursor_3",
+      "inventory_identity_and_slots_0",
+      "inventory_identity_and_slots_1",
+      "inventory_identity_and_slots_2",
+      "inventory_identity_and_slots_3",
+      "real_inventory_click_transactions"
+    ],
+    "requiredActorMessages": [
+      {
+        "actor": "alpha",
+        "session": "s1",
+        "id": "denial",
+        "exact": "You do not have permission to use calibration tools."
+      },
+      {
+        "actor": "alpha",
+        "session": "s1",
+        "id": "grant",
+        "exact": "Granted ordinary; equip it in your main hand and use /onlydragons stats explain."
+      },
+      {
+        "actor": "alpha",
+        "session": "s1",
+        "id": "stats-weapon",
+        "exact": "weapon_damage: raw=100.0 effective=100.0"
+      },
+      {
+        "actor": "alpha",
+        "session": "s2",
+        "id": "status",
+        "containsAll": [
+          "OnlyDragons ready | version "
+        ]
+      }
+    ]
+  },
+  "headless-player-cleanup-abort": {
+    "mechanicRevision": "headless-cleanup-v1",
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/cleanup-abort-v1.json",
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "two_distinct_real_players",
+      "loopback_nonop_players",
+      "cleanup_permissions_initially_absent",
+      "cleanup_permissions_created",
+      "abort_blocks_restored",
+      "cleanup_blocks_changed",
+      "cleanup_entity_created",
+      "cleanup_delayed_task_created",
+      "abort_permissions_removed",
+      "abort_delayed_task_cancelled",
+      "alpha_real_uncancelled_command",
+      "beta_real_uncancelled_command",
+      "command_dispatch_settled_before_abort",
+      "both_actors_online_at_abort",
+      "resources_live_at_abort",
+      "scenario_exception",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ],
+    "requiredActorMessages": [
+      {
+        "actor": "alpha",
+        "session": "s1",
+        "id": "alpha-status",
+        "containsAll": [
+          "OnlyDragons ready | version "
+        ]
+      },
+      {
+        "actor": "beta",
+        "session": "s1",
+        "id": "beta-status",
+        "containsAll": [
+          "OnlyDragons ready | version "
+        ]
+      }
+    ]
   }
 }

@@ -174,6 +174,13 @@ Retain the existing dependency chain through T04/T05/T06/T07/T08 and the added T
 
 ## Integration and validation order
 
+Use the shared T09d infrastructure and [original-brief coverage](06-brief-coverage.md)
+for parameterized players, damage/event observations and future neutral altar
+interactions. T06 keeps its coding prerequisites; its final input acceptance
+uses the integrated primitives. T08 additionally waits for T09d, inherited by
+T08a/T08b/T08c/T10. Calibration is not feature multiplayer proof; M3 and later
+real-reward gates remain intact.
+
 1. Continue #5/#8 acceptance independently and dispatch newly registered foundation tasks only when their own prerequisites are integrated. Later altar and real reward decisions do not block the bounded definition/simulation scope.
 2. Clarify #9/#11 physical-boundary ownership; integrate #9 after its prerequisites.
 3. Publish D4's bounded dragon-definition contract before D1's definition-backed integration, then consume D1 from D2 and D3. Later loot-policy/delivery work does not block that lifecycle. Pure command/projection tests and remaining schema design can proceed in parallel only against agreed contracts and nonoverlapping ownership.

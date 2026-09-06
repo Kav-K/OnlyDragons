@@ -228,6 +228,12 @@
       "completedRequirements": [],
       "evidence": {},
       "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T09d": {
+      "status": "in-review",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Issue #43 registers lead-owned reusable fixture infrastructure only. No duplicate Symphony dispatch or implemented/action/bootstrap/feature acceptance is claimed. Network/bootstrap/dispatch recovery needs actual worker evidence."
     }
   },
   "milestones": {

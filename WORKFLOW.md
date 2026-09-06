@@ -113,10 +113,15 @@ than creating duplicate commits, comments, or pull requests.
   issue-local disposable world, loopback port, shared test lease and memory gate.
   Do not accept a new EULA, use human profiles/personal worlds, launch servers
   through other routes, or stop a JVM not owned by the current test run.
-  Only the runner's named --test-player protocol-calibration mode may create
-  an offline synthetic player in a fresh loopback disposable profile. Default
+  Only the runner's named --test-player protocol-calibration (one actor) or
+  protocol-actions-v1 (one-to-four declared identities in one bounded client JVM)
+  modes may create offline synthetic players in a fresh loopback disposable profile. Default
   tests and human profiles remain authenticated; the memory gate includes the
   client JVM and the shared lease lasts through both JVMs' cleanup.
+  Follow dev/game-tests/PLAYER-FIXTURES.md for real action plans, event acceptance,
+  damage observations and production API assertions. A submitted packet is not
+  proof of accepted damage; feature scenarios must assert the deployed service's
+  exact health/score/result alongside independently observed Paper events.
 - Do not publish a release, merge a PR, force-push, change branch
   protection, or modify external projects. If the task requires such an action,
   stop at a reviewable result and document the required human action.

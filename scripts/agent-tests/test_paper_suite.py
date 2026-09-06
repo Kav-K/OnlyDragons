@@ -14,6 +14,7 @@ import threading
 import time
 import unittest
 from unittest.mock import patch
+import zipfile
 
 import paper_suite as suite
 
@@ -26,7 +27,16 @@ class ReceiptFixture:
         self.write('src/main/Example.java', 'class Example {}\n')
         self.write('src/main/resources/help.md', 'Packaged documentation\n')
         self.write('README.md', 'Human instructions\n')
-        self.write('versions.properties', 'javaVersion=25\nminecraftVersion=26.2\npaperBuild=121\npaperSha256=' + suite.hashlib.sha256(b'paper').hexdigest() + '\n')
+        mojang_bytes = b'fixture upstream bootstrap bundle'
+        download = (suite.hashlib.sha256(mojang_bytes).hexdigest() + '\t'
+                    + 'https://piston-data.mojang.com/v1/objects/' + 'a' * 40
+                    + '/server.jar\tmojang_26.2.jar')
+        launcher = io.BytesIO()
+        with zipfile.ZipFile(launcher, 'w') as archive:
+            archive.writestr('META-INF/download-context', download)
+        paper_bytes = launcher.getvalue()
+        paper_pin = suite.hashlib.sha256(paper_bytes).hexdigest()
+        self.write('versions.properties', 'javaVersion=25\nminecraftVersion=26.2\npaperBuild=121\npaperSha256=' + paper_pin + '\n')
         self.descriptor = {'mechanicRevision': 'fixture-v1', 'requiredAssertions': ['feature', *suite.CLEANUP]}
         self.json('dev/game-tests/scenarios.json', {'fixture': self.descriptor})
         self.catalog = {'schemaVersion': 1, 'cases': {'fixture': {'scenarioId': 'fixture', 'expectation': 'positive'}},
@@ -45,7 +55,11 @@ class ReceiptFixture:
         self.path = self.suite_root / 'receipt.json'
         now = int(time.time() * 1000)
         self.start, self.end = now - 10000, now - 1000
-        self.write(self.profile / 'server.jar', b'paper')
+        self.write(self.profile / 'server.jar', paper_bytes)
+        mojang = root / 'run/agent-cache/mojang_26.2.jar'
+        self.write(mojang, mojang_bytes)
+        bootstrap = suite.runner.paper_bootstrap.stage_bootstrap(
+            self.profile, mojang, suite.runner.paper_bootstrap.inspect_launcher(self.profile / 'server.jar', paper_pin))
         self.write(self.profile / 'plugins/OnlyDragons.jar', b'production')
         self.write(self.profile / 'plugins/OnlyDragonsGameTests.jar', b'companion')
         self.write(self.profile / 'server.properties', 'server-ip=127.0.0.1\nserver-port=45678\nonline-mode=true\nenable-rcon=false\nenable-query=false\nenable-jmx-monitoring=false\nlevel-name=agent-world-' + self.run_id + '\n')
@@ -63,6 +77,7 @@ class ReceiptFixture:
                        'worktreeDirty': False, 'pins': suite.runner.properties(root / 'versions.properties'), 'javaVersion': '25.0.4.1',
                        'startedAtEpochMs': self.start + 1000, 'completedAtEpochMs': self.end - 1000, 'passed': True, 'error': None,
                        'cleanup': {'clean': True, 'forced': False, 'exitCode': 0}, 'scenario': self.scenario,
+                       'bootstrap': bootstrap,
                        'memory': suite.runner.assess_memory(1536, {'MemAvailable': 5000}),
                        'profile': {'directory': str(self.profile), 'port': 45678, 'world': 'agent-world-' + self.run_id,
                                    'authentication': 'authenticated', 'testPlayerMode': None},
@@ -168,6 +183,15 @@ class EvidenceTests(unittest.TestCase):
     def test_artifact_mutation_is_rejected(self):
         self.rejected(lambda: self.fixture.write(self.fixture.profile / 'plugins/OnlyDragons.jar', 'different bytecode'))
 
+    def test_missing_bootstrap_provenance_cannot_replay_as_passed(self):
+        self.rejected(lambda: self.fixture.result.pop('bootstrap'))
+
+    def test_changed_staged_mojang_bytes_are_independently_rejected(self):
+        self.rejected(lambda: self.fixture.write(self.fixture.profile / 'cache/mojang_26.2.jar', 'changed upstream bytes'))
+
+    def test_forged_bootstrap_checksum_cannot_replace_launcher_metadata(self):
+        self.rejected(lambda: self.fixture.result['bootstrap'].update(mojangSha256='f' * 64))
+
     def test_raw_report_or_log_mutation_is_rejected_even_if_receipt_passed(self):
         f = self.fixture
         self.rejected(lambda: f.write(f.reports / 'scenario.json', '{}'), refresh=False)
@@ -255,6 +279,7 @@ class SelectionTests(unittest.TestCase):
         source = Path(__file__).resolve().parents[2]
         for name in ('suites.json', 'scenarios.json'):
             shutil.copyfile(source / 'dev/game-tests' / name, self.root / 'dev/game-tests' / name)
+        shutil.copytree(source / 'dev/game-tests/player-plans', self.root / 'dev/game-tests/player-plans')
 
     def test_stats_changes_require_transitive_item_and_combat(self):
         selected = suite.required_cases(self.root, ['src/main/java/com/kaveenk/onlydragons/domain/stats/StatResolver.java'])
@@ -451,7 +476,7 @@ class ChildOwnershipTests(unittest.TestCase):
                     log_path.write_text(f'RUN {fixture.run_id}: fixture; reports: {fixture.reports}\nFAIL: {reason}\n')
                     return exit_code
                 args = SimpleNamespace(project=root, suite=['all'], changed_since=None, plan=False,
-                                       eula_file=None, lease_directory=None, java_home=None, paper_jar=None,
+                                       eula_file=None, lease_directory=None, java_home=None, paper_jar=None, mojang_jar=None,
                                        memory_mib=None, startup_timeout=None, lease_timeout=None, resource_timeout=None)
                 suite_id = 'c' * 32
                 with patch.object(suite.sys, 'platform', 'linux'), patch.object(suite, 'run_child', side_effect=child), \

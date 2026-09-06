@@ -52,3 +52,44 @@ jobs:
             build/libs/*.jar
             build/reports/tests/
             build/reports/jacoco/
+  paper-integration:
+    if: github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    concurrency:
+      group: onlydragons-manual-paper
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read the exact existing Linux JDK pin
+        id: paper-java
+        shell: bash
+        run: echo "java=$(python scripts/agent-tests/ci_paper.py java-version --checkout .)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ steps.paper-java.outputs.java }}
+      - name: Run and independently replay the complete isolated Paper suite
+        env:
+          ONLYDRAGONS_PAPER_EULA_BASE64: ${{ vars.ONLYDRAGONS_PAPER_EULA_BASE64 }}
+        shell: bash
+        run: |
+          python scripts/agent-tests/ci_paper.py run \
+            --checkout "$GITHUB_WORKSPACE" --revision "$GITHUB_SHA" \
+            --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" \
+            --output "$RUNNER_TEMP/onlydragons-paper-evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: OnlyDragons-Paper-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/onlydragons-paper-evidence/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14

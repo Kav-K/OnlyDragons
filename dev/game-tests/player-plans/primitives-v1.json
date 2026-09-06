@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "planId": "primitives-v1",
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "denied",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev loadout ordinary"
+              }
+            },
+            {
+              "id": "grant",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev loadout ordinary"
+              }
+            },
+            {
+              "id": "stats",
+              "action": "command",
+              "args": {
+                "command": "onlydragons stats explain"
+              }
+            },
+            {
+              "id": "inventory-pickup",
+              "action": "inventoryClick",
+              "args": {
+                "slot": 37,
+                "button": "left"
+              }
+            },
+            {
+              "id": "inventory-place",
+              "action": "inventoryClick",
+              "args": {
+                "slot": 40,
+                "button": "left"
+              }
+            },
+            {
+              "id": "inventory-pickup-back",
+              "action": "inventoryClick",
+              "args": {
+                "slot": 40,
+                "button": "left"
+              }
+            },
+            {
+              "id": "inventory-restore",
+              "action": "inventoryClick",
+              "args": {
+                "slot": 37,
+                "button": "left"
+              }
+            },
+            {
+              "id": "select",
+              "action": "selectSlot",
+              "args": {
+                "slot": 1
+              }
+            },
+            {
+              "id": "look",
+              "action": "look",
+              "args": {
+                "yaw": 0,
+                "pitch": 0
+              }
+            },
+            {
+              "id": "move",
+              "action": "move",
+              "args": {
+                "x": 0.5,
+                "y": 100,
+                "z": 0.75,
+                "onGround": false
+              }
+            },
+            {
+              "id": "swing",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "swap",
+              "action": "swapHands",
+              "args": {}
+            },
+            {
+              "id": "swap-back",
+              "action": "swapHands",
+              "args": {}
+            },
+            {
+              "id": "select-drop",
+              "action": "selectSlot",
+              "args": {
+                "slot": 2
+              }
+            },
+            {
+              "id": "drop",
+              "action": "dropItem",
+              "args": {
+                "all": false
+              }
+            },
+            {
+              "id": "select-bow",
+              "action": "selectSlot",
+              "args": {
+                "slot": 1
+              }
+            },
+            {
+              "id": "block",
+              "action": "interactBlock",
+              "args": {
+                "x": 1,
+                "y": 100,
+                "z": 2,
+                "face": "north",
+                "hand": "main",
+                "cursorX": 0.5,
+                "cursorY": 0.5,
+                "cursorZ": 0,
+                "insideBlock": false
+              }
+            },
+            {
+              "id": "cancelled-hit",
+              "action": "attackEntity",
+              "args": {
+                "targetRef": "melee"
+              }
+            },
+            {
+              "id": "accepted-hit",
+              "action": "attackEntity",
+              "args": {
+                "targetRef": "melee"
+              }
+            },
+            {
+              "id": "draw",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "respawn",
+              "action": "respawn",
+              "args": {}
+            },
+            {
+              "id": "reconnect",
+              "action": "reconnect",
+              "args": {
+                "delayMillis": 250
+              }
+            }
+          ]
+        },
+        {
+          "id": "s2",
+          "steps": [
+            {
+              "id": "status",
+              "action": "command",
+              "args": {
+                "command": "onlydragons status"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "attack",
+              "action": "attackEntity",
+              "args": {
+                "targetRef": "melee"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "targets": [
+    "melee",
+    "arrow"
+  ]
+}

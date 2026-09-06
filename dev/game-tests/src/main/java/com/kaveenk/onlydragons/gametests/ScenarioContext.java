@@ -25,6 +25,7 @@ public final class ScenarioContext {
     private final List<BukkitTask> tasks = new ArrayList<>();
     private final List<Chunk> chunks = new ArrayList<>();
     private final List<Listener> listeners = new ArrayList<>();
+    private final Map<String, Runnable> resources = new LinkedHashMap<>();
     private String mechanicRevision = "harness-v1";
     private boolean finished;
 
@@ -40,16 +41,23 @@ public final class ScenarioContext {
     }
     public void check(String name, Object expected, Object observed) {
         requireActive();
+        Json.write(expected); Json.write(observed); // Reject unsupported values before completion can become terminal.
         if (assertions.stream().anyMatch(row -> row.get("id").equals(name))) throw new IllegalArgumentException("Duplicate assertion: " + name);
         assertions.add(Map.of("id", name, "expected", expected, "observed", observed, "passed", Objects.equals(expected, observed)));
     }
-    public void observe(String name, Object value) { requireActive(); observations.put(name, value); }
+    public void observe(String name, Object value) { requireActive(); Json.write(value); observations.put(name, value); }
     public <T extends Entity> T own(T entity) { requireActive(); entities.add(entity); return entity; }
     /** Register before use so exception, completion and disable share cleanup. */
     public void listen(Listener listener) {
         requireActive();
         listeners.add(Objects.requireNonNull(listener));
         Bukkit.getPluginManager().registerEvents(listener, plugin);
+    }
+    /** Register reversible setup cleanup before mutating a fixture resource. */
+    public void cleanup(String name, Runnable release) {
+        requireActive();
+        if (resources.putIfAbsent(name, Objects.requireNonNull(release)) != null)
+            throw new IllegalArgumentException("Duplicate cleanup resource: " + name);
     }
     /** Make a fresh test chunk tick without players; release only force-loads owned by this scenario. */
     public void tickChunk(Chunk chunk) {
@@ -83,6 +91,12 @@ public final class ScenarioContext {
             if (!task.isCancelled()) uncancelled++;
         }
         tasks.clear();
+        int retainedResources = 0;
+        for (Runnable release : resources.values()) {
+            try { release.run(); } catch (RuntimeException failure) { retainedResources++; }
+        }
+        resources.clear();
+        check("owned_resources_released", 0, retainedResources);
         int retainedListeners = 0;
         for (Listener listener : listeners) {
             HandlerList.unregisterAll(listener);
