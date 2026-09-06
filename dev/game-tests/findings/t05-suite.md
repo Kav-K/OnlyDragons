@@ -1,78 +1,78 @@
-# T05 integrated suite evidence
+# T05 current integrated suite evidence
 
-PR [#30](https://github.com/Kav-K/OnlyDragons/pull/30), issue [#8](https://github.com/Kav-K/OnlyDragons/issues/8), remains In review.
-The preserved implementation now participates in shared changed-area selection
-and automated acceptance. This is the bounded production proc coordinator;
-physical firing/Duplex and end-to-end two-bow P08/P09 remain later integration.
+[PR #30](https://github.com/Kav-K/OnlyDragons/pull/30), [issue #8](https://github.com/Kav-K/OnlyDragons/issues/8), remains In review.
+The bounded production coordinator and additive suites/acceptance mappings are
+preserved. Full physical firing/Duplex/two-bow P08/P09 remain later integration;
+production composition wiring belongs to lead-coordinated T08/#11.
 
-## Source and access
+## Source and recovery verification
 
-Clean runtime source: `ee1721a4f8dbbb2c96d1df4f60023f6b1e504ac1`, including
-ordinary merge `f99f739` of main `5e8cfbfc7c9bfc7bc395e76f1e608f5853cd78be`.
-A fresh fetch after the suite confirmed the same main. The old read-only skill
-merge blocker is resolved by integrated PR #34; no sandbox bypass was used.
-Actual worker doctor returned ready: 16 context/fixture files readable,
-JDK 25.0.4.1, existing EULA readable, shared lease writable/available, errors
-and waiting empty. Memory: 6890 MiB guest, 5141 MiB effective host against
-2816 MiB with the protocol player. This doctor is access evidence only.
+Clean runtime `5284b66f086d3762bf9e3b269c50f57dd24e88fa` includes PR35 main
+`1deb9a804480522738192f795914fc424ab2d330`. Its complete 16-case suite finished
+before the infrastructure interruption. On 6 September, ordinary merge
+`e6c2b500cd80eaee105f33dba9a68fb60420fd4e` integrated current main
+`799c01dd5e9da35cf17bf29ddb671ebc66ab4b3b`. These later changes are planning-only;
+full receipt replay and task acceptance verified identical relevant inputs on the
+merged clean branch. The receipt retains its actual runtime/base identities.
+No new Paper execution is claimed for this recovery replay.
 
-## Observed verification
+Fresh actual-sandbox doctor returned ready: 16 readable context/fixture files,
+Java 25.0.4.1, existing accepted EULA readable, shared lease writable/available,
+errors/waiting empty. Guest memory was 9222 MiB and effective host memory 5208 MiB
+against 2816 required. This is preflight only. Prior skill-write and network
+blockers are resolved without changing authentication or sandbox boundaries.
 
-- Wrapper production build passed: 136 tests (54 T05), zero failures/errors/skips,
-  plus API isolation. Companion builds passed; its assertions run on Paper.
-- Protocol client build passed all 7 tests; exact pinned publication and strict
-  dependency verification retained.
-- `python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py'`:
-  130 passing tests. The simulated transient memory-probe message is test output.
-- `checkpoint.py plan --project .`: plan-valid. Changed-area selection included
-  every existing case plus T05 because shared catalog/harness registration changed.
-- `paper_suite.py --changed-since origin/main`: exit 0; all 16 cases met their
-  declared outcomes (11 positive, five intended negative), Paper 26.2 build 121,
-  Minecraft 26.2 / JDK 25.0.4.1. No missing, skipped or busy case counted as passed.
-- `paper_suite.py --validate <receipt>`: exit 0, verified suite.
-- `checkpoint.py acceptance --project . --base origin/main --receipt <receipt>
-  --automated --task T05`: exit 0, `automatedReady: true`,
-  `acceptanceApproved: false`. External review/CI is independently checked.
+## Verification
 
-Receipt: `build/reports/agent-paper-suites/8ca121b5b6ef4a3a8addf1514bcb3f4c/receipt.json`.
-Raw run reports, logs, copied JUnit and artifact evidence stay ignored locally.
+- Complete changed-area selection: all 16 cases below, including five intended
+  failures. Saved raw reports, copied JUnit, source/artifact hashes and owned
+  cleanup passed fresh `paper_suite.py --validate` replay.
+- Every case's wrapper build records 136 production tests, zero failures/errors/
+  skips; actor builds also record seven client tests. API isolation and pinned
+  client dependency verification passed in those builds.
+- Fresh `python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py'`:
+  135 tests passed after recovery.
+- `checkpoint.py plan --project .`: plan-valid.
+- `checkpoint.py acceptance --project . --base origin/main --receipt
+  build/reports/agent-paper-suites/b7fd6bc562374f6f83b15da1f192caac/receipt.json
+  --automated --task T05`: exit 0, automated-ready, acceptanceApproved false.
+  This checks all current selected cases and T05 requirements; CI/review remain
+  independent external gates.
+
+Receipt: `build/reports/agent-paper-suites/b7fd6bc562374f6f83b15da1f192caac/receipt.json`.
+Raw reports/build outputs remain ignored; exact identities follow.
 
 | Identity | SHA256 |
 | --- | --- |
-| Receipt | `ed9028ae8c01bcfc8b7eb59881b2d9fcb93b40e0456dace20123cf756e5008ef` |
-| Relevant source inputs | `2af9207b57b15df4714345f16ac592cd9ced85e4120cdcf154f573514ed04da6` |
-| productionSha256 | `851df13d2721eb4d4079d86741375a1613d66e53cad0b49c9265457a32ca0257` |
-| gameTestsSha256 | `b01ff7210830a877cf7388d582b0127876fbb6ce09574bda1ade98e00a49fea1` |
+| Receipt | `ec1840213dd4d202fbb775aa34624d74e383677aad497b120c8af37485be3072` |
+| Relevant source inputs | `87c3c92e408de81b9d8e6c6be072af741aa9376670f3902f135f091e4ceea7c8` |
+| Production artifact | `851df13d2721eb4d4079d86741375a1613d66e53cad0b49c9265457a32ca0257` |
+| Companion artifact | `b01ff7210830a877cf7388d582b0127876fbb6ce09574bda1ade98e00a49fea1` |
 
-All cases used the same production/companion bytes. The receipt records the
-client and all staged dependency hashes for actor cases and verifies exact inputs.
-
-| Case | Run ID | Runner exit | Report assertions |
+| Case | Run ID | Runner exit | Assertions |
 | --- | --- | --- | --- |
-| `lifecycle-calibration` | `e5e46575cabb4b9784e3d8c6f0f297c8` | 0 | 14 |
-| `foundation-contracts` | `f38cd7adbf4146928e0cb11a16a3aaa3` | 0 | 30 |
-| `stats-resolution` | `a07177610f454e27a32e059fb9c2fe1d` | 0 | 19 |
-| `item-identity` | `dc0146213e0c44b7bff67b1cf1fc41b2` | 0 | 35 |
-| `combat-accounting` | `8813dacd9e7a4f1fa2cce366fd961b31` | 0 | 31 |
-| `projectile-feasibility` | `219cded7384042dc8aee20c1b9e7f4e5` | 0 | 34 |
-| `protocol-player-calibration` | `e3f1465cfb7f4c9d997360f612a6647c` | 0 | 25 |
-| `deliberate-failure` | `925bfa85f3b6413a90601148a4f0e2a0` | 1 | 15 |
-| `projectile-cleanup-failure` | `3fa8192fa6454ddcb669ab0f2ea3316a` | 1 | 5 |
-| `projectile-cleanup-abort` | `14cf38908c774b6aa53b6fbf62dfd4f7` | 1 | 5 |
-| `protocol-player-early-exit` | `f00e2403f8284b978d8ce1ed56e09dc4` | 1 | 14 |
-| `protocol-player-idle` | `96de094620fe4c62b197ad9c2812b23b` | 1 | 14 |
-| `equipment-stats` | `8e7f63407fce49798cf70cf7969a8c43` | 0 | 23 |
-| `equipment-player` | `359adb8f01ec4259ac9b03c7ae29068f` | 0 | 47 |
-| `protocol-player-soak` | `fb07faa77ba14eb58cb4a2a9cc31445c` | 0 | 27 |
-| `enchants-procs` | `91ff51ab03c74a8098da926fd113b5b6` | 0 | 38 |
+| `lifecycle-calibration` | `78d90e4b78f346c8a9dec13f601c2e51` | 0 | 14 |
+| `foundation-contracts` | `e5c9372dac1447a5ad62edc5335a6a1a` | 0 | 30 |
+| `stats-resolution` | `be9fffc477dd4655bb571d7dbf310249` | 0 | 19 |
+| `item-identity` | `976975e9b60e4864ad111aedd4a343bb` | 0 | 35 |
+| `combat-accounting` | `031596ffe8c7460cb2abc01e2001a390` | 0 | 31 |
+| `projectile-feasibility` | `ef79de9a8d8146679f1d69d400d8c744` | 0 | 34 |
+| `protocol-player-calibration` | `963bd9911ad6478d8b9b58dd4e86d384` | 0 | 25 |
+| `deliberate-failure` | `e99b83c8fb67453ab0febafce419fd97` | 1 | 15 |
+| `projectile-cleanup-failure` | `5aa0703453924237a59237bbba05d44c` | 1 | 5 |
+| `projectile-cleanup-abort` | `68551e45a456404ea07175aac3cd77fe` | 1 | 5 |
+| `protocol-player-early-exit` | `3b7e28e042bf456d9c8c42d09ce952b6` | 1 | 14 |
+| `protocol-player-idle` | `878731c8ae9f4ae493637857bc1dca91` | 1 | 14 |
+| `equipment-stats` | `55f5c3dcacdd409e964d997a0f6d3c17` | 0 | 23 |
+| `equipment-player` | `f3105f57df6142548899355cc24ae271` | 0 | 47 |
+| `protocol-player-soak` | `262f1b30fdf64172af65857923732ee7` | 0 | 27 |
+| `enchants-procs` | `1e895c9e73c743368be4c65704b43f64` | 0 | 38 |
 
-Negative exits are accepted only for their declared assertion/exception/abort/
-early-exit/timeout outcome. Every report retained all four cleanup assertions at
-zero. All 16 Paper JVMs exited 0, clean and unforced; all five clients were reaped
-cleanly and unforced (the two negative clients exited 1 as intended). Every
-recorded loopback port was confirmed closed after the suite. Tests used disposable
-issue-local worlds, existing accepted EULA, shared lease and memory admission.
-Only catalog-declared actor cases used the explicit offline protocol mode.
+All 16 Paper processes exited cleanly and unforced; all five actor clients were
+reaped cleanly and unforced, with intended negative client exits distinguished.
+All four cleanup counters were zero in every scenario. The runner used the
+existing EULA, disposable issue-local worlds, loopback ports and shared lease/
+memory admission. Only declared actor cases used the explicit offline mode.
 
 ## T05 observations and remaining scope
 
@@ -94,8 +94,7 @@ remain objective later adapter/integration work. Windows Play/smoke, human
 input/visuals, authenticated multiplayer and performance remain unrun.
 No gameplay milestone is accepted. Lead review and serial merge remain required.
 
-Runtime-head Windows/Linux CI passed on `ee1721a`:
-[PR checks](https://github.com/Kav-K/OnlyDragons/actions/runs/34014552319),
-[branch checks](https://github.com/Kav-K/OnlyDragons/actions/runs/34014550674).
-Later evidence-only commits must retain the relevant source hash; final-head CI
-is linked in PR30's handoff instead of recursively changing this tested record.
+Final-head CI and the final current-main check are recorded in PR30's handoff.
+The [previous PR34 suite record](t05-suite-pr34.md) and
+[initial implementation evidence](t05-initial-evidence.md) retain historical
+source identities and results; neither substitutes for the current replay.

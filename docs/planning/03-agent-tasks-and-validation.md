@@ -33,7 +33,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T02 — Items | Complete | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Final clean 7ebaa6b after main 586a170: 54 production tests and 35 item-codec-v4 Paper assertions passed, including real serialized loadouts through production snapshots and four cleanup checks. [Evidence](#t02-item-validation-evidence). Merged at 7c6d843 after independent review and final-head CI; authenticated inventory/visual checks are separate. #7 equipment/grants are integrated in PR #29/#32; #9 firing remains deferred. |
 | T03 — Combat/ledger | Complete | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Merged at 9092fbe after independent review and final-head Windows/Linux CI. Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Physical adapter/native suppression and human checks are separate. |
 | T04 — Paper feasibility | In review (player-owned follow-up delivered) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). Player-owned follow-up is in draft PR #31 with native positive controls, cancellation/zero-damage observations, part geometry, phase and simultaneous-hit evidence. Issue #5 records the reviewed bounded phase/part policy; its worker still owns foundation-plan reconciliation and actual current-main suite evidence. T04 remains partial, #9 stays blocked and M0 unaccepted. |
-| T05 — Enchants/procs | In review | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | [Draft PR #30](https://github.com/Kav-K/OnlyDragons/pull/30): clean ee1721a includes main 5e8cfbf; 136 production tests, 130 Python tests, all 16 shared suite cases and automated T05 acceptance passed. [Exact evidence](../../dev/game-tests/findings/t05-suite.md). Current-input lead review/final-head CI remain external gates; physical P08/P09 remain later integration. |
+| T05 — Enchants/procs | In review | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | [Draft PR #30](https://github.com/Kav-K/OnlyDragons/pull/30): clean runtime 5284b66 passed 136 production tests and all 16 shared cases; current-main merge e6c2b50 preserves the verified relevant inputs. Fresh 135 Python tests, full receipt replay and automated T05 acceptance passed. [Exact evidence](../../dev/game-tests/findings/t05-suite.md). Current-input lead review/final-head CI remain external gates; physical P08/P09 remain later integration. |
 | T06 — Firing/Duplex | Blocked | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b/T02 are complete; wait for accepted T04 impact/native-damage evidence. Partial PR #22 and a passing T09b calibration alone cannot satisfy this gate. Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence remain required. |
 | T07 — Tracer/continuity | Planned | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |
 | T08 — Practice tools | Planned | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | Repeatable player procedure, permissions, and explained damage. |
@@ -129,16 +129,21 @@ Clean `ee1721a` with main `5e8cfbf` passed 136 production tests, seven client te
 130 Python tests, all 16 shared cases and automated T05 acceptance. Its 38 proc
 assertions exercised 72 Paper ticks, captured inheritance, bounded admission,
 Tempo expiry/swap eligibility and stale-session/target cleanup. Final evidence
-head `33b2a06` passed Windows/Linux CI. [Exact previous suite evidence](../../dev/game-tests/findings/t05-suite.md)
+head `33b2a06` passed Windows/Linux CI. [Exact previous suite evidence](../../dev/game-tests/findings/t05-suite-pr34.md)
 and [earlier implementation history](../../dev/game-tests/findings/t05-initial-evidence.md)
 retain their original source identities.
 
-PR35 main `1deb9a8` is now being reconciled normally. Its concise context/archive,
-deferred player-observation and external impact-policy gates, and T06/M1 P02/P04
-mappings are preserved alongside T05's implemented `bounded-procs` binding.
-Fresh doctor, structural checkpoint, complete affected suite and T05 acceptance
-remain pending on the new committed inputs. The former skill-write blocker is
-resolved; no implementation or acceptance gate is replaced.
+Current-main merge `e6c2b50` includes `799c01d` and preserves every additive
+registration and T04/T06/T08 boundary. Fresh actual-sandbox doctor and structural
+checkpoint passed. The completed clean-runtime `5284b66` suite
+`b7fd6bc562374f6f83b15da1f192caac` passed full replay against identical current
+relevant inputs: all 16 cases, 136 production tests, seven client tests and 38
+proc assertions. Fresh Python validation passed 135 tests; automated T05
+acceptance is ready with merge acceptance false. See the current findings for
+exact receipt/source/artifact identities. The former skill/network blockers are
+resolved. No new Paper execution is claimed for unchanged-input recovery replay;
+final-head CI and independent review remain separate. Production composition
+wiring is reserved for T08/#11; #7 equipment is complete.
 
 T05 remains In review. Physical firing/Duplex/two-bow P08/P09 are objective later
 integration work. Windows Play/smoke, human input/visuals, authenticated multiplayer
