@@ -16,7 +16,7 @@ import static com.kaveenk.onlydragons.domain.stats.StatKey.*;
 /** Real item serialization and production service with synthetic UUIDs and a capturing command sender. */
 public final class EquipmentStatsScenario implements Scenario {
     @Override public void start(ScenarioContext context) {
-        context.mechanicRevision("equipment-stats-v1");
+        context.mechanicRevision("equipment-stats-v2");
         var stats = context.production().equipment();
         var registry = CalibrationLoadouts.registry(); var codec = new WeaponItemCodec(registry);
         UUID actor = UUID.randomUUID();
@@ -24,16 +24,29 @@ public final class EquipmentStatsScenario implements Scenario {
             context.check("server_thread", true, Bukkit.isPrimaryThread());
             context.check("production_service", true, stats != null && EquipmentStatsService.class.getClassLoader()
                     == context.production().getClass().getClassLoader());
-            var expected = Map.of("ordinary", 0.0, "crit", 0.0, "ferocity_25", 25.0, "ferocity_100", 100.0,
-                    "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0);
+            var expectedTotals = Map.of(
+                    "ordinary", List.of(100.0, 50.0, 0.0, 0.0),
+                    "crit", List.of(100.0, 50.0, 100.0, 0.0),
+                    "ferocity_25", List.of(100.0, 50.0, 0.0, 25.0),
+                    "ferocity_100", List.of(100.0, 50.0, 0.0, 100.0),
+                    "ferocity_500", List.of(100.0, 50.0, 0.0, 500.0),
+                    "tracer", List.of(100.0, 50.0, 0.0, 0.0),
+                    "duplex", List.of(100.0, 50.0, 0.0, 0.0),
+                    "fatal_tempo", List.of(100.0, 50.0, 0.0, 25.0),
+                    "shortbow_v1", List.of(100.0, 50.0, 0.0, 0.0));
+            var expectedIds = new TreeSet<>(expectedTotals.keySet());
+            var actualIds = new TreeSet<>(stats.loadouts());
+            context.check("all_loadout_ids", List.copyOf(expectedIds), List.copyOf(actualIds));
+            if (!expectedIds.equals(actualIds)) {
+                throw new IllegalStateException("Calibration loadout oracle mismatch: expected "
+                        + expectedIds + ", actual " + actualIds);
+            }
             var observed = new TreeMap<String,List<Double>>();
-            var expectedTotals = new TreeMap<String,List<Double>>();
             for (String id : stats.loadouts()) {
                 var stack = ItemStack.deserializeBytes(stats.createLoadout(id).serializeAsBytes());
                 var result = stats.refresh(actor, stack, stats.createLoadout("ferocity_500"));
                 var snapshot = result.stats().snapshot();
                 observed.put(id, List.of(snapshot.raw(WEAPON_DAMAGE),snapshot.raw(CRIT_DAMAGE),snapshot.raw(CRIT_CHANCE),snapshot.raw(FEROCITY)));
-                expectedTotals.put(id, List.of(100.0,50.0,id.equals("crit") ? 100.0 : 0.0,expected.get(id)));
             }
             context.check("all_loadout_totals", expectedTotals, observed);
             var original = registry.create("ordinary"); var bow = codec.encode(original);

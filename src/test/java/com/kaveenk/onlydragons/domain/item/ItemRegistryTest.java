@@ -28,11 +28,14 @@ class ItemRegistryTest {
     }
 
     @Test void calibrationContributionsAreExplicitAndEffectsRemainData() {
-        assertEquals(9, registry.definitions().size());
+        var expectedFerocity = Map.of("ordinary", 0.0, "crit", 0.0, "ferocity_25", 25.0, "ferocity_100", 100.0,
+                "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0, "shortbow_v1", 0.0);
+        assertEquals(expectedFerocity.keySet(), registry.definitions().keySet(),
+                "Every calibration definition needs explicit numeric expectations");
         assertEquals(WeaponDefinition.FiringMode.SHORTBOW, registry.definitions().get("shortbow_v1").weapon().firingMode());
-        for (var row : Map.of("ordinary", 0.0, "crit", 0.0, "ferocity_25", 25.0, "ferocity_100", 100.0,
-                "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0).entrySet()) {
+        for (var row : expectedFerocity.entrySet()) {
             var item = registry.resolve(registry.create(row.getKey()));
+            assertEquals(100.0, item.definition().weapon().baseDamage(), row.getKey());
             assertEquals(row.getValue(), item.statModifiers().stream().filter(m -> m.key() == StatKey.FEROCITY).mapToDouble(StatModifier::amount).sum());
             assertEquals(row.getKey().equals("crit") ? 100 : 0,
                     item.statModifiers().stream().filter(m -> m.key() == StatKey.CRIT_CHANCE).mapToDouble(StatModifier::amount).sum());

@@ -170,6 +170,30 @@ cohort and a complete passing receipt/T06 checkpoint before acceptance. A coding
 worker resumes only on explicit redispatch. T06 remains In review and no
 requirement or milestone is marked accepted.
 
+## Equipment oracle reconciliation (GH-9 redispatch)
+
+[Owner redispatch 5559557738](https://github.com/Kav-K/OnlyDragons/issues/9#issuecomment-5559557738)
+reports that the retained hosted cohort failed in `equipment-stats` before T06:
+its eight-entry ferocity oracle omitted the ninth production loadout,
+`shortbow_v1`, passing null to `List.of`. Source inspection confirms that
+omission; this note does not claim an independently inspected exception stack.
+The original failed cohort and artifact above remain iteration evidence.
+
+The bounded repair gives `equipment-stats-v2` explicit raw damage / crit damage /
+crit chance / ferocity totals for all nine loadouts, including shortbow
+`[100, 50, 0, 0]`. A required `all_loadout_ids` assertion compares exact sorted
+expected/actual IDs before iteration and fails with a descriptive mismatch.
+`ItemRegistryTest` now checks the complete keyset and shortbow's numeric
+contributions, rather than checking nine definitions but only eight totals.
+The other numeric catalog oracle, `ItemIdentityScenario`, already includes
+shortbow; a search of production tests and companion fixtures found no other
+instance of this omission. No production firing or gameplay policy changes.
+
+Current main `92147a2` is already integrated. Fresh build and clean focused
+equipment Paper evidence are pending for this repair. The lead owns independent
+review and the next full 24-case hosted run, receipt replay and T06 checkpoint;
+the worker will not duplicate that run. Research/design contracts are unchanged.
+
 Windows Play/smoke, mouse/hold feel, rendered presentation and authenticated-client
 compatibility remain separate unrun human observations. T08 owns full multiplayer
 HP/proc/ghost-score accounting; it is not a circular prerequisite of this producer.

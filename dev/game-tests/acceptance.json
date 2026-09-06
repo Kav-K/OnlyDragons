@@ -298,6 +298,7 @@
       "assertions": [
         "server_thread",
         "production_service",
+        "all_loadout_ids",
         "all_loadout_totals",
         "repeat_refresh_cached",
         "same_uuid_edit_refresh",
