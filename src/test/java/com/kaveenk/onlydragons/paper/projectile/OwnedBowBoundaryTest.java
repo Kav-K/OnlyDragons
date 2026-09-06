@@ -21,6 +21,7 @@ class OwnedBowBoundaryTest {
     PlayerMock player;
     OwnedBowService bows;
     UUID encounter;
+    EntityShootBowEvent lastBowEvent;
     List<SettledHit> hits = new ArrayList<>();
     @BeforeEach void setup() {
         server = MockBukkit.mock(); plugin = MockBukkit.load(OnlyDragonsPlugin.class);
@@ -35,7 +36,8 @@ class OwnedBowBoundaryTest {
         // Native ammunition drawing precedes EntityShootBowEvent on the pinned server.
         player.getInventory().setItem(9, new ItemStack(Material.ARROW, 9));
         Arrow arrow = player.getWorld().spawn(player.getEyeLocation(), Arrow.class); arrow.setShooter(player);
-        bows.drawn(new EntityShootBowEvent(player, bow, new ItemStack(Material.ARROW), arrow, EquipmentSlot.HAND, 0.5f, true));
+        lastBowEvent = new EntityShootBowEvent(player, bow, new ItemStack(Material.ARROW), arrow, EquipmentSlot.HAND, 0.5f, true);
+        bows.drawn(lastBowEvent);
         bows.launched(new ProjectileLaunchEvent(arrow));
         return arrow;
     }
@@ -71,5 +73,25 @@ class OwnedBowBoundaryTest {
         Arrow arrow = shoot("ordinary"); Cow cow = target(); bows.hit(new ProjectileHitEvent(arrow, cow, null, null));
         bows.endEncounter(encounter); server.getScheduler().performOneTick();
         assertTrue(hits.isEmpty()); assertFalse(arrow.isValid()); assertEquals(0, bows.capacityUsed()); assertEquals(0, bows.pendingClaims());
+    }
+    @Test void finalBowVetoRefundsWholeGroupExactlyOnce() {
+        Arrow arrow = shoot("duplex"); lastBowEvent.setCancelled(true);
+        server.getScheduler().performOneTick();
+        assertFalse(arrow.isValid()); assertEquals(0, bows.capacityUsed()); assertEquals(0, bows.pendingGroups());
+        assertEquals(10, player.getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum());
+        bows.endEncounter(encounter); server.getScheduler().performOneTick();
+        assertEquals(10, player.getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum()); assertTrue(hits.isEmpty());
+    }
+    @Test void nativeLaunchVetoRetiresPrimaryAndReservedDuplexWithoutAClaim() {
+        Arrow arrow = shoot("duplex"); var launch = new ProjectileLaunchEvent(arrow);
+        bows.launched(launch); launch.setCancelled(true); server.getScheduler().performOneTick();
+        assertFalse(arrow.isValid()); assertEquals(0, bows.reservedCapacity()); assertEquals(0, bows.pendingGroups());
+        assertEquals(10, player.getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum()); assertTrue(hits.isEmpty());
+    }
+    @Test void unrelatedProjectileIsNotSuppressedClaimedOrRemoved() {
+        Arrow arrow = player.getWorld().spawn(player.getEyeLocation(), Arrow.class); arrow.setDamage(4); arrow.setCritical(true);
+        bows.launched(new ProjectileLaunchEvent(arrow)); bows.hit(new ProjectileHitEvent(arrow, target(), null, null));
+        assertEquals(4, arrow.getDamage()); assertTrue(arrow.isCritical()); assertTrue(arrow.isValid());
+        assertEquals(0, bows.pendingClaims()); bows.endEncounter(encounter); assertTrue(arrow.isValid());
     }
 }

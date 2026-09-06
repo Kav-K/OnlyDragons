@@ -153,6 +153,12 @@ debit from shortbow-owned reservation, instead of relying on that setter and
 charging twice. [Exact API/source and pending survival-inventory verification](evidence/t06-firing.md#calibration-and-native-ammo-discovery).
 This is implementation-source evidence, not a gameplay pass or Hypixel claim.
 
+The pinned disconnect patch defers handling to a following tick. T06's clean
+native-input trial observes a child before actual quit; a kick call alone proves
+no kick event. [Exact source, observations and reviewed layer-specific lifecycle
+coverage](evidence/t06-firing.md#validation-state) retain the synthetic pending-group
+regression separately from actual client disconnect/quit evidence.
+
 ### T04 measured collision boundary (Paper 121)
 
 **Observed on exact pin, 2026-09-05:** real shooterless arrows delivered multipart

@@ -1,7 +1,9 @@
 # T06 owned firing boundary (GH-9)
 
-Implementation is in progress on `symphony/gh-9`, based on integrated main
-`3c35a85bfa5d6bf6788af7c26d59891cfb852175`. No acceptance is claimed yet.
+Implementation is in review in [draft PR #52](https://github.com/Kav-K/OnlyDragons/pull/52)
+on `symphony/gh-9`. Ordinary merge `5390ebf` integrates main
+`7b8ff0f5eaa57800e8b7d1d08ea02e5aa79afe05`, preserving all 24 selected cases
+and accepted T02b/T05/M0 context. No T06 acceptance is claimed yet.
 
 ## Consumer contract
 
@@ -68,7 +70,7 @@ remaining failures below prevent feature acceptance.
 ## Validation state
 
 Initial doctor: ready; starting checkpoint: plan-valid, automated readiness false.
-JDK 25 wrapper build now passes 178 tests, zero failures/errors/skips, including
+JDK 25 wrapper build now passes 181 tests, zero failures/errors/skips, including
 domain capacity/child/clock boundaries and synthetic adapter final-veto,
 target-replacement, old-session impact and reset-before-settlement regressions.
 MockBukkit cannot simulate airborne `isInBlock`; retained-airborne physics is
@@ -89,12 +91,27 @@ other phase/claim controls, but retain quit-window and geometry-oracle failures.
 Independent review identifies the geometry oracle overwriting the first
 claimed part's dimensions with a later multipart callback. The correction keys
 geometry by projectile and actual part UUID and serializes each callback's
-dimensions. It changes no production part/phase policy. Ordinary protocol
-reconnect self-disconnects before a server kick can reliably exercise the
-pending-group window; shared expected-kick primitive coordination is pending.
-Real statistic, kick-event/cause, arrow validity and quit timing must all be
-observed, with a complete valid client receipt. The fixture is being corrected
-while preserving native flight, production timing and every required assertion.
+dimensions. It changes no production part/phase policy. Clean `3f10f61` run
+`0d52c50be0544d6ca2ef08ca36173196` passes 101/103 rows, including corrected
+geometry, with both JVMs exiting cleanly. The remaining two assertions assume
+quit precedes the child. Its actual journal has a valid primary/pending group
+at statistic tick 260, then a child and quit at 261, with no kick event. Artifact
+SHA256s: production `b5ee66a03876d02f95af08d378b762ccfe26046de27ce7a901c1091b1d108dff`,
+companion `9142982f204aa445088439b1c086130331f8933c6c212d8e8f9a8e2ffc964706`.
+
+The [lead-reviewed reconciliation](https://github.com/Kav-K/OnlyDragons/issues/9#issuecomment-5559298257)
+keeps the synthetic adapter regression for pre-settlement `clearSession`,
+including retained primary/debit and cancelled child reservation. Real native
+lifecycle asserts observed request/quit ordering, immutable airborne ownership,
+one debit, no emission after actual quit, inactive old token and reconnect
+isolation. It records whether a child legitimately emitted before quit. It does
+not label the synthetic branch as native quit evidence or claim server-kick
+coverage. No client-schema or production-timing change is needed.
+
+Pinned Paper's [disconnect implementation](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/patches/sources/net/minecraft/server/network/ServerCommonPacketListenerImpl.java.patch#L303-L308)
+defers connection-disconnect handling to the next tick. This explains the
+observed setup; it does not prove every possible earlier quit window impossible.
+The corrected current-input feature run and full cohort remain pending.
 
 Feature runtime, complete selected cohort/T06 checkpoint,
 independent review and current CI remain outstanding. Human mouse/hold feel,

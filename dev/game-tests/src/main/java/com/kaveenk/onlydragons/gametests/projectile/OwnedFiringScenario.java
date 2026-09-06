@@ -24,6 +24,8 @@ public final class OwnedFiringScenario implements Scenario, Listener {
     private DamageObservationProbe damage;
     private UUID encounter, secondEncounter;
     private boolean transferLaunch, immediateQuit, pendingAtQuit;
+    private long observationSequence, disconnectRequestOrder, quitOrder, quitTick;
+    private boolean kickObserved;
     private OwnedProjectile immediateShot, transferShot;
     private final List<OwnedProjectile> emissions = new ArrayList<>();
     private final List<SettledHit> settlements = new ArrayList<>();
@@ -197,9 +199,18 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             immediateQuit = true;
             draw("beta", "immediate", () -> players.await("immediate reconnect completed", 150, () -> players.joins("beta") == 2, () -> {
                 Player beta = players.player("beta"); beta.setGameMode(GameMode.SURVIVAL); beta.setAllowFlight(true); beta.setFlying(true); beta.setInvulnerable(true);
-                context.check("actual_quit_before_group_settlement", true, pendingAtQuit);
-                context.check("immediate_quit_retains_primary_and_debit", true, bows.projectile(immediateShot.shot().projectileId()).orElseThrow().equals(immediateShot)
-                        && bows.projectiles().stream().filter(a -> a.shot().shotId().equals(immediateShot.shot().shotId())).count() == 1 && ammo("beta") == 8);
+                context.check("post_shot_disconnect_request_precedes_actual_quit", true, disconnectRequestOrder > 0 && quitOrder > disconnectRequestOrder
+                        && quitTick >= immediateShot.shot().launchTick());
+                context.check("actual_quit_retains_primary_and_single_debit", true,
+                        bows.projectile(immediateShot.shot().projectileId()).orElseThrow().equals(immediateShot) && ammo("beta") == 8);
+                var group = emissions.stream().filter(a -> a.shot().shotId().equals(immediateShot.shot().shotId())).toList();
+                context.check("no_group_emission_after_actual_quit", true, !group.isEmpty() && group.stream().allMatch(a ->
+                        ((Number) nativeLaunches.get(a.shot().projectileId()).get("sequence")).longValue() < quitOrder));
+                long children = group.stream().filter(a -> a.shot().parentProjectileId().isPresent()).count();
+                context.check("disconnect_child_count_matches_observed_boundary", pendingAtQuit ? 0L : 1L, children);
+                context.observe("postShotDisconnectResult", Map.of("pendingAtQuit", pendingAtQuit, "childrenBeforeQuit", children,
+                        "quitTick", quitTick, "kickEventObserved", kickObserved,
+                        "scope", "Real client disconnect/quit after native launch; synthetic adapter regression separately covers clearSession before delayed settlement."));
                 context.check("immediate_quit_old_token_inactive", true, !bows.isCurrentSession(players.identity("beta"), immediateShot.sessionToken()));
                 dragon(0);
             }));
@@ -398,15 +409,17 @@ public final class OwnedFiringScenario implements Scenario, Listener {
     @EventHandler(priority = EventPriority.MONITOR) public void usedBow(PlayerStatisticIncrementEvent event) {
         if (event.getStatistic() == Statistic.USE_ITEM && event.getMaterial() == Material.BOW
                 && event.getPlayer().getUniqueId().equals(players.identity("beta")) && immediateShot != null && players.joins("beta") == 1) {
-            players.request("beta", "reconnect");
-            context.observe("immediateQuitSetup", "Public API kick after the real bow-use statistic, immediately following the ordered reconnect request; exercises actual quit while the launched group is pending.");
-            context.observe("immediateKickBoundary", Map.of("tick", Bukkit.getCurrentTick(), "pendingGroups", bows.pendingGroups(),
+            disconnectRequestOrder = ++observationSequence;
+            context.observe("postShotDisconnectRequest", Map.of("tick", Bukkit.getCurrentTick(), "sequence", disconnectRequestOrder,
+                    "statistic", event.getStatistic().name(), "material", event.getMaterial().name(), "pendingGroups", bows.pendingGroups(),
                     "validPrimary", bows.arrow(immediateShot.shot().projectileId()).map(Arrow::isValid).orElse(false)));
-            event.getPlayer().kick(net.kyori.adventure.text.Component.text("Immediate launch lifecycle calibration"));
+            players.request("beta", "reconnect");
         }
     }
     @EventHandler(priority = EventPriority.MONITOR) public void kick(PlayerKickEvent event) {
-        if (event.getPlayer().getUniqueId().equals(players.identity("beta"))) context.observe("immediateKickEvent", Map.of(
+        if (!event.getPlayer().getUniqueId().equals(players.identity("beta"))) return;
+        kickObserved = true;
+        context.observe("immediateKickEvent", Map.of(
                 "tick", Bukkit.getCurrentTick(), "cause", event.getCause().name(), "cancelled", event.isCancelled(),
                 "reason", net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(event.reason())));
     }
@@ -414,7 +427,8 @@ public final class OwnedFiringScenario implements Scenario, Listener {
         if (event.getPlayer().getUniqueId().equals(players.identity("beta")) && immediateShot != null && players.joins("beta") == 1) {
             boolean validPrimary = bows.arrow(immediateShot.shot().projectileId()).map(Arrow::isValid).orElse(false);
             pendingAtQuit = bows.pendingGroups() > 0 && validPrimary;
-            context.observe("immediateQuit", Map.of("tick", Bukkit.getCurrentTick(), "launchTick", immediateShot.shot().launchTick(), "pendingGroups", bows.pendingGroups(), "validPrimary", validPrimary));
+            quitOrder = ++observationSequence; quitTick = Integer.toUnsignedLong(Bukkit.getCurrentTick());
+            context.observe("immediateQuit", Map.of("tick", quitTick, "sequence", quitOrder, "launchTick", immediateShot.shot().launchTick(), "pendingGroups", bows.pendingGroups(), "validPrimary", validPrimary));
         }
     }
     @EventHandler(priority = EventPriority.MONITOR) public void interact(PlayerInteractEvent event) { interactions++; if (cancelInput) event.setUseItemInHand(Event.Result.DENY); }
@@ -423,6 +437,7 @@ public final class OwnedFiringScenario implements Scenario, Listener {
         if (cancelLaunch) event.setCancelled(true);
         var owned = bows.projectile(arrow.getUniqueId());
         nativeLaunches.put(arrow.getUniqueId(), Map.of("projectile", arrow.getUniqueId().toString(), "shooter", shooter.getUniqueId().toString(),
+                "sequence", ++observationSequence,
                 "tick", Bukkit.getCurrentTick(), "ownedAtLaunch", owned.isPresent() && owned.get().shot().ownerId().equals(shooter.getUniqueId()),
                 "position", List.of(arrow.getLocation().getX(), arrow.getLocation().getY(), arrow.getLocation().getZ()), "velocity", List.of(arrow.getVelocity().getX(), arrow.getVelocity().getY(), arrow.getVelocity().getZ()),
                 "damage", arrow.getDamage(), "critical", arrow.isCritical(), "cancelled", event.isCancelled()));
