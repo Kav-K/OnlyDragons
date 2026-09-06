@@ -26,6 +26,8 @@ agent:
 codex:
   # Cold Java MCP initialization can take over a minute on WSL-mounted storage.
   read_timeout_ms: 240000
+  # Large code responses can be quiet for over five minutes; retain bounded recovery.
+  stall_timeout_ms: 1200000
   command: bash "$ONLYDRAGONS_SOURCE/scripts/symphony/codex-worker.sh"
   approval_policy:
     granular:
