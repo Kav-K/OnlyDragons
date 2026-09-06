@@ -145,9 +145,16 @@
     },
     "T05": {
       "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "Draft PR30; main 5e8cfbf integrated at f99f739 and actual-sandbox doctor ready. Bounded-procs fixture/coverage registered; fresh clean-source suite, automated checkpoint and current CI pending. Physical P08/P09 remain later integration."
+      "completedRequirements": [
+        "bounded-procs"
+      ],
+      "evidence": {
+        "bounded-procs": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/30",
+          "revision": "ee1721a4f8dbbb2c96d1df4f60023f6b1e504ac1"
+        }
+      },
+      "notice": "In review: current main 5e8cfbf integrated; clean ee1721a passed 136 production/7 client/130 Python tests, all 16 suite cases and automated T05 acceptance. Receipt/source/artifact evidence: dev/game-tests/findings/t05-suite.md. Lead review and final-head CI remain external; physical P08/P09 remain later integration."
     },
     "T06": {
       "status": "blocked",
