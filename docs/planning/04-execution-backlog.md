@@ -3,8 +3,11 @@
 PR #52 integrated T06 at `25891c0` after the reviewed 24-case cohort,
 independent replay/task checkpoints, raw/source review and current CI.
 [Firing acceptance and single-consumer boundary](evidence/t06-suite.md).
-T08's prerequisites are integrated; T08 and optional parallel T07 remain
-undispatched until the lead records their next assignment.
+T08's prerequisites are integrated. After context PR #54 merged at `1331ccf`,
+the lead dispatched [T08/#11](https://github.com/Kav-K/OnlyDragons/issues/11#issuecomment-5559836724)
+and [T07/#10](https://github.com/Kav-K/OnlyDragons/issues/10#issuecomment-5559839786)
+to parallel Symphony workers. T08 accounting has priority for the playable
+checkpoint; both tasks' acceptance evidence remains pending.
 
 PR #50 integrated T09e at `7b8ff0f` after the reviewed 23-case cohort,
 independent replay/task checkpoints and current CI. [Restart acceptance](evidence/t09e-suite.md).
@@ -63,7 +66,7 @@ part of the worker's scope.
 
 Symphony has three coding slots. Label only tasks whose prerequisites are
 integrated into main and whose manual gates are satisfied. #6 and #20 are merged,
-#7 and #28 are complete after PR #32 at `73a8cc8`; objective connected-player equipment acceptance is verified. PR #31 is accepted and merged; T02b/T05 integrated through PR #48 and T06 through PR #52. T08/#11 and optional T07/#10 are the next eligible work, with dispatch still lead-managed. Issue/PR state owns live claims;
+#7 and #28 are complete after PR #32 at `73a8cc8`; objective connected-player equipment acceptance is verified. PR #31 is accepted and merged; T02b/T05 integrated through PR #48 and T06 through PR #52. T08/#11 and T07/#10 are now dispatched in parallel, with T08 the priority for the playable checkpoint. Issue/PR state owns live claims;
 the lead reconciles this summary after each serial merge.
 All server scenarios share one lease and obey the memory gate, regardless of
 how many agents are coding. A ready branch is not a satisfied dependency.
