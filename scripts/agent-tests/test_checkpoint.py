@@ -107,12 +107,41 @@ class CheckpointTests(unittest.TestCase):
             progress['tasks'][dependent].update(status='blocked', completedRequirements=[], evidence={})
         self.write(PROGRESS, progress)
 
+    def prepare_partial_t04(self):
+        # Model the unfinished prerequisite explicitly; the real ledger may already
+        # have accepted T04 and completed any number of its downstream consumers.
+        self.block_dependent_fixture_tasks('T04')
+        completed = [ref for ref in self.read(PLAN)['tasks']['T04']
+                     if ref != 'projectile-player-observations']
+        progress = self.read(PROGRESS)
+        progress['tasks']['T04'] = {
+            'status': 'partial', 'completedRequirements': completed,
+            'evidence': {ref: {'url': 'https://github.com/Kav-K/OnlyDragons/pull/22', 'revision': SHA}
+                         for ref in completed},
+        }
+        # These tests model an unaccepted foundation and all later milestones.
+        for milestone in progress['milestones'].values():
+            milestone.update(status='not-accepted', evidence={})
+        self.write(PROGRESS, progress)
+
+    def defer_fixture_requirement(self, requirement):
+        plan = self.read(PLAN)
+        component = plan['requirements'][requirement]
+        # Keep any now-implemented fixture structurally covered by the simulated
+        # baseline while testing that it cannot satisfy a deferred feature gate.
+        baseline = plan['requirements']['suite-baseline']['fixtures']
+        baseline.extend(sorted(set(component['fixtures']) - set(baseline)))
+        component.update(availability='deferred', fixtures=[])
+        self.write(PLAN, plan)
+
     def baseline(self, previous):
         with patch.object(checkpoint.subprocess, 'check_output', return_value=(SHA + '\n').encode()), \
                 patch.object(checkpoint, 'base_document', side_effect=lambda project, revision, path: previous.get(path)):
             return checkpoint.validate_no_weakening(self.project, 'origin/main', self.plan())
 
     def test_honest_plan_keeps_partial_feature_and_milestones_unaccepted(self):
+        self.prepare_partial_t04()
+        self.defer_fixture_requirement('P02')
         result = self.plan()['summary']
         self.assertEqual('partial', result['taskStates']['T04'])
         self.assertEqual({'not-accepted'}, set(result['milestoneStates'].values()))
@@ -133,6 +162,7 @@ class CheckpointTests(unittest.TestCase):
         self.reject_plan('issue mapping drift')
 
     def test_complete_label_does_not_replace_unfinished_components(self):
+        self.prepare_partial_t04()
         self.change(PROGRESS, lambda value: value['tasks']['T04'].update(status='complete', mergedRevision=SHA))
         self.reject_plan('complete with missing requirements')
 
@@ -141,8 +171,17 @@ class CheckpointTests(unittest.TestCase):
         self.reject_plan('Deferred component declared complete')
 
     def test_active_dispatch_requires_integrated_dependencies(self):
+        # Simulate future direct/transitive consumer completion too. The fixture
+        # must remain valid before testing the attempted dispatch against T04.
+        for task_id in ('T06', 'T08b'):
+            self.change(PROGRESS, lambda value: value['tasks'][task_id].update(
+                status='complete', mergedRevision=SHA,
+                completedRequirements=self.read(PLAN)['tasks'][task_id]))
+        self.change(PROGRESS, lambda value: value['milestones']['M1'].update(status='accepted'))
+        self.prepare_partial_t04()
+        self.assertTrue(self.plan()['summary']['planValid'])
         self.change(PROGRESS, lambda value: value['tasks']['T06'].update(status='active'))
-        self.reject_plan('Unsatisfied task prerequisites')
+        self.reject_plan('Unsatisfied task prerequisites for T06: T04')
 
     def prepare_milestone_dispatch(self):
         # Isolate the milestone gate from ordinary task dependencies: this fixture's
@@ -176,6 +215,7 @@ class CheckpointTests(unittest.TestCase):
         self.reject_plan('task/milestone dependency cycle')
 
     def test_milestone_cannot_accept_partial_foundation(self):
+        self.prepare_partial_t04()
         self.change(PROGRESS, lambda value: value['milestones']['M0'].update(status='accepted'))
         self.reject_plan('Milestone accepted with incomplete task')
 
@@ -262,8 +302,8 @@ class CheckpointTests(unittest.TestCase):
 
     def test_deferred_player_observations_cannot_be_satisfied_by_all_current_fixtures(self):
         # Retain this negative control after the real player fixture later lands.
-        self.change(PLAN, lambda value: value['requirements']['projectile-player-observations'].update(
-            availability='deferred', fixtures=[]))
+        self.prepare_partial_t04()
+        self.defer_fixture_requirement('projectile-player-observations')
         with self.assertRaisesRegex(checkpoint.CheckpointError,
                                     'deferred automated requirements: projectile-player-observations'):
             self.acceptance(['T04'])
@@ -314,6 +354,9 @@ class CheckpointTests(unittest.TestCase):
             self.assertEqual('automated', plan['requirements'][requirement]['kind'])
 
     def test_bounded_player_evidence_allows_machine_readiness_but_keeps_policy_external(self):
+        self.prepare_partial_t04()
+        for requirement in ('P02', 'P04'):
+            self.defer_fixture_requirement(requirement)
         fixture = self.implement_player_observation_fixture()
         result = self.acceptance(['T04'])
         self.assertTrue(result['automatedReady'])
@@ -328,7 +371,24 @@ class CheckpointTests(unittest.TestCase):
             self.acceptance(['T04'])
 
     def test_feasibility_completion_cannot_release_deferred_adapter_requirements(self):
-        self.implement_player_observation_fixture()
+        self.prepare_partial_t04()
+        fixture = self.implement_player_observation_fixture()
+        self.record_bounded_t04_completion()
+        # Start with synthetic implemented components and valid component evidence
+        # to prove the deferred fixture also survives future adapter implementation.
+        # This existing fixture is only a checkpoint seam, not production P02/P04 proof.
+        for requirement in ('P02', 'P04'):
+            self.defer_fixture_requirement(requirement)
+            self.change(PLAN, lambda value: value['requirements'][requirement].update(
+                availability='implemented', fixtures=[fixture]))
+        self.change(PROGRESS, lambda value: value['tasks']['T06'].update(
+            status='partial', completedRequirements=['P02', 'P04'], evidence={
+                ref: {'url': 'https://github.com/Kav-K/OnlyDragons/pull/31', 'revision': SHA}
+                for ref in ('P02', 'P04')}))
+        self.assertTrue(self.plan()['summary']['planValid'])
+        self.prepare_partial_t04()
+        for requirement in ('P02', 'P04'):
+            self.defer_fixture_requirement(requirement)
         self.record_bounded_t04_completion()
         self.assertTrue(self.plan()['summary']['planValid'])
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'deferred automated requirements: P02, P04'):
@@ -528,6 +588,7 @@ class CheckpointTests(unittest.TestCase):
         self.assertFalse(result['acceptanceApproved'])
 
     def test_closed_issue_does_not_complete_partial_feature(self):
+        self.prepare_partial_t04()
         snapshot = self.snapshot()
         number = self.read(MAPPING)['T04']['number']
         next(issue for issue in snapshot['issues'] if issue['number'] == number)['state'] = 'closed'

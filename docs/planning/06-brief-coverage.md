@@ -11,10 +11,11 @@ documents. Read this detail when extending fixtures or planning the remaining
 game, alongside [confirmed encounter decisions](05-encounter-expansion.md).
 
 The present accepted baseline provides contracts, arithmetic, item/equipment
-behavior, process cleanup and one fixed protocol-player sequence. It does not
-establish a complete managed dragon fight. PR #30's coordinator and PR #31's
-player-owned observations must be reconciled and accepted on their actual
-integration inputs; neither is a substitute for the later production adapter.
+behavior, process cleanup and protocol-player fixtures. It does not establish
+a complete managed dragon fight. PR #31's player-owned observations and scoped
+policy are accepted at `705de34`; [exact evidence](evidence/t04-suite.md) retains
+their boundaries. PR #30's coordinator still requires its own current-input
+acceptance; neither result substitutes for the later production adapter.
 T02b/T08a/T08b/T08c register the test dragon, controls, ranking and loot simulation.
 Their empty/deferred requirements do not count as implemented features.
 
@@ -24,7 +25,7 @@ Their empty/deferred requirements do not count as implemented features.
 | --- | --- | --- | --- |
 | Explainable stats, one ultimate per bow, immutable source/shot values | T00, T01a/T01b, T02; T06 integrates shot capture | Accepted `contract-consumers`, `stats-resolver`, `item-codec`, `equipment-service` and `equipment-player`; native shot capture must still preserve those values | Equipment service evidence does not establish firing-time snapshots |
 | No-Strength offense, crits, caps, separate HP and ghost/contribution damage | T03; T05, T06 and T08 integrate actual hits | `combat-services` is accepted; `bounded-procs`, `firing-input`, P01/P08/P09/P13 require feature integration. Keep fast independent numeric boundary tests and compare real-Paper production outputs | Final ferocity HP balance and unchosen optional enchant formulas remain explicit calibration/design choices |
-| One physical hit authority, native damage suppression and measured dragon parts/phases | T04, T06, T08, T08a | Partial shooterless evidence plus PR #31 player-owned observations; P02/P04 remain production requirements, with expected event absence/valid misses retained | Accepted T04 impact policy and actual production enforcement; no semantic-head or all-phase claim |
+| One physical hit authority, native damage suppression and measured dragon parts/phases | T04, T06, T08, T08a | T04 shooterless/player-owned observations and scoped policy accepted in PR #31; P02/P04 remain production requirements, with expected event absence/valid misses retained | Actual production enforcement remains pending; no semantic-head or all-phase claim |
 | Native drawn bows, shortbow cadence, ammo, offhand deduplication and Duplex identity | T06 with T09d primitives; T08 connects combat/procs | `firing-input`, P08/P09/P13 and T06 `automated-multiplayer-firing`; actual parameterized packets and observed Paper effects. Full accounting attribution remains required at T08/M3 | Fixed select/draw/release/quit calibration cannot prove all inputs; subjective feel remains human |
 | Tracer radius/steering, real pre-spawn UUID continuity and bounded capacity | T07, T10 | P03/P05/P06/P07/P10/P11/P12/P14: real flight, obstruction/miss controls, simultaneous hits, revisions and load/cleanup | Measured player/arrow envelope; preserve M3's human visual prefire rehearsal |
 | One extensible test-dragon definition and inert table bindings | T02b / #38 | `dragon-definition-catalog`, `sample-loot-table-bindings`: whole-candidate validation, retained revisions and real production-loader checks | One initial test dragon only; test definitions do not approve later content or production drop numbers |

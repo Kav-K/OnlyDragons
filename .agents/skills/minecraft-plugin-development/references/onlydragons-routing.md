@@ -17,6 +17,7 @@ return to these sections as the assigned implementation or review requires:
 | Damage versus contribution, proc ancestry, snapshot/expiry timing | Document 02 sections 5–8; document 03 T03/T05 and deterministic acceptance matrix |
 | Real arrow identity, firing, homing, chunk/lifecycle ownership | Document 02 section 9; document 03 T06/T07 and scenarios P05–P11 |
 | Prefire, reproducible traces, human input, performance | Document 02 sections 10/12; document 03 T09/T10 and sections 5–7 |
+| Test-dragon catalogs and inert versioned table/item bindings | Document 02 T02b contract; document 03 T02b; `src/main/resources/encounters/README.md`; no live phase or reward acceptance |
 | Later summon transactions and progression | Document 02 section 11; document 03 T11/T12 and their dependencies |
 
 `docs/planning/01-research.md` carries source dates, confidence, and unresolved

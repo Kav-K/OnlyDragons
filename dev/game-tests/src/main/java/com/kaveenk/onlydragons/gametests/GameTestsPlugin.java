@@ -16,6 +16,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.ofEntries(
+            Map.entry("dragon-definitions-abort", new com.kaveenk.onlydragons.gametests.definition.DragonDefinitionScenario(true)),
+            Map.entry("dragon-definitions", new com.kaveenk.onlydragons.gametests.definition.DragonDefinitionScenario()),
             Map.entry("headless-player-primitives", new com.kaveenk.onlydragons.gametests.fixtures.PlayerPrimitivesScenario()),
             Map.entry("headless-player-cleanup-abort", new com.kaveenk.onlydragons.gametests.fixtures.PlayerCleanupAbortScenario()),
             Map.entry("equipment-player", new com.kaveenk.onlydragons.gametests.equipment.EquipmentPlayerScenario()),
@@ -31,7 +33,8 @@ public final class GameTestsPlugin extends JavaPlugin {
             Map.entry("projectile-cleanup-failure", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario()),
             Map.entry("projectile-cleanup-abort", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(true)),
             Map.entry("stats-resolution", new com.kaveenk.onlydragons.gametests.stats.StatsResolutionScenario()),
-            Map.entry("combat-accounting", new com.kaveenk.onlydragons.gametests.combat.CombatAccountingScenario()));
+            Map.entry("combat-accounting", new com.kaveenk.onlydragons.gametests.combat.CombatAccountingScenario()),
+            Map.entry("enchants-procs", new com.kaveenk.onlydragons.gametests.enchant.EnchantProcScenario()));
     private final ExecutorService writer = Executors.newSingleThreadExecutor();
     private ScenarioContext active;
     private String runId;
