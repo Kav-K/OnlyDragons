@@ -186,11 +186,6 @@
       "owned-firing",
       "tracer-continuity",
       "tracer-cleanup-abort"
-    ],
-    "tracer-focused": [
-      "tracer-continuity",
-      "tracer-cleanup-abort",
-      "owned-firing"
     ]
   },
   "areas": {
