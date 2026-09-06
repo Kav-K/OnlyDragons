@@ -80,13 +80,13 @@ class EquipmentStatsTest {
     @Test void permissionsGrantsFullInventoryAndMalformedRequests() {
         command("dev loadout ordinary"); assertTrue(player.nextMessage().contains("permission"));
         assertEquals(-1, player.getInventory().first(Material.BOW));
-        player.setOp(true); command("dev loadout ordinary"); assertTrue(player.nextMessage().startsWith("Granted"));
+        player.setOp(true); command("dev loadout ordinary"); assertTrue(player.nextMessage().contains("Loadout")); assertTrue(org.bukkit.ChatColor.stripColor(player.nextMessage()).startsWith("Granted"));
         assertInstanceOf(ItemReadResult.Valid.class, new WeaponItemCodec(CalibrationLoadouts.registry()).decode(player.getInventory().getItem(0)));
-        command("dev loadout missing"); assertTrue(player.nextMessage().startsWith("Invalid"));
+        command("dev loadout missing"); assertTrue(org.bukkit.ChatColor.stripColor(player.nextMessage()).startsWith("Invalid"));
         for (int i=0;i<36;i++) player.getInventory().setItem(i, new ItemStack(Material.STONE,64));
-        command("dev loadout ordinary"); assertEquals("Inventory full; no loadout granted.",player.nextMessage());
-        command("dev bonus ferocity NaN"); assertTrue(player.nextMessage().startsWith("Invalid"));
-        command("dev bonus unknown 1"); assertTrue(player.nextMessage().startsWith("Invalid"));
+        command("dev loadout ordinary"); assertEquals("Inventory full; no loadout granted.",org.bukkit.ChatColor.stripColor(player.nextMessage()));
+        command("dev bonus ferocity NaN"); assertTrue(org.bukkit.ChatColor.stripColor(player.nextMessage()).startsWith("Invalid"));
+        command("dev bonus unknown 1"); assertTrue(org.bukkit.ChatColor.stripColor(player.nextMessage()).startsWith("Invalid"));
     }
     @Test void bonusReplacementIsAtomicAndSessionOnly() {
         player.setOp(true); player.getInventory().setItemInMainHand(stats.createLoadout("ordinary"));

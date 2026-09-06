@@ -138,3 +138,24 @@ The framework does not reset production encounters; #39 must establish its own
 disable/start absence/idle/new-spawn behavior. Starter greeting persistence is
 only the generic calibration. The suite replays each phase through the ordinary
 strict validator plus config/artifact/world/process continuity and lease checks.
+
+## Received dragon UI observations (T08d)
+
+The bounded `dragon-presentation-*` and `dragon-restart-*` plans enable
+`BossBarObservation` in the existing client. A run-bound `OD_UI_CHECK` marker
+samples the client's current state after preceding received bossbar packets.
+The receipt retains full UUID/title component/plain title/percent/style/flags,
+ordered add/update/remove events and samples; it also retains received chat
+component JSON alongside the existing plain messages. No packet creates damage
+or changes production UI. The separate `bossbar_observation.py` replay binds all
+required lifecycle samples to independently specified server HP oracles, checks
+stable per-generation identity across viewers/reconnect, and rejects duplicate
+or unobserved changes. Other plans retain their original receipt schema.
+
+The presentation scenario's score-only catalog is labelled fixture setup and
+uses the production public constructors with the single live combat authority;
+it does not change the normal catalog or select a new player-facing balance.
+Native collisions, deployed HP/credit and received bars remain separate evidence.
+Restart observations augment the existing two-boot fixture; disconnected players
+cannot establish receipt of shutdown packets. Connected adapter-close removal and
+actual process restart/empty next boot are reported as distinct lifecycle checks.

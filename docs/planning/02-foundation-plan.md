@@ -540,6 +540,40 @@ use UUID labels when no live name is available. No offline queue or persistent
 history is added. Diagnostic cancelled/admin/reset/abort paths publish no board.
 Result inspection still exposes separate HP and credit; no rewards are enabled.
 
+### T08d health UI and shared formatter (GH-64, In review in PR #74)
+
+`application.PresentationFormatter` is the reusable display-only Adventure boundary:
+`number(double)` supplies locale-independent grouping and up to two decimals;
+`credit(double)` retains two displayed decimals; `label(String)`, `heading(String)`,
+`value(String,double)` and `healthTitle(String,double,double)` serve command,
+health and later item/book consumers. Trusted metadata remains authoritative;
+never parse presentation back into stats or ranking. Full-precision ranking,
+UUID fallback names, top ten and personal placement scope remain unchanged.
+`stats` is compact; `stats explain`, combat explanations and dragon status retain
+machine diagnostics. Result headings/numbers/colors use the same formatter.
+
+`paper.encounter.presentation.DragonHealthPresenter` owns one synchronous tick
+loop and reads the selected development generation, configured world and domain
+TargetState. `ManagedCombatService.ownsEntity` distinguishes retained ownership
+from historical defeated Views without relying on native liveness. One
+`application.DragonHealthBar` instance keeps one Adventure bar per generation,
+updates domain HP/max/percentage, and reconciles online world viewers by UUID
+and exact current Audience session. Zero HP retains the bar through native death
+animation; actual ownership retirement/reset removes it by the next tick. Close
+cancels the loop and removes all viewers before dragon/combat shutdown. Failed
+viewer delivery is counted, warned once, and cannot skip another viewer's cleanup.
+No bossbar sky/music/fog flags, native battle effects, rewards or competing damage
+path are introduced. Motion/backend/tickets remain T08e-owned.
+
+The focused packet fixture separately observes native player-owned collisions and
+production accounting, then samples actual received bar identity/title/percent/
+flags and message components for two actors. A named fixture-only score-only
+catalog uses the same deployed combat and UI adapters to distinguish 100 HP from
+200 credit. It is not a production balance selection. Existing restart fixtures
+add received empty/new/reset UI checks to their real two-boot evidence. The [focused run](evidence/t08d-presentation.md) passed; complete-suite/restart
+verification remains pending, with human appearance/authentication and milestone
+acceptance separate.
+
 ### Managed health
 
 Keep large boss HP in the domain model. The Paper dragon can carry a normalized health representation within native attribute limits; the custom boss bar displays domain HP. The adapter suppresses unmanaged native reductions and native crystal healing for owned targets, and mirrors authoritative changes without re-entering the damage engine.

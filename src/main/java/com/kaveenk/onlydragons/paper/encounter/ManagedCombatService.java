@@ -224,7 +224,8 @@ public final class ManagedCombatService implements AutoCloseable {
         putBounded(last, damage.ownerId(), explanation, 128);
         Player player = Bukkit.getPlayer(damage.ownerId());
         if (player != null && f.contains(player)) {
-            player.sendMessage(Component.text(explanation.summary())); player.sendActionBar(Component.text(explanation.summary()));
+            player.sendMessage(com.kaveenk.onlydragons.application.PresentationFormatter.message(explanation.summary()));
+            player.sendActionBar(com.kaveenk.onlydragons.application.PresentationFormatter.combat(damage, explanation.healthRemaining()));
         }
     }
     private void synchronize(Fight f) {

@@ -18,6 +18,7 @@ public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.ofEntries(
             Map.entry("dragon-restart-animation", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false, true)),
             Map.entry("tempo-ghost", new com.kaveenk.onlydragons.gametests.enchant.TempoGhostScenario()),
+            Map.entry("dragon-presentation", new com.kaveenk.onlydragons.gametests.encounter.DragonPresentationScenario()),
             Map.entry("dragon-ranking", new com.kaveenk.onlydragons.gametests.encounter.DragonRankingScenario()),
             Map.entry("dragon-combat", new com.kaveenk.onlydragons.gametests.encounter.DragonCombatScenario()),
             Map.entry("dragon-restart-fresh", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false)),

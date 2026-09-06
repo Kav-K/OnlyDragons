@@ -12,7 +12,7 @@ class PracticeCommandTest {
     ServerMock server;OnlyDragonsPlugin plugin;PlayerMock player;
     @BeforeEach void setup(){server=MockBukkit.mock();plugin=MockBukkit.load(OnlyDragonsPlugin.class);player=server.addPlayer();drain();}
     @AfterEach void cleanup(){MockBukkit.unmock();}
-    List<String> drain(){var messages=new ArrayList<String>();String message;while((message=player.nextMessage())!=null)messages.add(message);return messages;}
+    List<String> drain(){var messages=new ArrayList<String>();String message;while((message=player.nextMessage())!=null)messages.add(org.bukkit.ChatColor.stripColor(message));return messages;}
     void command(String text){server.dispatchCommand(player,"onlydragons "+text);}
     @Test void deniedKitAndInspectionCannotMutateInventoryOrCreateTarget(){
         command("dev kit ordinary");assertTrue(player.getInventory().isEmpty());assertEquals(0,plugin.combat().activeCount());
@@ -38,7 +38,7 @@ class PracticeCommandTest {
     @Test void consolePlayerOnlyCommandsHaveClearRegisteredHandling(){
         var console=server.getConsoleSender();
         for(String text:List.of("combat last","dev kit ordinary","dev dummy full","dev scenario reduced","dev reset")){
-            server.dispatchCommand(console,"onlydragons "+text);assertEquals("This command requires a player.",console.nextMessage());
+            server.dispatchCommand(console,"onlydragons "+text);assertEquals("This command requires a player.",org.bukkit.ChatColor.stripColor(console.nextMessage()));
         }
         assertEquals(0,plugin.combat().activeCount());
     }

@@ -1475,7 +1475,9 @@
       "owned_listeners_removed",
       "owned_entities_removed",
       "owned_tasks_cancelled",
-      "owned_chunk_tickets_removed"
+      "owned_chunk_tickets_removed",
+      "restart_ui_initially_empty",
+      "restart_ui_active"
     ],
     "phases": [
       {
@@ -1499,7 +1501,9 @@
           "duplicate_preserves_generation",
           "active_at_first_shutdown",
           "failed_read_keeps_loaded_arena",
-          "failed_read_fixture_restores_saved_bytes"
+          "failed_read_fixture_restores_saved_bytes",
+          "restart_ui_initially_empty",
+          "restart_ui_active"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-1-v1.json",
         "requiredActorMessages": [
@@ -1570,7 +1574,10 @@
           "old_native_absent_after_chunk_load",
           "selected_definition_readback",
           "restart_new_spawn_reset_cleanup",
-          "repeat_reset_no_result"
+          "repeat_reset_no_result",
+          "restart_ui_initially_empty",
+          "restart_ui_active",
+          "restart_ui_reset_empty"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
         "requiredActorMessages": [
@@ -1624,7 +1631,9 @@
       "owned_entities_removed",
       "owned_tasks_cancelled",
       "owned_chunk_tickets_removed",
-      "legacy_extra_preserved"
+      "legacy_extra_preserved",
+      "restart_ui_initially_empty",
+      "restart_ui_active"
     ],
     "phases": [
       {
@@ -1649,7 +1658,9 @@
           "duplicate_preserves_generation",
           "active_at_first_shutdown",
           "failed_read_keeps_loaded_arena",
-          "failed_read_fixture_restores_saved_bytes"
+          "failed_read_fixture_restores_saved_bytes",
+          "restart_ui_initially_empty",
+          "restart_ui_active"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-1-v1.json",
         "requiredActorMessages": [
@@ -1721,7 +1732,10 @@
           "old_native_absent_after_chunk_load",
           "selected_definition_readback",
           "restart_new_spawn_reset_cleanup",
-          "repeat_reset_no_result"
+          "repeat_reset_no_result",
+          "restart_ui_initially_empty",
+          "restart_ui_active",
+          "restart_ui_reset_empty"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
         "requiredActorMessages": [
@@ -1868,7 +1882,9 @@
       "owned_listeners_removed",
       "owned_entities_removed",
       "owned_tasks_cancelled",
-      "owned_chunk_tickets_removed"
+      "owned_chunk_tickets_removed",
+      "restart_ui_initially_empty",
+      "restart_ui_active"
     ],
     "phases": [
       {
@@ -1893,7 +1909,9 @@
           "active_at_first_shutdown",
           "failed_read_keeps_loaded_arena",
           "failed_read_fixture_restores_saved_bytes",
-          "animation_owned_at_shutdown"
+          "animation_owned_at_shutdown",
+          "restart_ui_initially_empty",
+          "restart_ui_active"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-animation-v1.json",
         "requiredActorMessages": [
@@ -1964,7 +1982,10 @@
           "old_native_absent_after_chunk_load",
           "selected_definition_readback",
           "restart_new_spawn_reset_cleanup",
-          "repeat_reset_no_result"
+          "repeat_reset_no_result",
+          "restart_ui_initially_empty",
+          "restart_ui_active",
+          "restart_ui_reset_empty"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
         "requiredActorMessages": [
@@ -2040,7 +2061,7 @@
         "actor": "alpha",
         "session": "s2",
         "containsAll": [
-          "Dragon defeated! Damage leaderboard (credited damage)"
+          "Dragon defeated! Credited damage"
         ]
       },
       {
@@ -2066,7 +2087,7 @@
         "session": "s2",
         "containsAll": [
           "#1 ",
-          "_0 - 1200.00 credited damage"
+          "_0 - 1,200.00 credited damage"
         ]
       },
       {
@@ -2074,7 +2095,7 @@
         "actor": "alpha",
         "session": "s2",
         "containsAll": [
-          "Your placement: #1 - 1200.00 credited damage"
+          "Your placement: #1 - 1,200.00 credited damage"
         ]
       },
       {
@@ -2082,7 +2103,7 @@
         "actor": "beta",
         "session": "s1",
         "containsAll": [
-          "Dragon defeated! Damage leaderboard (credited damage)"
+          "Dragon defeated! Credited damage"
         ]
       },
       {
@@ -2108,7 +2129,7 @@
         "session": "s1",
         "containsAll": [
           "#1 ",
-          "_0 - 1200.00 credited damage"
+          "_0 - 1,200.00 credited damage"
         ]
       },
       {
@@ -2175,6 +2196,58 @@
         "session": "s1",
         "containsAll": [
           "You do not have permission to use dragon controls."
+        ]
+      }
+    ]
+  },
+  "dragon-presentation": {
+    "mechanicRevision": "dragon-presentation-v1",
+    "requiredAssertions": [
+      "distinct_connected_viewers",
+      "world_viewers_ignore_aim",
+      "veto_no_hp_or_credit",
+      "physical_hp_and_credit",
+      "quit_viewer_released",
+      "lethal_domain_and_native",
+      "bar_retained_in_native_animation",
+      "actual_retirement_clears_bar",
+      "reset_clears_bar",
+      "ghost_credit_without_hp",
+      "ui_close_releases_viewers",
+      "no_rewards_or_native_loot",
+      "native_physical_observations",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ],
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/dragon-presentation-v1.json",
+    "requiredActorMessages": [
+      {
+        "id": "ui-stats",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Weapon Damage: 100"
+        ]
+      },
+      {
+        "id": "ui-combat",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Health removed: 100",
+          "Credited damage: 100"
+        ]
+      },
+      {
+        "id": "ui-result",
+        "actor": "beta",
+        "session": "s2",
+        "containsAll": [
+          "Your placement: #1 - 1,000.00 credited damage"
         ]
       }
     ]

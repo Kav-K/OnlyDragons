@@ -413,10 +413,10 @@
       "notice": "PR #50 merged at 7b8ff0f5eaa57800e8b7d1d08ea02e5aa79afe05 after the fresh 23-case hosted cohort, independent raw replay/review, T09e/T04/T02b/T05 checkpoints against actual main 3c35a85 and current Windows/Linux CI. Exact evidence: docs/planning/evidence/t09e-suite.md. Generic two-boot persisted starter configuration and connected commands only; managed-dragon recovery, T06 production firing and M1-M5 remain unaccepted. Earlier focused/cohort results retain their original identities and checkpoint disposition."
     },
     "T08d": {
-      "status": "active",
+      "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+      "notice": "Draft PR #74: clean focused 03e8af7 passed 18 Paper assertions/28 received-bar samples, 235 production/6 companion/30 client and 273 Python tests. Main 7a38040 integrated. Full changed-area suite, restart UI and task checkpoint pending; no completed requirement or milestone accepted. Evidence: docs/planning/evidence/t08d-presentation.md."
     },
     "T08e": {
       "status": "active",

@@ -10,7 +10,7 @@ public final class LeaderboardMessages {
 
     public static List<String> topTen(RankedEncounterResult ranking, Function<UUID, String> names) {
         var lines = new ArrayList<String>();
-        lines.add("Dragon defeated! Damage leaderboard (credited damage)");
+        lines.add("Dragon defeated! Credited damage");
         for (var row : ranking.placements().stream().limit(10).toList()) {
             String name = names.apply(row.playerId());
             if (name == null || name.isBlank()) name = row.playerId().toString();
@@ -25,6 +25,6 @@ public final class LeaderboardMessages {
 
     private static String credit(RankedEncounterResult.Placement row) {
         double amount = row.contribution().contributionDamage();
-        return String.format(Locale.ROOT, "%.2f", amount == 0 ? 0 : amount);
+        return PresentationFormatter.credit(amount);
     }
 }

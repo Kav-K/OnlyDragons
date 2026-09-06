@@ -3,7 +3,7 @@ package com.kaveenk.onlydragons.command;
 import com.kaveenk.onlydragons.paper.encounter.*;
 import java.io.IOException;
 import java.util.*;
-import net.kyori.adventure.text.Component;
+import com.kaveenk.onlydragons.application.PresentationFormatter;
 import org.bukkit.command.CommandSender;
 
 /** Production operator commands; no companion or player-position bootstrap. */
@@ -20,22 +20,22 @@ public final class DragonCommand {
                     if (args.length != 9) { usage(sender); return; }
                     dragons.setup(new DevelopmentArena(args[3], Double.parseDouble(args[4]), Double.parseDouble(args[5]),
                             Double.parseDouble(args[6]), Double.parseDouble(args[7]), args[8]));
-                    say(sender, "Dragon arena saved. " + dragons.status());
+                    sayStatus(sender, "Dragon arena saved. " + dragons.status());
                 }
                 case "spawn" -> {
                     if (args.length != 3 && !(args.length == 4 && (args[3].equalsIgnoreCase("training") || args[3].equalsIgnoreCase("calibration")))) { usage(sender); return; }
                     dragons.spawn(args.length == 3 ? DevelopmentDragonService.SpawnMode.STANDARD
-                            : args[3].equalsIgnoreCase("training") ? DevelopmentDragonService.SpawnMode.TRAINING : DevelopmentDragonService.SpawnMode.CALIBRATION); say(sender, "Dragon spawned. " + dragons.status());
+                            : args[3].equalsIgnoreCase("training") ? DevelopmentDragonService.SpawnMode.TRAINING : DevelopmentDragonService.SpawnMode.CALIBRATION); sayStatus(sender, "Dragon spawned. " + dragons.status());
                 }
-                case "status" -> { if (args.length > 3) { usage(sender); return; } say(sender, dragons.status()); }
+                case "status" -> { if (args.length > 3) { usage(sender); return; } sayStatus(sender, dragons.status()); }
                 case "reset" -> {
                     if (args.length < 3 || args.length > 4) { usage(sender); return; }
-                    dragons.reset(args.length == 4 ? UUID.fromString(args[3]) : dragons.generation().orElseThrow(() -> new IllegalArgumentException("No dragon generation."))); say(sender, "Dragon reset. " + dragons.status());
+                    dragons.reset(args.length == 4 ? UUID.fromString(args[3]) : dragons.generation().orElseThrow(() -> new IllegalArgumentException("No dragon generation."))); sayStatus(sender, "Dragon reset. " + dragons.status());
                 }
                 case "result" -> {
                     if (args.length < 3 || args.length > 4) { usage(sender); return; }
                     var result = dragons.result(args.length == 4 ? UUID.fromString(args[3]) : dragons.generation().orElseThrow(() -> new IllegalArgumentException("No dragon generation."))).completion().orElseThrow();
-                    say(sender, "Frozen dragon result=" + result.completionId() + " | " + dragons.status());
+                    sayStatus(sender, "Frozen dragon result=" + result.completionId() + " | " + dragons.status());
                 }
                 default -> usage(sender);
             }
@@ -53,6 +53,12 @@ public final class DragonCommand {
             return dragons.generation().map(id -> List.of(id.toString())).orElse(List.of());
         return List.of();
     }
-    private static void usage(CommandSender sender) { say(sender, "Usage: /onlydragons dev dragon setup <world-key> <x> <y> <z> <radius 16-48> <test_dragon> | spawn [training|calibration] | status | reset [generation] | result [generation]"); }
-    private static void say(CommandSender sender, String text) { sender.sendMessage(Component.text(text)); }
+    private void usage(CommandSender sender) { say(sender, "Usage: /onlydragons dev dragon setup <world-key> <x> <y> <z> <radius 16-48> <test_dragon> | spawn [training|calibration] | status | reset [generation] | result [generation]"); }
+    private void sayStatus(CommandSender sender, String text) {
+        sender.sendMessage(PresentationFormatter.heading("Dragon · " + dragons.view().map(v -> PresentationFormatter.label(v.state().name())).orElse("Idle")));
+        dragons.view().ifPresent(view -> sender.sendMessage(PresentationFormatter.healthTitle(
+                dragons.selection().orElseThrow().displayName(), view.target().currentHealth(), view.target().maxHealth())));
+        say(sender, text);
+    }
+    private static void say(CommandSender sender, String text) { sender.sendMessage(PresentationFormatter.message(text)); }
 }

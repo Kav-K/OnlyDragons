@@ -311,6 +311,15 @@ def _report_header(report, plan, plan_sha256, run_id, pins, start, end, passed, 
     return _times(report, start, end)
 
 
+def _ui_session_fields(session, plan):
+    require(isinstance(session, dict), 'Missing client session')
+    fields = {'bossBars', 'styledMessages'}
+    enabled = plan['planId'].startswith(('dragon-presentation-', 'dragon-restart-'))
+    require((fields <= set(session)) if enabled else not (fields & set(session)),
+            'Missing UI receipt or UI fields outside bounded presentation plan')
+    return {k: v for k, v in session.items() if k not in fields}
+
+
 def validate_report(report, plan, plan_sha256, run_id, pins, start, end):
     """Verify completed client submission evidence; server behavior is checked separately."""
     begin, finish = _report_header(report, plan, plan_sha256, run_id, pins, start, end, True, '')
@@ -324,7 +333,7 @@ def validate_report(report, plan, plan_sha256, run_id, pins, start, end):
         previous_finish = begin
         reconnect_delay = 0
         for expected_session, session in zip(expected_actor['sessions'], sessions):
-            _object(session, 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
+            _object(_ui_session_fields(session, plan), 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
                     'playerLoadedSent', 'teleportsAcknowledged', 'steps', 'messages', 'bindings', 'inventorySnapshots',
                     'inventoryConfirmations',
                     'disconnected', 'passed', 'error')
@@ -421,6 +430,9 @@ def _server_journal(scenario_report, player_report, plan, aborted=False):
     if aborted:
         _abort_plan(plan)
     require(isinstance(scenario_report, dict) and isinstance(player_report, dict), 'Missing fixture evidence')
+    if scenario_report.get("scenarioId") == "dragon-presentation" or scenario_report.get("scenarioId", "").startswith("dragon-restart-"):
+        import bossbar_observation
+        bossbar_observation.validate(scenario_report, player_report)
     require(isinstance(scenario_report.get('runId'), str)
             and scenario_report['runId'] == player_report.get('runId'), 'Server/client fixture run IDs differ')
     observations = scenario_report.get('observations')
@@ -546,7 +558,7 @@ def validate_abort_report(report, plan, plan_sha256, run_id, pins, start, end):
                 and actor['uuid'] == identity['uuid'], 'Wrong cleanup-abort actor identity')
         session = _array(actor['sessions'], 1, 1)[0]
         expected_session = expected_actor['sessions'][0]
-        _object(session, 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
+        _object(_ui_session_fields(session, plan), 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
                 'playerLoadedSent', 'teleportsAcknowledged', 'steps', 'messages', 'bindings', 'inventorySnapshots',
                 'inventoryConfirmations',
                 'disconnected', 'passed', 'error')

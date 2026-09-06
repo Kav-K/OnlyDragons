@@ -39,6 +39,10 @@
     {
       "command": "onlydragons dev dragon spawn invalid",
       "expect": "Usage: .*spawn \\[training\\|calibration\\]"
+    },
+    {
+      "command": "onlydragons dev dragon status",
+      "expect": "Dragon . Idle"
     }
   ]
 }
