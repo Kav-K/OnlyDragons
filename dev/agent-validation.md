@@ -126,3 +126,12 @@ Automate observable functionality instead of assigning it to a human by default.
 Human review remains useful for homing/weapon feel, readability, visual effects,
 authenticated-client compatibility and unresolved balance/product choices. Keep
 those observations separate from exact packet, service, event and numeric evidence.
+
+## Build and memory ownership
+
+All three Gradle projects use bounded workers and disable persistent build
+daemons, so idle builders do not retain a heap per issue checkout. The runner
+checks memory again after builds and admits Paper only with fresh successful
+guest and Windows-host readings. Transient host-probe failures wait within the
+configured resource deadline; exhausted waits remain outstanding evidence.
+The suite preserves the runner's actual pre-start failure reason for remediation.
