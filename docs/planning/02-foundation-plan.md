@@ -470,6 +470,64 @@ For tempo, store a player-scoped percentage bonus and expiry tick. The proposed 
 
 Clear temporary state on death, quit, arena exit, and encounter reset. Scheduled children retain damage snapshots but must recheck encounter/target validity. A quitter's already flying physical arrows may finish in the same encounter and credit their UUID, but they do not recreate a live player buff; future rewards can be delivered to that UUID later.
 
+### T05 adopted coordinator boundary (GH-8)
+
+`application.proc.ProcCoordinator(encounter, Limits, RandomSource)` owns exactly
+one `CombatEncounter`, one bounded due queue and one bounded player-session map
+on their creating server thread. `physical(ShotContext, PhysicalImpact,
+DamageModifiers, Session, Optional<RejectionReason>)` is the proc-admitting entry:
+it delegates settled physical acceptance to T03 and returns the authoritative
+`DamageResult`, admission reason, requested count and immutable child commands.
+There is deliberately no public “enqueue this accepted DTO” method that could
+mint another batch from a duplicate delivery. Production composition wiring is
+owned by lead-coordinated T08/#11; this component registers no listeners or scheduler tasks.
+
+`Session(ownerId, token)` is captured alongside the shot at launch. `activate`
+returns false at the session limit; reconnect/death/arena reentry uses a fresh
+token. `clearSession` removes matching pending children and tempo; a late clear
+for an old token preserves the new session. Old physical arrows can still credit
+the captured owner through T03, but inactive-session impacts admit neither buff
+updates nor new proc children. This is a scoped lifecycle decision to prevent
+old-generation delayed work from rebuilding state. `close` is terminal reset /
+shutdown: clear all queue/session/buff state, end the encounter, and discard the
+instance. A new encounter requires a new coordinator and encounter UUID.
+
+Limits explicitly supply queue capacity, per-tick drain budget, session capacity
+and positive strike spacing; the tests use two ticks, adopting the proposed
+spacing as **calibration**, not final balance. Whole child groups reserve space
+or return `CAPACITY_REJECTED`; the accepted parent remains credited. Metrics
+expose rejected and cleared child counts. Stable child IDs derive from parent
+impact ID and ordinal 1–5. `tick(now)` expires buffs, processes at most the budget,
+returns immutable accepted/rejected T03 child results, and refuses a second drain
+at the same tick. A late tick retains due ordering and bounded work. Target death
+or encounter end earns no late score. No child rerolls crit/ferocity or spawns
+Duplex, although an accepted eligible child can increment tempo.
+
+The scoped `enchant-calibration-v1` rules adopt integer percentage-point Tempo
+increments 10/20/30/40/50, a shared +200% cap, and exclusive expiry at last
+qualifying hit +60 game ticks. Resolve captured effective base ferocity times
+`1 + liveBonus/100`, capped at 500, **before** adding that hit's increment.
+The shot's snapshot must exclude Tempo; its trusted T02 Vicious contribution is
+already included and is never added again. Zero base stays zero. A Duplex bow
+uses an existing live bonus but cannot refresh it; a captured Tempo arrow/proc
+retains eligibility across a bow swap. Fractional ferocity uses one strict
+[0,1) sample; whole hundreds use none. Random values and timing are preflighted
+before physical damage commits, so a rejected candidate may consume a sample
+without admitting children.
+
+`domain.enchant.EnchantEffects.modifiers(shot, impactPosition, airborneTarget)`
+returns T03 named modifiers. Power uses the researched I–VII table; Snipe adopts
+continuous `level * 0.001 * distance(launch, impact)` as an OnlyDragons rule.
+Captured launch displacement excludes homing loops and later owner movement.
+Call this once for physical damage; children inherit the already mitigated basis.
+`GravityProfile` requires an explicit revision/table and alias choice; the
+calibration profile has no chosen Gravity values and disables Dragon Hunter.
+An absent table value, conflicting alias, or deferred Overload use fails explicitly.
+`OverloadPolicy` is a named extension receiving the captured shot, including raw
+crit chance; no probability or mega-crit formula is adopted. Enchant tables and
+trusted loadouts remain T02/lead-owned and unchanged. These compiled calibration
+rules are not a hot-reload system; a later balance change must carry a new revision.
+
 ## 9. Real bows and Dragon Tracer
 
 ### Two firing modes

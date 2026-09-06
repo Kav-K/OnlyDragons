@@ -148,7 +148,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Draft PR30 reviewed at3477ed0; current-main/T09c integration and affected-suite/current CI remain pending."
+      "notice": "In review: main 4cfb7b9 (PR44/PR45) reconciled additively for bounded local checks. Historical b7fd6bc acceptance held: old console matcher missed ERROR lines. No fresh Paper acceptance claimed. Lead owns combined current suite/raw replay and T05 checkpoint after T04 integration and T02b/T05 reconciliation. See dev/game-tests/findings/t05-suite.md; physical P08/P09 and T08 composition remain later integration."
     },
     "T06": {
       "status": "blocked",
