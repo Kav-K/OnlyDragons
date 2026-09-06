@@ -114,7 +114,13 @@ continuation adds a positive case and bounded T04 observation coverage,
 retaining deferred P02/P04 production integration and natural-cycle automation.
 The shared suite admits player negatives only for its calibrated base scenario;
 the projectile early-exit control remains a separate runner invocation.
-Clean-source suite evidence and current CI remain pending. T04 stays In review,
+Clean `696fa1e` now passed the complete 16-case suite and receipt replay,
+82 production/7 client tests, 131 Python tests and runtime-head Windows/Linux CI.
+Player feasibility passed 52 assertions, shooterless 34, soak 27; the separate
+projectile early-exit failed as intended with all owned cleanup zero/unforced.
+[Complete fresh evidence](../../dev/game-tests/findings/projectile-player-feasibility.md#integrated-continuation-verification).
+T04 acceptance replay correctly fails deferred P02/P04; the lead is reviewing
+the circular mapping to later adapter work separately. T04 stays In review,
 #9 blocked, M0 unaccepted; separate human gates remain unrun.
 
 Keep one concise row per meaningful decision or delivery update. The tables and

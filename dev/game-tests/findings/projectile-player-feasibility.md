@@ -106,7 +106,85 @@ admitted by the reviewed calibration design, including managed seated hits;
 other phases require an explicit unsupported-phase rejection until measured.
 Production enforcement remains pending in assigned adapter tasks.
 
-## Verification
+## Integrated continuation verification
+
+Clean runtime **`696fa1ecbf1ca2920f32af2465867c21290e7445`** includes main
+`5e8cfbfc7c9bfc7bc395e76f1e608f5853cd78be` by ordinary merge. The protected-skill
+blocker is resolved. Fresh committed-checkout doctor JSON was `ready`: 16
+readable fixtures/context, JDK 25.0.4.1, existing EULA readable, shared lease
+writable/available, 2816 MiB required versus 6720 guest / 3538 effective host
+available, no errors/waits. This preflight is separate from the tests below.
+
+Changed-area selection required the complete **16-case** suite: all 15 main
+baseline cases plus projectile-player-feasibility. Suite
+`558f9bd2d44e4840999ac1dad6d6602d` completed successfully and independent
+`paper_suite.py --validate` replay passed against current inputs. Eleven positive
+cases and five expected failures met their declared outcomes; negative assertion
+counts below include intentional failures and are not positive gameplay passes.
+
+| Case | Run ID | Report assertions / expected outcome |
+| --- | --- | --- |
+| lifecycle-calibration | `0735f67e63cc428fb4118ef5d2ffb040` | 14 / positive |
+| foundation-contracts | `a51e3622526447db8d63a232e4394ea9` | 30 / positive |
+| stats-resolution | `4203862537df4718978eb7530766f33c` | 19 / positive |
+| item-identity | `38769f42d8d1426e8795fcfe903bb65d` | 35 / positive |
+| combat-accounting | `488dba25af29442dac99338e34259c6f` | 31 / positive |
+| projectile-feasibility | `5e6834f0816640e39b154cfb1b26d94d` | 34 / positive |
+| protocol-player-calibration | `1844246cfae640eeb2e383964ea4bc08` | 25 / positive |
+| deliberate-failure | `af7b0ac8618c4774959b16f1f96503ad` | 15 / deliberate-failure |
+| projectile-cleanup-failure | `711696e1391c4038845edb88d53a9aab` | 5 / cleanup-failure |
+| projectile-cleanup-abort | `2576b4564c8f4cb3b52290c53072a682` | 5 / cleanup-abort |
+| protocol-player-early-exit | `9d27f14d929c4350998e585f30cdab7e` | 14 / player-early-exit |
+| protocol-player-idle | `ce13f5ea47e64d1f9d46876f9e7fc399` | 14 / player-idle |
+| equipment-stats | `033630677d1b4c2ca77f84086b4a2995` | 23 / positive |
+| equipment-player | `0402f2313166409ba3cbeabf31722a8b` | 47 / positive |
+| protocol-player-soak | `1d058532f8564029b6a2f258cbfa605b` | 27 / positive |
+| projectile-player-feasibility | `e854ce4766644afea1e2ebb0b15a23ff` | 52 / positive |
+
+The complete receipt is in ignored
+`build/reports/agent-paper-suites/558f9bd2d44e4840999ac1dad6d6602d/receipt.json`;
+it binds raw reports/logs, archived JUnit XML, client dependencies and artifact
+hashes. Source input SHA256 is
+`d77b488ade2f5caff308d24047418142a297b532bdf384c3ec395b63c67df91b`.
+All runs used exact Paper 121, successful builds, closed loopback ports and clean
+unforced owned-process cleanup. Builds report **82 production / 7 client tests**,
+zero failures/errors/skips; **131 Python tests** passed. Runtime-head Windows and
+Linux CI passed. Later documentation-only commits do not change these inputs.
+
+- Production SHA256: `afc7374f6240e4866b392239cc8027af07fe13f853de58d4eb9127b37b5fa209`
+- Companion SHA256: `cb9e02114fd968c0bb729313e91c13a6aa1c5cf917ba0f3c699e486289330e05`
+- Client SHA256: `94388053a34649a8f1659cfb9da3e6d81a60a8de10a9331323fd004d76ae4e59`
+
+Fresh player run `e854ce4766644afea1e2ebb0b15a23ff` reproduced native HP loss
+3.25 (client release) / 2 (API control), zero loss on each suppression control,
+small/large geometry loss 4/2, CIRCLING loss 2, seated loss 0 with no damage
+event and rebound/fire, and three distinct impacts at tick 248 with one damage
+event / 2 HP loss. Cancelled-hit arrow crossed four parts at ticks
+118/121/124/125. Its synthetic player UUID was
+`bf89eace-37e6-3b94-9764-28cd7cd5624b`. Fresh selected geometry:
+
+| Box min → max | Arrow UUID | Actual part UUID | Parent UUID |
+| --- | --- | --- | --- |
+| `(0,99,5.5)` → `(1,100,6.5)` | `c6bc72d4-ccae-4297-a97c-89b94c7a9c8c` | `a7a25710-1c5e-4f0f-ac37-4688672c94b7` | `c55b943c-9f18-4862-aedf-1b620d62d2f3` |
+| `(-2,100,9.5)` → `(3,103,14.5)` | `33b4642c-f3b7-4166-b5b9-3479a6d3bb43` | `201a39a9-53a6-45a9-b4cd-0ddfe45477db` | `795a947b-f1ac-4607-bcd0-c0f3cf292327` |
+
+Separate projectile early-exit run `1a33eff934bf42e7a693742115c611c2` at the same
+clean revision returned expected exit 1: missing required assertions, no client
+actions, client error `Deliberate early client exit`, and failed expected quit.
+All four owned counters were zero; Paper exit 0 and client exit 1 were clean and
+unforced, port 58861 closed. The shared suite intentionally admits its player
+negative policies only for protocol calibration, so this feature control remains
+separate; no shared runner/client policy was broadened.
+
+Static checkpoint is plan-valid. T04 acceptance replay with `--automated --task
+T04` correctly returned exit 1: deferred P02/P04. The lead identified this as a
+circular mapping to later production-adapter work and is reviewing a separate
+scope correction. This receipt does not approve that correction or complete
+T04/M0. Preserve natural-End-cycle/all-phase automation, production claim/veto/
+retirement/phase rejection, and separate human/authenticated/visual/multiplayer/
+performance gates. #9 remains blocked until lead acceptance.
+
+## Earlier verification
 
 Clean runtime revision **`7b3a172751a3ea4ce809b23b68d26f0eb4b28e15`** includes main
 `9092fbe` by ordinary merge. All eleven registrations are retained using
