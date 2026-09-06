@@ -153,7 +153,11 @@ def load_catalog(project):
     for area in areas.values():
         names(area.get('paths'), 'area paths')
         require(set(names(area.get('cases'), 'area cases')).issubset(cases), 'Unknown area case')
+        require(not area['paths'] or area['cases'], 'Mapped runtime paths require nonempty scenario coverage')
         require(set(names(area.get('affects'), 'affected areas')).issubset(areas), 'Unknown affected area')
+    if 'harness-and-build' in areas:
+        require(set(areas['harness-and-build']['cases']) == set(cases),
+                'Harness/build changes require every catalog case')
     names(catalog.get('ignoredChanges'), 'ignored changes')
     return catalog, scenarios
 
@@ -534,6 +538,7 @@ def capture_tests(project, suite_root, case_id, actor):
 
 def run_child(command, project, log_path):
     """Forward cancellation to the owned runner; it retains its lease until JVM cleanup."""
+    require(sys.platform == 'linux', 'Owned Paper runner processes require Linux/WSL')
     process = None
     with log_path.open('w', encoding='utf-8') as log:
         try:

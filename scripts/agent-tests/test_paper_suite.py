@@ -258,6 +258,22 @@ class SelectionTests(unittest.TestCase):
         with self.assertRaisesRegex(suite.ValidationError, 'every classified case'):
             suite.load_catalog(self.root)
 
+    def test_mapped_runtime_area_cannot_claim_empty_coverage(self):
+        path = self.root / 'dev/game-tests/suites.json'
+        data = json.loads(path.read_text())
+        data['areas']['stats']['cases'] = []
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(suite.ValidationError, 'nonempty scenario coverage'):
+            suite.load_catalog(self.root)
+
+    def test_harness_mapping_cannot_omit_new_or_existing_cases(self):
+        path = self.root / 'dev/game-tests/suites.json'
+        data = json.loads(path.read_text())
+        data['areas']['harness-and-build']['cases'].pop()
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(suite.ValidationError, 'every catalog case'):
+            suite.load_catalog(self.root)
+
 
 class NegativePolicyTests(unittest.TestCase):
     def setUp(self):
@@ -315,9 +331,24 @@ class NegativePolicyTests(unittest.TestCase):
 
 
 class ChildOwnershipTests(unittest.TestCase):
-    def test_suite_interrupt_waits_for_owned_runner_cleanup_and_preserves_unrelated_child(self):
+    def test_unsupported_platform_rejects_execution_before_opening_log_or_spawning(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
+            with patch.object(suite.sys, 'platform', 'win32'), patch.object(suite.subprocess, 'Popen') as spawn:
+                with self.assertRaisesRegex(suite.ValidationError, 'require Linux/WSL'):
+                    suite.run_child([sys.executable, '-c', 'raise SystemExit(0)'], root, root / 'runner.log')
+                spawn.assert_not_called()
+                self.assertFalse((root / 'runner.log').exists())
+
+    def test_runner_platform_boundary_and_linux_owned_process_cleanup(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            if sys.platform != 'linux':
+                # This platform verifies rejection only; actual signal/cleanup evidence is Linux-only.
+                with self.assertRaisesRegex(suite.ValidationError, 'require Linux/WSL'):
+                    suite.run_child([sys.executable, '-c', 'raise SystemExit(0)'], root, root / 'runner.log')
+                self.assertFalse((root / 'runner.log').exists())
+                return
             child = root / 'runner.py'
             child.write_text('import signal,time\nfrom pathlib import Path\n'
                              'def stop(signum,frame):\n Path("cleaned").write_text("done")\n raise SystemExit(0)\n'
