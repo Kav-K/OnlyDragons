@@ -162,6 +162,12 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 120
+    },
+    "dragon-ranking": {
+      "scenarioId": "dragon-ranking",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
     }
   },
   "suites": {
@@ -188,7 +194,8 @@
       "dragon-combat",
       "dragon-restart-fresh",
       "dragon-restart-legacy",
-      "dragon-restart-animation"
+      "dragon-restart-animation",
+      "dragon-ranking"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -233,7 +240,8 @@
       "dragon-combat",
       "dragon-restart-fresh",
       "dragon-restart-legacy",
-      "dragon-restart-animation"
+      "dragon-restart-animation",
+      "dragon-ranking"
     ]
   },
   "areas": {
@@ -586,6 +594,21 @@
         "dragon-restart-fresh",
         "dragon-restart-legacy",
         "dragon-restart-animation"
+      ],
+      "affects": []
+    },
+    "frozen-ranking": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/domain/encounter/RankedEncounterResult.java",
+        "src/main/java/com/kaveenk/onlydragons/application/LeaderboardMessages.java",
+        "src/test/java/com/kaveenk/onlydragons/domain/encounter/RankedEncounterResultTest.java",
+        "src/main/java/com/kaveenk/onlydragons/paper/encounter/DragonLeaderboardPresenter.java",
+        "src/test/java/com/kaveenk/onlydragons/paper/encounter/DragonLeaderboardPresenterTest.java",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/encounter/DragonRankingScenario.java",
+        "dev/game-tests/player-plans/dragon-ranking-v1.json"
+      ],
+      "cases": [
+        "dragon-ranking"
       ],
       "affects": []
     }

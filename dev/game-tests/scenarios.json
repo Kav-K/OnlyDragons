@@ -2003,5 +2003,122 @@
         ]
       }
     ]
+  },
+  "dragon-ranking": {
+    "mechanicRevision": "dragon-ranking-v1",
+    "requiredAssertions": [
+      "two_distinct_real_players",
+      "rejected_participant_excluded",
+      "first_owned_damage_exact",
+      "reconnect_preserves_uuid_participant",
+      "same_frozen_result_and_selection",
+      "tied_credit_unique_acceptance_order",
+      "lethal_overkill_hp_separate",
+      "real_native_owned_arrow_death",
+      "replayed_delivery_same_projection",
+      "late_arrow_and_equipment_cannot_reorder",
+      "stale_completion_cannot_enter_next_fight",
+      "proc_only_lethal_delivers_new_generation",
+      "prior_frozen_board_unchanged",
+      "cancelled_native_death_has_no_board",
+      "admin_followup_cannot_announce",
+      "abort_reset_has_no_board",
+      "ranking_resources_released",
+      "no_rewards_alpha",
+      "no_rewards_beta",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ],
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/dragon-ranking-v1.json",
+    "requiredActorMessages": [
+      {
+        "id": "alpha-header",
+        "actor": "alpha",
+        "session": "s2",
+        "containsAll": [
+          "Dragon defeated! Damage leaderboard (credited damage)"
+        ]
+      },
+      {
+        "id": "alpha-first-own",
+        "actor": "alpha",
+        "session": "s2",
+        "containsAll": [
+          "Your placement: #1 - 600.00 credited damage"
+        ]
+      },
+      {
+        "id": "alpha-first-top",
+        "actor": "alpha",
+        "session": "s2",
+        "containsAll": [
+          "#1 ",
+          "_0 - 600.00 credited damage"
+        ]
+      },
+      {
+        "id": "alpha-second-top",
+        "actor": "alpha",
+        "session": "s2",
+        "containsAll": [
+          "#1 ",
+          "_0 - 1200.00 credited damage"
+        ]
+      },
+      {
+        "id": "alpha-second-own",
+        "actor": "alpha",
+        "session": "s2",
+        "containsAll": [
+          "Your placement: #1 - 1200.00 credited damage"
+        ]
+      },
+      {
+        "id": "beta-header",
+        "actor": "beta",
+        "session": "s1",
+        "containsAll": [
+          "Dragon defeated! Damage leaderboard (credited damage)"
+        ]
+      },
+      {
+        "id": "beta-first-own",
+        "actor": "beta",
+        "session": "s1",
+        "containsAll": [
+          "Your placement: #2 - 600.00 credited damage"
+        ]
+      },
+      {
+        "id": "beta-first-top",
+        "actor": "beta",
+        "session": "s1",
+        "containsAll": [
+          "#1 ",
+          "_0 - 600.00 credited damage"
+        ]
+      },
+      {
+        "id": "beta-second-top",
+        "actor": "beta",
+        "session": "s1",
+        "containsAll": [
+          "#1 ",
+          "_0 - 1200.00 credited damage"
+        ]
+      },
+      {
+        "id": "beta-second-own",
+        "actor": "beta",
+        "session": "s1",
+        "containsAll": [
+          "Your placement: #2 - 100.00 credited damage"
+        ]
+      }
+    ]
   }
 }

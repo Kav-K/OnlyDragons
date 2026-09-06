@@ -45,3 +45,18 @@ animation separately as human observations. Agents use only the isolated pinned
 Paper runner and never operate this human profile. T10 still requires physical
 countdown/hatch continuity and its human rehearsal; this direct spawn loop does
 not accept M3.
+
+## Post-kill leaderboard
+
+An ordinary managed kill sends each online combat participant the top ten by
+credited damage and their own unique placement/credited total. Exact ties use
+the accepted tick and ordinal of the last strict total increase; zero-only
+participants use first participation. Values display to two decimals, while
+ranking uses full precision. Names label UUIDs and reconnects keep one participant.
+The existing result command retains separate HP-removed diagnostics.
+
+The board is frozen and announced once per completion. A later spawn starts a
+new board; reset, abort, cancelled/revived native death and administrative follow-up
+death do not announce a victory. Offline participants remain in the result but
+have no queued chat delivery. No global history or rewards are enabled.
+Full-client readability and authenticated multiplayer remain operator checks.

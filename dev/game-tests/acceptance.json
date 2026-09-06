@@ -1151,6 +1151,38 @@
         "dragon-restart-animation"
       ],
       "scope": "Production shutdown during actual owned-arrow native death animation, followed by loaded old-chunk UUID absence and new generation controls; no simulated disable."
+    },
+    "dragon-ranking": {
+      "assertions": [
+        "two_distinct_real_players",
+        "rejected_participant_excluded",
+        "first_owned_damage_exact",
+        "reconnect_preserves_uuid_participant",
+        "same_frozen_result_and_selection",
+        "tied_credit_unique_acceptance_order",
+        "lethal_overkill_hp_separate",
+        "real_native_owned_arrow_death",
+        "replayed_delivery_same_projection",
+        "late_arrow_and_equipment_cannot_reorder",
+        "stale_completion_cannot_enter_next_fight",
+        "proc_only_lethal_delivers_new_generation",
+        "prior_frozen_board_unchanged",
+        "cancelled_native_death_has_no_board",
+        "admin_followup_cannot_announce",
+        "abort_reset_has_no_board",
+        "ranking_resources_released",
+        "no_rewards_alpha",
+        "no_rewards_beta",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-ranking"
+      ],
+      "scope": "Two real offline protocol identities: production owned-arrow death, frozen ranking, reconnect, proc lethal, diagnostic/no-board controls and received messages."
     }
   },
   "requirements": {
@@ -1481,9 +1513,11 @@
     },
     "frozen-damage-ranking": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Post-kill unique ranking by frozen credited damage including reduced/zero-HP procs and lethal overkill, excluding post-death impacts. Compare total descending, then receiver commit tick of last strict represented-total increase and encounter-global monotonic committed accepted-impact ordinal. Zero-only existing combat participants instead use immutable first-successful-participation tick/ordinal after positive totals; repeated zeros cannot move it and zero-to-positive selects the credit stamp without choosing loot eligibility. Require complete production provenance, no backdated-input influence, unchanged-total and transitivity controls plus actual multi-identity Paper presentation.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-ranking"
+      ]
     },
     "personal-loot-preview": {
       "kind": "automated",

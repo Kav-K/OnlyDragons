@@ -10,7 +10,7 @@ Baseline reconciled **6 September 2026** after PR #57 merged at
 `3505d6cc58cd2cf9b09c2d21ac38ec6eca3f4c45`: T08's connected dummy combat
 and explanations are accepted through exactly five requirements; [final evidence](evidence/t08-suite.md).
 T07 retains P07/P10 [acceptance](evidence/t07-suite.md); T06, T09e, T02b/T05
-and bounded M0 retain their prior evidence. T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md). T08b/#40 is lead-assigned and awaiting its Symphony dispatch label; no running worker or ranking acceptance is claimed.
+and bounded M0 retain their prior evidence. T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md). T08b/#40 is dispatched on `symphony/gh-40`; frozen projection/presentation is In progress and acceptance remains pending.
 The user's priority is core mechanics: reuse the mature fixtures and add only
 cases necessary to prove the feature, preserving all existing suite and gate requirements.
 The original T09c acceptance baseline was tested at `78c3de4`
@@ -45,7 +45,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T07 — Tracer/continuity | Complete | [#10](https://github.com/Kav-K/OnlyDragons/issues/10), [PR #56](https://github.com/Kav-K/OnlyDragons/pull/56) | Merged at `2c0be58` after clean `576e394` passed all 26 hosted outcomes, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions; its abort control passed 10 checks with the exact expected exception; retained firing passed 115. [Final evidence](evidence/t07-suite.md); [consumer/broker contract and focused history](evidence/t07-tracer.md). Exactly P07/P10 are accepted; T08 integration and later milestones remain separate. |
 | T08 — Practice tools | Complete | [#11](https://github.com/Kav-K/OnlyDragons/issues/11), [PR #57](https://github.com/Kav-K/OnlyDragons/pull/57) | Merged at `3505d6c` after the complete 28-case `24ddf86` cohort, independent raw replay/review, original/latest-main checkpoints and current-head CI. Practice passed 85 assertions plus 17 messages; lifecycle passed 25. Exactly P01/P13 and the three named player/damage/attribution requirements are accepted; [final evidence](evidence/t08-suite.md). Human Windows Play/authentication/visual checks remain unrun. |
 | T08a — Managed dragon controls | Complete | [#39](https://github.com/Kav-K/OnlyDragons/issues/39), [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) | Merged at `889a3db` after the complete cohort, independent raw/source review, strict replay, actual-main checkpoint and current CI. Exactly `managed-dragon-development` accepted; [evidence](evidence/t08a-suite.md). Human observations and M1–M5 remain separate. |
-| T08b — Frozen damage ranking | Lead-assigned; awaiting dispatch | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | Integrated T08a supplies frozen results and the bounded completion subscription. Awaiting the Symphony label; no implementation or ranking acceptance. |
+| T08b — Frozen damage ranking | In progress | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | Pure projection and per-spawn participant presentation implemented; focused two-actor ranking and affected dragon-combat checks pending. Full hosted regression, independent review/CI and acceptance remain lead-owned; human readability/authentication unrun. |
 | T08c — Personal loot simulation | Planned | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | After T02b/T08b: personal placement-dependent previews with hard item locks and explicit sample calibration. Real rewards always disabled; all resolver/no-grant Paper evidence pending. |
 | T09 — Gameplay validation | In progress (T09a/T09b/T09c complete; future gameplay gates pending) | [#2 runner](https://github.com/Kav-K/OnlyDragons/issues/2), [PR #16](https://github.com/Kav-K/OnlyDragons/pull/16), [#20 protocol player](https://github.com/Kav-K/OnlyDragons/issues/20), [PR #27](https://github.com/Kav-K/OnlyDragons/pull/27) | T09b merged at 5b0e030 after independent review and final-head CI. Clean runtime 1dd6ffe passed 25 protocol-player Paper assertions; early-exit and timeout controls failed as intended, with both owned JVMs cleaned up. [Exact evidence/hashes](../../dev/agent-paper-tests.md#protocol-player-evidence). T09c merged in [PR #32](https://github.com/Kav-K/OnlyDragons/pull/32) at 73a8cc8: all 15 shared cases met their declared outcomes, including the 40-second actor soak and five expected-failure controls; [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). Human visuals/authenticated multiplayer and future feature scenarios remain separate gates. |
 | T09d — Reusable headless fixtures | Complete; merged `9def91f75d655caaccd6c7fa01313e4ba3a0ea54` | [#43](https://github.com/Kav-K/OnlyDragons/issues/43), [PR #44](https://github.com/Kav-K/OnlyDragons/pull/44), integration-lead-owned | Reviewed runtime `3047a56` passed all 17 hosted suite outcomes, including two-player action/damage and intended-abort controls, 82 production/28 client tests and current-runtime CI. Independent unchanged-artifact replay and the T09d checkpoint passed; [exact evidence](evidence/t09d-suite.md). Final documentation-head CI passed and PR #44 merged at `9def91f75d655caaccd6c7fa01313e4ba3a0ea54`. Generic calibration does not satisfy production multiplayer firing/accounting or human gates. No duplicate Symphony dispatch. |
@@ -503,7 +503,7 @@ Extend T08's shared target/combat/proc lifecycle with the real test-dragon backe
 
 T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md).
 The [focused archive](evidence/t08a-focused-paper.md) retains original revisions, failed iterations and the bounded final-worker rerun.
-T08b/#40 is lead-assigned and awaiting its Symphony dispatch label; no running worker or ranking acceptance is claimed.
+T08b/#40 is dispatched on `symphony/gh-40`; frozen projection/presentation is In progress and acceptance remains pending.
 Reuse mature fixtures and add only necessary feature cases. Human Windows Build/Play, authentication, readability/aiming/visuals and performance remain unrun for this acceptance.
 
 ### T08b — Frozen post-kill damage ranking
@@ -512,13 +512,23 @@ Reuse mature fixtures and add only necessary feature cases. Human Windows Build/
 
 Rank frozen credited damage, including reduced-health and zero-HP proc credit and lethal overkill, with no post-death credit. Preserve actual HP loss separately. Unique placements use the lead-reviewed rule: total descending, then receiver commit tick of the last strict represented-total increase, then encounter-global monotonic committed accepted-impact ordinal. Complete production provenance is required; backdated inputs and additions that round to an unchanged total cannot improve rank. Any allowed imported/test fallback must use one fixed normalized tuple rather than pairwise missing-field rules. Capture metadata through a lead-reviewed shared result/accounting boundary; do not reconstruct it from live equipment or install another damage listener.
 
-`frozen-damage-ranking` remains deferred until deterministic tie/transitivity/boundary cases and actual distinct-player Paper attribution/presentation pass. Reconnects, map order, later gear and late hits must not reorder a frozen result; retries announce once. Publish immutable placement/result identity for T08c. Persistent global rankings are outside this task.
+`frozen-damage-ranking` binds the new `dragon-ranking` fixture on this branch; runtime acceptance remains pending until deterministic tie/transitivity/boundary cases and actual distinct-player Paper attribution/presentation pass. Reconnects, map order, later gear and late hits must not reorder a frozen result; retries announce once. Publish immutable placement/result identity for T08c. Persistent global rankings are outside this task.
 
 Zero-only existing combat participants use separate first-successful-participation
 tick/ordinal after all positive totals; repeated zeros do not move that stamp.
 Positive totals use the strict-increase credit stamp. This fixed tuple yields
 unique placements without fabricating credit or selecting loot eligibility.
 Test zero-to-positive transitions, failed first hits and same-tick zero participants.
+
+GH-40 implementation uses the same immutable completion and existing read-only
+subscription on every production spawn. Pure tests cover precision, all input
+permutations, signed zeros, actual rejected/replayed/rounded/late commits,
+proc/overkill HP separation, >10 formatting and generation/delivery failures.
+The two-actor fixture covers real owned-arrow ties/overkill, reconnect, a later
+proc-only lethal, stale/replayed delivery and cancelled/admin/reset exclusions.
+Focused clean-source Paper evidence is pending; the lead's dispatch assigns the
+complete hosted cohort, independent replay/review and current CI to the lead.
+No prior fixture/gate is removed and T08c remains the next dependent task.
 
 ### T08c — Personal placement-based loot simulation
 
