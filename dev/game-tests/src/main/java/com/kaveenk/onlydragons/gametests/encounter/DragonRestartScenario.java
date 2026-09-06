@@ -37,13 +37,14 @@ public final class DragonRestartScenario implements Scenario, Listener {
             var expected = new DevelopmentArena(world.getKey().toString(), 0, 100, 0, 24, "test_dragon");
             c.check("loaded_arena_before_setup", true, expected.equals(dragons.arena().orElseThrow()));
             String previous = phase.previousReport();
-            var matcher = java.util.regex.Pattern.compile("\\\"oldNative\\\"\\s*:\\s*\\\"([a-f0-9-]{36})\\\"").matcher(previous);
-            if (!matcher.find()) throw new IllegalStateException("Missing prior native UUID");
-            UUID old = UUID.fromString(matcher.group(1));
-            // Load all chunks surrounding the exact first-boot spawn before asserting absence.
-            for (int x = -2; x <= 2; x++) for (int z = -2; z <= 2; z++) c.tickChunk(world.getChunkAt(x, z));
+            var observations = com.google.gson.JsonParser.parseString(previous).getAsJsonObject().getAsJsonObject("observations");
+            UUID old = UUID.fromString(observations.get("oldNative").getAsString());
+            var chunk = observations.getAsJsonObject("oldChunks");
+            int oldX = chunk.get("x").getAsInt(), oldZ = chunk.get("z").getAsInt();
+            // Load the recorded first-boot native chunks before asserting absence.
+            for (int x = oldX - 2; x <= oldX + 2; x++) for (int z = oldZ - 2; z <= oldZ + 2; z++) c.tickChunk(world.getChunkAt(x, z));
             c.check("old_native_absent_after_chunk_load", true, world.getEntities().stream().noneMatch(e -> e.getUniqueId().equals(old)) && Bukkit.getEntity(old) == null);
-            c.check("selected_definition_readback", true, previous.contains("test_dragon") && c.production().dragonDefinitions().snapshot().select(expected.type()).maxHealth() == 1000);
+            c.check("selected_definition_readback", observations.get("selectedDefinition").getAsString(), c.production().dragonDefinitions().snapshot().select(expected.type()).toString());
         }
         players = new PlayerFixture(c); c.listen(this);
         players.await("restart actor", 300, players::allOnline, this::setup);

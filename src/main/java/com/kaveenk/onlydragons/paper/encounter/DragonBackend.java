@@ -65,17 +65,21 @@ public final class DragonBackend implements TargetBackend {
         outcome = "REMOVED_" + cause; retirement.accept(this);
     }
     private void announce() {
-        if (announced || disqualified || !confirmed || result == null || !outcome.equals("ANIMATING") || removed || entity.getHealth() != 0) return;
+        if (announced || disqualified || !confirmed || result == null || !outcome.equals("ANIMATING") || actuallyRemoved() || entity.getHealth() != 0) return;
         announced = true; completion.accept(result);
+    }
+    private boolean actuallyRemoved() {
+        // The event arrives before Paper assigns its removal reason; retain both observations.
+        return removed || entity == null || entity.getRemovalReason() != null;
     }
     public boolean released() {
         // isValid() also tests liveness: a zero-HP dragon still owns its native animation.
-        if (removed) tickets.endArena(ticketOwner);
-        return removed;
+        if (actuallyRemoved()) { tickets.endArena(ticketOwner); return true; }
+        return false;
     }
     public boolean lethalRequested() { return lethal; }
     public void close() {
-        try { if (entity != null && !removed) { disqualified = true; outcome = "RESET"; entity.remove(); removed = true; } }
+        try { if (entity != null && !actuallyRemoved()) { disqualified = true; outcome = "RESET"; entity.remove(); removed = true; } }
         finally { tickets.endArena(ticketOwner); retirement.accept(this); }
     }
 }
