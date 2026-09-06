@@ -57,12 +57,18 @@ staged launcher and Mojang bytes again.
    settled/final damage, cancellation and health. Its next-tick health records
    group every event on the same target/tick: a shared health delta must not be
    attributed independently to each of several hits.
+   Call `watch(target)` for each target before the trial. Restrict a trial's
+   evidence to its player/projectile/target identities and event/tick window;
+   a matching event from an earlier trial cannot satisfy it.
 6. Assert your deployed production API's expected result separately. For the
    stats system, query `context.production().equipment()` after actual equipment
    input and compare exact expected values. Combat consumers must assert their
    actual accepted `ShotContext`/`DamageResult`, deduplication, HP, contribution,
    procs and frozen result using independently calculated golden values. See
    `combat/CombatAccountingScenario.java` for existing deployed domain vectors.
+   Canonicalize unordered sets to sorted lists before recording expected and
+   observed values. Java set equality can pass while the serialized JSON arrays
+   differ in order; the independent report validator must still reject that row.
 7. Register the scenario, required assertions, case and changed-area mapping in
    `scenarios.json`, `suites.json` and `acceptance.json`. Add
    `testPlayerMode: protocol-actions-v1` and the repository-relative
