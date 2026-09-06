@@ -1261,6 +1261,93 @@
           "Captured weapon=crit",
           "ferocity=0.0"
         ]
+      },
+      {
+        "actor": "alpha",
+        "session": "s1",
+        "id": "ordinary-captured-weapon",
+        "containsAll": [
+          "Captured weapon=ordinary stats=",
+          " draw=1.0 projectile=1.0 ferocity=0.0"
+        ]
+      },
+      {
+        "actor": "alpha",
+        "session": "s1",
+        "id": "ordinary-captured-stats",
+        "exact": "Captured damage=100.0 crit chance=0.0 crit damage=50.0 base ferocity=0.0"
+      },
+      {
+        "actor": "alpha",
+        "session": "s1",
+        "id": "ordinary-profile-context",
+        "containsAll": [
+          "Profile=MechanicRevision[profileId=practice-full-cycle, revision=v1] collision tick=",
+          " commit tick=",
+          " procs=NO_CHILDREN modifiers=",
+          "criticalMultiplier=1.0",
+          "drawScale=1.0",
+          "projectileScale=1.0",
+          "weaponDamage=100.0"
+        ]
+      },
+      {
+        "actor": "beta",
+        "session": "s1",
+        "id": "critical-captured-weapon",
+        "containsAll": [
+          "Captured weapon=crit stats=",
+          " draw=1.0 projectile=1.0 ferocity=0.0"
+        ]
+      },
+      {
+        "actor": "beta",
+        "session": "s1",
+        "id": "critical-captured-stats",
+        "exact": "Captured damage=100.0 crit chance=100.0 crit damage=50.0 base ferocity=0.0"
+      },
+      {
+        "actor": "beta",
+        "session": "s1",
+        "id": "critical-profile-context",
+        "containsAll": [
+          "Profile=MechanicRevision[profileId=practice-full-cycle, revision=v1] collision tick=",
+          " commit tick=",
+          " procs=NO_CHILDREN modifiers=",
+          "criticalMultiplier=1.5",
+          "drawScale=1.0",
+          "projectileScale=1.0",
+          "weaponDamage=100.0"
+        ]
+      },
+      {
+        "actor": "beta",
+        "session": "s1",
+        "id": "score-only-captured-weapon",
+        "containsAll": [
+          "Captured weapon=ferocity_100 stats=",
+          " draw=1.0 projectile=1.0 ferocity=100.0"
+        ]
+      },
+      {
+        "actor": "beta",
+        "session": "s1",
+        "id": "score-only-captured-stats",
+        "exact": "Captured damage=100.0 crit chance=0.0 crit damage=50.0 base ferocity=100.0"
+      },
+      {
+        "actor": "beta",
+        "session": "s1",
+        "id": "score-only-profile-context",
+        "containsAll": [
+          "Profile=MechanicRevision[profileId=practice-score-only-cycle, revision=v1] collision tick=",
+          " commit tick=",
+          " procs=NO_CHILDREN modifiers=",
+          "criticalMultiplier=1.0",
+          "drawScale=1.0",
+          "projectileScale=1.0",
+          "weaponDamage=100.0"
+        ]
       }
     ]
   },
