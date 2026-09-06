@@ -101,7 +101,7 @@ class ReceiptFixture:
         self.write(path, json.dumps(value))
 
     def git(self, *args):
-        return subprocess.check_output(['git', *args], cwd=self.root, stderr=subprocess.DEVNULL)
+        return subprocess.check_output(['git', '-c', 'maintenance.auto=false', *args], cwd=self.root, stderr=subprocess.DEVNULL)
 
     def commit(self):
         self.git('add', '.')

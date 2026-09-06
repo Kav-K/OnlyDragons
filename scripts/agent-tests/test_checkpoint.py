@@ -3,6 +3,7 @@ from contextlib import redirect_stdout
 from copy import deepcopy
 import io
 import json
+import os
 from pathlib import Path
 import tempfile
 import subprocess
@@ -73,6 +74,12 @@ class CheckpointTests(unittest.TestCase):
 
     def write(self, path, value):
         (self.project / path).write_text(json.dumps(value), encoding='utf-8')
+
+    def git(self, *arguments):
+        # Commit-triggered maintenance may detach and race TemporaryDirectory
+        # cleanup. These disposable histories need no automatic maintenance.
+        return subprocess.check_output(['git', '-c', 'maintenance.auto=false', *arguments],
+                                       cwd=self.project, stderr=subprocess.DEVNULL)
 
     def change(self, path, mutation):
         value = self.read(path)
@@ -328,8 +335,7 @@ class CheckpointTests(unittest.TestCase):
             self.acceptance()
 
     def test_renamed_file_selects_both_removed_and_added_areas(self):
-        def git(*arguments):
-            return subprocess.check_output(['git', *arguments], cwd=self.project, stderr=subprocess.DEVNULL)
+        git = self.git
         git('init', '-q')
         git('config', 'user.name', 'Checkpoint test')
         git('config', 'user.email', 'checkpoint@example.invalid')
@@ -348,6 +354,28 @@ class CheckpointTests(unittest.TestCase):
         with patch.object(checkpoint, 'validate_no_weakening', return_value=base):
             result = checkpoint.validate_acceptance(self.project, 'build/receipt.json', base, suite_module=self.suite)
         self.assertEqual({'src/old-area/Feature.java', 'src/new-area/Feature.java'}, set(result['changedPaths']))
+
+    def test_temporary_git_commits_do_not_start_maintenance_children(self):
+        git = self.git
+        git('init', '-q')
+        git('config', 'user.name', 'Checkpoint test')
+        git('config', 'user.email', 'checkpoint@example.invalid')
+        # Exercise an inherited opt-in while keeping a failing regression's
+        # maintenance synchronous, so its own temporary cleanup remains safe.
+        git('config', 'maintenance.auto', 'true')
+        git('config', 'maintenance.autoDetach', 'false')
+        git('config', 'gc.autoDetach', 'false')
+        git('add', '.')
+        with tempfile.TemporaryDirectory() as trace_directory:
+            trace = Path(trace_directory) / 'git-trace.json'
+            with patch.dict(os.environ, {'GIT_TRACE2_EVENT': str(trace)}):
+                git('commit', '-qm', 'Fixture history')
+            events = [json.loads(line) for line in trace.read_text(encoding='utf-8').splitlines()]
+        self.assertTrue(any(event.get('event') == 'start' and 'commit' in event.get('argv', []) for event in events))
+        self.assertEqual(b'1', git('rev-list', '--count', 'HEAD').strip())
+        maintenance = [event for event in events if event.get('event') == 'child_start'
+                       and {'maintenance', 'gc'}.intersection(event.get('argv', []))]
+        self.assertEqual([], maintenance, 'Fixture commit must not outlive its temporary repository')
 
     def test_receipt_omitting_changed_area_case_rejected(self):
         self.suite.receipt['cases'] = [{'caseId': 'item-identity'}]
