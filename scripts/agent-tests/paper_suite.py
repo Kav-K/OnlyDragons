@@ -455,6 +455,7 @@ def verify_case(project, record, case, descriptor, source, suite_root):
         player = runner.strict_json(player_path)
         verify_player(player, case, run_id, pins, start, end)
         if positive:
+            runner.validate_player_messages(player, descriptor)
             require(runner.json_values_equal(result.get('player'), player), 'Raw player differs from accepted player report')
         cleanup = result.get('playerCleanup', {})
         require(cleanup.get('clean') is True and cleanup.get('forced') is False
