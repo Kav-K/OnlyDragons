@@ -312,7 +312,7 @@ Process an impact on the server thread:
 8. Determine bounded ferocity children from the pre-update buff snapshot; update eligible tempo state; schedule children.
 9. Publish immutable results for UI, traces, and future rewards.
 
-`ProjectileHitEvent` and `EntityDamageByEntityEvent` must not both call the engine independently. The T04 findings below identify a physical-impact source and measured event ordering, with native player-damage acceptance still pending. Track collision candidates and finalize only after relevant cancellation has settled. Centralize native damage suppression and managed damage application in one adapter; do not award managed damage from an event cancelled by another component. [Projectile event semantics](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
+`ProjectileHitEvent` and `EntityDamageByEntityEvent` must not both call the engine independently. The T04 findings below identify a physical-impact source and measured event ordering, with player-owned native controls now measured in the companion. Track collision candidates and finalize only after relevant cancellation has settled. Centralize native damage suppression and managed damage application in one adapter; do not award managed damage from an event cancelled by another component. [Projectile event semantics](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
 
 **T04 scoped refinement (Paper 121):** use `ProjectileHitEvent` as the sole
 physical-impact candidate source. Real shooterless dragon collisions can omit the
@@ -329,11 +329,37 @@ requiring a guaranteed veto must use the physical-hit boundary. This explicit
 lead clarification replaces the earlier unsupported later-native-veto promise.
 Recheck encounter generation and target liveness before committing the claim.
 Zero native arrow damage/critical randomness before managed flight;
-centralize residual native managed-target damage suppression. The cow control
-supports this path; authenticated native dragon damage remains a separate gate.
-Use uniform part scaling until semantic head/body classification is verified:
-actual parent mapping is exposed, but part display names and iteration order do
-not supply a semantic part identifier. See [T04 evidence and limits](../../dev/game-tests/findings/projectile-feasibility.md).
+centralize residual native managed-target damage suppression. The player-owned
+continuation supports this path on Paper 121: native positive
+controls lose HP, while hit cancellation, damage cancellation and zero native
+base damage prevent that loss. Zero damage and seated hits can omit damage
+events and leave rebounding arrows; terminal retirement must be explicit.
+Three simultaneous player-owned collisions emit only one native damage event,
+so native hurt-window behavior must not discard physical candidates. External
+integrations need the hit path for vetoes when native damage events are absent.
+Actual 1×1×1 versus 5×3×5 geometry lost 4 versus 2 HP; this does not establish a
+robust semantic selector.
+
+**Reviewed OnlyDragons calibration policy (GH-5 / PR #31):** every managed
+dragon part uses scale **1.0**, with parent identity from the actual impacted
+part. No semantic head identifier or Hypixel parity is claimed. Initially
+admit actual part impacts only during the measured `HOVER`, `CIRCLING`, and
+`SEARCH_FOR_BREATH_ATTACK_TARGET` phases, including managed hits in that
+measured seated phase despite native arrow immunity. Reject every other phase
+with an explicit unsupported-phase reason until measured. Natural End cycles
+and all-phase coverage remain pending automation.
+
+`ProjectileHitEvent` supplies the physical candidate. The production adapter
+must make one idempotent claim and explicitly retire terminal projectiles;
+zero-damage rebounds and cancelled hits can retain live arrows. Zero native
+base damage and critical randomness before flight, then suppress residual
+native damage. Keep external vetoes distinguishable from this owned suppression.
+Do not require a native damage event: zero-damage/seated impacts and simultaneous
+physical hits can omit it. [Player-owned evidence](../../dev/game-tests/findings/projectile-player-feasibility.md)
+records the positive controls and limits. These scoped decisions revise the
+unsupported semantic/phase assumptions; production end-to-end claim, veto,
+retirement and phase-rejection tests remain assigned to later adapter tasks.
+T04 remains In review; #9 stays blocked and M0 unaccepted pending lead acceptance.
 No production adapter is introduced by the feasibility scenario.
 
 A proposed simple damage model is:

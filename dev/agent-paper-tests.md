@@ -323,9 +323,12 @@ and this evidence are documentation-only; runtime evidence remains at `1dd6ffe`.
 
 ### Extending the actor after calibration
 
-The runner currently admits this mode only for `protocol-player-calibration`.
-T04/#5 and equipment/#7 must receive a reviewed scenario-admission extension and
-add their own actual production/Paper assertions after T09b merges. They can
+The catalog now declares player mode for protocol calibration/soak, connected
+player equipment and GH-5 `projectile-player-feasibility`; see its
+[fixture, evidence and remaining gates](game-tests/findings/projectile-player-feasibility.md).
+Main's generic admission requires the explicit CLI mode to match that declaration.
+Every new fixture still needs scoped ownership, actual Paper assertions and
+suite/acceptance bindings. Fixtures can
 reuse the select/draw/release/quit markers with their public-API fixtures.
 The current bow-use packet uses yaw/pitch zero: align a fixture with that shot
 direction or explicitly review a bounded aiming-message extension. Do not treat

@@ -26,6 +26,7 @@ public final class GameTestsPlugin extends JavaPlugin {
             Map.entry("protocol-player-calibration", new PlayerCalibrationScenario()),
             Map.entry("protocol-player-soak", new PlayerCalibrationScenario(true)),
             Map.entry("item-identity", new com.kaveenk.onlydragons.gametests.item.ItemIdentityScenario()),
+            Map.entry("projectile-player-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectilePlayerFeasibilityScenario()),
             Map.entry("projectile-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectileFeasibilityScenario()),
             Map.entry("projectile-cleanup-failure", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario()),
             Map.entry("projectile-cleanup-abort", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(true)),
