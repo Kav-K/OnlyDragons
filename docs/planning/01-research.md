@@ -128,6 +128,16 @@ The local project pins **Paper API 26.2.build.121-stable and Java 25**. Its down
 
 Paper's PDC supports namespaced metadata on items and entities. It is a suitable storage boundary for item definitions, enchant levels, shot ownership, and schema versions. Lore should be a presentation of that data. [Paper PDC documentation](https://docs.papermc.io/paper/dev/pdc/)
 
+**Observed locally, T02 / GH-4, 5 September 2026:** on pinned Paper
+26.2-121-a2a42c5, the production item codec preserved all eight calibration
+loadouts through `ItemStack.serializeAsBytes`/`deserializeBytes`; two bow UUIDs
+remained distinct across a synthetic inventory move. Copied names/lore/glint
+did not grant managed identity to an ordinary bow. Schema/type/revision and
+trusted enchant/roll rejection controls passed. This establishes the item
+metadata boundary, not authenticated inventory/anvil behavior, restart recovery,
+combat effects or protection against privileged plugins forging PDC.
+See [T02 evidence](03-agent-tasks-and-validation.md#t02-item-validation-evidence).
+
 The projectile hit event's cancellation semantics require care: cancelling an entity hit prevents its normal collision action, while cancellation does not generally prevent block collision. The plan must not cancel every hit and assume vanilla impact behavior remains. [Paper ProjectileHitEvent API](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
 
 World/entity mutation belongs on the server thread; asynchronous work is for immutable report data and file I/O. [Paper scheduling documentation](https://docs.papermc.io/paper/dev/scheduler/)
