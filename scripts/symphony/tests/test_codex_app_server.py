@@ -21,6 +21,10 @@ class BridgeTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix='symphony-bridge-')
         self.addCleanup(self.temp.cleanup)
         self.source = Path(self.temp.name)
+        (self.source / '.codex').mkdir()
+        (self.source / '.codex/config.toml').write_text(
+            (BRIDGE_PATH.parents[2] / '.codex/config.toml').read_text()
+        )
         self.workspace = self.source / '.symphony/workspaces/issue'
         (self.workspace / '.git').mkdir(parents=True)
         self.turn = {
@@ -61,6 +65,20 @@ class BridgeTests(unittest.TestCase):
             bridge.validate_workspace(self.workspace, self.source)
         with self.assertRaises(ValueError):
             bridge.transform_message(self.turn, self.workspace)
+
+    def test_mcp_command_uses_operator_config_and_anchors_issue_checkout(self):
+        import tomllib
+        # An issue branch must not redirect tool startup to an arbitrary command.
+        (self.workspace / '.codex').mkdir()
+        (self.workspace / '.codex/config.toml').write_text('[mcp_servers.serena]\ncommand="unreviewed"\n')
+        command = bridge.codex_command(self.workspace, self.source)
+        servers = tomllib.loads(next(arg for arg in command if arg.startswith('mcp_servers=')))['mcp_servers']
+        self.assertEqual('node', servers['serena']['command'])
+        self.assertEqual(str(self.workspace), servers['serena']['cwd'])
+        self.assertEqual(str(self.workspace), servers['serena']['args'][-1])
+        self.assertTrue(servers['serena']['args'][0].startswith(str(self.source)))
+        self.assertNotIn('execute_shell_command', servers['serena']['enabled_tools'])
+        self.assertEqual('https://mcp.context7.com/mcp', servers['context7']['url'])
 
     def test_protocol_transparency_and_child_shutdown(self):
         fake_bin = self.source / 'bin'

@@ -1,0 +1,31 @@
+# Shared project tools. Codex loads this file in trusted checkouts.
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+enabled = true
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+enabled_tools = ["resolve-library-id", "query-docs"]
+
+[mcp_servers.serena]
+command = "node"
+# Locate the launcher when an interactive Codex session starts in a subdirectory.
+# MCP command arguments are process-relative, not TOML path-valued settings.
+args = ["--input-type=module", "--eval", '''
+import { existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+let root = process.cwd();
+while (!existsSync(join(root, 'scripts/agent-tools/serena-launch.mjs'))) {
+  const parent = dirname(root);
+  if (parent === root) throw new Error('Project Serena launcher not found');
+  root = parent;
+}
+process.chdir(root);
+await import(pathToFileURL(join(root, 'scripts/agent-tools/serena-launch.mjs')).href);
+''']
+env_vars = ["LOCALAPPDATA", "JAVA_HOME", "ONLYDRAGONS_AGENT_RUNTIME", "ONLYDRAGONS_JAVA_HOME", "ONLYDRAGONS_SERENA_BIN", "ONLYDRAGONS_SERENA_PYTHON", "ONLYDRAGONS_JDTLS_ROOT"]
+enabled = true
+startup_timeout_sec = 180
+tool_timeout_sec = 120
+# Keep edits in the client's normal workspace controls. Serena supplies navigation.
+enabled_tools = ["initial_instructions", "get_current_config", "list_dir", "find_file", "search_for_pattern", "get_symbols_overview", "find_symbol", "find_referencing_symbols"]

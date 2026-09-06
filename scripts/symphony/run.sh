@@ -49,6 +49,12 @@ done
 [[ "$missing" == 0 ]] || exit 1
 codex --version
 java -version 2>&1 | head -n 1
+if node "$ONLYDRAGONS_SOURCE/scripts/agent-tools/serena-launch.mjs" --project "$ONLYDRAGONS_SOURCE" --check >"$state_root/agent-tools-check.json"; then
+  echo 'OK: Serena and Java language-server dependencies'
+else
+  echo 'Run Symphony.cmd install to provision agent tools.'
+  missing=1
+fi
 codex login status || { echo 'Run Symphony.cmd login.'; missing=1; }
 python3 "$ONLYDRAGONS_SOURCE/scripts/symphony/check-github.py" || missing=1
 [[ "$missing" == 0 ]] || exit 1

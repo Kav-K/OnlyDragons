@@ -67,6 +67,8 @@ fi
 npm install --prefix "$RUNTIME_ROOT" --cache "$RUNTIME_ROOT/npm-cache" \
   --save-exact --no-audit --no-fund --ignore-scripts "@openai/codex@$CODEX_VERSION"
 
+bash "$PROJECT_ROOT/scripts/agent-tools/install-serena.sh" "$RUNTIME_ROOT"
+
 "$RUNTIME_ROOT/java/bin/java" -version
 "$RUNTIME_ROOT/node_modules/.bin/codex" --version
 

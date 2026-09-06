@@ -9,6 +9,41 @@ import signal
 import subprocess
 import sys
 import threading
+import tomllib
+
+
+def toml_value(value):
+    """Encode the small JSON-compatible config subset for Codex -c arguments."""
+    if isinstance(value, dict):
+        return '{' + ', '.join(json.dumps(key) + ' = ' + toml_value(item) for key, item in value.items()) + '}'
+    if isinstance(value, list):
+        return '[' + ', '.join(toml_value(item) for item in value) + ']'
+    if isinstance(value, (str, bool, int, float)):
+        return json.dumps(value)
+    raise ValueError('Unsupported MCP configuration value.')
+
+
+def codex_command(workspace, source):
+    # Use the operator's reviewed tool configuration, not an issue branch's
+    # arbitrary MCP commands or its local trust state. Paths bind to this clone.
+    source = Path(source).resolve(strict=True)
+    with (source / '.codex/config.toml').open('rb') as config_file:
+        servers = tomllib.load(config_file)['mcp_servers']
+    servers['serena']['args'] = [
+        str(source / 'scripts/agent-tools/serena-launch.mjs'),
+        '--project', str(workspace),
+    ]
+    servers['serena']['cwd'] = str(workspace)
+    # Codex forwards a small environment to stdio MCP servers. Explicitly carry
+    # the shared installation path, without forwarding tracker credentials.
+    servers['serena']['env'] = dict(
+        servers['serena'].get('env', {}),
+        ONLYDRAGONS_AGENT_RUNTIME=str(source / '.symphony/runtime'),
+    )
+    return [
+        'codex', '--config', 'shell_environment_policy.inherit=all',
+        '--config', 'mcp_servers=' + toml_value(servers), 'app-server',
+    ]
 
 
 def validate_workspace(workspace, source):
@@ -58,7 +93,7 @@ def main():
     for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
         signal.signal(signum, lambda *_: stopping.set())
     child = subprocess.Popen(
-        ['codex', '--config', 'shell_environment_policy.inherit=all', 'app-server'],
+        codex_command(workspace, source),
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=None,
         cwd=workspace, start_new_session=True,
     )

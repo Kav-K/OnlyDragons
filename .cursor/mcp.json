@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "serena": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/scripts/agent-tools/serena-launch.mjs",
+        "--project",
+        "${workspaceFolder}"
+      ]
+    }
+  }
+}

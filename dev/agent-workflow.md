@@ -2,7 +2,7 @@
 
 Codex and Cursor share the root `AGENTS.md` contract. Cursor also has the short
 always-applied `.cursor/rules/minecraft.mdc` entry point. The skills below add
-reusable guidance across projects when installed in the active client. The project
+reusable guidance from the committed `.agents/skills/` bundle. The project
 scripts remain the source of truth for build, server, and debugger actions.
 
 ## Choose the relevant tools
@@ -13,7 +13,7 @@ scripts remain the source of truth for build, server, and debugger actions.
 | Verify a plugin on an actual Paper server | `paper-runtime-validation` skill and `mcdev.cmd` |
 | Review async I/O, schedulers, shared state, or shutdown cleanup | `paper-threading-review` skill |
 | Check an unfamiliar or version-sensitive API | Context7, then official version-matching docs/API signatures as needed |
-| Navigate Java symbols, references, and targeted edits in Codex | Serena when connected; explicitly activate this project before symbol work |
+| Navigate Java symbols and references | Project Serena MCP; launcher activates the checkout; confirm with `get_current_config` |
 | Inspect or debug a project open in IntelliJ | IntelliJ MCP when configured and connected; the IDE must expose that project |
 | Compile, test, start/stop, inspect logs, or debug in Cursor | Existing `.vscode` tasks, Gradle wrapper, and `mcdev.cmd` |
 
@@ -21,9 +21,10 @@ Skills and MCP connections are optional enhancements. If a client has not loaded
 one, follow the local contract and scripts, and state a missing capability only when
 it blocks required work. An IntelliJ installation is not required for this workflow.
 Read a selected skill before following it. Do not load every skill for every edit.
-Serena must target the current project; confirm the active project when moving
-between workspaces. Its Java analysis and Cursor's existing Java tooling supplement
-the checked-in build and tests.
+See [agent tool setup](agent-tools.md) for the shared client configuration,
+prerequisites, and connection checks. Serena must target the current project;
+its Java analysis and Cursor's Java tooling supplement the checked-in tests.
+Use native client tools for edits, Git, and build commands.
 
 ## Read the project before changing it
 
@@ -97,27 +98,26 @@ from this workflow. Do not introduce alternate server managers for routine tasks
 ## Reuse in another project
 
 Run the template's `mcdev.cmd new -Name YourPlugin`. Add `-NoOpen` to scaffold without
-opening Cursor. The scaffold copies `AGENTS.md`, `.cursor/rules/`, this document,
+opening Cursor. The scaffold copies `AGENTS.md`, `.agents/skills/`, `.codex/`,
+`.cursor/`, this document,
 the build/test pipeline, `.serena/project.yml`, and the rest of the existing template
 allowlist. Only Serena's project configuration is inherited; caches, logs, and
-memories are not copied. Global
-skills and MCP settings stay in each client's user configuration; they are not copied
-into or bundled with the plugin. Local project instructions apply to both clients.
+memories are not copied. The shared Minecraft skills and project MCP configuration
+travel with the source; executables, Java indexes, and credentials stay local.
+The conditional OnlyDragons routing reference does not supply a generated
+starter with the original game's design. Local instructions apply to both clients.
 
-On this Windows setup, Serena's local configuration is
-`%LOCALAPPDATA%\MinecraftAgentTools\serena-home\serena_config.yml`. A new folder is
-not automatically trusted. After reviewing the new project's configuration, add
-its exact absolute root as a list entry under `trusted_project_path_patterns`,
-preserving existing entries, then restart the Serena MCP connection. Project Java
-language-server settings, including wrapper support, require that explicit trust.
-Use exact roots rather than a broad wildcard. Activate the new project explicitly
-before asking Serena to navigate or edit its symbols.
+The project launcher makes an isolated Serena configuration for the current
+checkout and session. It trusts that exact root for Java settings, leaving
+global Serena settings and the tracked project configuration untouched. Codex
+still requires project trust to load `.codex/config.toml` in an interactive client;
+review that file when opening a new clone. Restart the client connection afterward.
 
-When moving machines or changing the pinned JDK, update `.serena/project.yml`:
-`ls_specific_settings.java.gradle_java_home` and the `runtimes` entry's `name` and
-`path` must match the selected JDK. `scripts/Configure-Java.ps1` updates Cursor's
-folder/workspace Java settings; it does not update Serena's configuration. Restart
-the Serena connection after changing its Java settings.
+When moving machines, provision the dependencies described in `agent-tools.md`.
+The launcher supplies platform-specific Java/Gradle overrides without writing
+Windows paths into a Linux worker's settings. On a JDK upgrade, review the launcher
+and installer pins as well as `versions.properties`. `scripts/Configure-Java.ps1`
+updates Cursor's Java settings separately. Restart Serena after such changes.
 
 An existing unrelated project can adopt the relevant guidance, but adapt its build
 commands, loader, version pins, and runtime checks first. Do not copy Paper-specific

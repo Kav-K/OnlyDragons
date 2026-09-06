@@ -72,6 +72,11 @@ than creating duplicate commits, comments, or pull requests.
   maintenance task; do not execute the rest of the backlog. Reconcile relevant
   issue/PR state with the delivery ledger before assuming a dependency is done.
   Pass the context paths, revision, scope, and gates to any subagent.
+- Use the relevant repository skills under .agents/skills/ and tool routing in
+  dev/agent-workflow.md. Context7 supplies API documentation; Serena is already
+  bound to this issue checkout for Java navigation. Confirm its current config.
+  Use native workspace tools for edits. An unavailable helper is not a gameplay
+  blocker when local source, official docs, and the build supply the needed evidence.
 - Work only in the provided issue workspace. Do not edit the source checkout,
   other issue workspaces, credentials, runtime installation, or personal worlds.
 - Use the host-authenticated github_api tool for GitHub REST requests. Its input

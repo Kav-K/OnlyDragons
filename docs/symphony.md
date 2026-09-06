@@ -9,6 +9,12 @@ The configuration is prepared for local use. Installing these files does not
 start the service or establish that a real issue has completed successfully.
 Use the checks below before dispatching work.
 
+The repository bundles the three Minecraft skills for both Cursor and Codex,
+plus Context7 and Serena MCP configuration. The runtime installer provisions
+Serena and the Java language server for isolated Linux workers. See
+[shared agent tools](../dev/agent-tools.md) for coverage, local checks, and client
+reload instructions. These tools do not require an additional credential.
+
 ## Credentials
 
 | Required access | What to supply locally | Where to obtain it |
@@ -92,7 +98,9 @@ The pinned Codex CLI uses the `granular` approval-policy schema. A small local
 app-server adapter grants each worker write access to that checkout's `.git`
 directory so it can commit under workspace-write restrictions. It leaves the
 remaining sandbox policy intact. Gradle's cache stays inside each issue
-workspace. Revalidate this adapter when upgrading Codex or Symphony.
+workspace. The adapter also supplies the operator's reviewed MCP configuration
+and binds Serena to the issue clone and shared runtime installation. Revalidate
+this adapter when upgrading Codex or Symphony.
 
 Run its protocol, path-boundary, and subprocess cleanup tests in WSL:
 

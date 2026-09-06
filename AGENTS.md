@@ -68,15 +68,20 @@ missing context before making decisions that depend on it.
 Use `dev/agent-workflow.md` for the shared Codex/Cursor tool routing and local
 validation commands, subject to the Symphony server restrictions below.
 
-- Read only relevant installed skills: `minecraft-plugin-development` for plugin
+- Shared skills are committed under `.agents/skills/` for both Codex and Cursor.
+  Read the relevant repository copy: `minecraft-plugin-development` for plugin
   implementation, `paper-runtime-validation` for runtime verification, and
   `paper-threading-review` for async/scheduler, shared-state, or lifecycle changes.
 - Use Context7 when connected for unfamiliar or version-sensitive APIs. Resolve
   the library first and query for the pinned version. Check official documentation
   and the actual dependency's API signatures when results do not match the target.
-- When Serena is connected in Codex, explicitly activate the current project before
-  symbol search, references, or edits. Confirm its active project after switching
-  folders. Cursor's existing Java tooling remains available independently.
+- The project Serena launcher activates this checkout automatically. Confirm it
+  with `get_current_config` before symbol work and after switching folders. Serena
+  exposes navigation tools; use the client's normal tools for edits and commands.
+  Its local caches and memories are not shared project context.
+- Tool setup and checks are in `dev/agent-tools.md`. Keep skills, their references,
+  and tool instructions current with verified discoveries in the same change;
+  preserve provenance and avoid duplicating the living planning documents.
 - IDE/MCP diagnostics supplement the wrapper build and runtime evidence. Report
   unavailable tools only when they block required work; use local scripts otherwise.
 

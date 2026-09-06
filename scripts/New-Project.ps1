@@ -13,14 +13,15 @@ if (-not $Directory) { $Directory = Join-Path (Split-Path -Parent $templateRoot)
 $destination = [IO.Path]::GetFullPath($Directory)
 if ($destination.StartsWith($templateRoot + '\',[StringComparison]::OrdinalIgnoreCase) -or $destination -eq $templateRoot) { throw 'Create the new project outside the template project.' }
 if (Test-Path -LiteralPath $destination) { throw "Destination already exists; nothing was changed: $destination" }
-$entries = @('src','.vscode','.cursor','.serena\project.yml','.github','dev','scripts','gradle','.editorconfig','.gitattributes','.gitignore','gradle.properties','settings.gradle.kts','build.gradle.kts','versions.properties','gradlew','gradlew.bat','mcdev.cmd','Play.cmd','Test.cmd','Stop.cmd','README.md','AGENTS.md','scaffold.json',($template.name + '.code-workspace'))
+$entries = @('src','.vscode','.cursor','.agents/skills','.codex/config.toml','.serena\project.yml','.github','dev','scripts','gradle','.editorconfig','.gitattributes','.gitignore','gradle.properties','settings.gradle.kts','build.gradle.kts','versions.properties','gradlew','gradlew.bat','mcdev.cmd','Play.cmd','Test.cmd','Stop.cmd','README.md','AGENTS.md','scaffold.json',($template.name + '.code-workspace'))
 $files = foreach ($entry in $entries) {
     $path = Join-Path $templateRoot $entry
     if (-not (Test-Path -LiteralPath $path)) { throw "Template file missing: $entry" }
     if (Test-Path -LiteralPath $path -PathType Container) { Get-ChildItem -LiteralPath $path -Recurse -File -Force | Where-Object {
         $relativeFile = $_.FullName.Substring($templateRoot.Length + 1)
         $relativeFile -notmatch '^(dev[\\/]lab-tools[\\/])?(build|bin|\.gradle|\.git|\.settings)([\\/]|$)' -and
-            $relativeFile -notmatch '^(dev[\\/]lab-tools[\\/])?\.(classpath|project)$'
+            $relativeFile -notmatch '^(dev[\\/]lab-tools[\\/])?\.(classpath|project)$' -and
+            $relativeFile -notmatch '(^|[\\/])__pycache__([\\/]|$)' -and $_.Extension -notin @('.pyc','.pyo')
     } }
     else { Get-Item -LiteralPath $path -Force }
 }
@@ -30,7 +31,8 @@ foreach ($file in $files) {
     $relative = $relative.Replace($template.basePackage.Replace('.','\'),$BasePackage.Replace('.','\')).Replace($template.name,$Name)
     $target = Join-Path $destination $relative
     New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
-    if ($file.Extension -eq '.jar') { Copy-Item -LiteralPath $file.FullName -Destination $target }
+    # Shared skills retain their own names, links, and provenance in every project.
+    if ($file.Extension -eq '.jar' -or $relative -match '^\.agents[\\/]skills[\\/]') { Copy-Item -LiteralPath $file.FullName -Destination $target }
     else {
         $text = [IO.File]::ReadAllText($file.FullName).Replace($template.basePackage,$BasePackage).Replace($template.name,$Name).Replace($template.name.ToLowerInvariant(),$Name.ToLowerInvariant())
         [IO.File]::WriteAllText($target,$text,[Text.UTF8Encoding]::new($false))
