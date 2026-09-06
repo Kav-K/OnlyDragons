@@ -209,7 +209,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Draft PR #46; one lead-reviewed 1000-HP test dragon, immutable resolved references and inert sample table. Review fixes add owned abort restoration, author-maintained revision-label guidance and LF/CRLF fixture coverage. JDK 25 wrapper build passed 109 production tests with no failures/errors/skips; companion build passed. Focused Paper evidence pending. Per owner coordination, the lead will run the final combined suite and T02b checkpoint; no completed requirements or milestone/live dragon/reward acceptance claimed."
+      "notice": "Draft PR #46; clean runtime 90b5cf6775dcdf53003f89d1d5fb2cf7940edf58 includes main 4cfb7b9. 109 production tests, companion build, 92 checkpoint/suite tests and runtime-head Windows/Linux CI passed. Focused Paper: 30 positive assertions passed; abort control had 14 passes/one intended exception, restored the catalog and cleaned up. Exact evidence: docs/planning/evidence/t02b-focused-paper.md. Per owner coordination the lead owns the final combined suite and T02b automated acceptance checkpoint; no complete receipt, completed requirements or milestone/live dragon/reward acceptance claimed."
     },
     "T08a": {
       "status": "planned",
