@@ -65,9 +65,9 @@
     },
     {
       "id": "T06", "title": "Implement owned bow, shortbow and Duplex projectiles", "dependsOn": ["T01b", "T02", "T04"],
-      "scope": "Native drawn-bow capture, shortbow trigger/cooldown, one-time ammo/capacity reservation, immutable shot inputs, real Arrow registry and distinct Duplex child. Own firing/lifecycle subpackages of domain.projectile and paper.projectile.",
+      "scope": "Native drawn-bow capture, shortbow trigger/cooldown, one-time ammo/capacity reservation, immutable shot inputs, real Arrow registry and distinct Duplex child. Own firing/lifecycle subpackages of domain.projectile and paper.projectile, including the single physical-hit claim boundary, owned part-to-parent mapping, accepted T04 phase guard, native-damage suppression and arrow retirement. Publish that boundary for T08; do not own combat calculation or encounter presentation.",
       "acceptance": "Real Paper UUID traces show physical primary/child identity and ownership, no duplicate emission/consumption on cancellation or offhand events, exact one Duplex child, and cleanup after failures. Shot-time equipment verification uses T01b. Authenticated mouse/hold input remains a separate client gate.",
-      "coordination": "Use T04's accepted impact/event decisions. Keep issue #9 undispatched while T04 player-owned native suppression and semantic head/native-damage evidence remain unresolved; partial PR #22 or T09b calibration alone does not satisfy T04. Do not implement Tracer steering in this issue; publish registry contracts for T07."
+      "coordination": "Use T04's accepted impact/event decisions. Keep issue #9 undispatched until T04 player-owned native suppression evidence and the explicit supported part/phase policy are reviewed and accepted; partial PR #22 or T09b calibration alone does not satisfy T04. A uniform-part policy must not claim semantic-head damage scaling. Do not implement Tracer steering in this issue; publish registry contracts for T07."
     },
     {
       "id": "T07", "title": "Implement Dragon Tracer and continuous pre-spawn arrows", "dependsOn": ["T04", "T06"],
@@ -77,7 +77,7 @@
     },
     {
       "id": "T08", "title": "Integrate the playable dummy combat sandbox and explanations", "dependsOn": ["T01b", "T03", "T05", "T06"],
-      "scope": "Practice target, one physical damage adapter, native suppression per T04, stats/last-hit UI, development loadouts and deterministic scenario controls. Integrate one composition root and one command tree.",
+      "scope": "Practice target, stats/last-hit UI, development loadouts and deterministic scenario controls. Consume T06's single settled physical-hit boundary to call the shared combat/proc services and synchronize managed target HP/death. Do not register a second projectile-impact or native-suppression listener. Integrate one composition root and one command tree.",
       "acceptance": "Real owned-arrow hit changes managed HP/score once, cancellation grants neither damage nor duplicated consumption, reports agree with deterministic math, non-admin operations reject, and teardown is clean. A fresh main checkout builds and starts through existing Cursor Play/Run tasks with a documented in-game test sequence.",
       "coordination": "Integration-lead-owned bootstrap/descriptor/command registration. Revalidate latest main and existing status smoke checks before merge."
     },
