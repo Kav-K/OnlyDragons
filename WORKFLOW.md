@@ -149,7 +149,13 @@ than creating duplicate commits, comments, or pull requests.
    in the issue early; do not poll on every tool call or repeat unchanged comments.
 5. Run the feature's actual Paper scenarios using scripts/agent-tests/paper_test.py
    and dev/agent-paper-tests.md. Add meaningful scenario assertions for the
-   production feature; do not substitute a boot test for behavior. Inspect the
+   production feature. Await each Gradle-owning command's exit before starting
+   another in this checkout, and freeze source while its build/run is active.
+   For a multi-phase focused run, pass the catalog-appropriate bounded scenario
+   timeout explicitly; follow dev/agent-validation.md#build-and-memory-ownership.
+   Inspect the actual staged artifact when investigating an iteration. Do not
+   assume a later source edit was included in an already-started build. Do not
+   substitute a boot test for behavior. Inspect the
    fresh run/scenario report, artifact hashes and cleanup result. A busy lease
    or low-memory response means wait/retry within the runner's bounded policy,
    not bypass the gate or claim a pass. Record separate remaining client checks.
