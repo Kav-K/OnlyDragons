@@ -56,11 +56,67 @@ The lease coordinates these agent tests; Windows human play does not acquire
 it. Keep human sessions and heavy tests coordinated when memory is tight.
 
 Paper binds to loopback on a currently free ephemeral port. Authentication
-remains enabled; RCON, query, and JMX are disabled. Every run has a random ID,
+remains enabled by default; the explicitly named protocol-player mode below
+uses an offline synthetic identity in its new disposable profile only.
+RCON, query, and JMX are disabled. Every run has a random ID,
 its own world name, and only the production and game-test companion plugins.
 The runner controls its own JVM through stdin and waits for clean `stop` and
 exit. Failures, timeouts, and termination signals run that same cleanup; a
 forced termination fails validation. It never finds JVMs by name or PID lists.
+
+## Protocol player calibration
+
+The lead-authorized `--test-player protocol-calibration` option is accepted only
+with `--scenario protocol-player-calibration`. It creates a fresh loopback-only
+offline profile, whitelists one unique synthetic player, and launches the
+separate [pinned client](player-client/README.md). It does not modify
+`dev/server.properties`, human profiles, EULA acceptance, or account credentials.
+All other agent scenarios remain authenticated by default.
+
+```bash
+python3 scripts/agent-tests/paper_test.py \
+  --scenario protocol-player-calibration --test-player protocol-calibration
+```
+
+The client is a headless MCProtocolLib 26.2/protocol 776 process with a 256 MiB
+heap. The memory gate includes that heap before either process starts, giving
+a default admission requirement of 1536 + 256 + 1024 = 2816 MiB. The same shared
+lease covers both JVMs through client disconnection and Paper shutdown. Every
+staged client dependency is rehashed against the build's recorded bytes.
+
+The companion requires actual `PlayerJoinEvent` and offline UUID, a real
+selected-slot event, bow-use and release events with a full draw, native Arrow
+shooter identity and motion, and `PlayerQuitEvent` followed by removal from the
+online-player collection. Setup uses public Paper APIs; input comes from the
+protocol connection. No NMS, reflection, or manufactured callbacks are used.
+Owned listeners, tasks, chunks and arrows are cleaned up through the scenario
+context. These checks establish protocol input and server events, with human
+visuals and authenticated multiplayer still separate gates.
+
+The result also requires the client's complete, fresh `player.json` and exit 0.
+`player.log`, per-JAR hashes, dependency-lock/verification hashes, explicit
+authentication mode, client memory reservation and `playerCleanup` remain in
+the run report. Missing actions, early failure, a deadline, or forced termination
+fails the run even if Paper booted successfully.
+
+Two negative controls intentionally return exit **1** and must still clean up
+both owned processes and release the lease:
+
+```bash
+python3 scripts/agent-tests/paper_test.py \
+  --scenario protocol-player-calibration --test-player protocol-calibration \
+  --player-control early-exit
+python3 scripts/agent-tests/paper_test.py \
+  --scenario protocol-player-calibration --test-player protocol-calibration \
+  --player-control idle --scenario-timeout 15
+```
+
+`early-exit` disconnects after receiving the login packet; `idle` handles
+protocol housekeeping but sends no scenario actions. Neither option converts
+an expected failure into a pass. A caller must inspect the exact failure and
+both cleanup records. This initial calibration does not test OnlyDragons
+equipment services or player-owned dragon damage; those need their own
+integrated scenarios after the calibration is accepted.
 
 ## What the initial scenario proves
 

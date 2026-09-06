@@ -119,11 +119,13 @@ def validate_report(path, expected, issued_ms, deadline_ms, now_ms=None):
     return report
 
 
-def wait_for_report(path, expected, issued_ms, timeout, process):
+def wait_for_report(path, expected, issued_ms, timeout, process, client_process=None):
     deadline = time.monotonic() + timeout
     deadline_ms = issued_ms + int(timeout * 1000)
     while not path.exists():
         require(process.poll() is None, 'Paper exited before writing a scenario report')
+        if client_process is not None:
+            require(client_process.poll() in (None, 0), 'Protocol player exited unsuccessfully before scenario completion')
         require(time.monotonic() < deadline, 'Timed out waiting for a scenario report')
         time.sleep(0.1)
     require(time.monotonic() <= deadline, 'Scenario report arrived after its deadline')
@@ -168,10 +170,11 @@ def server_lease(directory, timeout):
         os.close(descriptor)
 
 
-def assess_memory(memory_mib, linux, windows_available=None):
+def assess_memory(memory_mib, linux, windows_available=None, client_memory_mib=0):
     """Account for already resident, reclaimable WSL cache without assuming it is all reusable."""
-    required = memory_mib + 1024
-    result = {'linuxMemoryMiB': linux, 'requiredMiB': required}
+    required = memory_mib + client_memory_mib + 1024
+    result = {'linuxMemoryMiB': linux, 'requiredMiB': required, 'paperHeapMiB': memory_mib,
+              'playerClientHeapMiB': client_memory_mib, 'combinedReserveMiB': 1024}
     enough = linux['MemAvailable'] >= required
     if windows_available is not None:
         reclaimable = min(max(0, linux['MemAvailable'] - linux['MemFree']),
@@ -196,19 +199,19 @@ def windows_available_memory():
         raise ValidationError('Cannot verify Windows host memory before starting WSL Paper') from error
 
 
-def available_memory(memory_mib):
+def available_memory(memory_mib, client_memory_mib=0):
     raw = dict(re.findall(r'^(\w+):\s+(\d+)\s+kB', Path('/proc/meminfo').read_text(), re.M))
     linux = {key: int(raw[key]) // 1024 for key in ('MemAvailable', 'MemFree', 'Buffers', 'Cached', 'SReclaimable', 'Shmem')}
     is_wsl = 'microsoft' in Path('/proc/sys/kernel/osrelease').read_text().lower()
-    return assess_memory(memory_mib, linux, windows_available_memory() if is_wsl else None)
+    return assess_memory(memory_mib, linux, windows_available_memory() if is_wsl else None, client_memory_mib)
 
 
-def wait_for_memory(memory_mib, timeout):
+def wait_for_memory(memory_mib, timeout, client_memory_mib=0):
     deadline = time.monotonic() + timeout
     announced = 0.0
     while True:
         try:
-            return available_memory(memory_mib)
+            return available_memory(memory_mib, client_memory_mib)
         except ResourceBusy as busy:
             if time.monotonic() >= deadline:
                 raise ResourceBusy(str(busy) + '; resource wait expired') from busy
@@ -330,6 +333,89 @@ class OwnedServer:
         return self.shutdown
 
 
+class OwnedPlayer(OwnedServer):
+    """The same PID/group ownership as Paper, with a client's different exit evidence."""
+    def stop(self, timeout=5):
+        result = super().stop(timeout)
+        result['clean'] = not result['forced'] and result['exitCode'] is not None
+        result['successfulExit'] = result['exitCode'] == 0
+        return result
+
+
+PLAYER_ARTIFACT = 'org.geysermc.mcprotocollib:protocol:26.2-20260824.124638-17'
+PLAYER_PROTOCOL_SHA256 = '07ec18ba92c8b4041286eeff2470e08257fd1f383881515cba4a0a9bf6fa98c1'
+
+
+def player_mode(mode, scenario, control):
+    require(mode in (None, 'protocol-calibration'), 'Unknown isolated player mode')
+    require(control in ('calibrate', 'early-exit', 'idle'), 'Unknown player failure control')
+    require((mode is not None) == (scenario == 'protocol-player-calibration'),
+            'Protocol player mode requires exactly the protocol-player-calibration scenario')
+    require(mode is not None or control == 'calibrate', 'Player failure controls require protocol player mode')
+    return mode is not None
+
+
+def test_settings(base, run_id, port, with_player=False):
+    """Return settings for a new disposable directory; never mutate a human/default file."""
+    settings = dict(base)
+    settings.update({'server-ip': '127.0.0.1', 'server-port': str(port),
+                     'online-mode': 'false' if with_player else 'true',
+                     'enable-rcon': 'false', 'enable-query': 'false', 'enable-jmx-monitoring': 'false',
+                     'level-name': 'agent-world-' + run_id, 'pause-when-empty-seconds': '-1'})
+    if with_player:
+        settings.update({'enforce-secure-profile': 'false', 'white-list': 'true', 'enforce-whitelist': 'true',
+                         'max-players': '1', 'allow-flight': 'true'})
+    return settings
+
+
+def validate_player_report(path, run_id, issued_ms, timeout):
+    report = strict_json(path)
+    require(isinstance(report, dict), 'Player report must be an object')
+    expected = {'schemaVersion': 1, 'runId': run_id, 'username': 'od_' + run_id[:13],
+                'authentication': 'offline-disposable-loopback', 'artifact': PLAYER_ARTIFACT,
+                'minecraftVersion': '26.2', 'protocolVersion': 776, 'loginReceived': True,
+                'playerLoadedSent': True, 'actions': ['select', 'draw', 'release', 'quit'],
+                'disconnected': True, 'passed': True, 'error': ''}
+    for key, value in expected.items():
+        require(json_values_equal(value, report.get(key)), 'Missing/failed player evidence: ' + key)
+    start, end = report.get('startedAtEpochMs'), report.get('completedAtEpochMs')
+    require(type(start) is int and type(end) is int and issued_ms <= start <= end <= issued_ms + timeout * 1000,
+            'Stale or timed-out player timestamps')
+    require(end <= int(time.time() * 1000) + 1000 and path.stat().st_mtime_ns // 1_000_000 >= issued_ms - 1000,
+            'Stale/future player report')
+    require(type(report.get('teleportsAcknowledged')) is int and report['teleportsAcknowledged'] > 0,
+            'Player did not acknowledge teleportation')
+    return report
+
+
+def build_player_client(project, java_home, report_root):
+    env = dict(os.environ, JAVA_HOME=str(java_home), GRADLE_USER_HOME=str(project / '.gradle/agent-home'))
+    env['PATH'] = str(java_home / 'bin') + os.pathsep + env.get('PATH', '')
+    with (report_root / 'build.log').open('a', encoding='utf-8') as log:
+        result = subprocess.run(['bash', str(project / 'gradlew'), '-p', 'dev/player-client', 'build', 'installDist',
+                                 '--dependency-verification', 'strict', '--console=plain'], cwd=project, env=env,
+                                stdout=log, stderr=subprocess.STDOUT, timeout=900)
+    require(result.returncode == 0, 'Player Gradle build or dependency verification failed; see build.log')
+    root = project / 'dev/player-client'
+    tests = list((root / 'build/test-results/test').glob('TEST-*.xml'))
+    require(tests, 'Player client JUnit evidence is missing')
+    counts = dict.fromkeys(('tests', 'failures', 'errors', 'skipped'), 0)
+    for file in tests:
+        suite = ET.parse(file).getroot()
+        for key in counts:
+            counts[key] += int(suite.attrib.get(key, '0'))
+    require(counts['tests'] > 0 and not any(counts[key] for key in ('failures', 'errors', 'skipped')),
+            'Player client tests failed, aborted, or skipped')
+    jars = sorted((root / 'build/install/OnlyDragonsPlayerClient/lib').glob('*.jar'))
+    hashes = {jar.name: sha256(jar) for jar in jars}
+    require('OnlyDragonsPlayerClient.jar' in hashes, 'Player client artifact is missing')
+    require(hashes.get('protocol-26.2-20260824.124638-17.jar') == PLAYER_PROTOCOL_SHA256,
+            'MCProtocolLib artifact differs from the verified exact 26.2 publication')
+    return jars, {'artifact': PLAYER_ARTIFACT, 'jars': hashes, 'unitTests': counts,
+                  'lockSha256': sha256(root / 'gradle.lockfile'),
+                  'verificationMetadataSha256': sha256(root / 'gradle/verification-metadata.xml')}
+
+
 def fetch_paper(project, pins, supplied):
     expected = pins['paperSha256']
     require(re.fullmatch(r'[a-f0-9]{64}', expected), 'Invalid pinned Paper SHA256')
@@ -390,7 +476,9 @@ def execute(args):
     outcome = {'schemaVersion': 1, 'runId': run_id, 'scenarioId': args.scenario, 'passed': False,
                'startedAtEpochMs': int(time.time() * 1000), 'error': None, 'cleanup': None}
     server = None
+    client = None
     try:
+        with_player = player_mode(args.test_player, args.scenario, args.player_control)
         accepted_eula(args.eula_file)
         require(args.lease_directory is not None, 'Supply the operator-provisioned shared lease directory')
         require(args.java_home is not None, 'Supply JDK via --java-home or JAVA_HOME')
@@ -409,9 +497,11 @@ def execute(args):
         main, companion, build = build_artifacts(project, java_home, report_root)
         outcome['build'] = build
         outcome['artifacts'] = {'productionSha256': sha256(main), 'gameTestsSha256': sha256(companion)}
+        if with_player:
+            client_jars, outcome['playerBuild'] = build_player_client(project, java_home, report_root)
         paper = fetch_paper(project, pins, args.paper_jar)
         with server_lease(args.lease_directory.resolve(), args.lease_timeout):
-            outcome['memory'] = wait_for_memory(args.memory_mib, args.resource_timeout)
+            outcome['memory'] = wait_for_memory(args.memory_mib, args.resource_timeout, 256 if with_player else 0)
             directory = project / 'run/agent-tests' / run_id
             directory.mkdir(parents=True, exist_ok=False)
             plugins = directory / 'plugins'
@@ -421,15 +511,25 @@ def execute(args):
             stage_artifact(paper, directory / 'server.jar', pins['paperSha256'])
             shutil.copyfile(args.eula_file, directory / 'eula.txt')
             port = free_port()
-            settings = properties(project / 'dev/server.properties')
-            settings.update({'server-ip': '127.0.0.1', 'server-port': str(port), 'online-mode': 'true',
-                             'enable-rcon': 'false', 'enable-query': 'false', 'enable-jmx-monitoring': 'false',
-                             'level-name': 'agent-world-' + run_id, 'pause-when-empty-seconds': '-1'})
+            settings = test_settings(properties(project / 'dev/server.properties'), run_id, port, with_player)
+            if with_player:
+                client_dir = directory / 'player-client'
+                client_dir.mkdir()
+                for jar in client_jars:
+                    stage_artifact(jar, client_dir / jar.name, outcome['playerBuild']['jars'][jar.name])
+                player_name = 'od_' + run_id[:13]
+                offline_id = bytearray(hashlib.md5(('OfflinePlayer:' + player_name).encode()).digest())
+                offline_id[6] = (offline_id[6] & 0x0f) | 0x30
+                offline_id[8] = (offline_id[8] & 0x3f) | 0x80
+                atomic_json(directory / 'whitelist.json', [{'uuid': str(uuid.UUID(bytes=bytes(offline_id))), 'name': player_name}])
             (directory / 'server.properties').write_text(''.join(f'{key}={value}\n' for key, value in settings.items()), encoding='utf-8')
-            outcome['profile'] = {'directory': str(directory), 'port': port, 'world': settings['level-name']}
+            outcome['profile'] = {'directory': str(directory), 'port': port, 'world': settings['level-name'],
+                                  'authentication': 'offline-disposable-loopback' if with_player else 'authenticated',
+                                  'testPlayerMode': args.test_player}
             command = [str(java_home / 'bin/java'), f'-Xmx{args.memory_mib}m', '-Xms256m', '-XX:ActiveProcessorCount=2',
                        '-Dfile.encoding=UTF-8', '-Dterminal.jline=false', '-Dterminal.ansi=false',
-                       f'-Donlydragons.test.runId={run_id}', '-jar', 'server.jar', '--nogui']
+                       f'-Donlydragons.test.runId={run_id}', f'-Donlydragons.test.playerMode={args.test_player or ""}',
+                       '-jar', 'server.jar', '--nogui']
             try:
                 print(f'Starting isolated Paper at 127.0.0.1:{port}', flush=True)
                 blocked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGINT, signal.SIGTERM})
@@ -446,13 +546,32 @@ def execute(args):
                 expected = dict(scenario, runId=run_id, scenarioId=args.scenario,
                                 minecraftVersion=pins['minecraftVersion'], paperBuild=pins['paperBuild'])
                 scenario_path = plugins / 'OnlyDragonsGameTests/report.json'
-                outcome['scenario'] = wait_for_report(scenario_path, expected, issued_ms, args.scenario_timeout, server.process)
+                if with_player:
+                    server.wait_text('OD_PLAYER_READY ' + run_id, min(args.scenario_timeout, 10))
+                    client_command = [str(java_home / 'bin/java'), '-Xmx256m', '-Xms32m', '-XX:ActiveProcessorCount=2',
+                                      '-Dfile.encoding=UTF-8', '-cp', str(client_dir / '*'),
+                                      'com.kaveenk.onlydragons.playerclient.ProtocolPlayer', run_id, str(port),
+                                      str(report_root / 'player.json'), str(args.scenario_timeout), args.player_control]
+                    blocked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGINT, signal.SIGTERM})
+                    try:
+                        client = OwnedPlayer(client_command, directory, report_root / 'player.log')
+                    finally:
+                        signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
+                outcome['scenario'] = wait_for_report(scenario_path, expected, issued_ms, args.scenario_timeout,
+                                                      server.process, client.process if client else None)
+                if client:
+                    require(client.process.wait(timeout=5) == 0, 'Protocol player exited unsuccessfully')
+                    outcome['player'] = validate_player_report(report_root / 'player.json', run_id, issued_ms, args.scenario_timeout)
             finally:
                 if server is not None:
                     # Ignore a repeated termination while saving this runner's own disposable world.
                     previous = {item: signal.signal(item, signal.SIG_IGN) for item in (signal.SIGTERM, signal.SIGINT)}
                     try:
-                        outcome['cleanup'] = server.stop()
+                        try:
+                            if client is not None:
+                                outcome['playerCleanup'] = client.stop()
+                        finally:
+                            outcome['cleanup'] = server.stop()
                     finally:
                         for item, handler in previous.items():
                             signal.signal(item, handler)
@@ -460,6 +579,8 @@ def execute(args):
                 if raw_report.is_file():
                     shutil.copyfile(raw_report, report_root / 'scenario.json')
             require(outcome['cleanup'] and outcome['cleanup']['clean'], 'Paper did not stop cleanly')
+            if with_player:
+                require(outcome.get('playerCleanup', {}).get('clean'), 'Protocol player did not stop cleanly')
             errors = [line for line in server.text().splitlines() if re.search(r'(?:/ERROR\]|\bSEVERE\]|OD_GAME_TEST_REPORT_ERROR|Error occurred while (?:enabling|disabling)|Could not load|Failed to start the minecraft server)', line)]
             require(not errors, 'Paper logged errors: ' + '\n'.join(errors[:10]))
             outcome['passed'] = True
@@ -482,6 +603,9 @@ def main():
     parser.add_argument('--lease-directory', type=Path, default=os.environ.get('ONLYDRAGONS_TEST_COORDINATION'))
     parser.add_argument('--java-home', type=Path, default=os.environ.get('JAVA_HOME'))
     parser.add_argument('--paper-jar', type=Path, default=os.environ.get('ONLYDRAGONS_TEST_PAPER_JAR'))
+    parser.add_argument('--test-player', choices=['protocol-calibration'], help='Explicit disposable loopback offline actor mode')
+    parser.add_argument('--player-control', choices=['calibrate', 'early-exit', 'idle'], default='calibrate',
+                        help='Negative client controls always fail validation; default performs the calibration')
     def bounded(minimum, maximum):
         def parse(value):
             number = int(value)
