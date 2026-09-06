@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "planId": "tracer-continuity-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "first",
+          "steps": [
+            {
+              "id": "prefire-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "prefire-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "level1-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "level1-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "level2-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "level2-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "level3-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "level3-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "level4-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "level4-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "level5-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "level5-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "loss-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "loss-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "wall-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "wall-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "crossing-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "crossing-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "end",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

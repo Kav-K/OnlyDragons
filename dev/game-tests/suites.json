@@ -116,6 +116,16 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
+    },
+    "tracer-continuity": {
+      "scenarioId": "tracer-continuity",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
+    },
+    "tracer-cleanup-abort": {
+      "scenarioId": "tracer-cleanup-abort",
+      "expectation": "cleanup-abort"
     }
   },
   "suites": {
@@ -135,7 +145,8 @@
       "same-profile-restart",
       "enchants-procs",
       "dragon-definitions",
-      "owned-firing"
+      "owned-firing",
+      "tracer-continuity"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -145,7 +156,8 @@
       "protocol-player-idle",
       "headless-player-cleanup-abort",
       "same-profile-restart-abort",
-      "dragon-definitions-abort"
+      "dragon-definitions-abort",
+      "tracer-cleanup-abort"
     ],
     "all": [
       "lifecycle-calibration",
@@ -171,7 +183,9 @@
       "enchants-procs",
       "dragon-definitions",
       "dragon-definitions-abort",
-      "owned-firing"
+      "owned-firing",
+      "tracer-continuity",
+      "tracer-cleanup-abort"
     ]
   },
   "areas": {
@@ -224,7 +238,9 @@
         "enchants-procs",
         "dragon-definitions",
         "dragon-definitions-abort",
-        "owned-firing"
+        "owned-firing",
+        "tracer-continuity",
+        "tracer-cleanup-abort"
       ],
       "affects": [
         "stats",
@@ -305,7 +321,9 @@
         "projectile-cleanup-failure",
         "projectile-cleanup-abort",
         "projectile-player-feasibility",
-        "owned-firing"
+        "owned-firing",
+        "tracer-continuity",
+        "tracer-cleanup-abort"
       ],
       "affects": []
     },
@@ -342,7 +360,9 @@
         "lifecycle-calibration",
         "dragon-definitions",
         "dragon-definitions-abort",
-        "owned-firing"
+        "owned-firing",
+        "tracer-continuity",
+        "tracer-cleanup-abort"
       ],
       "affects": [
         "shared-contracts",
@@ -405,7 +425,9 @@
         "enchants-procs",
         "dragon-definitions",
         "dragon-definitions-abort",
-        "owned-firing"
+        "owned-firing",
+        "tracer-continuity",
+        "tracer-cleanup-abort"
       ],
       "affects": []
     },
@@ -452,6 +474,21 @@
       "cases": [
         "dragon-definitions",
         "dragon-definitions-abort"
+      ],
+      "affects": []
+    },
+    "tracer-continuity": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/domain/projectile/homing/**",
+        "src/main/java/com/kaveenk/onlydragons/paper/projectile/homing/**",
+        "src/test/java/com/kaveenk/onlydragons/domain/projectile/homing/**",
+        "src/test/java/com/kaveenk/onlydragons/paper/projectile/homing/**",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/projectile/homing/**",
+        "dev/game-tests/player-plans/tracer-continuity-v1.json"
+      ],
+      "cases": [
+        "tracer-continuity",
+        "tracer-cleanup-abort"
       ],
       "affects": []
     }

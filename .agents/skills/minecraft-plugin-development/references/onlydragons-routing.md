@@ -15,7 +15,7 @@ return to these sections as the assigned implementation or review requires:
 | Stats, PDC item schemas, weapon/enchant identity | Document 02 sections 3–5; document 03 T01/T02 and deterministic acceptance matrix |
 | Physical collision authority, multipart dragons, native damage | Document 02 section 6; document 03 T04 and real-Paper scenarios P01–P04/P13 |
 | Damage versus contribution, proc ancestry, snapshot/expiry timing | Document 02 sections 5–8; document 03 T03/T05 and deterministic acceptance matrix |
-| Real arrow identity, firing, homing, chunk/lifecycle ownership | Document 02 section 9; document 03 T06/T07 and scenarios P05–P11 |
+| Real arrow identity, firing, homing, chunk/lifecycle ownership | Document 02 section 9; document 03 T06/T07 and scenarios P05–P11; `docs/planning/evidence/t07-tracer.md` for shared ticket/admission APIs and separate MockBukkit/Paper evidence |
 | Prefire, reproducible traces, human input, performance | Document 02 sections 10/12; document 03 T09/T10 and sections 5–7 |
 | Test-dragon catalogs and inert versioned table/item bindings | Document 02 T02b contract; document 03 T02b; `src/main/resources/encounters/README.md`; no live phase or reward acceptance |
 | Later summon transactions and progression | Document 02 section 11; document 03 T11/T12 and their dependencies |

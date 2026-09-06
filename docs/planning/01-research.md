@@ -144,6 +144,17 @@ World/entity mutation belongs on the server thread; asynchronous work is for imm
 
 API signatures do **not** prove multipart collision delivery, seated-dragon arrow behavior, exact event ordering, or same-tick damage behavior. The implementation plan starts with a bounded real-Paper experiment for those uncertainties. MockBukkit remains valuable for lifecycle, commands, inventory metadata, and event routing, but it is not a physics simulator.
 
+### T07 public API and fixture boundary (Paper 121)
+
+**Inspected, 6 September 2026:** the resolved pinned API binary exposes
+`AbstractArrow.getLifetimeTicks`/`setLifetimeTicks`. Public plugin tickets are
+unique per plugin/chunk, requiring shared reference counting for multiple
+OnlyDragons consumers. T07 therefore uses a shared broker and does not remove
+pre-existing same-plugin tickets. MockBukkit's plugin-ticket call aborted its
+initial test; pure broker tests use an injected native boundary and actual ticket
+behavior is verified separately on Paper. [T07 contract and evidence status](evidence/t07-tracer.md).
+This adds no claim about Hypixel steering, long-term persistence or performance.
+
 ### T06 native ammunition API inspection (Paper 121)
 
 **Inspected, 6 September 2026:** the pinned API marks the bow event's

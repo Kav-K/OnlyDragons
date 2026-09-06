@@ -7,6 +7,8 @@ import com.kaveenk.onlydragons.domain.item.*;
 import com.kaveenk.onlydragons.domain.projectile.*;
 import com.kaveenk.onlydragons.domain.stats.StatKey;
 import com.kaveenk.onlydragons.paper.item.codec.ItemReadResult;
+import com.kaveenk.onlydragons.domain.projectile.homing.TracerRules;
+import com.kaveenk.onlydragons.paper.projectile.homing.ArrowContinuity;
 import com.kaveenk.onlydragons.paper.item.equipment.EquipmentStatsService;
 import java.util.*;
 import java.util.function.Consumer;
@@ -24,6 +26,8 @@ import org.bukkit.util.Vector;
 public final class OwnedBowService implements AutoCloseable {
     public enum Retirement { HIT, MISS, FAILED_LAUNCH, REMOVED, ARENA_EXIT, OWNER_DEATH, RESET, DISABLE }
     public record Trace(String kind, UUID projectileId, UUID ownerId, long tick, String detail) {}
+    public record AdmittedArena(UUID encounterId, UUID worldId, TracerRules.Box bounds, MechanicRevision mechanic) {}
+    public record AdmittedTarget(UUID encounterId, UUID targetId, UUID entityId, TracerRules.Box bounds) {}
     private record Arena(UUID id, World world, BoundingBox bounds, MechanicRevision mechanic) {
         boolean contains(Location l) { return world.equals(l.getWorld()) && bounds.contains(l.toVector()); }
     }
@@ -65,6 +69,7 @@ public final class OwnedBowService implements AutoCloseable {
     private final EquipmentStatsService equipment;
     private final RandomSource random;
     private final ArrowRegistry registry;
+    private final ArrowContinuity continuity;
     private final Map<UUID, Arena> arenas = new LinkedHashMap<>();
     private final Map<UUID, Target> targets = new HashMap<>();
     private final Map<UUID, UUID> sessions = new HashMap<>();
@@ -84,6 +89,7 @@ public final class OwnedBowService implements AutoCloseable {
     public OwnedBowService(JavaPlugin plugin, EquipmentStatsService equipment, int capacity, RandomSource random) {
         this.plugin = Objects.requireNonNull(plugin); this.equipment = Objects.requireNonNull(equipment);
         this.random = Objects.requireNonNull(random); registry = new ArrowRegistry(capacity);
+        continuity = new ArrowContinuity(plugin);
     }
     public void start() {
         check(); if (task != null) throw new IllegalStateException("Already started");
@@ -95,6 +101,7 @@ public final class OwnedBowService implements AutoCloseable {
         if (arenas.containsKey(id) || bounds.getVolume() <= 0 || arenas.values().stream()
                 .anyMatch(a -> a.world().equals(world) && a.bounds().overlaps(bounds)))
             throw new IllegalArgumentException("Duplicate/overlapping/empty arena");
+        continuity.tickets().reserve(id, world, box(bounds));
         Arena arena = new Arena(id, world, bounds.clone(), mechanic); arenas.put(id, arena);
         Bukkit.getOnlinePlayers().stream().filter(p -> arena.contains(p.getLocation())).forEach(this::activate);
     }
@@ -119,6 +126,16 @@ public final class OwnedBowService implements AutoCloseable {
     public Optional<OwnedProjectile> projectile(UUID id) { thread(); return registry.lookup(id); }
     /** Live entity access for T07 steering, on the server thread only. Never transfers ownership. */
     public Optional<Arrow> arrow(UUID id) { thread(); return Optional.ofNullable(entities.get(id)); }
+    /** Defensive values only; no mutable arena maps, bounds, or target entities escape. */
+    public List<AdmittedArena> admittedArenas() {
+        thread(); return arenas.values().stream().map(a -> new AdmittedArena(a.id(), a.world().getUID(), box(a.bounds()), a.mechanic())).toList();
+    }
+    public List<AdmittedTarget> admittedTargets(UUID encounter) {
+        thread(); Arena arena = arenas.get(encounter); if (arena == null) return List.of();
+        return targets.values().stream().filter(t -> t.encounter().equals(encounter))
+                .map(t -> new AdmittedTarget(encounter, t.id(), t.entity().getUniqueId(), box(arena.bounds()))).toList();
+    }
+    public ArrowContinuity continuity() { thread(); return continuity; }
     public int capacityUsed() { thread(); return registry.used(); }
     public int reservedCapacity() { thread(); return registry.reserved(); }
     public int pendingGroups() { thread(); return groups.size(); }
@@ -170,6 +187,7 @@ public final class OwnedBowService implements AutoCloseable {
             Player player = Bukkit.getPlayer(owner);
             if (id.equals(sessionArenas.get(owner))) clearSession(owner, sessions.get(owner), false);
         }
+        continuity.tickets().endArena(id);
     }
     void drawn(EntityShootBowEvent event) {
         check(); if (!(event.getEntity() instanceof Player player)) return;
@@ -267,6 +285,16 @@ public final class OwnedBowService implements AutoCloseable {
             if (arrow == null || !arrow.isValid() || arrow.isDead()) retire(id, Retirement.REMOVED);
             else if (arena == null || !arena.contains(arrow.getLocation())) retire(id, Retirement.ARENA_EXIT);
             else if (arrow.isInBlock() || arrow.isOnGround()) retire(id, Retirement.MISS);
+            else {
+                String previous = continuity.frame(id).flatMap(f -> f.aim()).map(a -> a.part().targetId() + ":" + a.part().partId()).orElse("");
+                continuity.tick(owned, arrow, admittedTargets(owned.shot().encounterId()), tick);
+                var aim = continuity.frame(id).orElseThrow().aim();
+                String current = aim.map(a -> a.part().targetId() + ":" + a.part().partId()).orElse("");
+                if (!previous.equals(current)) {
+                    if (!previous.isEmpty()) record("tracer-released", owned, previous);
+                    if (!current.isEmpty()) record("tracer-acquired", owned, TracerRules.REVISION + " target:part=" + current + " distance=" + aim.orElseThrow().distance());
+                }
+            }
         }
     }
     private void shortbow(Player player) {
@@ -413,6 +441,7 @@ public final class OwnedBowService implements AutoCloseable {
             if (group != null && (reason == Retirement.MISS || reason == Retirement.HIT)) group.physicalRetirement = true;
         });
         registry.retire(id); candidates.remove(id);
+        continuity.retire(id);
         Arrow arrow = entities.remove(id); if (arrow != null) arrow.remove();
         owned.ifPresent(value -> record("retired", value, reason.name()));
     }
@@ -427,6 +456,7 @@ public final class OwnedBowService implements AutoCloseable {
     private void feedback(Player player, String message) { player.sendActionBar(net.kyori.adventure.text.Component.text(message)); }
     private Arena requireArena(UUID id) { return Objects.requireNonNull(arenas.get(id), "Encounter not admitted"); }
     private Arena arena(Location location) { return arenas.values().stream().filter(a -> a.contains(location)).findFirst().orElse(null); }
+    private static TracerRules.Box box(BoundingBox bounds) { return new TracerRules.Box(vector(bounds.getMin()), vector(bounds.getMax())); }
     private static Vector3 vector(Vector value) { return new Vector3(value.getX(), value.getY(), value.getZ()); }
     private static long now() { return Integer.toUnsignedLong(Bukkit.getCurrentTick()); }
     private static void thread() { if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Firing requires server thread"); }
@@ -435,6 +465,7 @@ public final class OwnedBowService implements AutoCloseable {
         thread(); if (closed) return;
         for (Group group : List.copyOf(groups.values())) fail(group);
         for (UUID id : List.copyOf(entities.keySet())) retire(id, Retirement.DISABLE);
+        continuity.close();
         closed = true; if (task != null) task.cancel(); task = null;
         registry.clear(); candidates.clear(); inputs.clear(); holds.clear(); sessions.clear(); sessionArenas.clear(); cooldowns.clear(); targets.clear(); arenas.clear(); receiver = null;
     }
