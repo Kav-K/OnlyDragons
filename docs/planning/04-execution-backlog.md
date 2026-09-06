@@ -15,8 +15,8 @@ part of the worker's scope.
 
 | Task | GitHub issue | Start after | Owned result |
 | --- | --- | --- | --- |
-| T00 | [#1](https://github.com/Kav-K/OnlyDragons/issues/1) | None; started locally | Shared domain contracts. PR #15 is in review; actual Paper fixture remains a gate. |
-| T09a | [#2](https://github.com/Kav-K/OnlyDragons/issues/2) | None; started locally | Isolated runner, independent Paper companion and strict reports. |
+| T00 | [#1](https://github.com/Kav-K/OnlyDragons/issues/1) | Complete: PR #15 merged at be920d0 | Shared contracts; 21 production tests and 29 actual-Paper assertions passed, independent review and final CI passed. |
+| T09a | [#2](https://github.com/Kav-K/OnlyDragons/issues/2) | Complete: PR #16 merged at 140f11c | Isolated runner; positive and deliberate-failure controls, independent review, and CI passed. |
 | T01a | [#3](https://github.com/Kav-K/OnlyDragons/issues/3) | T00, T09a | Base stat resolver and immutable explained snapshots. |
 | T02 | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | T00, T09a | Item definitions, codec/PDC and enchant validation. |
 | T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | T00, T09a | Real arrow/dragon feasibility findings. |
@@ -33,6 +33,7 @@ part of the worker's scope.
 Symphony has three coding slots. Label only tasks whose prerequisites are
 integrated into main and whose manual gates are satisfied. The local T00/T09a
 agents already own their issues; do not label them for a duplicate worker.
+The next eligible wave is #3, #4, and #5; their prerequisites are integrated.
 All server scenarios share one lease and obey the memory gate, regardless of
 how many agents are coding. A ready branch is not a satisfied dependency.
 
@@ -43,6 +44,13 @@ how many agents are coding. A ready branch is not a satisfied dependency.
 2. Stabilize shared types through T00. Feature agents own separate packages;
    codec and equipment work have distinct paths. The lead coordinates bootstrap,
    descriptor, Gradle/pins, shared DTOs and top-level command registration.
+   For #3/#4/#5, the lead delegates additive registrations of each owned scenario
+   in GameTestsPlugin.java and scenarios.json. Publish the scenario descriptor,
+   preserve every existing entry, include all cleanup assertions, and reconcile
+   shared additions after merging main. Core harness changes remain coordinated.
+   #3 owns new stats resolver/profile/resources; #4 owns new trusted item/enchant
+   registries, codec/presentation/resources. Weapon base damage is supplied once;
+   item data does not construct snapshots or classify untrusted PDC as ultimate.
 3. Before final verification, fetch and merge current main into the issue
    branch. Resolve conflicts by preserving and reconciling both features, then
    rerun affected tests. Do not force-push published history or copy whole context
