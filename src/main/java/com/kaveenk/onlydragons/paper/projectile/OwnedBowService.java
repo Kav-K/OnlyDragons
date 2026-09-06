@@ -355,7 +355,10 @@ public final class OwnedBowService implements AutoCloseable {
         ShotContext shot = new ShotContext(group.arena.id(), group.id, arrow.getUniqueId(), 0, Optional.empty(),
                 player.getUniqueId(), item.instance().identity(), inspection.stats().snapshot(), item.enchantments(),
                 group.arena.mechanic(), now(), vector(arrow.getLocation().toVector()), vector(arrow.getVelocity()),
-                new CritResolver().roll(inspection.stats().snapshot(), random), force, 1);
+                new CritResolver().roll(inspection.stats().snapshot(), random), force, 1,
+                com.kaveenk.onlydragons.domain.enchant.OverloadCapture.roll(
+                        com.kaveenk.onlydragons.domain.enchant.EnchantEffects.level(item.enchantments(), "overload", 5),
+                        inspection.stats().snapshot(), random));
         return new OwnedProjectile(shot, group.session,
                 com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile.forDefinition(item.definition().weapon()), shot.launchTick());
     }

@@ -4,7 +4,7 @@ package com.kaveenk.onlydragons.domain.item;
 public final class ItemValidationException extends IllegalArgumentException {
     public enum Code {
         MALFORMED_DATA, UNSUPPORTED_SCHEMA, REVISION_MISMATCH, UNKNOWN_DEFINITION,
-        UNKNOWN_ENCHANT, INVALID_LEVEL, INCOMPATIBLE_ENCHANT,
+        UNKNOWN_ENCHANT, UNAVAILABLE_ENCHANT, INVALID_LEVEL, INCOMPATIBLE_ENCHANT,
         MULTIPLE_ULTIMATES, UNKNOWN_ROLL, DUPLICATE_ROLL, WRONG_MATERIAL, INVALID_AMOUNT
     }
     private final Code code;

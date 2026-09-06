@@ -116,6 +116,6 @@ class EnchantRulesTest {
         return new ShotContext(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), 0, Optional.empty(), UUID.randomUUID(),
                 new WeaponIdentity(UUID.randomUUID(), "test", 1, "v1"), stats,
                 List.of(new WeaponDefinition.Enchantment(enchant, level, WeaponDefinition.EnchantmentKind.ORDINARY)),
-                CombatProfile.calibration().mechanic(), 0, new Vector3(0, 0, 0), new Vector3(1, 0, 0), CritOutcome.CRITICAL, 1, 1);
+                CombatProfile.calibration().mechanic(), 0, new Vector3(0, 0, 0), new Vector3(1, 0, 0), CritOutcome.CRITICAL, 1, 1, enchant.equals("overload") ? OverloadCapture.roll(level, stats, () -> .99) : OverloadCapture.absent());
     }
 }

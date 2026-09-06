@@ -24,7 +24,7 @@ public final class EquipmentStatsScenario implements Scenario {
             context.check("server_thread", true, Bukkit.isPrimaryThread());
             context.check("production_service", true, stats != null && EquipmentStatsService.class.getClassLoader()
                     == context.production().getClass().getClassLoader());
-            var expectedTotals = Map.of(
+            var expectedTotals = new TreeMap<>(Map.of(
                     "ordinary", List.of(100.0, 50.0, 0.0, 0.0),
                     "crit", List.of(100.0, 50.0, 100.0, 0.0),
                     "ferocity_25", List.of(100.0, 50.0, 0.0, 25.0),
@@ -33,8 +33,13 @@ public final class EquipmentStatsScenario implements Scenario {
                     "tracer", List.of(100.0, 50.0, 0.0, 0.0),
                     "duplex", List.of(100.0, 50.0, 0.0, 0.0),
                     "fatal_tempo", List.of(100.0, 50.0, 0.0, 25.0),
-                    "shortbow_v1", List.of(100.0, 50.0, 0.0, 0.0),
-                    "tracer_return_v2", List.of(100.0, 50.0, 0.0, 0.0));
+                    "shortbow_v1", List.of(100.0, 50.0, 0.0, 0.0)));
+            // Explicit v3 calibration oracle; legacy totals and IDs remain required.
+            new TreeMap<>(expectedTotals).forEach((id, totals) -> expectedTotals.put(id + "_v3", totals));
+            // Returning Tracer has its own v2 identity; it is not one of the nine v3 clones.
+            expectedTotals.put("tracer_return_v2", List.of(100.0, 50.0, 0.0, 0.0));
+            expectedTotals.put("overload_v3", List.of(100.0, 55.0, 200.0, 0.0));
+            expectedTotals.put("gravity_v3", List.of(100.0, 50.0, 0.0, 0.0));
             var expectedIds = new TreeSet<>(expectedTotals.keySet());
             var actualIds = new TreeSet<>(stats.loadouts());
             context.check("all_loadout_ids", List.copyOf(expectedIds), List.copyOf(actualIds));

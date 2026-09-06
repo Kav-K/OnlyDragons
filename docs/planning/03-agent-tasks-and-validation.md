@@ -9,8 +9,8 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 [Checkpoint 2](07-checkpoint-two.md): T05b/#66 is complete through merged
 [PR #73](https://github.com/Kav-K/OnlyDragons/pull/73) at `29f0cf3`, accepting exactly
 `fatal-tempo-ghost-scaling`, P08 and P09 after the verified 34-case hosted cohort;
-[full evidence](evidence/t05b-suite.md). T03b/#67 is active and lead-assigned with
-its prerequisites integrated; Symphony dispatch follows the lead's label.
+[full evidence](evidence/t05b-suite.md). T03b/#67 is In review in [PR #79](https://github.com/Kav-K/OnlyDragons/pull/79),
+with focused evidence and final combined acceptance pending.
 T08d/#64 and T08e/#65 are In review pending their combined current-input cohort.
 Their [combined integration evidence](evidence/checkpoint2-ui-flight.md) records
 the focused pass and the first complete-cohort failure; no acceptance is implied.
@@ -108,6 +108,25 @@ T03b/#67 is active and lead-assigned with T05b/T06 integrated; the lead applies
 its Symphony label after this context is reconciled. T08d/T08e remain In review
 pending their combined cohort, and T06c/T06b/T02c remain planned. Human appearance,
 authenticated compatibility, balance/feel and M1–M5 remain unaccepted.
+
+### T03b — Expanded bow enchants (GH-67)
+
+**In review**, [PR #79](https://github.com/Kav-K/OnlyDragons/pull/79), branch
+`symphony/gh-67`. Clean runtime `5bdb0ee` includes main `a1070cc`; T05b/T06
+prerequisites are integrated. The [contract](02-foundation-plan.md#t03b-expanded-bow-contract-gh-67)
+preserves old items/shots and ten descriptors; IQ/Flame remain unavailable for T06c.
+
+[Focused evidence and failed iterations](evidence/t03b-focused-paper.md): 275
+production / six companion / 28 client tests; expanded-bow 49, equipment 25,
+catalog 30 assertions and the exact 15-row catalog-abort control, with clean owned
+JVM/resource cleanup. Real releases/collisions, fixture-controlled profiles/paused
+swap arrows and injected positive native damage remain explicitly distinguished.
+Static plan and changed-area selection pass. PR76 main integration and any affected
+focused rerun remain pending. The lead owns the final current-input hosted
+cohort/replay/T03b acceptance checkpoint per its issue instruction; no duplicate
+local cohort or automated/milestone acceptance is claimed. Independent review/CI,
+Windows smoke, authenticated-client visuals/feel and performance remain separate.
+Next dependency: T06c consumes descriptors and the existing firing authority.
 
 ## Shared context update protocol
 

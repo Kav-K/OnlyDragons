@@ -61,7 +61,7 @@ public final class ManagedCombatService implements AutoCloseable {
     private final List<Consumer<SettledHit>> observers = new ArrayList<>();
     private final java.util.function.Predicate<UUID> protection = this::ownsEntity;
     private final Consumer<SettledHit> receiver = this::receive;
-    private final EnchantEffects effects = EnchantEffects.calibration();
+    private final EnchantEffects effects = EnchantEffects.checkpointTwo();
     private BukkitTask task;
     private boolean closed, notifying;
     private final ArrayDeque<String> diagnostics = new ArrayDeque<>();

@@ -291,6 +291,17 @@ These packet observations still do not establish rendered-client smoothness.
 [The pinned public API](https://jd.papermc.io/paper/26.2/org/bukkit/entity/Entity.html)
 supplies the position adapter; no NMS/reflection is used by production or fixtures.
 
+### T03b declared expanded calibration
+
+The owner selected explicit Overload/Gravity tables on 6 September 2026 before
+implementation in [GH-67](https://github.com/Kav-K/OnlyDragons/issues/67#issuecomment-5561931960).
+These are **OnlyDragons decisions**, with no new claim about upstream internals.
+The [implementation contract](02-foundation-plan.md#t03b-expanded-bow-contract-gh-67)
+resolves our formerly deferred probability, multiplier order, Gravity VI and
+AIRBORNE classification. Earlier T05 evidence retains its original limited scope.
+[Focused Paper evidence](evidence/t03b-focused-paper.md) verifies the declared
+physical controls; final combined acceptance remains pending in T03b's ledger.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

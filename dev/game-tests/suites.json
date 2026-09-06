@@ -201,6 +201,12 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
+    },
+    "expanded-bow": {
+      "scenarioId": "expanded-bow",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
     }
   },
   "suites": {
@@ -234,7 +240,8 @@
       "dragon-motion-experiment",
       "dragon-flight",
       "moving-tracer",
-      "dragon-restart-moving"
+      "dragon-restart-moving",
+      "expanded-bow"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -286,7 +293,8 @@
       "dragon-motion-experiment",
       "dragon-flight",
       "moving-tracer",
-      "dragon-restart-moving"
+      "dragon-restart-moving",
+      "expanded-bow"
     ]
   },
   "areas": {
@@ -354,7 +362,8 @@
         "dragon-motion-experiment",
         "dragon-flight",
         "moving-tracer",
-        "dragon-restart-moving"
+        "dragon-restart-moving",
+        "expanded-bow"
       ],
       "affects": [
         "stats",
@@ -559,7 +568,8 @@
         "dragon-motion-experiment",
         "dragon-flight",
         "moving-tracer",
-        "dragon-restart-moving"
+        "dragon-restart-moving",
+        "expanded-bow"
       ],
       "affects": []
     },
@@ -707,6 +717,17 @@
       ],
       "cases": [
         "dragon-presentation"
+      ],
+      "affects": []
+    },
+    "expanded-bow": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/domain/enchant/OverloadCapture.java",
+        "src/test/java/com/kaveenk/onlydragons/domain/enchant/ExpandedEnchantTest.java",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/enchant/ExpandedBowScenario.java"
+      ],
+      "cases": [
+        "expanded-bow"
       ],
       "affects": []
     }

@@ -21,6 +21,6 @@ public final class FiringRules {
         return new ShotContext(primary.encounterId(), primary.shotId(), id, 1,
                 Optional.of(primary.projectileId()), primary.ownerId(), primary.weapon(), primary.stats(),
                 primary.enchantments(), primary.mechanic(), tick, primary.launchPosition(), primary.initialVelocity(),
-                primary.crit(), primary.drawScale(), duplexScale(level));
+                primary.crit(), primary.drawScale(), duplexScale(level), primary.overload());
     }
 }

@@ -716,6 +716,33 @@ crit chance; no probability or mega-crit formula is adopted. Enchant tables and
 trusted loadouts remain T02/lead-owned and unchanged. These compiled calibration
 rules are not a hot-reload system; a later balance change must carry a new revision.
 
+### T03b expanded bow contract (GH-67)
+
+Adopted within the owner-published scope: `enchant-checkpoint2-v2` selects
+Overload I–V +1/2/3/4/5 raw CC and CD, once through trusted item modifiers;
+mega probability `clamp((rawCC - 100)/100, 0, 1)` and factors
+1.10/1.20/1.30/1.40/1.50. Preserve the ordinary draw, then consume one extra
+sample only when Overload is equipped, including probability zero/one. The
+existing capture-before-final-veto lifecycle remains. `ShotContext.overload`
+is immutable and copied by Duplex; Ferocity retains parent diagnostics and
+already-mitigated basis, never rerolling or applying mega twice. Mega follows
+ordinary critical offense and precedes mitigation/cap.
+
+Gravity I–VI adds 5/10/15/20/30/40% alongside Power/Snipe only for the explicit
+AIRBORNE backend descriptor (dragon true, default dummy false). Height and
+phase do not change classification or widen native collision admission.
+These are OnlyDragons calibrations, not measured upstream parity. The
+[versioned tables and ten descriptors](../../src/main/resources/enchants/README.md)
+record max levels, compatibility and unavailable IQ/Flame consumers for T06c.
+
+`CalibrationLoadouts.compatibleRegistry()` routes exact v2/v3 histories.
+Legacy bows keep identity/selections and six-enchant rules; new distinct v3
+presets enable expanded effects. No automatic migration is defined. Inert
+catalog bindings use `ItemRegistry.catalog(revision)` before resolving IDs;
+old retained selections remain valid. [Catalog compatibility](../../src/main/resources/items/README.md#expanded-catalog-and-legacy-compatibility-t03b).
+This supersedes the deferred Overload/Gravity implementation statements above
+only for the explicit expanded profile; legacy calibration remains available.
+
 ### T05b level-based ghost policy (GH-66)
 
 Accepted through merged PR #73 at `29f0cf3`, exactly for
