@@ -4,13 +4,13 @@
 
 The user requested testing commands including dragon spawning, a damage leaderboard after death, per-type loot-table architecture, dragon types and Hypixel-like eye placement. The original proposal was inspected against main `1deb9a8`, integrated through PR #36 at `9b554de`, and updated with initial decisions through PR #37 at `799c01d`. The additional confirmed rules below support four bounded tasks. D1–D4 remain descriptive components; dispatch uses the registered task IDs and dependencies in the table below. Later unanswered content/altar choices remain separate from this foundation.
 
-Read this linked detail when working on those encounter/result/content tasks; the three original planning documents remain the common context. Nothing here is a command available in the current plugin.
+Read this linked detail when working on those encounter/result/content tasks; the three original planning documents remain the common context. Accepted development commands are documented in the [operator guide](../../dev/dragon-play.md); historical interface proposals below do not add commands.
 
 ## User-confirmed direction
 
 | Topic | Confirmed decision | Still open |
 | --- | --- | --- |
-| Initial dragon | Start with one test dragon and preserve an extension path for later dragon types. | Its exact test definition and later roster, abilities, balance and selection probabilities. |
+| Initial dragon | Start with one test dragon and preserve an extension path for later dragon types. | The shipped test definition is accepted; later roster, abilities, balance and selection probabilities remain open. |
 | Post-kill ranking | Rank by credited damage including reduced/zero-health proc credit and lethal overkill; exclude impacts after finalized death. Preserve actual HP removed separately. Every ranked player has a unique placement; the user delegates damage-time tie-breaks to the lead. | Later display preferences and retention; the initial view is per encounter, not a persistent global board. |
 | Loot direction | Each eligible player receives a personal roll. Better leaderboard placement improves chances and also controls hard item-eligibility locks. Build the system with actual rewards disabled. | Production participant eligibility, rank bands, real items, probabilities, draw counts, delivery and acquisition rules. Explicit test policies are calibration, not approved production balance. |
 
@@ -59,17 +59,17 @@ same-tick zero participants and zero-to-positive transitions.
 | T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b, T08b | Personal rank-based loot evaluation with hard locks and actual grants disabled. |
 
 Task registration began planned with deferred automated requirements; the current
-ledger now records T02b complete through PR #48 and T08a/T08b/T08c still planned. [Combined evidence](evidence/catalog-procs-suite.md). Only integrated prerequisites plus
+ledger records T02b complete through PR #48 and T08a complete through PR #60 at `889a3db`; T08b is lead-assigned awaiting its label and T08c remains planned. [Combined evidence](evidence/catalog-procs-suite.md). Only integrated prerequisites plus
 lead assignment permit dispatch. T10 additionally consumes
 T08a's shared backend. Original T10 dependencies and all T11/M3/T12 gates remain.
 
 ## Present implementation and constraints
 
-- Production commands provide status/reload, stats explanation and calibration loadout/bonus/clear. There is no managed dragon spawn/reset/completion command or player-facing leaderboard.
-- `CombatEncounter` owns one target/generation on its construction thread, tracks distinct actual-health and contribution totals, and freezes one immutable `EncounterResult` at lethal managed damage. Late impacts cannot add score. It does not prove physical collision, suppress native damage, synchronize an entity, or publish a death notification.
-- `EncounterResult` contains completion/encounter IDs, `variantId`, mechanic revision and UUID-keyed contributions. This is not ranked presentation or durable result storage. `variantId` is only a nonblank string; T02b now supplies a separate immutable resolved selection integrated through PR #48 (see document 02 and the combined evidence). A live result consumer must retain that selection explicitly.
+- Production includes accepted stats/calibration, dummy combat and managed dragon setup/spawn/status/reset/result commands. T08b still owns the player-facing leaderboard; [T08a evidence](evidence/t08a-suite.md).
+- `CombatEncounter` owns one target/generation on its construction thread, tracks distinct actual-health and contribution totals, and freezes one immutable `EncounterResult` at lethal managed damage. Late impacts cannot add score. That pure class does not own native effects; accepted T06/T08/T08a compose physical claims, suppression, native projection and ordinary-defeat notification around it.
+- `EncounterResult` contains completion/encounter IDs, `variantId`, mechanic revision and UUID-keyed contributions. This is not ranked presentation or durable result storage. `variantId` is only a nonblank string; T02b now supplies a separate immutable resolved selection integrated through PR #48 (see document 02 and the combined evidence). Accepted T08/T08a retain the full Selection and receiver-commit/ordinal provenance in live frozen results; T08b must consume those immutable values.
 - `eyesPlaced` exists in the contribution DTO, but `CombatEncounter` currently always writes zero. Eye-only placers are not represented by that combat ledger. No placement transactions, loot resolver or reward-grant persistence exists.
-- T04's measured collision/native-damage policy and T05's bounded proc implementation are accepted. Lead-dispatched #9/T06 supplies production firing/ownership and the required physical boundary; that production behavior is not yet accepted. Existing standalone fixtures are evidence of their stated scope, not a playable managed encounter.
+- T04/T05/T06/T07/T08 and T08a are accepted within their documented boundaries. The direct managed test-dragon loop is available; countdown/prefire, ranking, ritual and rewards remain separate work.
 - Keep public Paper APIs, one composition root, one physical-impact authority, server-thread entity access, immutable snapshots across asynchronous boundaries, and owned cleanup. Do not add a second independent damage listener or a new framework/database service merely to scaffold these tasks.
 - The integration lead owns bootstrap, descriptors, shared DTO changes and registration. Keep published history ordinary and integrate prerequisites before dispatch. Each feature extends the shared scenario/suite/acceptance mappings and verifies the exact clean source cohort before handoff.
 
@@ -99,7 +99,7 @@ T08a's shared backend. Original T10 dependencies and all T11/M3/T12 gates remain
 
 **Deliverable:** required development operations for spawn, status, reset and result inspection, under the existing development permission boundary and one explicitly configured test arena. Status identifies the intended encounter/generation and its actual state. Spawn/reset operate only on managed targets. Optional test completion must be visibly administrative with diagnostic provenance; it must never become qualifying combat damage, ordinary defeat or a real reward trigger. Its omission does not block the required controls. Do not use Bukkit killer attribution or arbitrary native `/kill` as the managed result authority. Suppress native loot/XP from managed test-dragon deaths as part of keeping actual rewards disabled; preserve unrelated entities.
 
-Concrete interface proposal for review (not current commands):
+Historical interface proposal (retained for provenance; use the [accepted command guide](../../dev/dragon-play.md) for actual syntax):
 
 | Operation | Proposed command | Observable outcome |
 | --- | --- | --- |
@@ -109,7 +109,7 @@ Concrete interface proposal for review (not current commands):
 | Test death handling | `/onlydragons dev dragon complete-test <encounter>` | Explicit diagnostic provenance; exercise the chosen completion path without fabricating player damage or real rewards. |
 | Inspect result | `/onlydragons dev dragon result <completion>` | Frozen totals and selected presentation, when D3 lands. |
 
-Keep these under the existing development permission boundary. Defaulting to a configured test arena is proposed; arena registration, location and concurrency limits need a written choice. Parser syntax is an implementation detail the assigned command owner may refine consistently. Normal fight/death acceptance still requires real owned-arrow kills, even if the diagnostic command passes.
+Keep these under the existing development permission boundary. T08a adopts one explicitly configured cube with radius 16–48, loaded world/height/border validation and one development generation; it does not infer a player/world location. Parser syntax is an implementation detail the assigned command owner may refine consistently. Normal fight/death acceptance still requires real owned-arrow kills, even if the diagnostic command passes.
 
 **Automated acceptance:** real connected player invokes permitted operations and receives meaningful captured output; non-admin and console/player-only boundaries; malformed identifiers/coordinates/state transitions; repeated spawn/reset requests; stale encounter IDs; another encounter/unmanaged dragon unaffected; spawn failure produces no ghost registry entry. If optional test completion is implemented, repeated calls remain diagnostic in outputs/result handling and produce no real grants or fabricated player damage. A documented clean-checkout build and existing Cursor Play sequence exercises the required controls. The protocol actor may need a bounded extension for new observable interactions; a successful command return alone is insufficient.
 
@@ -192,9 +192,9 @@ For each dispatched component, add explicit implemented/deferred/external requir
 
 ## Decisions for the integration lead to reconcile
 
-- Intended development-command operations, target selection/location, arena isolation and test-completion semantics.
+- Later refinements to the accepted bounded development controls; optional administrative test completion remains omitted, and future production arenas are separate scope.
 - Optional refinements to the documented lead-selected display default and retention; ghost damage and unique damage-time ties are settled above. Persistent cross-encounter history is separate scope.
-- Exact definition for the confirmed one test dragon and the minimal versioned extension boundary; additional playable types remain later scope.
+- Additional playable types and production balance remain later scope; the one test-dragon definition and retained versioned selection are accepted.
 - Production participant qualification, rank-based chance thresholds and hard item locks for personal rolls, plus eventual delivery behavior. Real grants remain disabled; sample policies do not select production drop rates or contents.
 - Eye placement/removal/charging/refund/recovery rules and whether initial eyes remain development-only or have an explicitly scoped acquisition path.
 
