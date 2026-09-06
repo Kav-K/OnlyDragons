@@ -26,7 +26,7 @@ be exercised. See [execution order](04-execution-backlog.md).
 | --- | --- | --- | --- |
 | T00 — Contracts | Complete | [#1](https://github.com/Kav-K/OnlyDragons/issues/1), [PR #15](https://github.com/Kav-K/OnlyDragons/pull/15) | Merged at be920d0 after independent review, final-head Windows/Linux CI, 21 production tests and 29 real-Paper contract assertions; see [evidence](../../dev/agent-paper-tests.md#foundation-contract-evidence). Feature engines remain separate tasks. |
 | T01 — Stats | Planned (T01a ready) | [#3 resolver](https://github.com/Kav-K/OnlyDragons/issues/3), [#7 equipment/play](https://github.com/Kav-K/OnlyDragons/issues/7) | Resolver, snapshot, and equipment provenance acceptance cases. T01b waits for stats and item integration. |
-| T02 — Items | In review | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [draft PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Trusted registry/codec/presentation/calibration factories: lead-requested crit baseline correction and resolvedWeapon projection implemented; updated verification pending; [evidence](#t02-item-validation-evidence). Lead review/merge and authenticated inventory/visual checks remain. #7 equipment/grants and #9 firing integrate later. |
+| T02 — Items | In review | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [draft PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Trusted registry/codec/presentation/calibration factories include lead-requested crit baseline correction and resolvedWeapon projection: 45 build tests and 32 real-Paper assertions passed at clean 2f66cc4; [evidence](#t02-item-validation-evidence). Lead review/merge and authenticated inventory/visual checks remain. #7 equipment/grants and #9 firing integrate later. |
 | T03 — Combat/ledger | Planned | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | Numeric fixtures, one impact authority, health/score/death invariants. |
 | T04 — Paper feasibility | Planned (ready) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Isolated real dragon/projectile scenarios and durable findings; client observations remain separate. |
 | T05 — Enchants/procs | Planned | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Bounded ferocity, tempo expiry/swap, and modifier fixtures. |
@@ -111,23 +111,21 @@ design sections above are the current summary; this record explains changes.
 | 2026-09-05 | T09a / #2 / PR #16 | Integrated an isolated Linux/WSL runner and same-Paper companion with a shared lease, memory admission, strict reports, and owned-process cleanup. | Merged into main at 140f11c. Clean 946858d positive and deliberate-failure controls produced the expected outcomes and clean shutdown; [calibration evidence](../../dev/agent-paper-tests.md#accepted-calibration-evidence). Broader T09 gameplay and human gates remain. |
 | 2026-09-05 | T00 / #1 / PR #15 | Established shared immutable domain contracts without introducing resolver/combat engines or choosing unresolved balance rules. | Clean 53f7e20: 21 production tests, no failures/errors/skips; real Paper passed 29 assertions with clean unforced shutdown. Independent review and final e3a9e68 Windows/Linux CI passed; merged at be920d0. [Versions, hashes, and scope](../../dev/agent-paper-tests.md#foundation-contract-evidence). |
 | 2026-09-05 | Report validation / [#17](https://github.com/Kav-K/OnlyDragons/issues/17), In review | Reject boolean/number equivalence recursively in assertion evidence, even with forged pass flags; preserve integer/float numeric equivalence and JSON structure/order checks. | Implementation 4aa62f4: Ubuntu 24.04 / Python 3.12.3, `python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py' -v` passed all 27 tests without skips. Revalidated unchanged stored T09 positive (13 assertions), negative (only `deliberate_failure` rejected), and T00 (29 assertions) reports within their original run windows. No new Paper JVM or gameplay gate; independent review/CI pending. |
-| 2026-09-05 | T02 / #4 / [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24) | Adopted schema v1 with explicit unsupported-schema/revision rejection, trusted enchant categories/levels and allowlisted named rolls. Added eight compiled calibration factories without changing T00 records or #7 equipment/bootstrap. Lead audit removed the redundant +50 crit-damage bonus (T01 owns baseline 50) and requested a resolvedWeapon projection to prevent duplicate contributions. | [Design and calibration rationale](02-foundation-plan.md#t02-adopted-item-boundary-gh-4). Prior clean 194e90c passed 44 build tests and 30 Paper assertions. Corrected catalog v2 / scenario `item-codec-v2` adds no-crit-bonus and projection assertions; rerun pending; [evidence](#t02-item-validation-evidence). No milestone or human gate advanced. |
+| 2026-09-05 | T02 / #4 / [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24) | Adopted schema v1 with explicit unsupported-schema/revision rejection, trusted enchant categories/levels and allowlisted named rolls. Added eight compiled calibration factories without changing T00 records or #7 equipment/bootstrap. Lead audit removed the redundant +50 crit-damage bonus (T01 owns baseline 50) and requested a resolvedWeapon projection to prevent duplicate contributions. | [Design and calibration rationale](02-foundation-plan.md#t02-adopted-item-boundary-gh-4). Corrected catalog v2 / scenario `item-codec-v2`: clean 2f66cc4 passed 45 build tests and 32 Paper assertions including no-crit-bonus and projection checks; [evidence](#t02-item-validation-evidence). No milestone or human gate advanced. |
 
 ### T02 item validation evidence
 
-**Earlier catalog-v1 evidence below is superseded by the lead integration
-correction; final catalog-v2 verification is pending.**
-
-GH-4 final verification revision `194e90ce2db3b0453cc8aada346cfee88b436666` was clean
-and included current main `6f0ccfb` before verification (ordinary merge, retaining
-both context entries). Production/scenario code remains the initial `9379bc9`. The isolated runner command
+GH-4 final verification revision `2f66cc4bc54ed1131c6c13f65253b928726e4efe` was clean
+and included current main `e72fb2a` before verification (ordinary merge, retaining
+both context entries). Final production/scenario code is `14d9b8b`, including the lead integration audit
+corrections; previous catalog-v1 evidence is superseded by this run. The isolated runner command
 was `python3 scripts/agent-tests/paper_test.py --scenario item-identity`, using
 the provisioned accepted EULA, shared lease and memory admission. Run
-`cce138579d804abbbbed1ddfabd81f60` returned exit 0 on Java `25.0.4.1`, Minecraft
-`26.2`, Paper `26.2-121-a2a42c5`, with mechanic revision `item-codec-v1`.
+`dc41a0c5fc8449bebda25bc20fe15198` returned exit 0 on Java `25.0.4.1`, Minecraft
+`26.2`, Paper `26.2-121-a2a42c5`, with mechanic revision `item-codec-v2`.
 
 - **Domain/build:** wrapper production and separate companion builds passed;
-  44 production tests, zero failures/errors/skips. Of these, 12 item-domain
+  45 production tests, zero failures/errors/skips. Of these, 13 item-domain
   cases cover trusted categories/levels, replacement edits, immutable inputs,
   calibration contributions, allowlisted rolls and explicit rejection. Eleven
   MockBukkit codec cases cover PDC/presentation/type/material/amount and the
@@ -135,24 +133,31 @@ the provisioned accepted EULA, shared lease and memory admission. Run
   checks. API isolation passed. After merging main's stricter report validator,
   its separate Python failure-contract suite also passed all 27 tests without
   skips (`python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py' -v`). The companion itself has no JUnit tests;
-  its assertions execute on Paper.
-- **Actual Paper:** all 30 required assertions passed through the production
+  its assertions execute on Paper. The integrated Symphony bridge suite also
+  passed all six tests after merging main; no bridge code is changed by T02.
+- **Actual Paper:** all 32 required assertions passed through the production
   classloader. Eight loadouts preserved resolved data through native ItemStack
   byte serialization. Two granted UUIDs stayed distinct through synthetic
   inventory moves. Renaming an ordinary bow did not grant identity, and editing
   a managed bow's text did not change identity or enchants. Base damage remained
   100 with no duplicate weapon-damage modifier; Vicious and a custom trusted
-  roll preserved their modifiers. Multiple ultimates rejected on write/load;
+  roll preserved their modifiers. Catalog v2 contributes no crit-damage bonus
+  on any preset, leaving T01 baseline 50 unchanged (expected damage/crit damage
+  100/50 with the shared profile). The resolvedWeapon projection retained edited
+  Duplex II/Vicious III and the roll with base modifiers exactly once; #7 must
+  pass that projection once with only external additional sources. Actual
+  cross-task factory/equipment integration remains #7 work. Multiple ultimates
+  rejected on write/load;
   invalid levels, unknown IDs/rolls, wrong types/UUIDs, unchecked stats/kinds,
   schema 0/2, mismatched revisions, material and amount rejected explicitly.
-- **Cleanup:** loopback port 42973; all three required entity/task/chunk-ticket
+- **Cleanup:** loopback port 41017; all three required entity/task/chunk-ticket
   cleanup assertions reported zero retained resources. This item-only scenario
   created no entities/tasks/tickets; its synthetic inventory was cleared in
   `finally`. The owned JVM exited 0, `forced=false`, `clean=true`.
 - **Artifacts:** production SHA256
-  `763ab4bc5e6b39cabca2921bd6672972502837505d5090596bb93e2b8d0f8530`;
+  `0da8e0ba22bc8922279c8e6c8eef929c3ca74443c26a2c351f0f9c3b8f559c66`;
   companion SHA256
-  `7330dca1e7b1bfc619aba61f7fc07d9044ead092f8d55e6362b887ea86ed172f`.
+  `c7e727011893b486bcd597a900807ddbd8f94d02cabbf4967a9d2925f1b12573`.
   Raw reports remain ignored under `build/reports/agent-paper/<runId>/`.
 - **Remaining gates:** Windows smoke and authenticated client inventory moves,
   anvil renames, lore/glint rendering and multiplayer remain unrun. They become
