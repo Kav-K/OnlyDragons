@@ -22,6 +22,7 @@ public final class GameTestsPlugin extends JavaPlugin {
             Map.entry("deliberate-failure", new CalibrationScenario(true)),
             Map.entry("foundation-contracts", new ContractScenario()),
             Map.entry("protocol-player-calibration", new PlayerCalibrationScenario()),
+            Map.entry("protocol-player-soak", new PlayerCalibrationScenario(true)),
             Map.entry("item-identity", new com.kaveenk.onlydragons.gametests.item.ItemIdentityScenario()),
             Map.entry("projectile-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectileFeasibilityScenario()),
             Map.entry("projectile-cleanup-failure", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario()),

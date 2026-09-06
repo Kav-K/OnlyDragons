@@ -77,29 +77,46 @@ public final class ProtocolPlayer extends SessionAdapter {
         return "od_" + runId.substring(0, 13);
     }
 
-    @Override public synchronized void packetReceived(Session session, Packet packet) {
+    private record Outbound(List<Packet> packets, String disconnectReason) {}
+
+    @Override public void packetReceived(Session session, Packet packet) {
+        Outbound outbound;
+        try {
+            outbound = receive(packet);
+        } catch (IllegalStateException invalid) {
+            synchronized (this) { error = invalid.getMessage(); }
+            session.disconnect(Component.text(invalid.getMessage()));
+            return;
+        }
+        // MCProtocolLib's game executor preserves action order. Its I/O callbacks
+        // may run concurrently: never hold our state monitor while sending or
+        // waiting for disconnect, which waits for that I/O event loop to close.
+        for (Packet outgoing : outbound.packets()) session.send(outgoing);
+        if (outbound.disconnectReason() != null) session.disconnect(Component.text(outbound.disconnectReason()));
+    }
+
+    private synchronized Outbound receive(Packet packet) {
+        if (error != null || requestedQuit || disconnected.getCount() == 0) return new Outbound(List.of(), null);
+        var outgoing = new ArrayList<Packet>();
+        String disconnectReason = null;
         if (packet instanceof ClientboundLoginPacket joined) {
             if (joined.isOnlineMode()) throw new IllegalStateException("Fixture requires its disposable offline profile");
             login = true;
             if (behavior.equals("early-exit")) {
                 error = "Deliberate early client exit";
-                session.disconnect(Component.text(error));
+                disconnectReason = error;
             }
         } else if (packet instanceof ClientboundPlayerPositionPacket position) {
-            session.send(new ServerboundAcceptTeleportationPacket(position.getId()));
+            outgoing.add(new ServerboundAcceptTeleportationPacket(position.getId()));
             teleports++;
-            if (!loaded) { loaded = true; session.send(ServerboundPlayerLoadedPacket.INSTANCE); }
+            if (!loaded) { loaded = true; outgoing.add(ServerboundPlayerLoadedPacket.INSTANCE); }
         } else if (packet instanceof ClientboundChunkBatchFinishedPacket) {
-            session.send(new ServerboundChunkBatchReceivedPacket(10.0f));
+            outgoing.add(new ServerboundChunkBatchReceivedPacket(10.0f));
         } else if (packet instanceof ClientboundSystemChatPacket chat) {
-            try {
-                String action = captureChat(chat.getContent(), chat.isOverlay());
-                if (action != null && !behavior.equals("idle")) act(session, action);
-            } catch (IllegalStateException invalid) {
-                error = invalid.getMessage();
-                session.disconnect(Component.text(error));
-            }
+            String action = captureChat(chat.getContent(), chat.isOverlay());
+            if (action != null && !behavior.equals("idle")) disconnectReason = act(action, outgoing);
         }
+        return new Outbound(List.copyOf(outgoing), disconnectReason);
     }
 
     // Record received ordinary text, never control markers or action-bar overlays.
@@ -126,7 +143,7 @@ public final class ProtocolPlayer extends SessionAdapter {
 
     synchronized List<String> capturedMessages() { return List.copyOf(messages); }
 
-    private void act(Session session, String action) {
+    private String act(String action, List<Packet> outgoing) {
         List<String> expected = List.of("select", "draw", "release", "quit");
         if (actions.size() >= expected.size() || !expected.get(actions.size()).equals(action)) {
             throw new IllegalStateException("Unexpected player action: " + action);
@@ -134,13 +151,14 @@ public final class ProtocolPlayer extends SessionAdapter {
         if (!login || !loaded) throw new IllegalStateException("Action before player loaded");
         actions.add(action);
         switch (action) {
-            case "select" -> session.send(new ServerboundSetCarriedItemPacket(1));
-            case "draw" -> session.send(new ServerboundUseItemPacket(Hand.MAIN_HAND, 1, 0, 0));
-            case "release" -> session.send(new ServerboundPlayerActionPacket(
+            case "select" -> outgoing.add(new ServerboundSetCarriedItemPacket(1));
+            case "draw" -> outgoing.add(new ServerboundUseItemPacket(Hand.MAIN_HAND, 1, 0, 0));
+            case "release" -> outgoing.add(new ServerboundPlayerActionPacket(
                     PlayerAction.RELEASE_USE_ITEM, Vector3i.ZERO, Direction.DOWN, 2));
-            case "quit" -> { requestedQuit = true; session.disconnect(Component.text("Calibration complete")); }
+            case "quit" -> { requestedQuit = true; return "Calibration complete"; }
             default -> throw new IllegalStateException(action);
         }
+        return null;
     }
 
     @Override public synchronized void disconnected(DisconnectedEvent event) {
@@ -149,7 +167,7 @@ public final class ProtocolPlayer extends SessionAdapter {
         disconnected.countDown();
     }
 
-    private synchronized Map<String, Object> report(long started) {
+    synchronized Map<String, Object> report(long started) {
         var report = new LinkedHashMap<String, Object>();
         report.put("schemaVersion", 1);
         report.put("runId", runId);

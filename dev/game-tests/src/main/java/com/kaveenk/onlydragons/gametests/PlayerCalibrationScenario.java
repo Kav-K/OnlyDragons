@@ -22,8 +22,13 @@ import org.bukkit.inventory.ItemStack;
 
 /** Validates a real loopback protocol player; no manufactured Bukkit callbacks. */
 final class PlayerCalibrationScenario implements Scenario {
+    private final boolean soak;
+
+    PlayerCalibrationScenario() { this(false); }
+    PlayerCalibrationScenario(boolean soak) { this.soak = soak; }
+
     @Override public void start(ScenarioContext context) {
-        context.mechanicRevision("protocol-player-v1");
+        context.mechanicRevision(soak ? "protocol-player-soak-v1" : "protocol-player-v1");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
         context.check("production_enabled", true, context.production().isEnabled());
         context.check("disposable_protocol_mode", "protocol-calibration", System.getProperty("onlydragons.test.playerMode", ""));
@@ -119,8 +124,25 @@ final class PlayerCalibrationScenario implements Scenario {
                 context.later(2, () -> {
                     context.check("native_projectile_live", true, arrow.isValid());
                     context.check("native_projectile_moving", true, arrow.getVelocity().lengthSquared() > 0);
-                    quitting = true;
-                    request("quit");
+                    if (soak) awaitSoak(System.nanoTime());
+                    else quitNormally();
+                });
+            }
+
+            private void quitNormally() {
+                quitting = true;
+                request("quit");
+            }
+
+            private void awaitSoak(long started) {
+                context.later(20, () -> {
+                    long elapsedMs = (System.nanoTime() - started) / 1_000_000;
+                    if (!player.isOnline()) throw new IllegalStateException("Protocol player disconnected during soak");
+                    if (elapsedMs < 40_000) { awaitSoak(started); return; }
+                    context.check("player_soak_online", true, player.isOnline() && player.getUniqueId().equals(expectedId));
+                    context.check("player_soak_elapsed", true, elapsedMs >= 40_000);
+                    context.observe("soakElapsedMs", elapsedMs);
+                    quitNormally();
                 });
             }
 
@@ -134,7 +156,7 @@ final class PlayerCalibrationScenario implements Scenario {
                 });
             }
         });
-        context.later(900, () -> context.fail(new IllegalStateException("Protocol player calibration timed out")));
+        context.later(soak ? 2200 : 900, () -> context.fail(new IllegalStateException("Protocol player calibration timed out")));
         context.harness().getLogger().info("OD_PLAYER_READY " + context.harness().runId());
     }
 }

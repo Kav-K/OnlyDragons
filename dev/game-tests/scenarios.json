@@ -349,5 +349,38 @@
       "owned_tasks_cancelled",
       "owned_chunk_tickets_removed"
     ]
+  },
+  "protocol-player-soak": {
+    "mechanicRevision": "protocol-player-soak-v1",
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "disposable_protocol_mode",
+      "offline_fixture",
+      "real_player_join",
+      "player_uuid",
+      "player_loopback",
+      "player_not_op",
+      "real_selected_slot_event",
+      "selected_slot_new",
+      "selected_bow_applied",
+      "real_bow_use_event",
+      "server_observed_bow_draw",
+      "real_bow_release_event",
+      "full_bow_draw_force",
+      "native_arrow_projectile",
+      "native_projectile_shooter",
+      "native_projectile_live",
+      "native_projectile_moving",
+      "real_player_quit",
+      "player_removed_after_quit",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "owned_listeners_removed",
+      "player_soak_online",
+      "player_soak_elapsed"
+    ],
+    "testPlayerMode": "protocol-calibration"
   }
 }
