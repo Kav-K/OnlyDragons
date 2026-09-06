@@ -20,6 +20,7 @@ import org.bukkit.util.Vector;
 public final class MovingTracerScenario implements Scenario, Listener {
     private ScenarioContext c; private PlayerFixture players; private DevelopmentDragonService dragons;
     private World world; private EnderDragon dragon; private Arrow latest; private boolean finished, sentinel;
+    private long latestReleaseTick; private float latestForce;
     private final List<SettledHit> hits=new ArrayList<>();
     private final Map<UUID,List<ArrowContinuity.Frame>> frames=new LinkedHashMap<>();
     private final Map<UUID,String> collisions=new HashMap<>();
@@ -76,8 +77,24 @@ public final class MovingTracerScenario implements Scenario, Listener {
     private void position(float pitch){players.setupPosition("alpha",new Location(world,160,100-players.player("alpha").getEyeHeight(),146,0,pitch));}
     private void draw(String id,ScenarioContext.Step next) { draw(id,25,next); }
     private void draw(String id,int holdTicks,ScenarioContext.Step next) {
+        var player=players.player("alpha");long requested=Integer.toUnsignedLong(Bukkit.getCurrentTick());
         latest=null;players.request("alpha",id+"-use");
-        c.later(holdTicks,()->{players.request("alpha",id+"-release");players.await("real release "+id,50,()->latest!=null,next);});
+        // A queued client request is not an observed draw. Chunk/teleport traffic
+        // can delay use until the release request is already waiting behind it.
+        players.await("actual draw "+id,50,player::isHandRaised,()->{
+            long started=Integer.toUnsignedLong(Bukkit.getCurrentTick());
+            c.later(holdTicks,()->{
+                long released=Integer.toUnsignedLong(Bukkit.getCurrentTick());players.request("alpha",id+"-release");
+                players.await("real release "+id,50,()->latest!=null,()->{
+                    double duration=holdTicks/20.0,minForce=Math.min(1,(duration*duration+2*duration)/3);
+                    c.observe(id+"Draw",Map.of("requestedTick",requested,"confirmedTick",started,"releaseRequestTick",released,
+                            "nativeReleaseTick",latestReleaseTick,"holdTicks",holdTicks,"force",latestForce,"projectile",latest.getUniqueId().toString()));
+                    c.check(id+"_confirmed_draw",true,started>=requested&&released-started==holdTicks
+                            &&latestReleaseTick>=released&&latestForce+1e-6>=minForce);
+                    next.run();
+                });
+            });
+        });
     }
     private void returning(){kit("tracer_return_v2",-1);position(-45);players.bind("moving-dragon",dragon.getUniqueId());sentinel=true;
         Location targetStart=dragon.getLocation();int start=hits.size();
@@ -205,6 +222,6 @@ public final class MovingTracerScenario implements Scenario, Listener {
     @EventHandler(priority=EventPriority.MONITOR)public void nativeDamageSentinel(ProjectileLaunchEvent event){
         if(sentinel&&event.getEntity() instanceof Arrow arrow)c.later(2,()->{if(arrow.isValid())arrow.setDamage(2);});
     }
-    @EventHandler(priority=EventPriority.MONITOR)public void release(EntityShootBowEvent e){if(e.getEntity() instanceof Player&&e.getProjectile() instanceof Arrow a)latest=a;}
+    @EventHandler(priority=EventPriority.MONITOR)public void release(EntityShootBowEvent e){if(e.getEntity() instanceof Player p&&p.getUniqueId().equals(players.identity("alpha"))&&e.getProjectile() instanceof Arrow a){latest=a;latestReleaseTick=Integer.toUnsignedLong(Bukkit.getCurrentTick());latestForce=e.getForce();}}
     @EventHandler(priority=EventPriority.LOWEST)public void impact(ProjectileHitEvent e){if(e.getEntity() instanceof Arrow a){collisions.put(a.getUniqueId(),e.getHitEntity() instanceof EnderDragonPart?"DRAGON":e.getHitBlock()!=null?"BLOCK":"OTHER");}}
 }

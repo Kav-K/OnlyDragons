@@ -106,6 +106,36 @@ decision alongside Tracer's captured profile/original launch tick. Its equipment
 oracle covers nine legacy definitions, their nine explicit v3 copies, the
 legacy-only returning Tracer and the two new expanded presets: 21 exact IDs.
 
+## Preserved combined-cohort draw timeout
+
+[Hosted run 34065448077](https://github.com/Kav-K/OnlyDragons/actions/runs/34065448077)
+tested clean `84056f2fc8f99beb2b43569f68b30fff9403c1ca`. Both platform builds
+passed, but suite `ca37f87d9e6240e1a746b9c53ba69a24` stopped after 37 completed
+cases when `moving-tracer` run `d09236f2402646b2ac392af465bd9989` timed out
+awaiting `real release blocked`. Moving restart and expanded-bow were unrun.
+The failed case's first ten feature assertions passed; Paper/client cleanup was
+unforced and all five owned-resource counters were zero. No task acceptance or
+complete-cohort pass is claimed.
+
+- Artifact: `9999265888`, `OnlyDragons-Paper-34065448077-1.zip`.
+- ZIP SHA256: `78be58a3d74ab6523f674d873f0d57100803dc5616d73333ae677e58d1175d4a`.
+
+The fixture started its short six-tick hold timer when requesting use, before
+observing native bow use. Server requests were at ticks 404/410, but the client
+submitted use/release only 19 ms apart. The earlier passing run also had closely
+spaced client submissions (17 ms), so those timestamps alone cannot establish
+the precise native-use duration. There was no release-event witness in this run.
+The scenario/action plan/client bytes are unchanged from the prior passing head;
+the added Overload capture runs after the missing event boundary.
+
+The narrow repair awaits this actor's hand-raised state, then retains the original
+6/25-tick hold and 50-tick release deadline. Each of the seven draws records
+request/confirmation/release/native-event ticks, force and projectile UUID, with
+a required confirmed-duration/minimum-force assertion. All original real-arrow
+collision, homing, accounting and cleanup checks remain. Gameplay code and client
+inputs are unchanged. Fresh focused Paper and complete current-input evidence
+are required; the failed artifact is preserved.
+
 ## Remaining gates
 
 The corrected complete cohort, independent raw/source review and strict replay,

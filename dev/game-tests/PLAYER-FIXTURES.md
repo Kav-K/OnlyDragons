@@ -49,6 +49,10 @@ staged launcher and Mojang bytes again.
    Advance after observing a real event or state change with a bounded
    `players.await(...)`. A fixed delay is appropriate for a known cooldown, not
    as a substitute for checking whether an event occurred.
+   For bow draws, start the hold timer only after the actor's native hand-raised
+   state is observed. A use request may wait behind chunk/teleport packets; two
+   requests six server ticks apart do not prove six ticks of native bow use.
+   Keep the real release-event/force and physical collision assertions separate.
 4. Bind an entity's actual UUID with `players.bind(targetRef, entityUuid)` before
    an attack. The client must have independently received that entity's network
    ID. Never target the nearest entity or manufacture a Bukkit callback.

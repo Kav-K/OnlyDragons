@@ -2325,7 +2325,14 @@
       "animation_retains_parent_tickets_motion_stopped",
       "native_death_releases_all_tickets_no_rewards",
       "native_velocity_curves_to_current_part",
-      "real_collision_during_ballistic_grace"
+      "real_collision_during_ballistic_grace",
+      "return_confirmed_draw",
+      "plain_confirmed_draw",
+      "blocked_confirmed_draw",
+      "range_confirmed_draw",
+      "prefire_confirmed_draw",
+      "grace_confirmed_draw",
+      "lethal_confirmed_draw"
     ],
     "testPlayerMode": "protocol-actions-v1",
     "playerActionPlan": "dev/game-tests/player-plans/moving-tracer-v2.json",
