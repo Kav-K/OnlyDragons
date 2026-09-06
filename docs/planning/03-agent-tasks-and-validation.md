@@ -119,7 +119,9 @@ CI. The lead's terminal-claim/veto clarification is recorded in document 02;
 production P02/P04 remain deferred under T06/M1. T04 stays In review, #9 blocked
 and M0 unaccepted pending current-input and policy acceptance.
 The lead independently reviewed that 16-case receipt. PR #44 is now integrated
-into this branch by ordinary merge `6936c6f`, including main `9def91f`. All
+into this branch by ordinary merge `6936c6f`, including main `9def91f`. Final
+merge `37cd803` includes PR #45/main `4cfb7b9` and preserves its completed
+T09d context. All
 projectile and T09d registrations/coverage survive the additive reconciliation.
 The actual-sandbox doctor is ready and the plan checkpoint passes; changed-area
 selection requires 18 cases. Per the latest GH-5 owner instruction, the lead

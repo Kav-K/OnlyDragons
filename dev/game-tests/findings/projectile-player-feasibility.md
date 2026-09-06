@@ -15,6 +15,9 @@ Catalog/acceptance/suite conflicts were resolved additively: the unchanged
 player-action/damage/abort fixtures. The shared runner/client, generic admission,
 corrected ERROR matcher and lead-authored terminal-claim/veto policy are retained.
 No production adapter or new collision behavior is introduced.
+The final ordinary main merge `37cd80353c5ee73d9444bb5b5641360de25eaa55`
+also integrates PR #45/main `4cfb7b9525a186c1f6591173a550565fed3efd53`;
+its documentation-only T09d completion record is preserved.
 
 Actual worker doctor: `state=ready`, 16 readable fixtures/context files,
 JDK 25.0.4.1, existing EULA readable, shared lease writable/available;
@@ -23,6 +26,13 @@ required memory 2816 MiB, guest available 8495 MiB, effective host available
 Plan checkpoint passes with `automatedReady=false`, `acceptanceApproved=false`.
 Changed-area selection requires **18 cases: 12 positives and six intended
 failures**, including both T09d cases and the preserved projectile-player case.
+
+Local reconciliation checks passed: root wrapper build/API isolation (unchanged
+production tests reused by Gradle: 82, zero failures/errors/skips), companion
+build, strict client `build installDist` (28 tests, zero failures/errors/skips),
+239 runner/checkpoint Python tests and 25 Symphony tests. Plan checkpoint passes
+again after PR #45 integration, preserving T09d complete and T04 partial. Main's
+fixture definitions and suite memberships were compared and all preserved.
 
 Per the [latest owner instruction](https://github.com/Kav-K/OnlyDragons/issues/5),
 the lead will dispatch the complete hosted Paper suite and independently replay
