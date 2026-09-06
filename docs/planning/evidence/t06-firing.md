@@ -140,10 +140,36 @@ trial observes one child before quit and no kick event; it makes no stronger
 native lifecycle claim. Synthetic pending-claim/session cleanup tests retain
 their separate scope.
 
-The current plan checkpoint is valid and changed-area selection retains all 24
-cases. [The coordinated hosted full cohort and T06 checkpoint are requested](https://github.com/Kav-K/OnlyDragons/issues/9#issuecomment-5559410649)
-on these frozen inputs. No duplicate local full suite has run. Complete selected
-cohort/T06 checkpoint, independent final review and current CI remain outstanding. Human mouse/hold feel,
-rendered presentation, Windows Play/smoke and authenticated-client compatibility
-remain separate unrun observations. T08 owns full multiplayer HP/proc/ghost-score
-accounting; it is not a circular prerequisite of this producer.
+## Combined candidate and lead handoff
+
+Combined candidate `92d4a37a5a83d0b4a264641303cf2504f859a126` normally
+merges lead-reviewed `55c1f1d` into the focused candidate. Only three synthetic
+Git test helpers changed: command-local `maintenance.auto=false` prevents
+background maintenance from racing temporary-repository cleanup. The real
+Trace2 regression preserves visible cleanup failures. All 257 Linux Python tests
+pass after integration. Production/companion inputs remain unchanged. The plan
+and no-weakening checkpoint pass against main `92147a2`, selecting all 24 cases.
+Current-head [PR CI](https://github.com/Kav-K/OnlyDragons/actions/runs/34035204613)
+and [push CI](https://github.com/Kav-K/OnlyDragons/actions/runs/34035202453) pass.
+
+[Hosted cohort 34035343529](https://github.com/Kav-K/OnlyDragons/actions/runs/34035343529)
+ran on this combined head. Both Windows/Linux build jobs passed, but the
+Paper integration job failed. Its log reports only that the full suite failed;
+no individual scenario cause is claimed from that summary. The exported
+[artifact 9990113615](https://github.com/Kav-K/OnlyDragons/actions/runs/34035343529/artifacts/9990113615)
+is retained for lead review (ZIP SHA256
+`cd904b8425cf556365339f894ef67757ff0b54e3edc080ee72aa7a2347947655`).
+This is failed cohort evidence, not a successful receipt or T06 checkpoint.
+
+[The lead took ownership of retained-artifact review, remaining validation and
+any remediation](https://github.com/Kav-K/OnlyDragons/issues/9#issuecomment-5559485039)
+and requested the worker handoff without duplicate testing or further runtime
+changes. Runtime/test inputs remain frozen at `92d4a37`; subsequent commits
+only record evidence. The next dependency is the lead's diagnosis of the failed
+cohort and a complete passing receipt/T06 checkpoint before acceptance. A coding
+worker resumes only on explicit redispatch. T06 remains In review and no
+requirement or milestone is marked accepted.
+
+Windows Play/smoke, mouse/hold feel, rendered presentation and authenticated-client
+compatibility remain separate unrun human observations. T08 owns full multiplayer
+HP/proc/ghost-score accounting; it is not a circular prerequisite of this producer.
