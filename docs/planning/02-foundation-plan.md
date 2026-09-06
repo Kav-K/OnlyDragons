@@ -1,6 +1,12 @@
 # OnlyDragons: foundation implementation plan
 
-**Draft v0.1 — 5 September 2026. Planning only.**
+**Design baseline v0.1 — 5 September 2026. Living implementation plan.**
+
+This document describes intended behavior, not proof that a feature exists.
+See the [delivery ledger](03-agent-tasks-and-validation.md#current-delivery-status)
+for implementation and validation state. Agents update affected design sections
+with scoped changes and record material decisions under the
+[context update protocol](03-agent-tasks-and-validation.md#shared-context-update-protocol).
 
 The first playable milestone is a reliable stats-and-bow combat sandbox. A player can equip a test bow, inspect their stats, shoot a target, and see an explanation of critical hits, ferocity, boss-health damage, and contribution. The next milestone adds real dragon tracing and prefire. The eight-eye ritual, complete dragon roster, loot, and progression follow those proofs.
 
@@ -24,7 +30,7 @@ Use configurable **mechanic profiles**, with an ID and revision recorded in ever
 
 ## 2. Existing project and what must change
 
-The inspected project already has the Gradle wrapper, pinned dependencies, JUnit, MockBukkit, JaCoCo, a real-server lab, Cursor tasks, and a separate legacy-API lab-tools project. Its plugin is still the starter command/welcome-message implementation. The new gameplay systems and their tests do not yet exist.
+At plan creation, the project had the Gradle wrapper, pinned dependencies, JUnit, MockBukkit, JaCoCo, a real-server lab, Cursor tasks, and a separate legacy-API lab-tools project. Its plugin was the starter command/welcome-message implementation, with no new gameplay systems or their tests. This is the historical starting point; use the delivery ledger and current code for subsequent progress.
 
 Retain the lab and the API-isolation check. Keep `dev/lab-tools` separate: putting its old Spigot API back on the plugin's merged classpath would recreate the editor errors fixed earlier. Game-specific real-Paper tests should compile against the same Paper pin as the plugin in a separate test project, not be forced into that Java 8 compatibility harness.
 

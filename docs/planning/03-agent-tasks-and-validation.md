@@ -1,16 +1,125 @@
 # OnlyDragons: agent work packages and validation
 
-**Draft v0.1 — 5 September 2026. These are future implementation assignments, not completed tasks.**
+**Work-plan baseline v0.1 — 5 September 2026. Living task and validation context.**
 
 Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research notes](01-research.md). Start with M0/M1; do not begin the economy or full altar while the foundation is under review.
+
+## Current delivery status
+
+Baseline reconciled **5 September 2026** from the checked-in source. The plugin
+still supplies starter status/reload commands and welcome messages; its four
+main Java classes do not implement the planned domain, projectile, or encounter
+systems. The previous setup validation passed 11 starter tests and built the
+artifacts on Linux. That is tooling evidence, not evidence for T00–T12 or M0–M5.
+The existing lab is available; the proposed gameplay runner does not yet exist.
+
+Symphony is configured for one concurrent worker, GitHub Issues, and draft PR
+handoff. At this baseline, GitHub authentication and the initial source push
+are pending; no real issue-to-PR run has been verified. Update this setup note
+when that integration is actually exercised.
+
+| Task | Implementation state | Owner / issue / PR | Remaining acceptance gate |
+| --- | --- | --- | --- |
+| T00 — Contracts | Planned | Unassigned | Shared consumers/fixtures compile; domain signatures and decisions agreed. |
+| T01 — Stats | Planned | Unassigned | Resolver, snapshot, and equipment provenance acceptance cases. |
+| T02 — Items | Planned | Unassigned | PDC/schema/identity and one-ultimate validation cases. |
+| T03 — Combat/ledger | Planned | Unassigned | Numeric fixtures, one impact authority, health/score/death invariants. |
+| T04 — Paper feasibility | Planned | Unassigned | Operator-run real dragon/projectile experiment and durable findings. |
+| T05 — Enchants/procs | Planned | Unassigned | Bounded ferocity, tempo expiry/swap, and modifier fixtures. |
+| T06 — Firing/Duplex | Planned | Unassigned | Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence. |
+| T07 — Tracer/continuity | Planned | Unassigned | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |
+| T08 — Practice tools | Planned | Unassigned | Repeatable player procedure, permissions, and explained damage. |
+| T09 — Gameplay validation | Planned | Unassigned | Independent Paper scenarios and report failure-path validation. |
+| T10 — Prefire/performance | Planned | Unassigned | Integrated traces, human rehearsal, and measured load/cleanup gates. |
+| T11 — Eight-eye lifecycle | Planned, later | Unassigned | M3 accepted, then transaction, spawn, cancellation, and recovery gates. |
+| T12 — Variants/progression | Planned, later | Unassigned | T11 plus separately agreed roster, rewards, and acquisition scope. |
+
+No milestone M0–M5 is accepted yet. The next focus remains T00 and the
+operator-supported T04 feasibility work, followed by M1 dependencies. A task's
+full acceptance criteria below remain authoritative; this table is a summary.
+
+Use **Planned**, **In progress**, **In review**, **Blocked**, or **Complete** for
+implementation state, with a short explanation when needed. Record validation
+separately: domain/build, real Paper, human/client, and performance each need
+their own actual outcome or an explicit pending/not-applicable reason. A task
+is Complete only after the implementation is integrated into the default branch
+(or explicitly accepted by the user in a local-only workflow) and every required
+acceptance gate has evidence. A draft PR is In review. An unrun operator gate
+does not become a pass because the coding portion is finished.
+
+GitHub issues/PRs own live assignments and review state; this ledger records the
+reconciled project summary. Read relevant open PRs before duplicating work. A
+status edit in an unmerged branch does not reserve the task globally.
+
+## Shared context update protocol
+
+Every agent reads all three planning files at task start under AGENTS.md.
+Maintain them as part of completing the assigned work; no separate permission
+is needed to record accurate progress, findings, or in-scope design refinements.
+This instruction does not authorize implementing unassigned work packages.
+
+1. Identify the task ID, dependencies, owned files, and required gates before
+   implementation. For maintenance outside T00–T12, record its bounded scope in
+   the change record without pretending it completes a gameplay task.
+2. Check the actual code and current issue/PR status. Distinguish the intended
+   design in 02 from implementation evidence; preserve the confidence labels
+   and open questions in 01. Record newly discovered uncertainty explicitly.
+3. Update the affected sections in place: sources/findings in 01,
+   behavior/architecture/contracts in 02, and status/evidence/dependencies here.
+   Change only what the task establishes. Include context updates in the same
+   commits and PR as their implementation. For a task that yields no durable
+   context change, explain that briefly in the handoff instead of adding noise.
+4. Attach evidence to each advanced status: task/issue and PR or commit, changed
+   behavior, exact check and environment/version, observed result, remaining
+   gates, blocker, and next dependency. Keep unit/build, real-server, and human
+   results separate. Reference the commit that was tested, not a future commit
+   or an assumed passing pipeline. Do not rerun checks solely to create a date.
+5. Keep concise, durable findings in the relevant plan section, a checked-in
+   findings note, or an accessible PR. An ignored local report path alone is
+   insufficient shared evidence. Do not commit credentials, raw logs, worlds,
+   build output, or private conversations into project context.
+6. Record material decisions in the change record below with their rationale
+   and affected task/section. Distinguish **user-confirmed**, **proposed**,
+   **adopted within task scope**, and **superseded** decisions. Retain why a rule
+   changed; do not silently erase user decisions or weaken an acceptance gate.
+   Do not turn historical research into a claim of current upstream behavior.
+7. Coordinate shared edits through the integration lead. Subagents own their
+   assigned sections or return context changes in their handoff; avoid whole-file
+   rewrites. Refresh the relevant base content before integration and reconcile
+   each status/evidence entry on its merits rather than choosing one entire file
+   in a conflict. Keep work on its assigned branch; do not modify other checkouts.
+8. Before handoff, cross-check the three documents for stale assumptions and
+   include the relevant section links, remaining gates, and next dependency in
+   the PR/issue update. After merge, the integration lead or next agent verifies
+   the referenced evidence and reconciles accepted status. New workspaces read
+   the merged context; unmerged proposals stay identified as pending.
+
+### Context change record
+
+Keep one concise row per meaningful decision or delivery update. The tables and
+design sections above are the current summary; this record explains changes.
+
+| Date | Task / reference | Change and rationale | Evidence / remaining work |
+| --- | --- | --- | --- |
+| 2026-09-05 | Shared-context setup; user request | Made the three planning documents required project context and added an agent maintenance/handoff protocol. | Starter-only source inventory reconciled; all gameplay tasks remain planned. Shared reading routes are in AGENTS.md, Cursor rules, and WORKFLOW.md. |
 
 ## 1. Team operating contract
 
 A practical team is one integration lead plus three implementation agents. Each work package has one owner, a bounded file area, dependencies, and observable acceptance criteria. The owner writes behavior tests with the feature; the validation agent independently exercises integrations and failure cases.
 
+This is a suggested coordination model, not a request to start four workers.
+The active orchestrator configuration controls concurrency (currently one
+Symphony worker). Under its current Linux worker policy, real Paper/server and
+human/client checks are operator-run gates. Prepare test code and instructions
+within scope, and keep those gates pending until their evidence is supplied.
+
 The integration lead owns `OnlyDragonsPlugin`, `plugin.yml`, Gradle/settings files, pins, the shared DTO/interface contract, and the top-level command registration. Other agents request changes to those files through the lead. Keep independently edited feature packages separate. Do not have every agent redesign `DamageContext` or install its own global damage listener.
 
 Each handoff includes: final changed files, implemented contract, tests and actual results, one reproducible demonstration, and any unresolved assumption. An unsupported MockBukkit method is an unresolved test gap until replaced with a real-server test, not a passing/skipped test.
+
+Also include the task/issue and branch/revision, affected shared-context sections,
+implementation/review state, remaining gates/blockers, and next dependency. A
+delegated agent receives those fields and the three document paths at kickoff.
 
 All code uses `com.kaveenk.onlydragons.*`. The generic `MinecraftDev` template keeps its generic behavior; game-specific systems belong in OnlyDragons. Shared lab fixes, if needed during implementation, should be reviewed independently before propagating to the template.
 

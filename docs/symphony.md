@@ -109,13 +109,20 @@ python3 -m unittest discover -s scripts/symphony/tests -v
    for a worker. The issue must remain open. The service polls every 15 seconds
    and runs one worker at a time, with at most 20 turns per agent invocation.
 3. The worker prepares an isolated checkout, implements on **symphony/gh-N**,
-   runs appropriate checks, pushes the branch, and opens a **draft PR**.
+   reads the three shared planning documents, runs appropriate checks, updates
+   affected project context with status and evidence, pushes the branch, and
+   opens a **draft PR**. Its context entry remains In review until accepted.
 4. It comments with the result and verification, then removes only the symphony
    label. The issue stays open for human review. The worker does not merge PRs,
    publish releases, deploy plugins, or start a server.
 5. Review the PR, run remaining Windows smoke and in-game checks, then decide
    whether to merge. To request rework, add clear owner guidance to the issue
    and restore the symphony label. The worker resumes existing work when it can.
+
+The planning documents are the shared memory for subsequent agents. Context
+changes travel with their implementation PR; later clean workspaces receive
+them after merge. The integration lead reconciles completed tasks and remaining
+operator gates under `docs/planning/03-agent-tasks-and-validation.md`.
 
 For missing access or another external blocker, the worker records the blocker
 and removes the dispatch label. If GitHub itself is inaccessible, the worker

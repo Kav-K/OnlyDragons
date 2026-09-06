@@ -1,6 +1,11 @@
 # OnlyDragons: research and mechanic reference
 
-Research date: **5 September 2026**. Status: **planning draft; gameplay has not been implemented**.
+Research baseline: **5 September 2026**. This is a living evidence reference;
+implementation progress is tracked in the [delivery ledger](03-agent-tasks-and-validation.md#current-delivery-status).
+
+Agents maintain this document when relevant evidence changes. Preserve the
+source/date/confidence of a claim, distinguish observations from OnlyDragons
+decisions, and explain material corrections. Follow the [context update protocol](03-agent-tasks-and-validation.md#shared-context-update-protocol).
 
 Read next: [foundation design](02-foundation-plan.md) and [agent tasks and validation](03-agent-tasks-and-validation.md).
 

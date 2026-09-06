@@ -6,6 +6,10 @@ alwaysApply: true
 Read and follow the repository's `AGENTS.md`. Use `dev/agent-workflow.md` for the
 shared Codex/Cursor development loop, commands, and validation evidence.
 
+Follow AGENTS.md's shared-context reading and maintenance contract. When
+`docs/planning/` exists, read all three planning files before work and update the
+affected research, design, task status, and validation evidence with the change.
+
 - Read `versions.properties` and use the checked-in Gradle wrapper and `mcdev.cmd`.
 - Select installed skills by task: `minecraft-plugin-development` for plugin work,
   `paper-runtime-validation` for server verification, and `paper-threading-review`

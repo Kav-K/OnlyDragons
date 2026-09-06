@@ -66,11 +66,19 @@ than creating duplicate commits, comments, or pull requests.
 
 - Read AGENTS.md, .cursor/rules/minecraft.mdc, README.md, and versions.properties
   before editing. Follow their development conventions within this workflow.
+- Read docs/planning/01-research.md, docs/planning/02-foundation-plan.md, and
+  docs/planning/03-agent-tasks-and-validation.md as shared context for every
+  issue. Match this issue to its task/dependencies or record a bounded unlisted
+  maintenance task; do not execute the rest of the backlog. Reconcile relevant
+  issue/PR state with the delivery ledger before assuming a dependency is done.
+  Pass the context paths, revision, scope, and gates to any subagent.
 - Work only in the provided issue workspace. Do not edit the source checkout,
   other issue workspaces, credentials, runtime installation, or personal worlds.
 - Use the host-authenticated github_api tool for GitHub REST requests. Its input
   is an object with method and relative path, plus optional params and body.
-  Keep all requests within /repos/Kav-K/OnlyDragons and this issue or its PR.
+  Keep all requests within /repos/Kav-K/OnlyDragons. Read-only inspection of
+  repository code and related dependency issues/PRs is allowed for context and
+  coordination. Writes remain limited to this issue, its work branch, and its PR.
 - Before doing implementation, GET /repos/Kav-K/OnlyDragons/issues/{{ issue.id }}.
   Verify that it is an open issue, has the owner-applied symphony dispatch label,
   and is not a pull request. If closed or no longer labeled, stop. The repository
@@ -108,7 +116,10 @@ than creating duplicate commits, comments, or pull requests.
    Record the specific Windows smoke command and any in-game checks the reviewer
    must run. Do not start a server through another route.
 6. Review the diff for scope, correctness, generated files, credentials, worlds,
-   and logs. Commit only relevant source, tests, configuration, and documentation.
+   and logs. Update the affected planning context under document 03's maintenance
+   protocol: research in 01, design/contract changes in 02, status/evidence and
+   remaining gates in 03. Include those updates in the same branch as the work.
+   Commit only relevant source, tests, configuration, and documentation.
    Use ordinary git push -u origin symphony/gh-{{ issue.id }}. The workspace's
    credential helper supplies scoped Git authentication; do not read token files,
    print authentication, or add secrets to Git URLs. Never force-push.
@@ -125,6 +136,9 @@ than creating duplicate commits, comments, or pull requests.
    branch. The description must explain the resulting behavior, reference the
    issue, list actual validation and results, and identify unrun Windows smoke
    or human checks. Never mark an existing human-ready PR back to draft.
+   Keep the task's planning entry In review; a draft PR or passing starter tests
+   cannot establish milestone completion. Add the resulting PR reference to
+   the context entry and push that documentation update before final handoff.
 3. Post one concise completion comment on this issue with the PR link, actual
    checks, and outstanding human validation. On retries, reuse an existing
    matching completion record instead of posting duplicates.
@@ -139,11 +153,21 @@ than creating duplicate commits, comments, or pull requests.
 ## Blockers
 
 If required access, a tool, an approval, clear scope, or a necessary dependency
-is missing, preserve the workspace and any useful work. When github_api remains
-available, post one brief issue comment explaining the blocker, what was
-completed, and the concrete action needed. Then remove only the symphony label
-as the final operation so the unchanged issue is not repeatedly dispatched.
-If GitHub access itself is unavailable, report the failure in the final response
-without claiming the issue or label was updated.
+is missing, preserve the workspace and handle the blocker in this order:
+
+1. Record the blocker, useful completed work, unrun gates, and concrete next
+   action in the branch's planning context. Keep a Windows-only runtime or human
+   gate pending for the operator; this does not permit starting a server.
+2. Commit and push useful implementation/context changes when access permits.
+   If a push cannot succeed, retain the local changes and identify them as
+   unshared in the handoff.
+3. If github_api remains available, post one brief blocker comment on this issue
+   with the status, relevant context/evidence, and the action needed. Include
+   a concise account of any unshared context update.
+4. Only after those steps, remove just the symphony label as the final GitHub
+   operation so the blocked issue is not repeatedly dispatched.
+
+If GitHub access itself is unavailable, report the failure and unshared context
+in the final response without claiming the issue or label was updated.
 Never work around denied approvals, remove failing tests, weaken validation, or
 claim a check passed without its successful result.

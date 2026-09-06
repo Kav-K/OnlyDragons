@@ -4,6 +4,49 @@ Read README.md, versions.properties, and .cursor/rules/minecraft.mdc before
 changes. This is a Java Paper plugin; the current pins are Minecraft 26.2,
 Paper build 121, and JDK 25. Treat versions.properties as the source of truth.
 
+## Shared project context
+
+When this checkout contains `docs/planning/`, every agent must read these three
+files before choosing, delegating, or implementing a task. Read them again after
+resuming with missing context, switching branches, or integrating relevant changes:
+
+1. `docs/planning/01-research.md`: researched mechanics, source confidence, and
+   unresolved questions. A report about another game is not an implementation fact.
+2. `docs/planning/02-foundation-plan.md`: intended experience, design decisions,
+   architecture, scope, and milestone gates. Proposed rules remain proposals
+   until a scoped decision and its rationale are recorded.
+3. `docs/planning/03-agent-tasks-and-validation.md`: current delivery status,
+   task IDs/dependencies, team behavior, acceptance criteria, and evidence.
+
+These are shared, living project context. The first outcome is the stats-and-bow
+combat sandbox, followed by physical dragon tracing/prefire; the full ritual,
+rewards, and progression come later. A backlog item or command example is not
+an instruction to execute unassigned work. Follow the current user's task and
+the active execution environment when applying the plan.
+
+- Each handoff/delegation includes the checkout and revision, these context paths,
+  the assigned task ID or bounded scope, owned files, dependencies, acceptance
+  gates, and relevant decisions/blockers. Subagents report discoveries to the
+  integration lead; they do not rely on another agent's private conversation.
+- Maintain the affected context in the same branch and PR as the work. Follow
+  the update protocol in document 03: record actual state/evidence, explain
+  design changes, retain open questions, and identify the next dependency.
+- Research updates belong in 01, design/contract changes in 02, and task status,
+  validation, and handoffs in 03. Update linked sections together when needed;
+  do not duplicate the whole specification or append a transcript of the run.
+- Agents may correct evidence, record discoveries, and advance verified task
+  status within the assigned scope. Do not silently overturn user-confirmed
+  decisions, remove acceptance gates, or expand the project's scope.
+- Use GitHub issues/PRs for live claims and coordination. Shared context becomes
+  available to subsequent clean workspaces after its PR is merged. Read relevant
+  open PRs for pending work; a branch-local status entry is not a global lock.
+  The integration lead reconciles shared edits and accepted status after merge.
+
+This context is repository-specific. A generated starter without `docs/planning/`
+uses its own project brief; do not import the original game's design into it.
+If the planning directory exists but a listed document is missing, restore the
+missing context before making decisions that depend on it.
+
 ## Development
 
 - Keep ordinary business logic in service classes without server imports where

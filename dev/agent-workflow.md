@@ -29,7 +29,9 @@ the checked-in build and tests.
 
 1. Inspect the working tree and preserve existing changes. Read `AGENTS.md`,
    `versions.properties`, `build.gradle.kts`, `src/main/resources/plugin.yml`, and
-   the code/tests relevant to the task.
+   the code/tests relevant to the task. When `docs/planning/` exists, read all
+   three planning documents under AGENTS.md's shared-context contract. Check
+   the delivery ledger and relevant issues/PRs before claiming a task.
 2. Treat the repository pins as the target. Resolve Context7's library ID before
    requesting documentation, and include the pinned API version in the question.
    A result for another release is not proof an API exists here. Check official
@@ -37,6 +39,11 @@ the checked-in build and tests.
 3. Implement one coherent change. Keep pure logic separate from server callbacks;
    review thread ownership and lifecycle cleanup when the feature crosses threads.
    Update commands, permissions, config, tests, and console assertions as applicable.
+4. Before handoff, update the affected project context in the same change.
+   Record what exists, actual validation and remaining gates, decisions and
+   blockers, task/PR references, and the next dependency. The integration lead
+   reconciles overlapping context edits. A draft PR remains in review until its
+   changes are accepted and the required gates pass.
 
 ## Validate proportionately
 
