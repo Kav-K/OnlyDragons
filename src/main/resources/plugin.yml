@@ -22,3 +22,6 @@ permissions:
   onlydragons.calibration:
     description: Grant yourself calibration bows and session stat bonuses.
     default: op
+  onlydragons.fire:
+    description: Fire managed bows inside admitted OnlyDragons arenas.
+    default: true

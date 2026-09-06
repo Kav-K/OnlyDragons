@@ -162,10 +162,10 @@
       "notice": "In review: the lead candidate combines main 705de34, handed-back proc head bc9eaba, corrected T04 completion ledger 91911d7 and catalog head 2613ba4, preserving all 21 cases. Historical b7fd6bc acceptance remains held because the old console matcher missed ERROR lines. The fresh combined suite, independent raw replay and T05 checkpoint remain pending. Prior worker evidence retains its original inputs; see dev/game-tests/findings/t05-suite.md. Physical P08/P09 and T08 composition remain later integration."
     },
     "T06": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "T01b, T02 and accepted T04 are integrated; eligible for the lead's dispatch label. T09d is available for final production multiplayer firing tests. P02/P04, firing-input and automated-multiplayer-firing remain deferred; no accepted-M0 prerequisite or milestone acceptance is introduced."
+      "notice": "Owner-dispatched at main 3c35a85. Production owned firing/session/settlement implementation and feature-specific two-player fixtures are in progress on symphony/gh-9. Automated feature acceptance and the clean complete cohort/T06 checkpoint remain pending; see evidence/t06-firing.md. No milestone accepted."
     },
     "T07": {
       "status": "blocked",

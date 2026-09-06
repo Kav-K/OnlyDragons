@@ -39,7 +39,10 @@ public final class CalibrationLoadouts {
                 bow("ferocity_500", "Cap Calibration Bow", 0, 500, List.of()),
                 bow("tracer", "Tracer Calibration Bow", 0, 0, List.of(enchant("dragon_tracer", false))),
                 bow("duplex", "Duplex Calibration Bow", 0, 0, List.of(enchant("duplex", true))),
-                bow("fatal_tempo", "Tempo Calibration Bow", 0, 25, List.of(enchant("fatal_tempo", true)))
+                bow("fatal_tempo", "Tempo Calibration Bow", 0, 25, List.of(enchant("fatal_tempo", true))),
+                new ItemDefinition(new WeaponDefinition("shortbow_v1", ItemRegistry.SCHEMA_VERSION, "shortbow-calibration-v1",
+                        WeaponDefinition.FiringMode.SHORTBOW, 100, List.of(), List.of(enchant("duplex", true))),
+                        "Shortbow Calibration v1", "BOW", Set.of())
         ), enchants, Map.of());
     }
 

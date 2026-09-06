@@ -28,7 +28,8 @@ class ItemRegistryTest {
     }
 
     @Test void calibrationContributionsAreExplicitAndEffectsRemainData() {
-        assertEquals(8, registry.definitions().size());
+        assertEquals(9, registry.definitions().size());
+        assertEquals(WeaponDefinition.FiringMode.SHORTBOW, registry.definitions().get("shortbow_v1").weapon().firingMode());
         for (var row : Map.of("ordinary", 0.0, "crit", 0.0, "ferocity_25", 25.0, "ferocity_100", 100.0,
                 "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0).entrySet()) {
             var item = registry.resolve(registry.create(row.getKey()));

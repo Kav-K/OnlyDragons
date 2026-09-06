@@ -7,7 +7,7 @@ calls `registry.create(id)`, then `new WeaponItemCodec(registry).encode(instance
 on the server thread. Each create allocates a new UUID; encode/moves/clones retain
 that identity. Cloning is not a new legitimate grant or an anti-duplication ledger.
 
-All eight presets are BOW / DRAWN_BOW, with weapon base damage 100 exactly once,
+The eight original presets are BOW / DRAWN_BOW, with weapon base damage 100 exactly once,
 no crit-damage bonus, and flat crit chance/ferocity contributions below. These
 are OnlyDragons calibration contributions, not effective stats: T01 owns the
 base profile, aggregation, probability and caps. T01 supplies baseline crit damage 50 and baseline crit chance/ferocity 0.
@@ -26,6 +26,12 @@ proposed cap value; this catalog does not enforce a cap.
 | tracer | 0 | 0 | Dragon Tracer V |
 | duplex | 0 | 0 | Duplex V |
 | fatal_tempo | 0 | 25 | Fatal Tempo V |
+| shortbow_v1 | 0 | 0 | Duplex V |
+
+T06 adds `shortbow_v1`: BOW material, SHORTBOW firing mode, definition revision
+`shortbow-calibration-v1`, base damage 100 and no additional stat modifiers.
+The eight original definition revisions and catalog identity remain supported.
+Its firing calibration is described in the [T06 contract](../../../../docs/planning/evidence/t06-firing.md).
 
 `ItemRegistry.edit` replaces the full enchant/roll selection, retaining identity.
 Registry construction, create, edit, resolve and codec encode/decode validate.
@@ -59,5 +65,6 @@ Names, lore and glint are generated from resolved data and never read for
 behavior. No native enchants are added. Encoding makes a fresh stack; it is not
 an in-place repair API preserving foreign metadata/durability. Consumers should
 read valid data independently of renamed presentation and reject Invalid items
-without silently upgrading or granting them. Native firing/damage suppression,
-permissions, commands, inventory events and reload adoption remain later work.
+without silently upgrading or granting them. Native firing/damage suppression
+and terminal physical claims belong to T06; T01b supplies permissions, grants
+and equipment events. Combat accounting and runtime catalog adoption are separate.

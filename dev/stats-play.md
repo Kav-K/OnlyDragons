@@ -1,7 +1,8 @@
 # Stats calibration in Cursor Play
 
-T01b supplies inspection and calibration items. Bow effects, managed damage,
-projectile shot-time capture, and the practice dummy are later tasks.
+T01b supplies inspection and calibration items. T06 supplies owned firing inside
+API-admitted arenas; managed damage and player-facing practice arena commands
+remain T08 work. Outside an admitted arena the bows retain ordinary behavior.
 
 1. In Cursor use **Tasks: Run Build Task**, then **Tasks: Run Task → Minecraft:
    Play (build + start server)** (or `.\mcdev play`). Connect an authenticated
@@ -16,7 +17,9 @@ projectile shot-time capture, and the practice dummy are later tasks.
    and `fatal_tempo` with the same command. Each has damage 100 / crit damage 50.
    `crit` has crit chance 100; the ferocity bows have 25/100/500; Fatal Tempo has
    25; the other presets have zero crit/ferocity. Tracer/Duplex/Fatal Tempo are
-   validated enchant metadata here, with no implemented combat effects.
+   validated enchant metadata in this stats procedure. The additional
+   `shortbow_v1` loadout has damage 100, crit damage 50, zero crit/ferocity and
+   Duplex V; its custom firing route requires an admitted T06 arena.
 4. Swap selected slots, equip/unequip, move a bow through inventory, and swap
    hands. Only the active main-hand bow contributes. An offhand-only bow leaves
    weapon damage/crit chance/ferocity at 0 and crit damage at 50. Repeat inspection

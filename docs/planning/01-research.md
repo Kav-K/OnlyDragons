@@ -144,6 +144,15 @@ World/entity mutation belongs on the server thread; asynchronous work is for imm
 
 API signatures do **not** prove multipart collision delivery, seated-dragon arrow behavior, exact event ordering, or same-tick damage behavior. The implementation plan starts with a bounded real-Paper experiment for those uncertainties. MockBukkit remains valuable for lifecycle, commands, inventory metadata, and event routing, but it is not a physics simulator.
 
+### T06 native ammunition API inspection (Paper 121)
+
+**Inspected, 6 September 2026:** the pinned API marks the bow event's
+`setConsumeItem` as nonfunctional. The matching Paper `a2a42c5` patch dispatches
+that event after ammunition drawing. T06 therefore distinguishes Paper's native
+debit from shortbow-owned reservation, instead of relying on that setter and
+charging twice. [Exact API/source and pending survival-inventory verification](evidence/t06-firing.md#calibration-and-native-ammo-discovery).
+This is implementation-source evidence, not a gameplay pass or Hypixel claim.
+
 ### T04 measured collision boundary (Paper 121)
 
 **Observed on exact pin, 2026-09-05:** real shooterless arrows delivered multipart
