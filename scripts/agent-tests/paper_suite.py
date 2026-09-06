@@ -536,8 +536,13 @@ def run_child(command, project, log_path):
     process = None
     with log_path.open('w', encoding='utf-8') as log:
         try:
-            process = subprocess.Popen(command, cwd=project, stdout=log, stderr=subprocess.STDOUT,
-                                       start_new_session=True)
+            blocked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGINT, signal.SIGTERM})
+            try:
+                process = subprocess.Popen(command, cwd=project, stdout=log, stderr=subprocess.STDOUT,
+                                           start_new_session=True,
+                                           preexec_fn=lambda: signal.pthread_sigmask(signal.SIG_SETMASK, set()))
+            finally:
+                signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
             return process.wait()
         except KeyboardInterrupt:
             if process is not None and process.poll() is None:

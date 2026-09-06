@@ -1,10 +1,14 @@
 """Failure-boundary tests for suite selection and independently replayed evidence."""
 import copy
 import json
+import os
 from pathlib import Path
+import signal
 import shutil
 import subprocess
+import sys
 import tempfile
+import threading
 import time
 import unittest
 from unittest.mock import patch
@@ -236,6 +240,7 @@ class SelectionTests(unittest.TestCase):
     def test_harness_changes_require_every_positive_and_negative_case(self):
         catalog, _ = suite.load_catalog(self.root)
         self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, ['scripts/agent-tests/paper_suite.py'])))
+        self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, ['dev/game-tests/acceptance.json'])))
 
     def test_unclassified_new_scenario_fails_catalog(self):
         path = self.root / 'dev/game-tests/scenarios.json'
@@ -298,6 +303,7 @@ class NegativePolicyTests(unittest.TestCase):
         with self.assertRaises(suite.ValidationError):
             suite.verify_player(report, case, self.run_id, self.pins, self.now - 2000, self.now)
 
+
     def test_idle_requires_real_loaded_player_and_exact_timeout_or_cleanup(self):
         report = self.player()
         report.update(playerLoadedSent=True, teleportsAcknowledged=1, error='Timed out waiting for calibration')
@@ -307,6 +313,32 @@ class NegativePolicyTests(unittest.TestCase):
         with self.assertRaises(suite.ValidationError):
             suite.verify_player(report, case, self.run_id, self.pins, self.now - 2000, self.now)
 
+
+class ChildOwnershipTests(unittest.TestCase):
+    def test_suite_interrupt_waits_for_owned_runner_cleanup_and_preserves_unrelated_child(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            child = root / 'runner.py'
+            child.write_text('import signal,time\nfrom pathlib import Path\n'
+                             'def stop(signum,frame):\n Path("cleaned").write_text("done")\n raise SystemExit(0)\n'
+                             'signal.signal(signal.SIGTERM,stop)\nPath("ready").touch()\ntime.sleep(30)\n')
+            unrelated = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])
+            def interrupt_when_ready():
+                deadline = time.monotonic() + 5
+                while not (root / 'ready').exists() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                os.kill(os.getpid(), signal.SIGINT)
+            thread = threading.Thread(target=interrupt_when_ready)
+            thread.start()
+            try:
+                with self.assertRaises(KeyboardInterrupt):
+                    suite.run_child([sys.executable, str(child)], root, root / 'runner.log')
+                self.assertEqual('done', (root / 'cleaned').read_text())
+                self.assertIsNone(unrelated.poll())
+            finally:
+                thread.join()
+                unrelated.terminate()
+                unrelated.wait(timeout=5)
 
 if __name__ == '__main__':
     unittest.main()
