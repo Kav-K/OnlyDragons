@@ -44,7 +44,12 @@ do not launch a duplicate Symphony worker against those files.
 
 T09d extends the pinned protocol client and same-Paper companion already in the
 repository. It does not install another game framework or reimplement combat.
-Its three initially deferred requirements are:
+PR #44's reviewed runtime `3047a56` now verifies its three reusable components,
+the full 17-case suite baseline and checkpoint requirements. Independent exported
+artifact replay and current-runtime CI passed; [exact evidence](evidence/t09d-suite.md).
+Final documentation-head CI and actual merge remain pending, so the progress
+ledger retains in-review and downstream dispatch still waits for integration.
+The three reusable components are:
 
 - `headless-player-primitives`: bounded, versioned action programs and at least
   two actual independently identified players, with matched client/Paper traces.
