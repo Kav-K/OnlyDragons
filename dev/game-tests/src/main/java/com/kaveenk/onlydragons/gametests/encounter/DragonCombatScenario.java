@@ -157,8 +157,8 @@ public final class DragonCombatScenario implements Scenario, Listener {
         else if(!handlesChecked){
             handlesChecked=true;
             var one=dragons.subscribe(generation,repeatedConsumer);var two=dragons.subscribe(generation,repeatedConsumer);
-            oldHandle.close();oldHandle.close();c.check("stale_subscription_handle_preserves_new_generation",2,dragons.subscriberCount());
-            one.close();one.close();c.check("repeated_handle_preserves_equal_registration",1,dragons.subscriberCount());two.close();
+            oldHandle.close();oldHandle.close();c.check("stale_subscription_handle_preserves_new_generation",3,dragons.subscriberCount());
+            one.close();one.close();c.check("repeated_handle_preserves_equal_registration",2,dragons.subscriberCount());two.close();
         }
         dragons.subscribe(generation,event->{throw new IllegalStateException("deliberate consumer failure");});
         dragons.subscribe(generation,event->{

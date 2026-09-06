@@ -22,6 +22,7 @@ public final class DevelopmentDragonService implements AutoCloseable {
     private final List<Registration> subscribers = new ArrayList<>();
     private int notificationFailures;
     private boolean closed;
+    private final DragonLeaderboardPresenter leaderboard;
     public Subscription subscribe(UUID expected, java.util.function.Consumer<Completion> consumer) {
         check(); requireGeneration(expected);
         if (!active() || view().orElseThrow().state() != ManagedCombatService.State.ACTIVE) throw new IllegalArgumentException("Subscribe to an active generation before defeat.");
@@ -47,7 +48,11 @@ public final class DevelopmentDragonService implements AutoCloseable {
         });
     }
     public DevelopmentDragonService(ManagedCombatService combat, DragonDefinitionRegistry definitions, ArenaConfiguration arena, com.kaveenk.onlydragons.paper.projectile.homing.ArenaTickets tickets) {
+        this(combat, definitions, arena, tickets, new DragonLeaderboardPresenter());
+    }
+    DevelopmentDragonService(ManagedCombatService combat, DragonDefinitionRegistry definitions, ArenaConfiguration arena, com.kaveenk.onlydragons.paper.projectile.homing.ArenaTickets tickets, DragonLeaderboardPresenter leaderboard) {
         this.combat = combat; this.definitions = definitions; this.arena = arena; this.tickets = tickets;
+        this.leaderboard = Objects.requireNonNull(leaderboard);
     }
     public Optional<DevelopmentArena> arena() { thread(); return arena.current(); }
     public String arenaProblem() { thread(); return arena.problem(); }
@@ -63,17 +68,18 @@ public final class DevelopmentDragonService implements AutoCloseable {
         check(); if (active()) throw new IllegalArgumentException("Dragon already active; reset its generation first.");
         var config = arena.current().orElseThrow(() -> new IllegalArgumentException(arena.problem()));
         var selected = config.validate(definitions.snapshot());
-        DragonBackend candidate = new DragonBackend(config.location(), tickets, this::completed, value -> { if (backend == value) subscribers.clear(); });
+        DragonBackend candidate = new DragonBackend(config.location(), tickets, this::completed, value -> { if (backend == value) retirePresentation(); });
         try {
             UUID id = combat.open(owner, candidate, config.bounds(), selected.maxHealth(), selected.defense(),
                     selected.identity().id(), selected.combatProfile(), Optional.of(selected), Math::random);
-            subscribers.clear(); backend = candidate; generation = id; selection = selected; return id;
+            retirePresentation(); backend = candidate; generation = id; selection = selected;
+            leaderboard.begin(id); subscribe(id, leaderboard::accept); return id;
         } catch (RuntimeException failure) { candidate.close(); throw failure; }
     }
     public void reset(UUID expected) {
         check(); requireGeneration(expected);
         if (!active()) throw new IllegalArgumentException("Generation already retired; no active dragon to reset.");
-        combat.reset(owner); subscribers.clear();
+        combat.reset(owner); retirePresentation();
     }
     public ManagedCombatService.View result(UUID expected) {
         thread(); requireGeneration(expected);
@@ -101,7 +107,13 @@ public final class DevelopmentDragonService implements AutoCloseable {
                 + " table=" + selection.table().identity() + " | remainingHP=" + v.target().currentHealth()
                 + " HP removed=" + hp + " credit=" + credit + " | rewards disabled";
     }
-    public void close() { combat.requireMutationAllowed(); if (closed) return; if (active()) combat.reset(owner); subscribers.clear(); closed = true; }
+    public void close() { combat.requireMutationAllowed(); if (closed) return; if (active()) combat.reset(owner); retirePresentation(); closed = true; }
+    public Optional<com.kaveenk.onlydragons.domain.encounter.RankedEncounterResult> ranking() { thread(); return leaderboard.ranking(); }
+    public int leaderboardDeliveryFailures() { thread(); return leaderboard.deliveryFailures(); }
+    private void retirePresentation() {
+        subscribers.clear();
+        if (generation != null) leaderboard.retire(generation);
+    }
     private static void thread() { if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Dragon controls require server thread"); }
     private void check() { thread(); if (closed) throw new IllegalStateException("Dragon controls closed"); combat.requireMutable(); }
 }

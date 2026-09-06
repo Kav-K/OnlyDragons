@@ -469,7 +469,7 @@ four-sample fractional cycle. No production ferocity balance is selected.
 ### T08a development backend
 
 T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md).
-T08b/#40 is lead-assigned and awaiting its Symphony dispatch label; no running worker or ranking acceptance is claimed.
+T08b/#40 is dispatched and implementing the ranked presentation below; acceptance remains pending.
 
 The production `DevelopmentDragonService` owns one explicit configured development
 cube and delegates every hit/proc/result to `ManagedCombatService`. `DragonBackend`
@@ -503,6 +503,33 @@ and its announcements remain T08b-owned. Cancelled/revived
 native death keeps diagnostic completion, never retries lethal damage, and remains
 protected until explicit reset. Reset/abort/disable do not mint results or rewards.
 The backend supplies T10's future target projection, not countdown/prefire or M3.
+
+### T08b frozen ranking and presentation
+
+Implemented on the GH-40 branch; [focused Paper evidence](evidence/t08b-focused-paper.md)
+passes on clean `bdde815`. Full cohort/lead acceptance remains pending.
+`RankedEncounterResult` retains the exact immutable `EncounterResult`, full Selection,
+and contribution/stamp values. It validates complete participant
+provenance, rejects ordinal ownership/tick conflicts and backdated stamps, then
+assigns contiguous placements by normalized full-precision credit descending,
+strict-increase tick/ordinal ascending (first participation for zero-only totals).
+A lethal HP reduction may leave stored credit unchanged through rounding, so its
+terminal ordinal need not appear in a last-increase stamp. Names and two-decimal
+display never enter ordering; no imported-data fallback exists.
+
+`LeaderboardMessages` formats top ten plus each participant's own placement/credit.
+Every successful `DevelopmentDragonService.spawn()` starts and subscribes its
+`DragonLeaderboardPresenter` through the existing read-only completion API.
+Only the matching generation's confirmed ANIMATING completion is admitted.
+Presenter mutation remains package-private to its service; consumers receive only
+immutable ranking/failure diagnostics. The completion ID is checked before delivery; a different second completion for
+that generation rejects. Recipient failures are isolated and never retry the
+public announcement. Reset/retirement/disable invalidate delivery and release the
+existing subscriptions; at most one frozen board is retained until the next spawn.
+Online participants receive plain Adventure chat; offline UUIDs remain ranked and
+use UUID labels when no live name is available. No offline queue or persistent
+history is added. Diagnostic cancelled/admin/reset/abort paths publish no board.
+Result inspection still exposes separate HP and credit; no rewards are enabled.
 
 ### Managed health
 

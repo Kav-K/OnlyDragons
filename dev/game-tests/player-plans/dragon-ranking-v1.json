@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "planId": "dragon-ranking-v1",
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "first-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "first-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reconnect",
+              "action": "reconnect",
+              "args": {
+                "delayMillis": 250
+              }
+            }
+          ]
+        },
+        {
+          "id": "s2",
+          "steps": [
+            {
+              "id": "proc-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "proc-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "cancelled-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "cancelled-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "lethal-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "late-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "late-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "second-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "second-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "targets": []
+}

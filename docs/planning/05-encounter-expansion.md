@@ -59,7 +59,7 @@ same-tick zero participants and zero-to-positive transitions.
 | T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b, T08b | Personal rank-based loot evaluation with hard locks and actual grants disabled. |
 
 Task registration began planned with deferred automated requirements; the current
-ledger records T02b complete through PR #48 and T08a complete through PR #60 at `889a3db`; T08b is lead-assigned awaiting its label and T08c remains planned. [Combined evidence](evidence/catalog-procs-suite.md). Only integrated prerequisites plus
+ledger records T02b complete through PR #48 and T08a complete through PR #60 at `889a3db`; T08b is In review in [PR #62](https://github.com/Kav-K/OnlyDragons/pull/62), with [focused evidence](evidence/t08b-focused-paper.md); T08c remains planned. [Combined evidence](evidence/catalog-procs-suite.md). Only integrated prerequisites plus
 lead assignment permit dispatch. T10 additionally consumes
 T08a's shared backend. Original T10 dependencies and all T11/M3/T12 gates remain.
 
