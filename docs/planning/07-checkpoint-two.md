@@ -1,6 +1,6 @@
 # Checkpoint 2: combat feedback, volleys and enchant books
 
-**6 September 2026 — implementation started; new feature acceptance remains pending.**
+**6 September 2026 — T05b accepted; the remaining checkpoint features and human outcomes remain pending.**
 
 The first managed dragon/ranking slice is integrated on main `36b420c`.
 The user now prioritizes a persistent dragon health bar, smoother bounded flight,
@@ -16,17 +16,21 @@ T11/T12 gates, and it accepts no M1–M5 milestone or unobserved human outcome.
 | --- | --- | --- |
 | T08d / [#64](https://github.com/Kav-K/OnlyDragons/issues/64) | T08a, T08b | Shared text formatter and one owned dragon boss bar; `dragon-bossbar`, `combat-presentation`. |
 | T08e / [#65](https://github.com/Kav-K/OnlyDragons/issues/65) | T08a, T07 | Bounded real dragon motion and versioned moving-target Tracer integration; `bounded-dragon-flight`, `moving-dragon-tracer`. |
-| T05b / [#66](https://github.com/Kav-K/OnlyDragons/issues/66) | T05, T08a, T08b | Player-wide Tempo/Ferocity HP policy and immutable provenance; `fatal-tempo-ghost-scaling`, existing deferred P08/P09. |
+| T05b / [#66](https://github.com/Kav-K/OnlyDragons/issues/66) | T05, T08a, T08b | Player-wide Tempo/Ferocity HP policy and immutable provenance; `fatal-tempo-ghost-scaling`, P08/P09: accepted through [PR #73](https://github.com/Kav-K/OnlyDragons/pull/73). |
 | T03b / [#67](https://github.com/Kav-K/OnlyDragons/issues/67) | T05b, T06 | Overload/Gravity, captured decisions and all-ten trusted descriptors; `expanded-bow-enchantments`. |
 | T06c / [#70](https://github.com/Kav-K/OnlyDragons/issues/70) | T03b | Authoritative Infinite Quiver ammo and owned Flame DOT; `quiver-flame-integration`. |
 | T06b / [#68](https://github.com/Kav-K/OnlyDragons/issues/68) | T03b, T08e, T06c | Actual held-fire tiers and useful separate-ultimate loadouts; `held-shortbow-loadouts`. |
 | T02c / [#69](https://github.com/Kav-K/OnlyDragons/issues/69) | T03b, T08d, T06c | Metadata-safe books, recipes and real anvil transactions; `enchant-books-anvil`. |
 
-T08d/T08e/T05b are assigned and active in Symphony after the registration merged
-through PR #71 at `a4e9210`; their prerequisites are integrated.
-T03b then T06c establish effects before T06b/T02c expose the complete experience.
-Those three task entries are active and the remaining four stay planned, all with empty evidence/completed requirements;
-all nine new automated requirements and P08/P09 remain deferred until feature proof.
+T05b is complete after PR #73 merged at `29f0cf3969e7d256b2f678a54f846d836ca6db9f`;
+[its 34-case hosted evidence](evidence/t05b-suite.md) accepts exactly
+`fatal-tempo-ghost-scaling`, P08 and P09. T03b/#67 is active and lead-assigned:
+T05b and T06 are integrated, with the Symphony label applied by the lead after
+context reconciliation. T08d/#64 and T08e/#65 remain In review pending their
+combined current-input cohort. T06c/#70, T06b/#68 and T02c/#69 remain planned.
+These six unfinished tasks retain empty completed requirements/evidence; the
+eight other new automated requirements remain unaccepted. T03b then T06c
+establish effects before T06b/T02c expose the complete experience.
 
 T10 retains every prior dependency and additionally consumes T08d, T08e, T05b
 and T06b. T06b brings T03b/T06c transitively. Anvil application is independent of
@@ -80,7 +84,7 @@ bows, and swapping is supported. The ten requested IDs are Dragon Tracer, Duplex
 Fatal Tempo, Power, Vicious, Snipe, Overload, Gravity, Infinite Quiver and Flame.
 No new armor application, reward items, acquisition economy or extra dragon types
 are implied. The recorded issue contracts supply the calibration decisions for
-implementation; they do not claim those new effects have passed their gates.
+implementation. T05b has the scoped acceptance above; the other new effects still require their gates.
 
 ## Shared ownership and feature evidence
 
