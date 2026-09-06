@@ -36,7 +36,7 @@ part of the worker's scope.
 | T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | Complete: playable PR #29 at a48ebd4; objective connected acceptance in PR #32 at 73a8cc8 | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
 | T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Draft PR #30 in review; current-main/shared suite pending | Bounded procs and enchant state. |
 | T09c | [#28](https://github.com/Kav-K/OnlyDragons/issues/28) | Complete: PR #32 merged at 73a8cc8 | Shared regression suites, connected-player equipment/message fixture, actor lock-cycle regression/40-second soak, and evidence/dependency checkpoints. All 15 baseline cases met their declared outcomes; [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). P01–P14 and M0–M5 remain pending. |
-| T09d | [#43](https://github.com/Kav-K/OnlyDragons/issues/43) | T09a/T09b/T09c complete; PR #44 implementation and automated acceptance verified, merge pending | Reviewed `3047a56`: all 17 hosted suite outcomes, independent raw replay/task checkpoint and current-runtime CI passed; [evidence](evidence/t09d-suite.md). Reusable player/damage primitives and verified offline bootstrap become downstream prerequisites only after actual merge. No duplicate Symphony dispatch or generic-to-feature acceptance substitution. |
+| T09d | [#43](https://github.com/Kav-K/OnlyDragons/issues/43) | Complete: PR #44 merged at `9def91f75d655caaccd6c7fa01313e4ba3a0ea54` | Reviewed `3047a56`: all 17 hosted suite outcomes, independent raw replay/task checkpoint and runtime CI passed; final documentation-head CI passed at `9c669ad`. [Evidence](evidence/t09d-suite.md). Reusable player/damage primitives and verified offline bootstrap are integrated; other task prerequisites and dispatch labels still apply. No duplicate Symphony dispatch or generic-to-feature acceptance substitution. |
 | T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b, T02, fully accepted T04; blocked | Bow/shortbow/Duplex capture and owned projectiles. Merging partial PR #22 or passing T09b alone does not release this gate. |
 | T07 | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | T04, T06 | Tracer steering and arrow continuity. |
 | T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | T01b, T03, T05, T06, T09d | Playable dummy combat and explanations with shared headless fixtures. |
@@ -75,7 +75,7 @@ T09b protocol packets prove only their recorded Paper events; human visuals,
 authentication, multiplayer and feature-specific dragon behavior remain separate.
 T09c makes admission explicit per catalog scenario. The lead coordinates shared protocol/lifecycle extensions; every issue has access to all committed named fixtures. The actor retains its bounded select/draw/release/quit sequence.
 PR #44 preserves that calibration and adds T09d's bounded multi-actor action plans;
-its verified runtime evidence is recorded above, with final integration still pending.
+it merged at `9def91f`, with the verified runtime evidence recorded above.
 Those tasks must collect their own feature assertions and keep the same bounded
 actor/process ownership. Passing T09b alone does not unblock #9 or accept M0.
 

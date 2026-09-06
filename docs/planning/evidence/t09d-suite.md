@@ -6,8 +6,12 @@ passed the complete 17-case suite on GitHub-hosted Ubuntu 24.04.
 [Manual workflow 34024646724, attempt 1](https://github.com/Kav-K/OnlyDragons/actions/runs/34024646724)
 and [current-runtime CI 34024649057](https://github.com/Kav-K/OnlyDragons/actions/runs/34024649057)
 passed. The suite ran from 09:29:03.334 to 09:39:44.687 UTC (641.353 seconds).
-All five T09d automated requirements are verified; final documentation-head CI
-and the actual PR merge remain pending. No merge revision is claimed here.
+All five T09d automated requirements are verified. Final documentation head
+`9c669ad0bec2e1abf45b00abf22d242cf16c4e7a` passed
+[CI run 34025800244](https://github.com/Kav-K/OnlyDragons/actions/runs/34025800244)
+and unchanged-input replay. PR #44 merged at
+`9def91f75d655caaccd6c7fa01313e4ba3a0ea54`; T09d is complete.
+The runtime, archive and receipt identities below remain the original evidence.
 
 ## Exact replay inputs
 
@@ -92,4 +96,5 @@ production multiplayer firing, T08/M3 HP/ghost-score attribution, T04's remainin
 dragon findings, P01–P14, a managed encounter, a ritual or real rewards.
 Authenticated clients, human visuals/input feel, Windows operator Play and
 performance gates retain their separate unrun status. M0–M5 remain unaccepted.
-Downstream workers use T09d only after the reviewed fixture PR actually merges.
+T09d is now integrated. Downstream workers still require their other task
+prerequisites and the lead's dispatch label; this does not release future gates.
