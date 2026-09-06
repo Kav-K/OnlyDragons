@@ -98,7 +98,8 @@
       "owned_tasks_cancelled",
       "owned_chunk_tickets_removed",
       "owned_listeners_removed"
-    ]
+    ],
+    "testPlayerMode": "protocol-calibration"
   },
   "item-identity": {
     "mechanicRevision": "item-codec-v4",
@@ -222,6 +223,34 @@
       "owned_chunk_tickets_removed"
     ]
   },
+  "equipment-stats": {
+    "mechanicRevision": "equipment-stats-v1",
+    "requiredAssertions": [
+      "server_thread",
+      "production_service",
+      "all_loadout_totals",
+      "repeat_refresh_cached",
+      "same_uuid_edit_refresh",
+      "changed_revision",
+      "same_uuid_retained",
+      "unequip_offhand_inactive",
+      "invalid_weapon_profile",
+      "same_uuid_roll_refresh",
+      "roll_fingerprint_changed",
+      "session_cleanup",
+      "new_session_revision",
+      "console_stats_rejected",
+      "console_grant_rejected",
+      "permission_denied",
+      "status_preserved",
+      "reload_preserved",
+      "reload_keeps_snapshot",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ]
+  },
   "combat-accounting": {
     "mechanicRevision": "combat-accounting-calibration-v1",
     "requiredAssertions": [
@@ -257,6 +286,130 @@
       "owned_tasks_cancelled",
       "owned_chunk_tickets_removed"
     ]
+  },
+  "equipment-player": {
+    "mechanicRevision": "equipment-player-v2",
+    "testPlayerMode": "protocol-calibration",
+    "requiredPlayerMessages": [
+      {
+        "id": "permission-denial",
+        "exact": "You do not have permission to use calibration tools."
+      },
+      {
+        "id": "ordinary-grant",
+        "exact": "Granted ordinary; equip it in your main hand and use /onlydragons stats explain."
+      },
+      {
+        "id": "offhand-grant",
+        "exact": "Granted ferocity_500; equip it in your main hand and use /onlydragons stats explain."
+      },
+      {
+        "id": "equipped-hand-labels",
+        "containsAll": [
+          "Main hand: ordinary ",
+          "enchants={vicious=3}",
+          " | Offhand (inactive): ferocity_500 "
+        ]
+      },
+      {
+        "id": "weapon-damage-values",
+        "exact": "weapon_damage: raw=100.0 effective=100.0"
+      },
+      {
+        "id": "ferocity-values",
+        "exact": "ferocity: raw=3.0 effective=3.0"
+      },
+      {
+        "id": "vicious-source-explanation",
+        "exact": "    enchant:vicious FLAT 3.0"
+      },
+      {
+        "id": "bonus-replacement",
+        "exact": "Session bonus replaced for ferocity. Clears on death, quit or dev clear."
+      }
+    ],
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "disposable_protocol_mode",
+      "offline_fixture",
+      "equipment_service_loaded_from_production",
+      "real_player_join",
+      "player_uuid",
+      "player_loopback",
+      "player_not_op",
+      "nonop_calibration_denied",
+      "denied_player_grant_has_no_item",
+      "permitted_player_grants",
+      "grants_have_distinct_identity",
+      "grant_permission_removed",
+      "inventory_event_unequipped_baseline",
+      "real_held_slot_event",
+      "held_listener_refresh",
+      "same_uuid_item_edit",
+      "item_edit_listener_refresh",
+      "offhand_does_not_stack",
+      "old_equipment_snapshot_immutable",
+      "item_edit_changes_revision",
+      "invalid_item_listener_quarantine",
+      "restored_item_listener_refresh",
+      "real_player_stats_command",
+      "stats_command_reuses_current_fingerprint",
+      "player_bonus_applied",
+      "player_bonus_replaced",
+      "invalid_player_bonus_atomic",
+      "denied_player_clear_preserves_bonus",
+      "bonus_permission_removed",
+      "real_bow_draw",
+      "real_managed_bow_release",
+      "native_owned_arrow_flight",
+      "death_listener_clears_session",
+      "real_player_death_event",
+      "real_player_respawn_event",
+      "respawn_listener_rebuilds_without_bonus",
+      "new_session_bonus_before_quit",
+      "all_fixture_permissions_removed",
+      "real_player_quit",
+      "quit_listener_clears_session",
+      "player_removed_after_quit",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ]
+  },
+  "protocol-player-soak": {
+    "mechanicRevision": "protocol-player-soak-v1",
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "disposable_protocol_mode",
+      "offline_fixture",
+      "real_player_join",
+      "player_uuid",
+      "player_loopback",
+      "player_not_op",
+      "real_selected_slot_event",
+      "selected_slot_new",
+      "selected_bow_applied",
+      "real_bow_use_event",
+      "server_observed_bow_draw",
+      "real_bow_release_event",
+      "full_bow_draw_force",
+      "native_arrow_projectile",
+      "native_projectile_shooter",
+      "native_projectile_live",
+      "native_projectile_moving",
+      "real_player_quit",
+      "player_removed_after_quit",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "owned_listeners_removed",
+      "player_soak_online",
+      "player_soak_elapsed"
+    ],
+    "testPlayerMode": "protocol-calibration"
   },
   "projectile-player-feasibility": {
     "mechanicRevision": "projectile-player-v3",
@@ -313,6 +466,7 @@
       "three_distinct_player_owned_same_tick_impacts",
       "volley_native_damage_event_count",
       "volley_native_health_loss"
-    ]
+    ],
+    "testPlayerMode": "protocol-calibration"
   }
 }

@@ -189,36 +189,57 @@ def assess_memory(memory_mib, linux, windows_available=None, client_memory_mib=0
     return result
 
 
-def windows_available_memory():
+def windows_available_memory(timeout=15):
     powershell = shutil.which('powershell.exe') or '/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe'
-    command = '[int64]((Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory / 1024)'
+    command = ("$ErrorActionPreference='Stop'; "
+               "$memoryProbe = Get-CimInstance Win32_OperatingSystem -ErrorAction Stop; "
+               "if ($null -eq $memoryProbe.FreePhysicalMemory) { throw 'Missing FreePhysicalMemory' }; "
+               '[int64]($memoryProbe.FreePhysicalMemory / 1024)')
     try:
-        probe = subprocess.run([powershell, '-NoProfile', '-NonInteractive', '-Command', command], capture_output=True, text=True, check=True, timeout=15)
-        return int(probe.stdout.strip())
+        probe = subprocess.run([powershell, '-NoProfile', '-NonInteractive', '-Command', command], capture_output=True, text=True, check=True, timeout=timeout)
+        output = probe.stdout.strip()
+        if not re.fullmatch(r'[0-9]+', output):
+            raise ValueError('invalid nonnegative MiB response: ' + repr(output[:200]))
+        return int(output)
     except (OSError, ValueError, subprocess.SubprocessError) as error:
-        raise ValidationError('Cannot verify Windows host memory before starting WSL Paper') from error
+        if isinstance(error, subprocess.TimeoutExpired):
+            detail = f'probe exceeded {timeout:g}s'
+        elif isinstance(error, subprocess.CalledProcessError):
+            detail = f'probe exit {error.returncode}: ' + str(error.stderr or '').strip()[:300]
+        else:
+            detail = type(error).__name__ + ': ' + str(error)[:300]
+        raise ResourceBusy('Busy: Cannot verify Windows host memory before starting WSL Paper: ' + detail) from error
 
 
-def available_memory(memory_mib, client_memory_mib=0):
+def available_memory(memory_mib, client_memory_mib=0, probe_timeout=15):
+    is_wsl = 'microsoft' in Path('/proc/sys/kernel/osrelease').read_text().lower()
+    windows = windows_available_memory(probe_timeout) if is_wsl else None
     raw = dict(re.findall(r'^(\w+):\s+(\d+)\s+kB', Path('/proc/meminfo').read_text(), re.M))
     linux = {key: int(raw[key]) // 1024 for key in ('MemAvailable', 'MemFree', 'Buffers', 'Cached', 'SReclaimable', 'Shmem')}
-    is_wsl = 'microsoft' in Path('/proc/sys/kernel/osrelease').read_text().lower()
-    return assess_memory(memory_mib, linux, windows_available_memory() if is_wsl else None, client_memory_mib)
+    return assess_memory(memory_mib, linux, windows, client_memory_mib)
 
 
 def wait_for_memory(memory_mib, timeout, client_memory_mib=0):
     deadline = time.monotonic() + timeout
     announced = 0.0
+    last_busy = ResourceBusy('Busy: memory admission has no successful probe')
     while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise ResourceBusy(str(last_busy) + '; resource wait expired') from last_busy
         try:
-            return available_memory(memory_mib, client_memory_mib)
+            admitted = available_memory(memory_mib, client_memory_mib, probe_timeout=min(15, remaining))
+            if time.monotonic() >= deadline:
+                raise ResourceBusy('Busy: memory probe completed after the resource deadline')
+            return admitted
         except ResourceBusy as busy:
+            last_busy = busy
             if time.monotonic() >= deadline:
                 raise ResourceBusy(str(busy) + '; resource wait expired') from busy
             if time.monotonic() >= announced:
                 print(str(busy) + '; waiting', flush=True)
                 announced = time.monotonic() + 30
-            time.sleep(1)
+            time.sleep(min(1, max(0, deadline - time.monotonic())))
 
 
 def varint(value):
@@ -355,11 +376,16 @@ def player_pins(pins):
             'minecraftVersion': pins['minecraftVersion']}
 
 
-def player_mode(mode, scenario, control):
+def player_mode(mode, scenario, control, catalog):
     require(mode in (None, 'protocol-calibration'), 'Unknown isolated player mode')
     require(control in ('calibrate', 'early-exit', 'idle'), 'Unknown player failure control')
-    require((mode is not None) == (scenario in ('protocol-player-calibration', 'projectile-player-feasibility')),
-            'Protocol player mode requires an explicitly admitted player scenario')
+    require(isinstance(catalog, dict) and scenario in catalog and isinstance(catalog[scenario], dict),
+            'Unknown or malformed scenario descriptor')
+    descriptor = catalog[scenario]
+    require('testPlayerMode' not in descriptor or descriptor['testPlayerMode'] == 'protocol-calibration',
+            'Unknown or malformed catalog player mode')
+    require(mode == descriptor.get('testPlayerMode'),
+            'Explicit player mode must match the selected scenario catalog declaration')
     require(mode is not None or control == 'calibrate', 'Player failure controls require protocol player mode')
     return mode is not None
 
@@ -377,7 +403,38 @@ def test_settings(base, run_id, port, with_player=False):
     return settings
 
 
-def validate_player_report(path, run_id, issued_ms, timeout, pins):
+def validate_player_messages(report, descriptor):
+    """Replay bounded received text and catalog matchers, not sent command intent."""
+    require(isinstance(report, dict) and isinstance(descriptor, dict), 'Malformed player message evidence/catalog')
+    messages = report.get('messages')
+    require(isinstance(messages, list) and len(messages) <= 128
+            and all(isinstance(message, str) and 0 < len(message) <= 2048
+                    and not message.startswith('OD_PLAYER:') for message in messages),
+            'Missing/malformed bounded player messages')
+    expected = descriptor.get('requiredPlayerMessages', [])
+    require(isinstance(expected, list) and len(expected) <= 32, 'Malformed required player messages')
+    seen = set()
+    for requirement in expected:
+        require(isinstance(requirement, dict) and set(requirement) in ({'id', 'exact'}, {'id', 'containsAll'}),
+                'Malformed player message matcher')
+        identity = requirement['id']
+        require(isinstance(identity, str) and re.fullmatch(r'[a-z][a-z0-9-]{0,63}', identity)
+                and identity not in seen, 'Missing/duplicate player message matcher identity')
+        seen.add(identity)
+        if 'exact' in requirement:
+            value = requirement['exact']
+            require(isinstance(value, str) and 0 < len(value) <= 2048, 'Malformed exact player message')
+            matched = value in messages
+        else:
+            fragments = requirement['containsAll']
+            require(isinstance(fragments, list) and 0 < len(fragments) <= 8
+                    and all(isinstance(value, str) and 0 < len(value) <= 256 for value in fragments),
+                    'Malformed player message fragments')
+            matched = any(all(fragment in message for fragment in fragments) for message in messages)
+        require(matched, 'Missing/incorrect required player message: ' + identity)
+
+
+def validate_player_report(path, run_id, issued_ms, timeout, pins, descriptor=None):
     report = strict_json(path)
     require(isinstance(report, dict), 'Player report must be an object')
     pinned = player_pins(pins)
@@ -395,6 +452,7 @@ def validate_player_report(path, run_id, issued_ms, timeout, pins):
             'Stale/future player report')
     require(type(report.get('teleportsAcknowledged')) is int and report['teleportsAcknowledged'] > 0,
             'Player did not acknowledge teleportation')
+    validate_player_messages(report, descriptor if descriptor is not None else {})
     return report
 
 
@@ -489,7 +547,8 @@ def execute(args):
     server = None
     client = None
     try:
-        with_player = player_mode(args.test_player, args.scenario, args.player_control)
+        plans = strict_json(project / 'dev/game-tests/scenarios.json')
+        with_player = player_mode(args.test_player, args.scenario, args.player_control, plans)
         accepted_eula(args.eula_file)
         require(args.lease_directory is not None, 'Supply the operator-provisioned shared lease directory')
         require(args.java_home is not None, 'Supply JDK via --java-home or JAVA_HOME')
@@ -497,8 +556,6 @@ def execute(args):
         pins = properties(project / 'versions.properties')
         release = properties(java_home / 'release')
         require(re.match(r'"?' + re.escape(pins['javaVersion']) + r'(?:\.|\")', release.get('JAVA_VERSION', '')), 'JDK major does not match versions.properties')
-        plans = strict_json(project / 'dev/game-tests/scenarios.json')
-        require(args.scenario in plans, 'Unknown scenario; register it in dev/game-tests/scenarios.json')
         scenario = plans[args.scenario]
         outcome.update({'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project, text=True).strip(),
                         'worktreeDirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=project, text=True).strip()),
@@ -572,7 +629,7 @@ def execute(args):
                                                       server.process, client.process if client else None)
                 if client:
                     require(client.process.wait(timeout=5) == 0, 'Protocol player exited unsuccessfully')
-                    outcome['player'] = validate_player_report(report_root / 'player.json', run_id, issued_ms, args.scenario_timeout, pins)
+                    outcome['player'] = validate_player_report(report_root / 'player.json', run_id, issued_ms, args.scenario_timeout, pins, plans[args.scenario])
             finally:
                 if server is not None:
                     # Ignore a repeated termination while saving this runner's own disposable world.

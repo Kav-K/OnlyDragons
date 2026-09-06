@@ -1,6 +1,20 @@
 {
   "checks": [
-    {"command": "onlydragons status", "expect": "OnlyDragons ready \\| version"},
-    {"command": "onlydragons reload", "expect": "OnlyDragons configuration reloaded\\."}
+    {
+      "command": "onlydragons status",
+      "expect": "OnlyDragons ready \\| version"
+    },
+    {
+      "command": "onlydragons reload",
+      "expect": "OnlyDragons configuration reloaded\\."
+    },
+    {
+      "command": "onlydragons stats explain",
+      "expect": "This command requires a player\\."
+    },
+    {
+      "command": "onlydragons dev loadout ordinary",
+      "expect": "This command requires a player\\."
+    }
   ]
 }

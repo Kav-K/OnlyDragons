@@ -87,7 +87,7 @@ class OnlyDragonsPluginTest {
         var player = player();
         var command = plugin.getCommand("onlydragons");
         assertNotNull(command);
-        assertEquals(List.of("status"), command.tabComplete(player, "onlydragons", new String[] { "" }));
+        assertEquals(List.of("status", "stats"), command.tabComplete(player, "onlydragons", new String[] { "" }));
         player.setOp(true);
         assertEquals(List.of("reload"), command.tabComplete(player, "onlydragons", new String[] { "re" }));
         assertEquals(List.of(), command.tabComplete(player, "onlydragons", new String[] { "reload", "" }));
@@ -97,6 +97,6 @@ class OnlyDragonsPluginTest {
     void unknownSubcommandShowsUsage() {
         var player = player();
         server.dispatchCommand(player, "onlydragons unknown");
-        assertEquals("Usage: /onlydragons [status|reload]", player.nextMessage());
+        assertEquals("Usage: /onlydragons [status|reload|stats|dev]", player.nextMessage());
     }
 }

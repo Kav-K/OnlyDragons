@@ -11,7 +11,7 @@ Only open issues labeled `symphony` are eligible. See [the setup and credential 
 
 ## OnlyDragons game design
 
-The dragon-combat foundation is currently in planning. Start with the [foundation plan](docs/planning/02-foundation-plan.md), supported by [Hypixel mechanic research](docs/planning/01-research.md) and [agent tasks and validation gates](docs/planning/03-agent-tasks-and-validation.md). Gameplay commands described there are proposed, not yet implemented.
+The dragon-combat foundation is currently in planning. Start with the [foundation plan](docs/planning/02-foundation-plan.md), supported by [Hypixel mechanic research](docs/planning/01-research.md) and [agent tasks and validation gates](docs/planning/03-agent-tasks-and-validation.md). T01b adds [playable equipment stats and calibration grants](dev/stats-play.md); combat commands remain planned.
 
 ## Agent development with Codex and Cursor
 

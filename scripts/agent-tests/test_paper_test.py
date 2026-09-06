@@ -223,8 +223,67 @@ class LifecycleContractTests(unittest.TestCase):
 
     def test_windows_probe_failure_does_not_silently_bypass_gate(self):
         with patch.object(runner.subprocess, 'run', side_effect=OSError('probe unavailable')):
-            with self.assertRaisesRegex(runner.ValidationError, 'Cannot verify Windows'):
+            with self.assertRaisesRegex(runner.ResourceBusy, 'Cannot verify Windows.*OSError: probe unavailable'):
                 runner.windows_available_memory()
+
+    def test_windows_probe_timeout_exit_and_invalid_output_keep_precise_busy_reason(self):
+        for error, reason in ((subprocess.TimeoutExpired('powershell', 4), 'probe exceeded 4s'),
+                              (subprocess.CalledProcessError(7, 'powershell', stderr='CIM unavailable'), 'probe exit 7: CIM unavailable')):
+            with self.subTest(reason=reason), patch.object(runner.subprocess, 'run', side_effect=error):
+                with self.assertRaisesRegex(runner.ResourceBusy, reason):
+                    runner.windows_available_memory(timeout=4)
+        for output in ('', '-1', 'not a memory reading'):
+            with self.subTest(output=output), patch.object(runner.subprocess, 'run', return_value=Mock(stdout=output)):
+                with self.assertRaisesRegex(runner.ResourceBusy, 'invalid nonnegative MiB response'):
+                    runner.windows_available_memory()
+
+    def wsl_memory(self, path):
+        if path == Path('/proc/sys/kernel/osrelease'):
+            return '6.6.87.2-microsoft-standard-WSL2'
+        self.assertEqual(path, Path('/proc/meminfo'))
+        return '\n'.join(f'{key}: {value * 1024} kB' for key, value in
+                         dict(MemAvailable=8000, MemFree=4000, Buffers=0, Cached=4000, SReclaimable=0, Shmem=0).items())
+
+    def test_transient_windows_failure_retries_and_admits_only_fresh_successful_probe(self):
+        elapsed = [0.0]
+        def sleep(seconds):
+            elapsed[0] += seconds
+        with patch.object(runner.time, 'monotonic', side_effect=lambda: elapsed[0]), \
+                patch.object(runner.time, 'sleep', side_effect=sleep), \
+                patch.object(Path, 'read_text', autospec=True, side_effect=self.wsl_memory), \
+                patch.object(runner.subprocess, 'run', side_effect=[OSError('transient CIM failure'), Mock(stdout='6000')]) as probe, \
+                patch.object(runner, 'assess_memory', wraps=runner.assess_memory) as assess:
+            admitted = runner.wait_for_memory(1536, 5, 256)
+        self.assertEqual(6000, admitted['windowsAvailableMiB'])
+        self.assertEqual(2816, admitted['requiredMiB'])
+        self.assertEqual(2, probe.call_count)
+        self.assertEqual([5, 4], [call.kwargs['timeout'] for call in probe.call_args_list])
+        self.assertEqual(1, assess.call_count, 'Failed host probe must never reach memory admission')
+
+    def test_failed_windows_probe_consumes_only_remaining_resource_budget_and_never_admits(self):
+        elapsed = [0.0]
+        def timeout(*args, **kwargs):
+            elapsed[0] += kwargs['timeout']
+            raise subprocess.TimeoutExpired('powershell', kwargs['timeout'])
+        with patch.object(runner.time, 'monotonic', side_effect=lambda: elapsed[0]), \
+                patch.object(Path, 'read_text', autospec=True, side_effect=self.wsl_memory), \
+                patch.object(runner.subprocess, 'run', side_effect=timeout) as probe, \
+                patch.object(runner, 'assess_memory') as assess:
+            with self.assertRaisesRegex(runner.ResourceBusy, 'probe exceeded 2s.*resource wait expired'):
+                runner.wait_for_memory(1536, 2)
+        probe.assert_called_once()
+        self.assertEqual(2, probe.call_args.kwargs['timeout'])
+        assess.assert_not_called()
+
+    def test_successful_probe_that_finishes_after_resource_deadline_is_not_admission(self):
+        elapsed = [0.0]
+        def late_probe(*args, **kwargs):
+            elapsed[0] = 6
+            return {'windowsAvailableMiB': 9000}
+        with patch.object(runner.time, 'monotonic', side_effect=lambda: elapsed[0]), \
+                patch.object(runner, 'available_memory', side_effect=late_probe):
+            with self.assertRaisesRegex(runner.ResourceBusy, 'probe completed after the resource deadline.*resource wait expired'):
+                runner.wait_for_memory(1536, 5)
 
     def test_changed_build_bytes_cannot_be_deployed_with_old_hash(self):
         source, destination = self.root / 'build.jar', self.root / 'deployed.jar'

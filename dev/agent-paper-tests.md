@@ -8,6 +8,11 @@ Gradle project in `dev/game-tests`, compiled against the production JAR and
 the exact Paper/JDK pins in `versions.properties`. It is never included in the
 production artifact or the legacy Java 8 lab harness.
 
+Start with [shared suites and delivery checkpoints](agent-validation.md) for
+preflight, changed-area selection, complete regression/failure controls and
+verifiable receipts. The individual runner below remains the process owner for
+every suite case. Every executing agent can use all committed fixtures.
+
 ## Run a scenario
 
 The operator supplies an **existing accepted** EULA file and the same writable
@@ -66,9 +71,11 @@ forced termination fails validation. It never finds JVMs by name or PID lists.
 
 ## Protocol player calibration
 
-The lead-authorized `--test-player protocol-calibration` option is accepted only
-with `--scenario protocol-player-calibration` or the GH-5
-`--scenario projectile-player-feasibility` experiment. It creates a fresh loopback-only
+The `--test-player protocol-calibration` option is accepted only for scenarios
+that explicitly declare `testPlayerMode: protocol-calibration` in the committed
+catalog. The CLI mode must match; adding a name alone cannot enable a player.
+This includes the protocol calibration and connected-player equipment fixture.
+It creates a fresh loopback-only
 offline profile, whitelists one unique synthetic player, and launches the
 separate [pinned client](player-client/README.md). It does not modify
 `dev/server.properties`, human profiles, EULA acceptance, or account credentials.
