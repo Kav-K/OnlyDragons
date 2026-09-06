@@ -113,6 +113,20 @@ The Windows mcdev lab and Cursor Play/Run targets remain the human workflow.
 Build, real-server, authenticated-client, and performance evidence are distinct;
 report unrun gates explicitly. Startup alone cannot validate a gameplay feature.
 
+Every executing agent may use every committed fixture in its issue checkout;
+no additional permission is needed. Use the shared regression suites and delivery
+checkpoint in `dev/agent-validation.md` to select cross-feature checks and attach
+verifiable evidence before handoff. New behavior requires happy-path, boundary,
+rejection and lifecycle cases at the appropriate layer. Extend the coverage and
+acceptance manifests with the feature; do not silently leave new code unclassified.
+Shared harness lifecycle/schema changes still require coordination to avoid
+conflicts, but running existing fixtures is part of every ticket's scope.
+Automate observable commands, permissions, equipment, timing and cleanup with
+real Paper/protocol actors where possible. Reserve human review for subjective
+feel, visual presentation, authenticated-client compatibility and unresolved
+product choices. A headless protocol test can prove its actual packets and
+server behavior; it cannot establish the appearance or feel of the full client.
+
 Use mcdev.cmd for version-isolated server preparation, restart, smoke tests, and
 shutdown. Restart Paper after structural plugin changes; never use server-wide
 `/reload` or runtime plugin unloaders. Keep servers and debugger on loopback.

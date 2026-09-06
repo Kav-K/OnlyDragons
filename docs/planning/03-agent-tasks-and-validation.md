@@ -6,11 +6,11 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
-Baseline reconciled **5 September 2026** against main `5b0e030` and repository
+Baseline reconciled **5 September 2026** against main `a48ebd4` and repository
 issue/PR state. The plugin still supplies starter status/reload commands and
 welcome messages. T00 contracts, the T01a stat resolver, T02 items, and the
-T09a/T09b isolated Paper runner and protocol actor are integrated. Combat is in review in #6;
-equipment inspection and encounters are not yet integrated. The recorded T00
+T09a/T09b isolated Paper runner and protocol actor are integrated. T03 combat merged in PR #26;
+T01b equipment inspection and calibration grants merged in PR #29. Encounters are not yet integrated. The recorded T00
 and T01a checks below establish their bounded contracts, not the later gameplay
 or milestone gates.
 
@@ -26,21 +26,20 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | Task | Implementation state | Owner / issue / PR | Remaining acceptance gate |
 | --- | --- | --- | --- |
 | T00 — Contracts | Complete | [#1](https://github.com/Kav-K/OnlyDragons/issues/1), [PR #15](https://github.com/Kav-K/OnlyDragons/pull/15) | Merged at be920d0 after independent review, final-head Windows/Linux CI, 21 production tests and 29 real-Paper contract assertions; see [evidence](../../dev/agent-paper-tests.md#foundation-contract-evidence). Feature engines remain separate tasks. |
-| T01 — Stats | In review (T01a complete; T01b delivered) | [#3 resolver](https://github.com/Kav-K/OnlyDragons/issues/3), [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23), [#7 equipment/play](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a merged at 1efa7d0 after review and final-head CI; 30 production tests and 18 real-Paper assertions passed. See [evidence](#t01a-resolver-validation). T01b [draft PR #29](https://github.com/Kav-K/OnlyDragons/pull/29): 82 production tests, 23 equipment and 35 item Paper assertions, plus unchanged 25-assertion protocol calibration; [evidence and remaining player gates](#t01b-equipment-validation-gh-7). Lead review/CI and authenticated Cursor Play remain pending. |
+| T01 — Stats | In progress (T01a complete; T01b playable slice merged) | [#3 resolver](https://github.com/Kav-K/OnlyDragons/issues/3), [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23), [#7 equipment/play](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a merged at 1efa7d0 after review and final-head CI; 30 production tests and 18 real-Paper assertions passed. See [evidence](#t01a-resolver-validation). T01b [merged PR #29](https://github.com/Kav-K/OnlyDragons/pull/29): 82 production tests, 23 equipment and 35 item Paper assertions, plus unchanged 25-assertion protocol calibration; [evidence and remaining player gates](#t01b-equipment-validation-gh-7). Independent review and final-head Windows/Linux CI passed before merge at a48ebd4. Connected-player equipment acceptance is being completed in PR #32; authenticated Cursor Play remains a separate observation. |
 | T02 — Items | Complete | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Final clean 7ebaa6b after main 586a170: 54 production tests and 35 item-codec-v4 Paper assertions passed, including real serialized loadouts through production snapshots and four cleanup checks. [Evidence](#t02-item-validation-evidence). Merged at 7c6d843 after independent review and final-head CI; authenticated inventory/visual checks are separate. #7 equipment/grants and #9 firing integrate later. |
-| T03 — Combat/ledger | In review | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [draft PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Independent code/evidence review passed; final-head CI and lead merge remain. Physical adapter/native suppression and human checks are separate. |
-| T04 — Paper feasibility | In progress (player-owned follow-up resumed) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). T09b merged at 5b0e030, allowing the lead to resume #5. Player-owned native dragon damage suppression and semantic head/native-damage classification still require their own experiments; #9 remains blocked and M0 unaccepted. |
-| T05 — Enchants/procs | Planned | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Bounded ferocity, tempo expiry/swap, and modifier fixtures. |
+| T03 — Combat/ledger | Complete | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Merged at 9092fbe after independent review and final-head Windows/Linux CI. Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Physical adapter/native suppression and human checks are separate. |
+| T04 — Paper feasibility | In review (player-owned follow-up delivered) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). Player-owned follow-up is in draft PR #31 with native positive controls, cancellation/zero-damage observations, part geometry, phase and simultaneous-hit evidence. Current-main/shared-suite reconciliation and an explicit supported phase/part policy remain required; #9 stays blocked and M0 unaccepted. |
+| T05 — Enchants/procs | In review | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Draft PR #30 passed independent source review, 128 production tests and 38 real-Paper assertions. Current-main/shared-suite integration and final CI remain pending. |
 | T06 — Firing/Duplex | Blocked | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | Wait for T01b/T02 and accepted T04 impact/native-damage evidence. Partial PR #22 and a passing T09b calibration alone cannot satisfy this gate. Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence remain required. |
 | T07 — Tracer/continuity | Planned | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |
 | T08 — Practice tools | Planned | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | Repeatable player procedure, permissions, and explained damage. |
-| T09 — Gameplay validation | In progress (T09a/T09b complete) | [#2 runner](https://github.com/Kav-K/OnlyDragons/issues/2), [PR #16](https://github.com/Kav-K/OnlyDragons/pull/16), [#20 protocol player](https://github.com/Kav-K/OnlyDragons/issues/20), [PR #27](https://github.com/Kav-K/OnlyDragons/pull/27) | T09b merged at 5b0e030 after independent review and final-head CI. Clean runtime 1dd6ffe passed 25 protocol-player Paper assertions; early-exit and timeout controls failed as intended, with both owned JVMs cleaned up. [Exact evidence/hashes](../../dev/agent-paper-tests.md#protocol-player-evidence). Human visuals/authenticated multiplayer and feature-specific scenarios remain separate gates. |
+| T09 — Gameplay validation | In progress (T09a/T09b complete; T09c validation) | [#2 runner](https://github.com/Kav-K/OnlyDragons/issues/2), [PR #16](https://github.com/Kav-K/OnlyDragons/pull/16), [#20 protocol player](https://github.com/Kav-K/OnlyDragons/issues/20), [PR #27](https://github.com/Kav-K/OnlyDragons/pull/27) | T09b merged at 5b0e030 after independent review and final-head CI. Clean runtime 1dd6ffe passed 25 protocol-player Paper assertions; early-exit and timeout controls failed as intended, with both owned JVMs cleaned up. [Exact evidence/hashes](../../dev/agent-paper-tests.md#protocol-player-evidence). Human visuals/authenticated multiplayer and feature-specific scenarios remain separate gates. |
 | T10 — Prefire/performance | Planned | [#12](https://github.com/Kav-K/OnlyDragons/issues/12) | Integrated traces, human rehearsal, and measured load/cleanup gates. |
 | T11 — Eight-eye lifecycle | Planned, later | [#13](https://github.com/Kav-K/OnlyDragons/issues/13) | M3 accepted, then transaction, spawn, cancellation, and recovery gates. |
 | T12 — Variants/progression | Planned, later | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus separately agreed roster, rewards, and acquisition scope. |
 
-No milestone M0–M5 is accepted yet. The next focus is final #6 combat integration,
-#7 equipment/play, and the resumed #5 player-owned experiments using T09b. A task's
+No milestone M0–M5 is accepted yet. The next focus is #28 shared suite/checkpoint validation and connected equipment acceptance, followed by current-main integration of #8 procs and #5 player-owned findings. A task's
 full acceptance criteria below remain authoritative; this table is a summary.
 
 Use **Planned**, **In progress**, **In review**, **Blocked**, or **Complete** for
@@ -122,8 +121,9 @@ design sections above are the current summary; this record explains changes.
 
 ### T01b equipment validation (GH-7)
 
-T01b is **In review** in [draft PR #29](https://github.com/Kav-K/OnlyDragons/pull/29),
-branch `symphony/gh-7`. Final clean runtime revision
+T01b's playable slice is **merged** in [PR #29](https://github.com/Kav-K/OnlyDragons/pull/29)
+at `a48ebd4`, after independent review and final-head Windows/Linux CI
+([run](https://github.com/Kav-K/OnlyDragons/actions/runs/34008900983)). Final clean runtime revision
 `4c28474b54e2a2aa25d6242d12525f8783c4ea1b` includes the ordinary merge of main
 `9092fbe` (combat PR #26). All eleven scenario registrations and existing
 assertion sets are retained with `Map.ofEntries`; both equipment and combat
@@ -185,14 +185,13 @@ Windows/Linux CI passed on runtime head `4c28474`
 The earlier `7751adc` runs remain integration history for main `5b0e030`; the
 three runs above supersede them for current-main handoff.
 
-**Remaining:** lead review/merge, final documentation-head CI, and Windows
-Cursor smoke/Build/Play. The lead's
-[#28](https://github.com/Kav-K/OnlyDragons/issues/28) fixture is now implementing
-objective real-player permission/grant, held-slot listener, same-UUID inventory
-change and session-cleanup assertions against this PR's clean 7751adc API. The
-lead requested delivery of this slice before integrating that additive fixture
-and rerunning the shared regression suite. Those automated gates remain pending
-#28 integration; they are not delegated to a blanket human checklist. Human
+**Remaining:** integrated shared-suite acceptance of the connected equipment
+fixture in [PR #32](https://github.com/Kav-K/OnlyDragons/pull/32), and Windows
+Cursor Build/Play environment checks. The fixture implements objective real-player
+permission/grant, received command text, held-slot listeners, same-UUID inventory
+changes, death/respawn and quit cleanup against the merged production API. These
+automated gates await the final shared baseline and review; they are not delegated
+to a blanket human checklist. Human
 visuals, authenticated account/multiplayer behavior and input feel remain distinct. T06 must still connect `refresh(Player)` at shot acceptance;
 `cached(UUID)` is diagnostic state and must not substitute for that recheck.
 No projectile integration, combat effects, player-health attributes, performance
@@ -200,7 +199,7 @@ claim or gameplay milestone is accepted here.
 
 ### T03 combat validation
 
-[Draft PR #26](https://github.com/Kav-K/OnlyDragons/pull/26) for GH-6 owns additive combat services, `CombatEncounter`, and its unit/Paper scenarios.
+[PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), merged at `9092fbe`, owns additive combat services, `CombatEncounter`, and its unit/Paper scenarios.
 T00 and T01a are integrated (owner dispatch confirms PR #23 merge `1efa7d0`);
 T01a review references in its evidence section are historical.
 Existing T00 DTOs, production listener/command registration, pins and other
@@ -618,6 +617,15 @@ The existing Windows `mcdev smoke` verifies startup/status/commands and clean sh
 ## 6. Human testing procedure after M2/M3
 
 Server commands here are existing lab commands. In-game development subcommands are proposed interfaces and become usable only when T08 lands.
+
+The user requested that objective behavior need very little human intervention.
+The checklist below is a qualitative rehearsal of feel, presentation and actual
+authenticated-client compatibility. Numeric results, permissions, input cadence,
+duplicate prevention, ownership, expiry and cleanup remain automated acceptance
+requirements, using real protocol/Paper fixtures as the features arrive. They
+must not be assigned to a human merely because the current fixture is missing.
+Track those gaps in `dev/game-tests/acceptance.json`; the shared suite/checkpoint
+workflow is in [agent validation](../../dev/agent-validation.md).
 
 1. From the OnlyDragons terminal run `.\mcdev play`. Use a client matching the printed server version and connect to `127.0.0.1:25565`. Any launcher is fine.
 2. If needed, use `.\mcdev console -Command 'op YourMinecraftName'` locally. Enter the practice arena through the future developer command; obtain a named test loadout.
