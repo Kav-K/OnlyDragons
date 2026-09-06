@@ -234,17 +234,6 @@
       "dragon-restart-fresh",
       "dragon-restart-legacy",
       "dragon-restart-animation"
-    ],
-    "t08a-worker": [
-      "dragon-combat",
-      "dragon-restart-fresh",
-      "dragon-restart-legacy",
-      "dragon-restart-animation",
-      "practice-combat",
-      "practice-lifecycle",
-      "owned-firing",
-      "same-profile-restart",
-      "same-profile-restart-abort"
     ]
   },
   "areas": {
