@@ -252,6 +252,16 @@ native HOVER for development initialization; it is not custom flight AI or a
 Hypixel movement claim. New subscription/failure cases and final clean-input
 acceptance remain pending in [T08a status](03-agent-tasks-and-validation.md#t08a--managed-real-dragon-backend-and-development-controls).
 
+The clean `713f859` combat run `e84e6b1c0d9a4cb6a37ab69b49e669ff`
+failed notification checks and exposed premature terminal release: the native
+result reported HP zero and ANIMATING while `isValid()` returned false.
+[Pinned Paper CraftEntity source](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java)
+confirms that validity includes liveness. It cannot prove removal during dragon
+death animation. The backend now tracks the public removal event; strengthened
+fixtures require retained ownership/tickets during animation and actual UUID
+absence after reset. The earlier `!isValid()` reset assertions are superseded,
+not accepted removal evidence.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

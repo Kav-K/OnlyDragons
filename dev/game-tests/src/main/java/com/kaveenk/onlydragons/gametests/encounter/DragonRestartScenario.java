@@ -105,7 +105,7 @@ public final class DragonRestartScenario implements Scenario, Listener {
                 if(animation) prepareAnimationShutdown(nativeDragon); else quit();
             }));
         } else command("reset", () -> {
-            c.check("restart_new_spawn_reset_cleanup", true, !nativeDragon.isValid() && c.production().combat().activeCount() == 0
+            c.check("restart_new_spawn_reset_cleanup", true, Bukkit.getEntity(nativeDragon.getUniqueId()) == null && c.production().combat().activeCount() == 0
                     && c.production().bows().continuity().tickets().demandCount() == 0 && c.production().bows().continuity().tickets().reservedCount() == 0);
             command("repeat", () -> { c.check("repeat_reset_no_result", true, c.production().combat().completions().isEmpty()); quit(); });
         });
@@ -122,7 +122,7 @@ public final class DragonRestartScenario implements Scenario, Listener {
             c.production().equipment().bonus(p,com.kaveenk.onlydragons.domain.stats.StatKey.WEAPON_DAMAGE,900);
             players.request("alpha","use");players.await("restart draw",60,p::isHandRaised,()->c.later(22,()->{
                 players.request("alpha","release");players.await("restart native death animation",120,()->dragon.getDeathAnimationTicks()>0,()->{
-                    c.check("animation_owned_at_shutdown",true,dragon.isValid()&&dragons.view().orElseThrow().completion().isPresent()&&c.production().combat().activeCount()==1);
+                    c.check("animation_owned_at_shutdown",true,Bukkit.getEntity(dragon.getUniqueId())==dragon&&c.production().bows().continuity().tickets().demandCount()>0&&dragons.view().orElseThrow().completion().isPresent()&&c.production().combat().activeCount()==1);
                     c.observe("shutdownAnimationTicks",dragon.getDeathAnimationTicks());quit();
                 });
             }));

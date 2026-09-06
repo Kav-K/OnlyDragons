@@ -9,7 +9,7 @@ import org.bukkit.entity.EnderDragon;
 /** Real disposable dragon projection shared with future hatch controls. Own until native removal. */
 public final class DragonBackend implements TargetBackend {
     private EnderDragon entity;
-    private boolean lethal, announced, issuingLethal, disqualified, confirmed;
+    private boolean lethal, announced, issuingLethal, disqualified, confirmed, removed;
     private final java.util.function.Consumer<EncounterResult> completion;
     private final java.util.function.Consumer<DragonBackend> retirement;
     private String outcome = "ALIVE";
@@ -60,21 +60,22 @@ public final class DragonBackend implements TargetBackend {
         else outcome = "ANIMATING";
     }
     public void removed(org.bukkit.event.entity.EntityRemoveEvent.Cause cause) {
+        removed = true;
         if (cause != org.bukkit.event.entity.EntityRemoveEvent.Cause.DEATH) disqualified = true;
         outcome = "REMOVED_" + cause; retirement.accept(this);
     }
     private void announce() {
-        if (announced || disqualified || !confirmed || result == null || !outcome.equals("ANIMATING") || !entity.isValid() || entity.getHealth() != 0) return;
+        if (announced || disqualified || !confirmed || result == null || !outcome.equals("ANIMATING") || removed || entity.getHealth() != 0) return;
         announced = true; completion.accept(result);
     }
     public boolean released() {
-        boolean removed = entity == null || !entity.isValid();
+        // isValid() also tests liveness: a zero-HP dragon still owns its native animation.
         if (removed) tickets.endArena(ticketOwner);
         return removed;
     }
     public boolean lethalRequested() { return lethal; }
     public void close() {
-        try { if (entity != null && entity.isValid()) { disqualified = true; outcome = "RESET"; entity.remove(); } }
+        try { if (entity != null && !removed) { disqualified = true; outcome = "RESET"; entity.remove(); removed = true; } }
         finally { tickets.endArena(ticketOwner); retirement.accept(this); }
     }
 }

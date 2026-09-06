@@ -16,7 +16,7 @@ import org.bukkit.util.Vector;
 /** Real connected commands and native bow arrows into the production dragon and shared accounting. */
 public final class DragonCombatScenario implements Scenario, Listener {
     ScenarioContext c; PlayerFixture players; DevelopmentDragonService dragons; DamageObservationProbe probe;
-    org.bukkit.entity.Cow unrelated; EnderDragon dragon, control; UUID generation; int commands, releases, deaths, animationStart=-1, removedAt=-1, xp, items, controlXp;
+    double unrelatedHealth; org.bukkit.entity.Cow unrelated; EnderDragon dragon, control; UUID generation; int commands, releases, deaths, animationStart=-1, removedAt=-1, xp, items, controlXp;
     boolean veto, sentinel, cancelDeath, failSpawn, nativeGuard, hold; final List<Arrow> held=new ArrayList<>(); final List<Vector> velocities=new ArrayList<>(); String loadout="ordinary"; double bonus; final List<DevelopmentDragonService.Completion> notifications=new ArrayList<>(); boolean reentryRejected, settledCloseRejected, handlesChecked, removeOnRetirement;
     DevelopmentDragonService.Subscription oldHandle;
     final java.util.function.Consumer<DevelopmentDragonService.Completion> repeatedConsumer=event->{};
@@ -36,7 +36,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
         p.getInventory().clear();p.getInventory().setHeldItemSlot(0);p.setTotalExperience(0);p.setLevel(0);p.setExp(0);
         for(int x=-3;x<=3;x++)for(int z=-3;z<=3;z++)c.tickChunk(p.getWorld().getChunkAt(x,z));
         unrelated=c.own(p.getWorld().spawn(new Location(p.getWorld(),16,100,16),org.bukkit.entity.Cow.class));
-        unrelated.setAI(false);unrelated.setGravity(false);unrelated.setInvulnerable(true);
+        unrelatedHealth=unrelated.getHealth();unrelated.setAI(false);unrelated.setGravity(false);unrelated.setInvulnerable(true);
         players.permission("alpha","onlydragons.practice",true);
         command("setup",()->command("spawn",()->{
             capture();c.check("real_dragon_initialized",true,dragon.isValid()&&dragon.getDragonBattle()==null&&dragon.getPhase()==EnderDragon.Phase.HOVER&&view().target().currentHealth()==1000);
@@ -77,9 +77,9 @@ public final class DragonCombatScenario implements Scenario, Listener {
         c.check("terminal_work_closed",true,v.procs().queued()==0&&v.procs().sessions()==0&&c.production().bows().pendingClaims()==0&&c.production().bows().capacityUsed()==0);
         command("result",()->{
             players.await("native death animation starts",80,()->dragon.getDeathAnimationTicks()>0,()->{
-                animationStart=Bukkit.getCurrentTick();c.check("native_animation_advances",true,dragon.getDeathAnimationTicks()>0);
+                animationStart=Bukkit.getCurrentTick();c.check("native_animation_advances",true,dragon.getDeathAnimationTicks()>0&&Bukkit.getEntity(dragon.getUniqueId())==dragon&&c.production().combat().ownsEntity(dragon.getUniqueId())&&c.production().bows().continuity().tickets().demandCount()>0&&c.production().bows().continuity().tickets().reservedCount()>0);
                 players.await("native DEATH removal",400,()->removedAt>=0,()->{
-                    c.check("one_native_death_removal",true,!dragon.isValid()&&deaths==1);
+                    c.check("one_native_death_removal",true,Bukkit.getEntity(dragon.getUniqueId())==null&&deaths==1);
                     long remaining=Math.max(220-(Bukkit.getCurrentTick()-animationStart),20);
                     c.later(remaining,()->{
                         c.check("delayed_rewards_suppressed",true,xp==0&&items==0&&players.player("alpha").getTotalExperience()==0&&players.player("alpha").getInventory().all(Material.DIAMOND).isEmpty());
@@ -98,7 +98,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
             command("spawn-again",()->{capture();UUID old=generation;
                 try{dragons.reset(UUID.randomUUID());c.check("stale_reset_rejected",true,false);}catch(IllegalArgumentException expected){c.check("stale_reset_rejected",true,dragon.isValid());}
                 command("reset",()->{
-                    c.check("reset_no_ordinary_result",true,!dragon.isValid()&&c.production().combat().completions().size()==1&&view().completion().isEmpty());
+                    c.check("reset_no_ordinary_result",true,Bukkit.getEntity(dragon.getUniqueId())==null&&c.production().combat().completions().size()==1&&view().completion().isEmpty());
                     command("repeat",()->{c.check("repeat_reset_no_extra_completion",1,c.production().combat().completions().size());failedSpawn(0);});
                 });
             });
@@ -118,7 +118,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
             c.check("proc_lethal_subscription",true,notifications.size()==2&&notifications.getLast().result().equals(r)&&dragons.subscriberCount()==0);
             c.check("proc_lethal_native_boundary",true,r.completedOrdinal()==2&&r.participants().get(players.identity("alpha")).actualHealthDamage()==1000&&r.participants().get(players.identity("alpha")).contributionDamage()==1200&&dragon.getHealth()==0);
             command("animation-reset",()->{
-                c.check("animation_reset_keeps_frozen_no_rewards",true,!dragon.isValid()&&view().completion().orElseThrow().equals(r)&&xp==0&&items==0);
+                c.check("animation_reset_keeps_frozen_no_rewards",true,Bukkit.getEntity(dragon.getUniqueId())==null&&view().completion().orElseThrow().equals(r)&&xp==0&&items==0);
                 cancelledTrial();
             });
         }));
@@ -135,7 +135,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
                 c.check("cancelled_death_not_retried",true,view().completion().orElseThrow().equals(frozen)&&dragon.getHealth()>0);
                 dragon.setHealth(0); // Explicit administrative second death must never validate the disqualified completion.
                 c.check("later_native_death_cannot_publish_cancelled_result",true,notifications.size()==2&&view().completion().orElseThrow().equals(frozen));
-                command("cancel-reset",()->{c.check("cancelled_death_cleanup",true,!dragon.isValid()&&c.production().combat().activeCount()==0&&c.production().bows().continuity().tickets().reservedCount()==0);removalTrial();});
+                command("cancel-reset",()->{c.check("cancelled_death_cleanup",true,Bukkit.getEntity(dragon.getUniqueId())==null&&c.production().combat().activeCount()==0&&c.production().bows().continuity().tickets().reservedCount()==0);removalTrial();});
             });
         }));
     });}
@@ -143,14 +143,14 @@ public final class DragonCombatScenario implements Scenario, Listener {
         capture();held.clear();velocities.clear();hold=true;bonus=900;
         draw("removal-held",()->{
             hold=false;removeOnRetirement=true;
-            draw("removal-lethal",()->players.await("retirement callback removes dragon",100,()->!dragon.isValid(),()->{
+            draw("removal-lethal",()->players.await("retirement callback removes dragon",100,()->Bukkit.getEntity(dragon.getUniqueId())==null,()->{
                 removeOnRetirement=false;
                 c.check("nonordinary_removal_before_delivery_disqualifies",true,notifications.size()==2&&view().completion().isPresent()&&dragons.subscriberCount()==0);
                 c.later(2,()->{c.check("retirement_callback_cleanup",true,c.production().combat().activeCount()==0&&c.production().bows().continuity().tickets().reservedCount()==0);finish();});
             }));
         });
     });}
-    void finish(){c.check("unrelated_entity_preserved",true,unrelated.isValid()&&unrelated.getHealth()==20);c.check("subscriptions_return_to_baseline",0,dragons.subscriberCount());c.observe("rewardEvents",rewards);c.observe("physicalHits",hits.entrySet().stream().map(e->Map.of("uuid",e.getKey().toString(),"tick",e.getValue())).toList());c.observe("playerActions",players.journal());players.request("alpha","quit");players.await("actual quit",100,()->players.quits("alpha")==1,c::finish);}
+    void finish(){c.check("unrelated_entity_preserved",true,unrelated.isValid()&&unrelated.getHealth()==unrelatedHealth);c.check("subscriptions_return_to_baseline",0,dragons.subscriberCount());c.observe("rewardEvents",rewards);c.observe("physicalHits",hits.entrySet().stream().map(e->Map.of("uuid",e.getKey().toString(),"tick",e.getValue())).toList());c.observe("playerActions",players.journal());players.request("alpha","quit");players.await("actual quit",100,()->players.quits("alpha")==1,c::finish);}
     ManagedCombatService.View view(){return c.production().combat().view(generation).orElseThrow();}
     void capture(){generation=dragons.generation().orElseThrow();dragon=(EnderDragon)Bukkit.getEntity(view().entityId());probe.watch(dragon);
         if(oldHandle==null)oldHandle=dragons.subscribe(generation,repeatedConsumer);
