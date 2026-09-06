@@ -1,5 +1,7 @@
 # T08a focused validation — GH-39 / draft PR #60
 
+**Final acceptance:** PR #60 merged at `889a3db3ca7d43ebdd98bae262a61cccf20cca3a`; [complete cohort and separate lead approval](t08a-suite.md). The focused statuses, failures and original run identities below are retained historical evidence.
+
 Final runtime: `abb906c24307fa25ec2448b649c80392fba90422`, clean, with main
 `706ab412e62645da2357e73cadfb2c020fec64fb` fetched and normally merged (already
 current). Later documentation commits do not change the runtime artifact.

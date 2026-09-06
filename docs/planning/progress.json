@@ -327,16 +327,25 @@
       "notice": "PR #48 merged at 3c35a85bfa5d6bf6788af7c26d59891cfb852175 after the complete 21-case hosted suite, independent raw replay/review, task checkpoints and current CI. Exact evidence: docs/planning/evidence/catalog-procs-suite.md. One shipped test-dragon definition and inert table/item bindings; no live spawn, reward calculation or delivery. Historical worker evidence retains its recorded inputs; earlier pending or held acceptance is not relabeled as passing."
     },
     "T08a": {
+      "status": "complete",
+      "completedRequirements": [
+        "managed-dragon-development"
+      ],
+      "evidence": {
+        "managed-dragon-development": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34049768254",
+          "revision": "854287c4017f284b9263d54affd57fca02c033df"
+        }
+      },
+      "notice": "PR #60 merged at 889a3db after the complete hosted cohort, independent raw/source review, strict replay, actual-main checkpoint and current CI. Exactly managed-dragon-development complete; evidence/t08a-suite.md. Ranking and M1–M5 remain separate.",
+      "reviewedRevision": "854287c4017f284b9263d54affd57fca02c033df",
+      "mergedRevision": "889a3db3ca7d43ebdd98bae262a61cccf20cca3a"
+    },
+    "T08b": {
       "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Lead-assigned after T08 acceptance through PR #57 at 3505d6c; awaiting the Symphony dispatch label on issue #39. Reuse mature fixtures and add only necessary managed-dragon feature cases; preserve all validation gates. No worker execution, implementation or accepted feature evidence is claimed yet."
-    },
-    "T08b": {
-      "status": "planned",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+      "notice": "Lead-assigned after accepted T08a; awaiting the Symphony dispatch label on issue #40. No running worker, implementation or completed ranking evidence claimed. Reuse the frozen result/subscription and existing fixtures; all gates remain intact."
     },
     "T08c": {
       "status": "planned",

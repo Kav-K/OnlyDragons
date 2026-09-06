@@ -11,8 +11,8 @@ documents. Read this detail when extending fixtures or planning the remaining
 game, alongside [confirmed encounter decisions](05-encounter-expansion.md).
 
 The present accepted baseline provides contracts, arithmetic, item/equipment
-behavior, process cleanup and protocol-player fixtures. It does not establish
-a complete managed dragon fight. PR #31's player-owned observations and scoped
+behavior, process cleanup and protocol-player fixtures. The separately accepted T08a direct development fight is linked below;
+this does not establish countdown/prefire, ranking or ritual completion. PR #31's player-owned observations and scoped
 policy are accepted at `705de34`; [exact evidence](evidence/t04-suite.md) retains
 their boundaries. PR #48 integrated the bounded proc coordinator and T02b catalog
 at `3c35a85` after the full 21-case cohort, independent replay/review and CI;
@@ -23,11 +23,12 @@ PR #56 integrates T07 Tracer/continuity at `2c0be58` after the complete 26-case
 cohort and independent acceptance of P07/P10; [exact evidence](evidence/t07-suite.md).
 PR #57 integrates T08 connected dummy accounting at `3505d6c` after the
 complete 28-case cohort and independent acceptance; [exact evidence](evidence/t08-suite.md).
-T08a is lead-assigned and awaiting dispatch; managed-dragon controls, ranking and
-loot simulation still require their own evidence. M1–M5 remain unaccepted.
+T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md).
+T08b/#40 is lead-assigned and awaiting its Symphony dispatch label; no running worker or ranking acceptance is claimed.
+Ranking and loot simulation require their own evidence; M1–M5 remain unaccepted.
 PR #50 integrated T09e at `7b8ff0f` after the complete 23-case cohort and
 independent acceptance; [generic restart evidence](evidence/t09e-suite.md)
-does not certify T08a managed-encounter recovery.
+is supplemented by T08a's separate managed-encounter recovery evidence.
 
 ## Brief to delivery and evidence
 
@@ -35,12 +36,12 @@ does not certify T08a managed-encounter recovery.
 | --- | --- | --- | --- |
 | Explainable stats, one ultimate per bow, immutable source/shot values | T00, T01a/T01b, T02; T06 integrates shot capture | Accepted `contract-consumers`, `stats-resolver`, `item-codec`, `equipment-service` and `equipment-player`; T06's production native shot capture preserves immutable values across delayed emission and equipment changes | T08 now consumes captured values once; T08a extends the shared backend rather than cloning accounting |
 | No-Strength offense, crits, caps, separate HP and ghost/contribution damage | T03; T05, T06 and T08 integrate actual hits | `combat-services`, `bounded-procs`, T06 `firing-input` and T08 P01/P13/connected attribution are accepted. P08/P09 remain integrated enchant gates; retain independent numeric tests and real-Paper comparisons | Final ferocity HP balance and unchosen optional enchant formulas remain explicit calibration/design choices |
-| One physical hit authority, native damage suppression and measured dragon parts/phases | T04, T06, T08, T08a | T04 observations/policy accepted in PR #31; production P02/P04 accepted in T06, including terminal retirement, veto and unsupported-phase controls | T08 HP/result composition is accepted for the shared dummy; T08a must prove its real-dragon backend; no semantic-head or all-phase claim |
+| One physical hit authority, native damage suppression and measured dragon parts/phases | T04, T06, T08, T08a | T04 observations/policy accepted in PR #31; production P02/P04 accepted in T06, including terminal retirement, veto and unsupported-phase controls | T08 HP/result composition is accepted for the shared dummy; T08a separately proves the real-dragon backend; no semantic-head or all-phase claim |
 | Native drawn bows, shortbow cadence, ammo, offhand deduplication and Duplex identity | T06 with T09d primitives; T08 connects combat/procs | T06 `firing-input` and `automated-multiplayer-firing` accepted using parameterized packets and production Paper effects; T08 P13 and full connected accounting attribution are now accepted; P08/P09 and M3 remain separate | Subjective input feel and authenticated-client compatibility remain human observations |
 | Tracer radius/steering, real pre-spawn UUID continuity and bounded capacity | T07, T10 | P07/P10 accepted through PR #56: five radii, moving native targets, obstruction, same-UUID flight, age/chunk continuity and shared-ticket cleanup. P03/P05/P06/P11/P12/P14 still require integrated rehearsal/load evidence | T10 production countdown/hatch and measured player/arrow envelope; preserve M3's human visual prefire rehearsal |
 | One extensible test-dragon definition and inert table bindings | T02b / #38 | Accepted `dragon-definition-catalog`, `sample-loot-table-bindings` through PR #48: whole-candidate validation, retained selections and real production-loader/abort checks | One initial test dragon only; test definitions do not approve later content or production drop numbers |
-| Reusable persisted configuration and same-world restart validation | T09e / #49, complete through PR #50 at `7b8ff0f` | Accepted `same-profile-restart`: two actual boots, saved configuration, independent phase plans/reports, connected commands and exact positive/abort outcomes in the [23-case cohort](evidence/t09e-suite.md) | T08a must still prove its own managed-dragon disable/start recovery; human/client gates remain separate |
-| Managed real dragon plus spawn/status/reset/result inspection | T08a / #39 after shared T08/T06 path | `managed-dragon-development`: native and domain death observations, permissions/output, failed spawn, repeated reset and one completion | No engine clone; no real grants; direct spawning does not accept prefire or the altar |
+| Reusable persisted configuration and same-world restart validation | T09e / #49, complete through PR #50 at `7b8ff0f` | Accepted `same-profile-restart`: two actual boots, saved configuration, independent phase plans/reports, connected commands and exact positive/abort outcomes in the [23-case cohort](evidence/t09e-suite.md) | T08a separately accepts its managed-dragon disable/start recovery; human/client gates remain separate |
+| Managed real dragon plus spawn/status/reset/result inspection | T08a / #39 after shared T08/T06 path | Accepted `managed-dragon-development`: native/domain death, permissions/output, failed spawn/reset and restart; [full evidence](evidence/t08a-suite.md) | No engine clone; no real grants; direct spawning does not accept prefire or the altar |
 | Post-kill damage ranking including ghost damage and overkill | T08b / #40 | `frozen-damage-ranking`: unique placements, strict-increase commit provenance, same-tick ordinal ties, no late credit and actual distinct-player attribution/messages | Cosmetic presentation and authenticated full-client compatibility remain separate |
 | Personal placement-based rolls, improved chances and hard item locks | T08c / #41 | `personal-loot-preview`: seeded sample policies, hard exclusion, per-player/type isolation, visible simulation and no inventory/XP/currency/grant side effects | Real rewards always disabled; sample probabilities and items are not production balance |
 | Eight tagged eyes, one summon, cancellation/refunds and animated hatch | T11 / #13 | `eye-transactions`: real block/inventory interactions, both hands, duplicate/final-placement concurrency, failed spawn and stored restart recovery | T10 integrated and M3 explicitly accepted first; altar/removal/refund/acquisition choices still need decisions |

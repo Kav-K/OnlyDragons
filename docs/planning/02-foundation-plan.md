@@ -433,7 +433,7 @@ in the accepted ledger. Bounded diagnostic retention remains an adapter concern.
 Accepted through PR #57 at `3505d6c` after the complete 28-case cohort,
 independent raw replay/review, actual-main task checkpoints and current CI.
 [Exact five requirements, evidence and limits](evidence/t08-suite.md). T08a/#39
-is implementing the dispatched development backend; M1–M5 remain unaccepted.
+is now separately accepted; M1–M5 remain unaccepted.
 
 `ManagedCombatService` owns the plugin-lifetime settled-hit receiver. Each target
 has one `CombatEncounter`, bounded `ProcCoordinator`, exact activated session
@@ -466,7 +466,10 @@ healing, no-drop/no-XP death, and player cleanup. Dummy commands use uncapped fu
 four-sample fractional cycle. No production ferocity balance is selected.
 [Production-only Windows player procedure](../../dev/combat-play.md).
 
-### T08a development backend (GH-39, implementation in progress)
+### T08a development backend
+
+T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md).
+T08b/#40 is lead-assigned and awaiting its Symphony dispatch label; no running worker or ranking acceptance is claimed.
 
 The production `DevelopmentDragonService` owns one explicit configured development
 cube and delegates every hit/proc/result to `ManagedCombatService`. `DragonBackend`
