@@ -28,7 +28,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T00 — Contracts | Complete | [#1](https://github.com/Kav-K/OnlyDragons/issues/1), [PR #15](https://github.com/Kav-K/OnlyDragons/pull/15) | Merged at be920d0 after independent review, final-head Windows/Linux CI, 21 production tests and 29 real-Paper contract assertions; see [evidence](../../dev/agent-paper-tests.md#foundation-contract-evidence). Feature engines remain separate tasks. |
 | T01 — Stats | In progress (T01a complete; T01b active) | [#3 resolver](https://github.com/Kav-K/OnlyDragons/issues/3), [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23), [#7 equipment/play](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a merged at 1efa7d0 after review and final-head CI; 30 production tests and 18 real-Paper assertions passed. See [evidence](#t01a-resolver-validation). T01b is dispatched after T02 merged at 7c6d843; its independent service/command work does not depend on T04 or T09b. |
 | T02 — Items | Complete | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Final clean 7ebaa6b after main 586a170: 54 production tests and 35 item-codec-v4 Paper assertions passed, including real serialized loadouts through production snapshots and four cleanup checks. [Evidence](#t02-item-validation-evidence). Merged at 7c6d843 after independent review and final-head CI; authenticated inventory/visual checks are separate. #7 equipment/grants and #9 firing integrate later. |
-| T03 — Combat/ledger | In review | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [draft PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Clean 0dd0fa7 includes main 7c6d843: 74 production tests, 27 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Lead review/CI/merge pending; physical adapter/native suppression and human checks remain separate. |
+| T03 — Combat/ledger | In review | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [draft PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Independent code/evidence review passed; final-head CI and lead merge remain. Physical adapter/native suppression and human checks are separate. |
 | T04 — Paper feasibility | In progress (player-owned follow-up resumed) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). T09b merged at 5b0e030, allowing the lead to resume #5. Player-owned native dragon damage suppression and semantic head/native-damage classification still require their own experiments; #9 remains blocked and M0 unaccepted. |
 | T05 — Enchants/procs | Planned | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Bounded ferocity, tempo expiry/swap, and modifier fixtures. |
 | T06 — Firing/Duplex | Blocked | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | Wait for T01b/T02 and accepted T04 impact/native-damage evidence. Partial PR #22 and a passing T09b calibration alone cannot satisfy this gate. Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence remain required. |
@@ -106,7 +106,7 @@ design sections above are the current summary; this record explains changes.
 
 | Date | Task / reference | Change and rationale | Evidence / remaining work |
 | --- | --- | --- | --- |
-| 2026-09-05 | T03 / #6 | Adopted immutable versioned combat policy and a single-thread encounter authority while preserving T00 DTOs. Physical/proc identity and inherited mitigated basis prevent duplicate or recursive credit. | Clean 0dd0fa7: 74 production tests, 27 runner tests and 31 production-service Paper assertions passed with clean shutdown. See T03 evidence below. Native suppression and human gates remain unaccepted. |
+| 2026-09-05 | T03 / #6 | Adopted immutable versioned combat policy and a single-thread encounter authority while preserving T00 DTOs. Physical/proc identity and inherited mitigated basis prevent duplicate or recursive credit. | Clean 633d81c after actor main 5b0e030: 74 production tests, 36 runner tests and 31 production-service Paper assertions passed with clean shutdown. See T03 evidence below. Native suppression and human gates remain unaccepted. |
 | 2026-09-05 | Shared-context setup; user request | Made the three planning documents required project context and added an agent maintenance/handoff protocol. | Starter-only source inventory reconciled; all gameplay tasks remain planned. Shared reading routes are in AGENTS.md, Cursor rules, and WORKFLOW.md. |
 | 2026-09-05 | Shared agent tooling; user request | Bundled three Minecraft skills with references/provenance; configured Context7 and project-scoped Serena for Cursor, Codex, and isolated Symphony workers. | All three skill validators passed; Windows/Linux MCP initialize/tool-list and Java-symbol checks passed. A fresh Linux issue clone discovered all three skills, connected Context7 (2 tools) and Serena (8), queried Paper docs and production lifecycle symbols. Direct Codex from a nested directory also connected. Five bridge tests and scaffold skill-preservation checks passed. No gameplay milestone advanced; see dev/agent-tools.md. |
 | 2026-09-05 | User-confirmed execution policy | Authorized feature agents to test against isolated real Minecraft, parallel coding, and lead merges of reviewed/tested PRs into main. Reuse existing local EULA acceptance; preserve human worlds and serialize JVM tests. | Existing managed dev server stopped cleanly with user permission. Fourteen issues created; T00/T09a agents started in separate clones. Bridge tests include the narrow shared lease directory (6 pass); client/milestone gates remain distinct. |
@@ -131,15 +131,18 @@ separate health/contribution, idempotent accepted impacts, validated inherited
 children, one completion, and terminal generation rejection. The 0.25 and 0
 ferocity HP fractions are test calibration, not researched Hypixel values.
 
-Final clean runtime revision `0dd0fa72c24ee419370382bdbe81d780a4a27a94`
-includes ordinary merges of main through `7c6d843`, retaining projectile and item
-registrations and all four owned-resource cleanup requirements. The wrapper
-`bash ./gradlew build --console=plain` and both runner builds passed on JDK
-25.0.4.1: 74 production tests (20 new combat cases), zero failures/errors/skips,
-and API isolation. The Python runner contract suite passed all 27 tests.
+Final clean runtime revision `633d81c2ef3377f9f94623db75808e42fe75ac38`
+includes the ordinary merge of actor main `5b0e030`, retaining all ten scenario
+registrations and all four owned-resource cleanup requirements. The new runner
+invoked both wrapper builds on JDK 25.0.4.1: 74 production tests (20 combat
+cases), zero failures/errors/skips, and API isolation passed. The Linux Python
+runner contract suite passed all 36 tests. Production combat and its scenario
+were unchanged from the independently reviewed `0dd0fa7`; the integrated runner
+and companion were rebuilt and exercised together. No protocol client was
+needed or started for this synthetic domain-service scenario.
 
 `python3 scripts/agent-tests/paper_test.py --scenario combat-accounting` returned
-exit 0 for run `33d78b17c5e04d00bc7b11e3308269d6`, Paper
+exit 0 for run `21ddb337ec114a22ab80f693f87df0cb`, Paper
 `26.2-121-a2a42c5` / Minecraft 26.2, mechanic `combat-accounting-calibration-v1`.
 All 31 assertions passed through the production classloader on the server thread.
 The golden critical fixture resolved 210; a calibrated 0.25 child requested 52.5
@@ -152,17 +155,23 @@ These are synthetic domain inputs on actual Paper, not collision evidence.
 
 All four listener/entity/task/chunk cleanup assertions reported zero retained
 resources. The owned JVM exited 0, `clean=true`, `forced=false`; its loopback
-port 54977 was confirmed closed afterward. Artifact SHA256 values:
+port 43475 was confirmed closed afterward, with no owned JVM remaining.
+Independent post-run validation checked the strict report against its catalog
+and original run window, summed the JUnit XML, and rehashed both deployed JARs
+and the pinned Paper JAR. The memory gate admitted 1536 MiB heap plus 1024 MiB
+reserve: guest available 6004 MiB and effective host available 3486 MiB
+(Windows 1419 MiB plus 2067 MiB conservative resident-cache allowance).
+The disposable profile retained authentication and used the shared lease.
+Artifact SHA256 values:
 
 - Production: `1ca28a2c3b79115e2b60e842cb748c50acf0aacf3f92a3e98a5098da43a7756f`
-- Companion: `be1870bd76a26b758e9806e9a7aa25753aeb324ce7b99334be4c545559ef0285`
+- Companion: `8b284e952d4112722604f7905d6619cfbcbf5d4e5f7fcd2ff82381e78595c3fe`
 
-The earlier clean `a4673cf` run passed 30 assertions before main integration;
-the run above is final acceptance evidence. Later evidence/PR-link commits are
-documentation only. Main `11b3124` was subsequently merged: its planning-only
-updates were reconciled without changing production code, scenario inputs or
-validation tooling, so the clean runtime evidence above remains applicable.
-Lead review, final-head CI and merge remain pending.
+Earlier clean `a4673cf` passed 30 assertions; `0dd0fa7` run
+`33d78b17c5e04d00bc7b11e3308269d6` passed 31 before actor integration. The run
+above supplies the final integrated evidence. Subsequent evidence/PR updates
+are documentation only. Independent code/evidence review passed; final-head CI
+and lead merge remain pending.
 Physical arrow/native suppression, Windows smoke, authenticated-client/input/
 visual/multiplayer and performance gates are unrun.
 Next dependency: T05 consumes the frozen pre-cap basis for bounded scheduling;
