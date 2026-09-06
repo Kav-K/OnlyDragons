@@ -277,7 +277,7 @@ Process an impact on the server thread:
 8. Determine bounded ferocity children from the pre-update buff snapshot; update eligible tempo state; schedule children.
 9. Publish immutable results for UI, traces, and future rewards.
 
-`ProjectileHitEvent` and `EntityDamageByEntityEvent` must not both call the engine independently. The T04 findings below identify a physical-impact source and measured event ordering, with native player-damage acceptance still pending. Track collision candidates and finalize only after relevant cancellation has settled. Centralize native damage suppression and managed damage application in one adapter; do not award managed damage from an event cancelled by another component. [Projectile event semantics](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
+`ProjectileHitEvent` and `EntityDamageByEntityEvent` must not both call the engine independently. The T04 findings below identify a physical-impact source and measured event ordering, with player-owned native controls now measured in the companion. Track collision candidates and finalize only after relevant cancellation has settled. Centralize native damage suppression and managed damage application in one adapter; do not award managed damage from an event cancelled by another component. [Projectile event semantics](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
 
 **T04 scoped refinement (Paper 121):** use `ProjectileHitEvent` as the sole
 physical-impact candidate source. Real shooterless dragon collisions can omit the
@@ -285,8 +285,19 @@ damage event entirely, so that event is an optional native-damage/cancellation
 guard, not an impact prerequisite. Finalization must still honor later external
 damage cancellation when it occurs and distinguish it from the adapter's own
 suppression. Zero native arrow damage/critical randomness before managed flight;
-centralize residual native managed-target damage suppression. The cow control
-supports this path; authenticated native dragon damage remains a separate gate.
+centralize residual native managed-target damage suppression. The player-owned
+continuation supports this path on Paper 121: native positive
+controls lose HP, while hit cancellation, damage cancellation and zero native
+base damage prevent that loss. Zero damage and seated hits can omit damage
+events and leave rebounding arrows; terminal retirement must be explicit.
+Three simultaneous player-owned collisions emit only one native damage event,
+so native hurt-window behavior must not discard physical candidates. External
+integrations need the hit path for vetoes when native damage events are absent.
+Actual 1×1×1 versus 5×3×5 geometry lost 4 versus 2 HP; this does not establish a
+robust semantic selector. Retain uniform managed scaling for lead review.
+[Exact player-owned evidence](../../dev/game-tests/findings/projectile-player-feasibility.md)
+is distinct from authenticated-client behavior and the production adapter's own
+later acceptance tests. #9 remains blocked and M0 unaccepted until lead review.
 Use uniform part scaling until semantic head/body classification is verified:
 actual parent mapping is exposed, but part display names and iteration order do
 not supply a semantic part identifier. See [T04 evidence and limits](../../dev/game-tests/findings/projectile-feasibility.md).

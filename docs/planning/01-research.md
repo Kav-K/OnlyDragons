@@ -156,6 +156,17 @@ head-hit pass. See the [bounded findings and remaining gates](../../dev/game-tes
 These observations are OnlyDragons test evidence, not Hypixel mechanics or
 player-owned dragon damage proof.
 
+**Player-owned continuation, exact pin:** clean runtime `7b3a172` passed 52
+real-Paper assertions with a real protocol Player. The unmodified native bow
+release lost 3.25 dragon HP; separate API-spawned arrows owned by that online
+player established native-positive and hit/damage-cancellation/zero-damage
+controls. Three same-tick impacts emitted only one native damage event. Zero
+base damage and seated collisions omitted damage events and left rebounding
+arrows. Actual 1×1×1 and 5×3×5 parts lost 4 and 2 HP respectively, but no public
+semantic part identifier was established. See [identities, geometry, exact
+artifacts and limits](../../dev/game-tests/findings/projectile-player-feasibility.md).
+This is Paper evidence, not a Hypixel mechanic or human/authenticated-client pass.
+
 ### T09b measured protocol-player boundary (Paper 121)
 
 **Observed on exact pin, 2026-09-05:** the timestamped MCProtocolLib 26.2 /

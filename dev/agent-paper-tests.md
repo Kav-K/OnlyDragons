@@ -67,7 +67,8 @@ forced termination fails validation. It never finds JVMs by name or PID lists.
 ## Protocol player calibration
 
 The lead-authorized `--test-player protocol-calibration` option is accepted only
-with `--scenario protocol-player-calibration`. It creates a fresh loopback-only
+with `--scenario protocol-player-calibration` or the GH-5
+`--scenario projectile-player-feasibility` experiment. It creates a fresh loopback-only
 offline profile, whitelists one unique synthetic player, and launches the
 separate [pinned client](player-client/README.md). It does not modify
 `dev/server.properties`, human profiles, EULA acceptance, or account credentials.
@@ -315,9 +316,11 @@ and this evidence are documentation-only; runtime evidence remains at `1dd6ffe`.
 
 ### Extending the actor after calibration
 
-The runner currently admits this mode only for `protocol-player-calibration`.
-T04/#5 and equipment/#7 must receive a reviewed scenario-admission extension and
-add their own actual production/Paper assertions after T09b merges. They can
+GH-5 adds the exact `projectile-player-feasibility` admission using the same
+client sequence; see its [fixture, evidence and remaining gates](game-tests/findings/projectile-player-feasibility.md).
+Equipment/#7 and other scenarios still require reviewed admission and their own
+actual production/Paper assertions. The lead will reconcile this narrow change
+with #28's catalog-based admission; it is not an unrestricted actor mode. They can
 reuse the select/draw/release/quit markers with their public-API fixtures.
 The current bow-use packet uses yaw/pitch zero: align a fixture with that shot
 direction or explicitly review a bounded aiming-message extension. Do not treat
