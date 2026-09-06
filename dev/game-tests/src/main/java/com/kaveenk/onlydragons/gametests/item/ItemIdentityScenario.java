@@ -31,7 +31,7 @@ import static com.kaveenk.onlydragons.domain.item.ItemValidationException.Code.*
 /** Real Paper items and a synthetic inventory; no authenticated actor or combat implementation. */
 public final class ItemIdentityScenario implements Scenario {
     @Override public void start(ScenarioContext context) {
-        context.mechanicRevision("item-codec-v3");
+        context.mechanicRevision("item-codec-v4");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
         context.check("production_enabled", true, context.production().isEnabled());
         context.check("codec_loaded_from_production", true,

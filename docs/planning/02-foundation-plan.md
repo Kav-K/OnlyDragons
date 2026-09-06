@@ -277,7 +277,20 @@ Process an impact on the server thread:
 8. Determine bounded ferocity children from the pre-update buff snapshot; update eligible tempo state; schedule children.
 9. Publish immutable results for UI, traces, and future rewards.
 
-`ProjectileHitEvent` and `EntityDamageByEntityEvent` must not both call the engine independently. The real-Paper spike selects the supported physical-impact source and establishes event ordering. Track collision candidates and finalize only after relevant cancellation has settled. Centralize native damage suppression and managed damage application in one adapter; do not award managed damage from an event cancelled by another component. [Projectile event semantics](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
+`ProjectileHitEvent` and `EntityDamageByEntityEvent` must not both call the engine independently. The T04 findings below identify a physical-impact source and measured event ordering, with native player-damage acceptance still pending. Track collision candidates and finalize only after relevant cancellation has settled. Centralize native damage suppression and managed damage application in one adapter; do not award managed damage from an event cancelled by another component. [Projectile event semantics](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
+
+**T04 scoped refinement (Paper 121):** use `ProjectileHitEvent` as the sole
+physical-impact candidate source. Real shooterless dragon collisions can omit the
+damage event entirely, so that event is an optional native-damage/cancellation
+guard, not an impact prerequisite. Finalization must still honor later external
+damage cancellation when it occurs and distinguish it from the adapter's own
+suppression. Zero native arrow damage/critical randomness before managed flight;
+centralize residual native managed-target damage suppression. The cow control
+supports this path; authenticated native dragon damage remains a separate gate.
+Use uniform part scaling until semantic head/body classification is verified:
+actual parent mapping is exposed, but part display names and iteration order do
+not supply a semantic part identifier. See [T04 evidence and limits](../../dev/game-tests/findings/projectile-feasibility.md).
+No production adapter is introduced by the feasibility scenario.
 
 A proposed simple damage model is:
 
