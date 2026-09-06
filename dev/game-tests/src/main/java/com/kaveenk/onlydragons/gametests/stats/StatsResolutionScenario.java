@@ -39,6 +39,7 @@ public final class StatsResolutionScenario implements Scenario {
         context.check("weapon_base_once", 151.5, snapshot.raw(WEAPON_DAMAGE));
         context.check("raw_crit_above_100", 175.0, snapshot.raw(CRIT_CHANCE));
         context.check("ordinary_probability", 1.0, snapshot.ordinaryCritProbability());
+        context.check("crit_damage_baseline", 50.0, snapshot.raw(CRIT_DAMAGE));
         context.check("ferocity_cap", List.of(750.5, 500.0), List.of(snapshot.raw(FEROCITY), snapshot.effective(FEROCITY)));
         context.check("explanation_values", List.of(101.0, 151.5, 75.75, 151.5, 151.5),
                 old.explanations().get(WEAPON_DAMAGE).steps().stream().map(ExplainedStatSnapshot.Step::result).toList());

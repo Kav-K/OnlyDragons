@@ -154,6 +154,19 @@ caps, identity/version and supported policies before returning; unknown, duplica
 missing or invalid properties fail. Existing resolvers/snapshots retain their old
 immutable profile. Runtime adoption/reload belongs to later integration.
 
+The lead's GH-3/GH-4 integration audit fixes ordinary calibration crit damage
+at 50 total: bows must not add a redundant flat 50. T02's requested
+`ResolvedItem.resolvedWeapon()` projection carries the validated base damage,
+complete definition/enchant/roll modifier list and enchantments. T01b passes that
+projection once to `StatSnapshotFactory`, with only external sources separately.
+The factory regression fixture resolves a bare 100-damage bow to damage 100,
+crit damage 50, crit chance 0 and ferocity 0. A projected fixture adding crit
+chance 100, ferocity 25 and rolled damage 2.5 resolves to 102.5 / 50 / 100 / 25,
+with ordinary probability 1 and exactly three contributions. Those roll/enchant
+amounts are boundary fixtures, not a claim about unpublished T02 loadout values.
+T02's projection implementation and complete preset totals must still be checked
+after its integration; its branch was not yet published during this audit.
+
 ### Initial test loadouts
 
 Provide deterministic calibration presets: normal damage with 0 ferocity; guaranteed crit; 25 ferocity; 100 ferocity; capped ferocity; a Tracer bow; a Duplex bow; and a Fatal Tempo bow with a nonzero base ferocity source. Each preset should state the stats it supplies. These are development gear grants, not the final acquisition loop.

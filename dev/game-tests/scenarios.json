@@ -51,6 +51,7 @@
       "weapon_base_once",
       "raw_crit_above_100",
       "ordinary_probability",
+      "crit_damage_baseline",
       "ferocity_cap",
       "explanation_values",
       "deterministic_order",

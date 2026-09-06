@@ -135,6 +135,30 @@ class StatResolverTest {
                 additional.replace("weapon", weapon.statModifiers())));
     }
 
+    @Test void sharedCalibrationKeepsCritDamageBaselineAndProjectedModifiersOnce() {
+        var factory = new StatSnapshotFactory(profile);
+        // T02 projects validated definition/enchant/roll modifiers into one WeaponDefinition.
+        // This fixture asserts the stable T00 boundary without importing an unmerged item API.
+        var ordinary = new WeaponDefinition("ordinary", 1, "fixture-v1", WeaponDefinition.FiringMode.DRAWN_BOW,
+                100, List.of(), List.of());
+        var baseline = factory.create("ordinary", ordinary, ModifierSources.empty()).snapshot();
+        assertEquals(100, baseline.raw(WEAPON_DAMAGE));
+        assertEquals(50, baseline.raw(CRIT_DAMAGE));
+        assertEquals(0, baseline.raw(CRIT_CHANCE));
+        assertEquals(0, baseline.raw(FEROCITY));
+        var projected = new WeaponDefinition("projected", 1, "fixture-v1", WeaponDefinition.FiringMode.DRAWN_BOW,
+                100, List.of(modifier("item:definition", CRIT_CHANCE, FLAT, 100, 0),
+                modifier("item:enchant", FEROCITY, FLAT, 25, 0),
+                modifier("item:roll", WEAPON_DAMAGE, FLAT, 2.5, 0)), List.of());
+        var equipped = factory.create("projected", projected, ModifierSources.empty()).snapshot();
+        assertEquals(102.5, equipped.raw(WEAPON_DAMAGE));
+        assertEquals(50, equipped.raw(CRIT_DAMAGE));
+        assertEquals(100, equipped.raw(CRIT_CHANCE));
+        assertEquals(1, equipped.ordinaryCritProbability());
+        assertEquals(25, equipped.raw(FEROCITY));
+        assertEquals(3, equipped.provenance().size());
+    }
+
     @Test void strictProfileLoadingAndImmutableCandidateValidation() throws Exception {
         String text;
         try (var input = StatProfile.class.getResourceAsStream("/stats/calibration-v1.properties")) {
