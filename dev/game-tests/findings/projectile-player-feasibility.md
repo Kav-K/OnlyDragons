@@ -190,6 +190,12 @@ external vetoes use the physical-hit boundary. This is a scoped production
 contract clarification, not an assertion that this observation fixture implements
 or verifies the later T06/T08 adapter.
 
+The [lead independently reviewed this 16-case raw receipt](https://github.com/Kav-K/OnlyDragons/issues/5#issuecomment-5558416986)
+and requested handoff pending PR #44 integration. Resume this same branch only
+when redispatched, merge the shared fixture baseline normally, and run the final
+affected exact-input suite before lead T04 acceptance. No additional run on the
+current baseline is required; preserve this reviewed evidence.
+
 ## Integrated continuation verification
 
 Clean runtime **`696fa1ecbf1ca2920f32af2465867c21290e7445`** includes main

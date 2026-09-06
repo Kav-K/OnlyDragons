@@ -113,6 +113,9 @@ record 82 production / 7 client / 136 Python tests and runtime-head Windows/Linu
 CI. The lead's terminal-claim/veto clarification is recorded in document 02;
 production P02/P04 remain deferred under T06/M1. T04 stays In review, #9 blocked
 and M0 unaccepted pending current-input and policy acceptance.
+The lead independently reviewed this fresh 16-case receipt and requested handoff
+pending PR #44 integration. Next: redispatch this same branch, ordinarily merge
+that baseline, and run its final affected suite before lead T04 acceptance.
 
 Keep new decisions concise and update the current ledger/design in place. The
 [archived change record](history/2026-09-05-foundation-evidence.md#context-change-record)
