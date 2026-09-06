@@ -169,34 +169,22 @@ All four owned cleanup counters were zero; Paper exited 0 with `forced=false`
 and `clean=true`. The port closed and no Java process for that run remained.
 Raw reports stay ignored under `build/reports/agent-paper/<runId>/`.
 
-Draft PR #30 remains In review. **Resume blocker (2026-09-05): current-main
-integration cannot complete in this worker sandbox.** PR #32 and context PR #33
-are now merged; fetched `origin/main` is
-`8f5069ce35741dc66d5678f36f48293246f7bac1`. The former missing-GH-28 blocker is
-resolved. From clean `3477ed0`, ordinary `git merge origin/main --no-edit`
-failed with `unable to unlink old '.agents/skills/paper-runtime-validation/SKILL.md':
-Read-only file system`; the configured sandbox explicitly mounts `.agents`
-read-only. No merge commit or MERGE_HEAD was created. No permissions or protected
-files were changed. The 19 untracked files left by the failed merge were removed
-only after byte-for-byte comparison with origin/main; original tracked work is
-preserved. This entry is an evidence-only update, not main integration.
+Draft PR #30 remains In review. The earlier failed skill merge and mixed-checkout
+preflight are superseded: PR #34 fixed the issue-local skill write boundary.
+Ordinary merge of current main `5e8cfbfc7c9bfc7bc395e76f1e608f5853cd78be`
+succeeded at `f99f739`, preserving all main scenarios and both context sections.
+Fresh actual-sandbox doctor JSON returned exit 0 / `state: ready`: all 16
+context/fixture files readable, JDK 25.0.4.1, existing EULA readable, shared lease
+writable/available, no errors or waits. Guest available memory was 6890 MiB;
+effective host 5141 MiB versus 2816 MiB required. This is preflight only.
 
-The main-version `doctor.py` left by that merge attempt was run inside the actual
-worker sandbox before cleanup, with the branch's existing runner. It returned
-exit 0 / `state: ready`: 16 shared context/fixture files readable, JDK 25.0.4.1,
-existing EULA readable, shared lease writable and available, no errors or waits.
-The memory snapshot reported 7045 MiB guest available and 4712 MiB effective host
-available against a 2816 MiB requirement (1536 Paper + 256 client + 1024 reserve).
-This proves that limited access preflight only; the mixed, failed-merge checkout
-is not an integrated fixture baseline or runtime acceptance result. No new build,
-Paper server, suite receipt, checkpoint plan/acceptance or final-head CI was run.
+T05 now adds its case to regression/all and shared harness/contract coverage,
+registers owned enchant/coordinator paths with stats/items/combat dependencies,
+and binds `bounded-procs` to the 38-assertion production fixture. The generic
+catalog-declared actor admission and all existing fixtures remain intact.
+Fresh clean-source suite/checkpoint evidence and final-head CI remain pending;
+the earlier runtime results above are historical, not proof for this merge.
 
-Next action: the lead completes the ordinary main merge on this same branch in
-an authorized environment that can update the tracked skill, preserving all
-additive scenario/context changes, then redispatches GH-8. Resume PR #30, add T05
-coverage to suites.json and acceptance.json, rerun doctor and checkpoint plan,
-inspect changed-area selection, execute the required suite from clean committed
-current-main source, and replay automated T05 acceptance plus final-head CI.
 Full physical firing/Duplex/two-bow P08/P09 production integration stays with its
 later adapter tickets; service fixtures do not accept it. Windows smoke,
 authenticated-client/visual/multiplayer and performance observations remain

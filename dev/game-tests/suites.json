@@ -69,6 +69,10 @@
       "expectation": "positive",
       "testPlayer": "protocol-calibration",
       "scenarioTimeout": 120
+    },
+    "enchants-procs": {
+      "scenarioId": "enchants-procs",
+      "expectation": "positive"
     }
   },
   "suites": {
@@ -82,7 +86,8 @@
       "protocol-player-calibration",
       "equipment-stats",
       "equipment-player",
-      "protocol-player-soak"
+      "protocol-player-soak",
+      "enchants-procs"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -106,7 +111,8 @@
       "protocol-player-idle",
       "equipment-stats",
       "equipment-player",
-      "protocol-player-soak"
+      "protocol-player-soak",
+      "enchants-procs"
     ]
   },
   "areas": {
@@ -150,13 +156,15 @@
         "protocol-player-idle",
         "equipment-stats",
         "equipment-player",
-        "protocol-player-soak"
+        "protocol-player-soak",
+        "enchants-procs"
       ],
       "affects": [
         "stats",
         "items",
         "combat",
-        "projectiles"
+        "projectiles",
+        "enchants-procs"
       ]
     },
     "stats": {
@@ -173,7 +181,8 @@
       "affects": [
         "items",
         "combat",
-        "equipment"
+        "equipment",
+        "enchants-procs"
       ]
     },
     "items": {
@@ -192,7 +201,8 @@
       ],
       "affects": [
         "combat",
-        "equipment"
+        "equipment",
+        "enchants-procs"
       ]
     },
     "combat": {
@@ -207,7 +217,9 @@
         "foundation-contracts",
         "combat-accounting"
       ],
-      "affects": []
+      "affects": [
+        "enchants-procs"
+      ]
     },
     "projectiles": {
       "paths": [
@@ -302,7 +314,8 @@
         "protocol-player-idle",
         "equipment-stats",
         "equipment-player",
-        "protocol-player-soak"
+        "protocol-player-soak",
+        "enchants-procs"
       ],
       "affects": []
     },
@@ -322,6 +335,22 @@
       "affects": [
         "combat"
       ]
+    },
+    "enchants-procs": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/domain/enchant/*",
+        "src/main/java/com/kaveenk/onlydragons/application/proc/*",
+        "src/test/java/com/kaveenk/onlydragons/domain/enchant/*",
+        "src/test/java/com/kaveenk/onlydragons/application/proc/*",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/enchant/*"
+      ],
+      "cases": [
+        "stats-resolution",
+        "item-identity",
+        "combat-accounting",
+        "enchants-procs"
+      ],
+      "affects": []
     }
   },
   "ignoredChanges": [

@@ -147,7 +147,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Draft PR30 reviewed at3477ed0; current-main/T09c integration and affected-suite/current CI remain pending."
+      "notice": "Draft PR30; main 5e8cfbf integrated at f99f739 and actual-sandbox doctor ready. Bounded-procs fixture/coverage registered; fresh clean-source suite, automated checkpoint and current CI pending. Physical P08/P09 remain later integration."
     },
     "T06": {
       "status": "blocked",

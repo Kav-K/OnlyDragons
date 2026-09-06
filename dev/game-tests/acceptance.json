@@ -414,6 +414,52 @@
         "protocol-player-soak"
       ],
       "scope": "Actual offline player remains connected through a 40-second monotonic delay after native flight; keepalive and bounded real quit/cleanup, not a general load benchmark."
+    },
+    "enchants-procs": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "coordinator_loaded_from_production",
+        "controlled_counts",
+        "zero_base_tempo",
+        "snipe_displacement",
+        "parent_preincrement",
+        "five_stable_ids",
+        "captured_basis_and_crit",
+        "duplicate_cannot_enqueue",
+        "capacity_rejection",
+        "actual_tick_progress",
+        "nothing_early",
+        "first_due_tick",
+        "eligible_child_builds_tempo",
+        "five_children_no_recursion",
+        "child_damage_inheritance",
+        "tempo_cap",
+        "accounting_totals",
+        "two_bow_swap",
+        "duplex_child_scaled",
+        "tempo_before_expiry",
+        "tempo_at_expiry",
+        "duplex_did_not_refresh",
+        "quit_clears_queue_and_buff",
+        "late_quit_preserves_reconnect",
+        "old_session_cannot_buff",
+        "ended_target_rejects_child",
+        "rejected_child_no_credit",
+        "shutdown_clears_state",
+        "late_callback_rejected",
+        "trusted_snapshot_vicious_once",
+        "codec_to_effects_to_combat",
+        "item_edit_cannot_rewrite_child",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "enchants-procs"
+      ],
+      "scope": "Production proc coordinator on actual Paper scheduler ticks with synthetic settled impacts/session tokens, plus real item serialization through stats/effects/combat. No physical firing, Duplex emission or player-listener P08/P09 acceptance."
     }
   },
   "requirements": {
@@ -508,7 +554,8 @@
         "combat-accounting",
         "equipment-stats",
         "equipment-player",
-        "protocol-player-soak"
+        "protocol-player-soak",
+        "enchants-procs"
       ]
     },
     "equipment-service": {
@@ -529,9 +576,11 @@
     },
     "bounded-procs": {
       "kind": "automated",
-      "availability": "deferred",
-      "description": "Production ferocity queue, nonrecursive children, expiry and lifecycle integration.",
-      "fixtures": []
+      "availability": "implemented",
+      "description": "Bounded production ferocity queue, inherited damage/crit, observable admission rejection, Tempo expiry/captured swap eligibility, item-to-effects regression and scheduler/session/target cleanup. Physical firing integration remains P08/P09.",
+      "fixtures": [
+        "enchants-procs"
+      ]
     },
     "firing-input": {
       "kind": "automated",
