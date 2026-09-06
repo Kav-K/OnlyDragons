@@ -6,8 +6,10 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
-Baseline reconciled **5 September 2026** against main `73a8cc8` and repository
-issue/PR state. The plugin still supplies starter status/reload commands and
+Baseline reconciled **5 September 2026** against main `5e8cfbf` and repository
+issue/PR state. The original T09c acceptance baseline was tested at `78c3de4`
+and merged through PR #32 at `73a8cc8`; subsequent validation runs retain their
+own input identities. The plugin still supplies starter status/reload commands and
 welcome messages. T00 contracts, the T01a stat resolver, T02 items, and the
 T09a/T09b isolated Paper runner and protocol actor are integrated. T03 combat merged in PR #26;
 T01b equipment inspection and calibration grants merged in PR #29;
@@ -28,7 +30,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | --- | --- | --- | --- |
 | T00 — Contracts | Complete | [#1](https://github.com/Kav-K/OnlyDragons/issues/1), [PR #15](https://github.com/Kav-K/OnlyDragons/pull/15) | Merged at be920d0 after independent review, final-head Windows/Linux CI, 21 production tests and 29 real-Paper contract assertions; see [evidence](../../dev/agent-paper-tests.md#foundation-contract-evidence). Feature engines remain separate tasks. |
 | T01 — Stats | Complete (T01a and objective T01b) | [#3 resolver](https://github.com/Kav-K/OnlyDragons/issues/3), [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23), [#7 equipment/play](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a merged at 1efa7d0 after review and final-head CI; 30 production tests and 18 real-Paper assertions passed. See [evidence](#t01a-resolver-validation). T01b [merged PR #29](https://github.com/Kav-K/OnlyDragons/pull/29): 82 production tests, 23 equipment and 35 item Paper assertions, plus unchanged 25-assertion protocol calibration; [equipment evidence and separate human observations](#t01b-equipment-validation-gh-7). Independent review and final-head Windows/Linux CI passed before merge at a48ebd4. Connected-player equipment acceptance completed in [PR #32](https://github.com/Kav-K/OnlyDragons/pull/32), merged at 73a8cc8; the 47-assertion fixture and eight required received-message checks passed in the full 15-case [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). The Windows operator Cursor Build target passed on clean main 73a8cc8 (82 tests, zero failures/errors/skips). Windows Play/smoke and authenticated/multiplayer/visual/feel observations remain unrun. |
-| T02 — Items | Complete | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Final clean 7ebaa6b after main 586a170: 54 production tests and 35 item-codec-v4 Paper assertions passed, including real serialized loadouts through production snapshots and four cleanup checks. [Evidence](#t02-item-validation-evidence). Merged at 7c6d843 after independent review and final-head CI; authenticated inventory/visual checks are separate. #7 equipment/grants and #9 firing integrate later. |
+| T02 — Items | Complete | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Final clean 7ebaa6b after main 586a170: 54 production tests and 35 item-codec-v4 Paper assertions passed, including real serialized loadouts through production snapshots and four cleanup checks. [Evidence](#t02-item-validation-evidence). Merged at 7c6d843 after independent review and final-head CI; authenticated inventory/visual checks are separate. #7 equipment/grants are integrated in PR #29/#32; #9 firing remains deferred. |
 | T03 — Combat/ledger | Complete | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Merged at 9092fbe after independent review and final-head Windows/Linux CI. Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Physical adapter/native suppression and human checks are separate. |
 | T04 — Paper feasibility | In review (player-owned follow-up delivered) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). Player-owned follow-up is in draft PR #31 with native positive controls, cancellation/zero-damage observations, part geometry, phase and simultaneous-hit evidence. Issue #5 records the reviewed bounded phase/part policy; its worker still owns foundation-plan reconciliation and actual current-main suite evidence. T04 remains partial, #9 stays blocked and M0 unaccepted. |
 | T05 — Enchants/procs | In review | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | [Draft PR #30](https://github.com/Kav-K/OnlyDragons/pull/30): clean ee1721a includes main 5e8cfbf; 136 production tests, 130 Python tests, all 16 shared suite cases and automated T05 acceptance passed. [Exact evidence](../../dev/game-tests/findings/t05-suite.md). Current-input lead review/final-head CI remain external gates; physical P08/P09 remain later integration. |
@@ -101,374 +103,169 @@ This instruction does not authorize implementing unassigned work packages.
 
 ### Context change record
 
-Keep one concise row per meaningful decision or delivery update. The tables and
-design sections above are the current summary; this record explains changes.
+Keep new decisions concise and update the current ledger/design in place. The
+[archived change record](history/2026-09-05-foundation-evidence.md#context-change-record)
+preserves earlier rationale and delivery claims verbatim. Stat/item/combat API
+contracts remain in document 02; the task definitions and acceptance gates below
+remain authoritative.
 
 | Date | Task / reference | Change and rationale | Evidence / remaining work |
 | --- | --- | --- | --- |
 | 2026-09-05 | T05 / #8 | Adopted bounded whole-group proc admission, session-token liveness, exclusive Tempo expiry and continuous launch-displacement Snipe; Gravity/Overload stay explicit deferred extensions. | Clean ee1721a includes main 5e8cfbf: 136 production tests, 16 shared suite cases and automated T05 acceptance passed, with 38 proc assertions. See T05 evidence and document 02 section 8; PR #30 remains In review. |
-| 2026-09-05 | Worker skill-update sandbox maintenance, In review | Grant only the real issue-local `.agents` directory alongside existing Git/lease roots so an ordinary upstream skill merge works. Reject missing/file/symlink or changed checkout paths on launch/each transformed turn; retain trusted operator MCP configuration and the other policy/input fields. | Eleven Linux bridge tests and the explicit Codex 0.153.4 no-model sandbox smoke passed: real two-parent skill merge preserved worker content; `.codex`/sibling writes remained EROFS; owned app-server exit 0 and scratch cleanup passed. Current-head review, CI and lead merge remain pending. [Scope and runnable smoke](../symphony.md#start-and-stop). No new Paper or gameplay acceptance is claimed; prior receipts retain their recorded input identities. |
+| 2026-09-05 | Agent execution/context audit maintenance, [PR #35](https://github.com/Kav-K/OnlyDragons/pull/35) | Reconcile integrated item/equipment facts, archive superseded validation chronology, and correct the T04/M0 dependency cycle: feasibility observations and explicit impact-policy review belong to T04/M0; deferred production P02/P04 behavior remains under T06/M1. Improve bounded context reads and useful tool routing. | Clean runtime `472aaed` passed the full 15-case Paper suite, 135 Linux runner/checkpoint tests and Windows/Linux CI. Independent replay verified raw reports, artifacts, JUnit, cleanup and closed ports. [Exact receipt/source identities and audit findings](../agent-audit-2026-09-05.md#validation-of-the-correction); PR #35 records final evidence-head CI and integration status. No gameplay task, P01–P14 requirement or M0–M5 milestone is advanced by this maintenance. |
+| 2026-09-05 | Worker skill-update sandbox maintenance, complete via [PR #34](https://github.com/Kav-K/OnlyDragons/pull/34) | Grant only the real issue-local `.agents` directory alongside existing Git/lease roots so an ordinary upstream skill merge works. Reject missing/file/symlink or changed checkout paths on launch/each transformed turn; retain trusted operator MCP configuration and the other policy/input fields. | Eleven Linux bridge tests and the explicit Codex 0.153.4 no-model sandbox smoke passed: real two-parent skill merge preserved worker content; `.codex`/sibling writes remained EROFS; owned app-server exit 0 and scratch cleanup passed. Independent review and final-head Windows/Linux CI passed; merged at `5e8cfbf`. Resumed GH-5/GH-8 workers completed ordinary main merges and their actual-sandbox doctor checks passed. [Scope and runnable smoke](../symphony.md#start-and-stop). No new Paper or gameplay acceptance is claimed; prior receipts retain their recorded input identities. |
 | 2026-09-05 | T09c / #28 and T01b / #7, complete via [PR #32](https://github.com/Kav-K/OnlyDragons/pull/32) | Integrated strict shared suites/checkpoints, objective player equipment and received command text, catalog-declared actor admission, and the callback/disconnect lock-cycle fix with delayed-quit soak. | Reviewed head `78c3de4` merged at `73a8cc8`; fresh 15-case baseline (10 positive, 5 intended negative), 82 production and 7 client tests; 130 Linux Python, 124 Windows Python plus 6 Linux-only exclusions. [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). The Windows operator Cursor Build target passed on clean main 73a8cc8 (82 tests, zero failures/errors/skips); Windows Play/smoke and authenticated/multiplayer/visual/feel checks remain unrun. P01–P14/M0–M5 remain pending. |
-| 2026-09-05 | T01b / #7 / [PR #29](https://github.com/Kav-K/OnlyDragons/pull/29), In review | Connected one active main-hand projection, full validated fingerprints, session-only source replacement/cleanup and permission-gated inspection/grants. Storage-only grants preserve equipment; incompatible bonuses reset visibly rather than leaving stale stats. | Clean 4c28474 after main 9092fbe: 82 production tests, 36 runner tests, 23 equipment/35 item Paper assertions, 25 unchanged protocol calibration assertions and 2 client tests; clean owned shutdowns. Retained all 11 scenario registrations through Map.ofEntries; runtime-head Windows/Linux CI passed. [Evidence and unrun human gates](#t01b-equipment-validation-gh-7). No shot-time integration or milestone acceptance. |
-| 2026-09-05 | T03 / #6 | Adopted immutable versioned combat policy and a single-thread encounter authority while preserving T00 DTOs. Physical/proc identity and inherited mitigated basis prevent duplicate or recursive credit. | Clean 633d81c after actor main 5b0e030: 74 production tests, 36 runner tests and 31 production-service Paper assertions passed with clean shutdown. See T03 evidence below. Native suppression and human gates remain unaccepted. |
-| 2026-09-05 | Shared-context setup; user request | Made the three planning documents required project context and added an agent maintenance/handoff protocol. | Starter-only source inventory reconciled; all gameplay tasks remain planned. Shared reading routes are in AGENTS.md, Cursor rules, and WORKFLOW.md. |
-| 2026-09-05 | Shared agent tooling; user request | Bundled three Minecraft skills with references/provenance; configured Context7 and project-scoped Serena for Cursor, Codex, and isolated Symphony workers. | All three skill validators passed; Windows/Linux MCP initialize/tool-list and Java-symbol checks passed. A fresh Linux issue clone discovered all three skills, connected Context7 (2 tools) and Serena (8), queried Paper docs and production lifecycle symbols. Direct Codex from a nested directory also connected. Five bridge tests and scaffold skill-preservation checks passed. No gameplay milestone advanced; see dev/agent-tools.md. |
 | 2026-09-05 | User-confirmed execution policy | Authorized feature agents to test against isolated real Minecraft, parallel coding, and lead merges of reviewed/tested PRs into main. Reuse existing local EULA acceptance; preserve human worlds and serialize JVM tests. | Existing managed dev server stopped cleanly with user permission. Fourteen issues created; T00/T09a agents started in separate clones. Bridge tests include the narrow shared lease directory (6 pass); client/milestone gates remain distinct. |
-| 2026-09-05 | T09a / #2 / PR #16 | Integrated an isolated Linux/WSL runner and same-Paper companion with a shared lease, memory admission, strict reports, and owned-process cleanup. | Merged into main at 140f11c. Clean 946858d positive and deliberate-failure controls produced the expected outcomes and clean shutdown; [calibration evidence](../../dev/agent-paper-tests.md#accepted-calibration-evidence). Broader T09 gameplay and human gates remain. |
-| 2026-09-05 | T01a / #3 / [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23) | Adopted named calibration defaults/ranges/caps and deterministic arithmetic policy within task scope; stable T00 records preserved. See document 02 section 3. | Merged at 1efa7d0 after review and final-head CI. Clean 36a7e23: 30 production tests (9 new resolver tests), zero failures/errors/skips; 18 production-resolver Paper assertions and clean unforced shutdown. See [evidence](#t01a-resolver-validation). T01b equipment integration and human play remain separate. |
-| 2026-09-05 | T00 / #1 / PR #15 | Established shared immutable domain contracts without introducing resolver/combat engines or choosing unresolved balance rules. | Clean 53f7e20: 21 production tests, no failures/errors/skips; real Paper passed 29 assertions with clean unforced shutdown. Independent review and final e3a9e68 Windows/Linux CI passed; merged at be920d0. [Versions, hashes, and scope](../../dev/agent-paper-tests.md#foundation-contract-evidence). |
-| 2026-09-05 | MAINT-17 / [#17](https://github.com/Kav-K/OnlyDragons/issues/17), Complete via [PR #19](https://github.com/Kav-K/OnlyDragons/pull/19) | Reject boolean/number equivalence recursively in assertion evidence, even with forged pass flags; preserve integer/float numeric equivalence and JSON structure/order checks. | Merged at 6f0ccfb after review and CI; issue #17 and PR #19 are closed. Implementation 4aa62f4: Ubuntu 24.04 / Python 3.12.3, `python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py' -v` passed all 27 tests without skips. Revalidated unchanged stored T09 positive (13 assertions), negative (only `deliberate_failure` rejected), and T00 (29 assertions) reports within their original run windows. No new Paper JVM or gameplay gate. |
-| 2026-09-05 | MAINT-18 / [#18](https://github.com/Kav-K/OnlyDragons/issues/18), Complete via [PR #21](https://github.com/Kav-K/OnlyDragons/pull/21) | Disable optional remote-plugin synchronization only for subsequent Symphony worker app servers; preserve repository skills, reviewed MCP tools, host GitHub tool, sandbox and active sessions. Refresh issue/API coordination before expensive verification and require clean committed final runtime evidence. | Merged at e72fb2a after review and CI; issue #18 and PR #21 are closed. Six bridge tests passed and are retained in Linux CI. The Codex 0.153.4 no-model app-server check discovered all three project skills, Context7 (2 tools), Serena (8), and queried Paper docs/Java symbols with clean smoke-process exit. See [operation notes](../../dev/agent-tools.md). |
-| 2026-09-05 | T09b / [#20](https://github.com/Kav-K/OnlyDragons/issues/20), Complete via [PR #27](https://github.com/Kav-K/OnlyDragons/pull/27) | Added the exact pinned protocol client, strict dependency verification, dual reports and runner-only disposable offline mode; default/human authentication is preserved. Both JVM heaps count toward admission and the shared lease covers cleanup. | Merged at 5b0e030 after independent review and final-head CI. Final clean 1dd6ffe: 54 production tests, 2 client tests, 36 Linux runner tests; 25/25 protocol-player Paper assertions plus expected early-exit/timeout failures, all owned cleanup counters zero and no forced exits. [Evidence and extension boundary](../../dev/agent-paper-tests.md#protocol-player-evidence). #5 is resumed for its own native-damage experiments; no T04 or milestone gate is accepted. |
-| 2026-09-05 | T02 / #4 / [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24) | Adopted schema v1 with explicit unsupported-schema/revision rejection, trusted enchant categories/levels and allowlisted named rolls. Added eight compiled calibration factories without changing T00 records or #7 equipment/bootstrap. Lead audit removed the redundant +50 crit-damage bonus (T01 owns baseline 50) and requested a resolvedWeapon projection to prevent duplicate contributions. | [Design and calibration rationale](02-foundation-plan.md#t02-adopted-item-boundary-gh-4). Final clean 7ebaa6b retains catalog v2 and adds required listener cleanup in scenario `item-codec-v4`: 54 production tests and 35 Paper assertions passed after merging stats/projectile main 586a170. Prior v2/v3 evidence remains in [validation history](#t02-item-validation-evidence). No milestone or human gate advanced. |
-| 2026-09-05 | T04 / #5 / [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22), Partial delivery merged | Adopted projectile-hit candidates as the single impact source because real shooterless dragon impacts omit damage events; damage events remain optional cancellation/native guards. Uniform part scaling is the supported interim design until semantic classification is verified. Added companion-owned listener cleanup and preserved measured misses. | Final clean a093877 after main 1efa7d0: 30 production tests, 27 runner tests, 34 real-Paper feasibility assertions and expected exception/abort controls, all three servers clean/unforced. Runtime-head Windows/Linux CI passed. Earlier e38bfaf lifecycle/deliberate controls remain recorded for unchanged cleanup code. Native player-owned suppression is still an acceptance blocker; no dependent dispatch or milestone completion. [Evidence](../../dev/game-tests/findings/projectile-feasibility.md). |
 
 ### T05 enchant and proc validation
 
-GH-8 owns new `domain.enchant`, `application.proc`, their behavior tests and the
-additive `enchants-procs` Paper scenario. Dependencies PR #23/#24/#26 are
-integrated in starting main `9092fbe`; this corrects the dispatch assumption for
-T05 without accepting other milestones. The API and adopted calibration decisions
-are in document 02 section 8. No shared DTO, item registry/loadout revision,
-production bootstrap/listener, equipment or player-scenario admission was changed.
-All ten previous scenario registrations and all four cleanup assertions remain.
+[Draft PR #30](https://github.com/Kav-K/OnlyDragons/pull/30) owns `domain.enchant`,
+`application.proc`, behavior tests and additive `enchants-procs` fixture/coverage.
+Document 02 section 8 defines the adopted coordinator contract. Shared DTOs,
+production bootstrap/listeners, trusted item revisions and actor admission remain
+unchanged. All existing scenarios and four cleanup requirements are preserved.
 
-Clean runtime revision `a7a8cd7ef3b3a3521864557bea299643cdb3330c` includes
-main `9092fbe` (fetched/merged before verification; still current afterward).
-`bash ./gradlew build --console=plain` and both isolated runner builds passed
-on JDK 25.0.4.1: 128 production tests (54 T05 cases), zero failures/errors/skips,
-plus API isolation. All 36 Python runner tests passed. The companion has no
-JUnit tests; its assertions ran on actual Paper.
+Clean `ee1721a` with main `5e8cfbf` passed 136 production tests, seven client tests,
+130 Python tests, all 16 shared cases and automated T05 acceptance. Its 38 proc
+assertions exercised 72 Paper ticks, captured inheritance, bounded admission,
+Tempo expiry/swap eligibility and stale-session/target cleanup. Final evidence
+head `33b2a06` passed Windows/Linux CI. [Exact previous suite evidence](../../dev/game-tests/findings/t05-suite.md)
+and [earlier implementation history](../../dev/game-tests/findings/t05-initial-evidence.md)
+retain their original source identities.
 
-`python3 scripts/agent-tests/paper_test.py --scenario enchants-procs` returned
-exit 0 in run `25a65e2d8e5141caa3d50d397d8d285f`, mechanic `enchants-procs-v1`,
-Paper `26.2-121-a2a42c5` / Minecraft 26.2. All 38 required assertions passed.
-The production coordinator executed on 72 actual Paper ticks: five stable
-children inherited 75 damage, no recursion occurred, whole-group rejection
-reported five children, and the first child arrived exactly two ticks later.
-The main test reached 525 contribution / 99,475 remaining HP; captured Duplex
-and its child each retained the 15-damage scaled basis. Tempo reached +200%,
-remained live immediately before expiry and was zero at the boundary without a
-Duplex refresh. Session replacement/late quit, stale-source rejection, ended
-target zero credit, terminal close and late callback checks passed.
+PR35 main `1deb9a8` is now being reconciled normally. Its concise context/archive,
+deferred player-observation and external impact-policy gates, and T06/M1 P02/P04
+mappings are preserved alongside T05's implemented `bounded-procs` binding.
+Fresh doctor, structural checkpoint, complete affected suite and T05 acceptance
+remain pending on the new committed inputs. The former skill-write blocker is
+resolved; no implementation or acceptance gate is replaced.
 
-A real Paper byte-serialized item passed codec → trusted registry → production
-snapshot → enchant modifiers → combat/queue. Power V and Snipe IV at ten blocks
-produced +0.4/+0.04, 72 mitigated damage, and the inherited child retained 72;
-Vicious V remained exactly 5 captured ferocity, with baseline crit damage 50.
-These are synthetic settled impacts and session tokens, not native collision or
-production equipment-listener acceptance. They do establish objective item,
-modifier, combat, queue and scheduler contracts without a client.
+T05 remains In review. Physical firing/Duplex/two-bow P08/P09 are objective later
+integration work. Windows Play/smoke, human input/visuals, authenticated multiplayer
+and performance remain unrun. No gameplay milestone is accepted.
 
-- Production SHA256: `eac1efb7106fc7b1c283ef7cd3e2556eef2fae97889ba57a945af456a28a75f4`.
-- Companion SHA256: `58010607fbf4ceb2bafa4b5946950f717003a83d10a4eabed920114cc6f06e35`.
-
-The run reused accepted EULA, shared lease/memory admission, authenticated default
-profile with no player, and disposable issue-local world on loopback port 47989.
-All four owned cleanup counters were zero; Paper exited 0 with `forced=false`
-and `clean=true`. The port closed and no Java process for that run remained.
-Raw reports stay ignored under `build/reports/agent-paper/<runId>/`.
-
-Draft PR #30 remains In review. The earlier failed skill merge and mixed-checkout
-preflight are superseded: PR #34 fixed the issue-local skill write boundary.
-Ordinary merge of current main `5e8cfbfc7c9bfc7bc395e76f1e608f5853cd78be`
-succeeded at `f99f739`, preserving all main scenarios and both context sections.
-Fresh actual-sandbox doctor JSON returned exit 0 / `state: ready`: all 16
-context/fixture files readable, JDK 25.0.4.1, existing EULA readable, shared lease
-writable/available, no errors or waits. Guest available memory was 6890 MiB;
-effective host 5141 MiB versus 2816 MiB required. This is preflight only.
-
-T05 now adds its case to regression/all and shared harness/contract coverage,
-registers owned enchant/coordinator paths with stats/items/combat dependencies,
-and binds `bounded-procs` to the 38-assertion production fixture. The generic
-catalog-declared actor admission and all existing fixtures remain intact.
-Fresh clean `ee1721a` passed all 16 selected suite cases, 136 production tests,
-7 client tests, 130 Python tests and automated T05 checkpoint acceptance.
-All 38 proc assertions passed again on 72 Paper ticks; all cleanup counters
-were zero, all owned processes exited unforced and all 16 ports were closed.
-[Exact receipt/source/artifact identities and case results](../../dev/game-tests/findings/t05-suite.md)
-supersede the historical runtime evidence above for this integration. Runtime-head
-Windows/Linux CI passed; final documentation-head CI and lead review are checked
-in the PR handoff. No task or milestone is marked Complete here.
-
-Full physical firing/Duplex/two-bow P08/P09 production integration stays with its
-later adapter tickets; service fixtures do not accept it. Windows smoke,
-authenticated-client/visual/multiplayer and performance observations remain
-separate and unrun. No milestone is accepted.
 ### T01b equipment validation (GH-7)
 
-T01b's playable slice is **merged** in [PR #29](https://github.com/Kav-K/OnlyDragons/pull/29)
-at `a48ebd4`, after independent review and final-head Windows/Linux CI
-([run](https://github.com/Kav-K/OnlyDragons/actions/runs/34008900983)). Final clean runtime revision
-`4c28474b54e2a2aa25d6242d12525f8783c4ea1b` includes the ordinary merge of main
-`9092fbe` (combat PR #26). All eleven scenario registrations and existing
-assertion sets are retained with `Map.ofEntries`; both equipment and combat
-context sections survived reconciliation. Equipment production code remains
-`e208933`; later handoff commits only record evidence/context. Design and
-rationale are in document 02's T01b section; [Cursor Play](../../dev/stats-play.md)
-records the short operator procedure.
+T01b's playable slice merged in [PR #29](https://github.com/Kav-K/OnlyDragons/pull/29)
+at `a48ebd4` after independent review and final-head Windows/Linux CI
+([run](https://github.com/Kav-K/OnlyDragons/actions/runs/34008900983)). Clean runtime
+`4c28474b54e2a2aa25d6242d12525f8783c4ea1b` included main `9092fbe`, retained all
+11 scenarios and both equipment/combat context sections; production implementation
+is `e208933`. [Full original evidence, hashes, run IDs and earlier checks](history/2026-09-05-foundation-evidence.md#t01b-equipment-validation-gh-7).
 
-- **Build/MockBukkit:** `bash ./gradlew build --console=plain` and runner wrapper
-  builds passed on JDK 25.0.4.1, with 82 production tests and zero failures,
-  errors or skips, plus API isolation. Eight new equipment cases cover cache
-  reuse, hand replacement, same-UUID enchant/roll edits, profile identity,
-  permission/grant/full-storage rejection, atomic bonus replacement/reset,
-  event refresh and quit/disable cleanup. MockBukkit's default inventory view
-  lacks `convertSlot`; the event test supplies a bounded view conversion and
-  remains explicitly synthetic. The integrated Python runner suite passed all
-  36 tests; the strict protocol-client build passed both client tests.
-- **Real Paper:** all final runs used Minecraft 26.2 / Paper
-  `26.2-121-a2a42c5`, with the accepted EULA, shared lease and memory admission.
-  `equipment-stats` (`equipment-stats-v1`) run
-  `9f19e62d321b454c95c5a1fb7bc5a3b9` passed 23/23 assertions. Native serialized
-  loadouts passed production codec → registry → equipment service → factory:
-  all eight resolved damage 100 / crit damage 50 and their declared crit/ferocity
-  totals. Same-UUID Vicious III changed ferocity 0→3; a trusted roll changed
-  damage 100→102.5 while old snapshots remained unchanged. Offhand-only/invalid
-  main-hand items resolved to damage 0 / ferocity 0 / crit damage 50. Repeated
-  refresh reused the inspection, source changes allocated a new revision,
-  and session removal discarded the cache. Capturing non-player command
-  senders verified denial, player-only errors and unchanged status/reload.
-  These sender/UUID inputs are synthetic, not logged-in-player evidence.
-- **Preserved item regression:** `item-identity` (`item-codec-v4`) run
-  `98cd61db8fc24518a0ead74d4f2a8271` passed all 35 assertions with this same
-  committed production/companion artifact.
-- **Protocol regression, distinct gate:** unchanged approved
-  `protocol-player-calibration --test-player protocol-calibration` run
-  `656549dbaf65441a9c434bb98043b25f` passed 25/25 assertions and the client
-  report. Real Paper observed the expected offline UUID, selected-slot input,
-  full-force bow release, player-owned arrow and quit with the new listeners
-  active. This is T09b calibration coexistence, not equipment-specific player
-  acceptance. No shared player admission or client sequence changed. The runner
-  admitted both JVMs against its 2816 MiB combined memory requirement (4703 MiB
-  guest available; 3087 MiB effective host available).
-- **Cleanup:** all three Paper JVMs and the protocol client exited 0 unforced;
-  every scenario cleanup counter was zero. Ports 53997, 44945 and 48809 were
-  checked closed afterward. The runner reaped its owned processes and released
-  the shared lease. Raw reports remain ignored under `build/reports/agent-paper/`.
+- **Build and unit evidence:** JDK 25.0.4.1 wrapper/API-isolation checks passed;
+  82 production tests with zero failures/errors/skips, including eight new
+  equipment cases; 36 Python runner tests and two client tests passed. Coverage
+  includes cache reuse, hand replacement, same-UUID enchant/roll changes, profile
+  identity, permission/full-storage rejection, atomic bonuses and event/cleanup
+  behavior. MockBukkit's inventory-view conversion remains explicitly synthetic.
+- **Real Paper at that revision:** equipment run `9f19e62d321b454c95c5a1fb7bc5a3b9`
+  passed 23 assertions; item run `98cd61db8fc24518a0ead74d4f2a8271` passed 35;
+  unchanged protocol calibration `656549dbaf65441a9c434bb98043b25f` passed 25 plus
+  its client report. All eight bows resolved damage 100 / crit damage 50;
+  same-UUID Vicious III and roll edits changed ferocity 0→3 and damage 100→102.5
+  without rewriting old snapshots. Offhand/invalid main-hand inputs gave damage
+  0 / ferocity 0 / crit damage 50. Repeated refresh reused the snapshot; source
+  changes changed revision; removing sessions cleared caches. Synthetic senders
+  established permission/player-only/status/reload behavior, not player input.
+  The accepted EULA, shared lease and combined memory gate were used; all three
+  Paper processes and the client exited 0 unforced, ports closed and cleanup
+  counters returned to zero.
+- **Latest connected-player gate:** [PR #32 / T09c baseline](../../dev/game-tests/findings/t09c-baseline.md)
+  completes objective T01b acceptance with real-player permission/grant, received
+  command text, held-slot listeners, same-UUID changes, death/respawn and quit
+  cleanup. Its full 15-case baseline has 82 production / seven client tests and
+  all intended outcomes; the current T09c entry records Python/platform counts.
 
-All final runs used production SHA256
-`afc7374f6240e4866b392239cc8027af07fe13f853de58d4eb9127b37b5fa209`
-and companion SHA256
-`10fde4aeb997684a01059c5ea433b53dc3409f969ff7efa6125a1b3550b55557`.
-The protocol client SHA256 is
-`ccab969031782ae9bdd2a1182d83316ac5da1f5278c84c3d3b923406a8af626e`,
-using the exact protocol 776 publication, dependency lock and strict verification
-metadata integrated by T09b; the run report records all 77 staged client JARs.
-
-Windows/Linux CI passed on runtime head `4c28474`
-([PR check run](https://github.com/Kav-K/OnlyDragons/actions/runs/34008634626)).
-The earlier `7751adc` runs remain integration history for main `5b0e030`; the
-three runs above supersede them for current-main handoff.
-
-**Connected-player acceptance:** completed by [PR #32](https://github.com/Kav-K/OnlyDragons/pull/32) at `73a8cc8`. The fresh shared baseline passed all 47 `equipment-player-v2` assertions and eight required actual received-message checks: non-OP denial and permission-scoped grant, held-slot event-driven refresh, same-UUID inventory edits, offhand exclusion, bonus replacement, death/respawn and quit cleanup. See [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). The fixture uses a real offline protocol player; controlled inventory edits, commands and death use supported server APIs and are described in its scope.
-
-**Windows operator build:** the exact default Cursor **Minecraft: Build and test** target passed on clean main `73a8cc8`: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Dev.ps1 Build` exited 0 with `BUILD SUCCESSFUL` in 16 seconds; parsed JUnit recorded 82 tests, zero failures/errors/skips. See [build evidence](../../dev/game-tests/findings/t09c-baseline.md#build-review-and-ci-evidence).
-
-**Separate unrun observations:** Windows Play/smoke, human visuals and input feel, authenticated-client compatibility and multiplayer. These do not stand in for the now-verified objective equipment gates. T06 must still connect `refresh(Player)` at shot acceptance;
-`cached(UUID)` is diagnostic state and must not substitute for that recheck.
-No projectile integration, combat effects, player-health attributes, performance
-claim or gameplay milestone is accepted here.
+[Cursor Play](../../dev/stats-play.md) documents the operator procedure. Human
+visuals, authenticated accounts/multiplayer and input feel remain separate. T06
+must connect `refresh(Player)` at shot acceptance; `cached(UUID)` is diagnostic
+and cannot replace that check. No firing, combat effects, player-health attributes,
+performance claim or gameplay milestone is accepted by this evidence.
 
 ### T03 combat validation
 
-[PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), merged at `9092fbe`, owns additive combat services, `CombatEncounter`, and its unit/Paper scenarios.
-T00 and T01a are integrated (owner dispatch confirms PR #23 merge `1efa7d0`);
-T01a review references in its evidence section are historical.
-Existing T00 DTOs, production listener/command registration, pins and other
-feature ownership are unchanged. See document 02 section 6 for the service API.
-The branch implements no-Strength offense, explicit crit, historical cap,
-separate health/contribution, idempotent accepted impacts, validated inherited
-children, one completion, and terminal generation rejection. The 0.25 and 0
-ferocity HP fractions are test calibration, not researched Hypixel values.
+[PR #26](https://github.com/Kav-K/OnlyDragons/pull/26) merged at `9092fbe` after
+independent review and final-head Windows/Linux CI. Clean runtime
+`633d81c2ef3377f9f94623db75808e42fe75ac38` includes actor main `5b0e030`, all ten
+then-registered scenarios and four cleanup requirements. T00 DTOs and production
+bootstrap stayed unchanged; document 02 section 6 defines the combat service API.
+[Full original run, artifact hashes, diagnostics and earlier revisions](history/2026-09-05-foundation-evidence.md#t03-combat-validation).
 
-Final clean runtime revision `633d81c2ef3377f9f94623db75808e42fe75ac38`
-includes the ordinary merge of actor main `5b0e030`, retaining all ten scenario
-registrations and all four owned-resource cleanup requirements. The new runner
-invoked both wrapper builds on JDK 25.0.4.1: 74 production tests (20 combat
-cases), zero failures/errors/skips, and API isolation passed. The Linux Python
-runner contract suite passed all 36 tests. Production combat and its scenario
-were unchanged from the independently reviewed `0dd0fa7`; the integrated runner
-and companion were rebuilt and exercised together. No protocol client was
-needed or started for this synthetic domain-service scenario.
+- **Build/unit:** JDK 25.0.4.1 wrapper and API-isolation checks passed with 74
+  production tests, including 20 combat cases, and no failures/errors/skips;
+  all 36 Python runner tests passed. No protocol client was needed.
+- **Real Paper:** run `21ddb337ec114a22ab80f693f87df0cb` passed 31 assertions on
+  Paper `26.2-121-a2a42c5`, mechanic `combat-accounting-calibration-v1`.
+  The critical fixture resolved 210; its test-only 0.25 child requested 52.5 HP,
+  removed the remaining 20 and credited 210, freezing totals at 230 HP / 420 score.
+  Historical cap boundaries produced 4,000/6,000/8,000/10,000 for one million max
+  HP; a 24,000 mitigated basis capped once to 6,000 for parent and child. Duplicate,
+  simultaneous-lethal, late, recursive, terminal, cancellation and overflow
+  controls passed. These are synthetic domain inputs on Paper, not collision proof.
+- **Cleanup/provenance:** all four owned-resource counters were zero; the JVM
+  exited 0 unforced and port 43475 closed. The accepted EULA/shared lease and
+  2560 MiB memory gate were used; independent replay checked the catalog/window,
+  JUnit and all three staged JAR hashes. Earlier revisions remain archived.
 
-`python3 scripts/agent-tests/paper_test.py --scenario combat-accounting` returned
-exit 0 for run `21ddb337ec114a22ab80f693f87df0cb`, Paper
-`26.2-121-a2a42c5` / Minecraft 26.2, mechanic `combat-accounting-calibration-v1`.
-All 31 assertions passed through the production classloader on the server thread.
-The golden critical fixture resolved 210; a calibrated 0.25 child requested 52.5
-HP, removed the remaining 20, and credited 210, freezing totals at 230 HP/420
-score. Cap boundaries resolved 4,000/6,000/8,000/10,000 for one million max HP;
-a 24,000 mitigated parent basis capped once to 6,000 for both parent and child.
-Duplicate impacts/procs, simultaneous lethal candidates, late descendants,
-recursive children, terminal reset, cancellation and overflow controls passed.
-These are synthetic domain inputs on actual Paper, not collision evidence.
-
-All four listener/entity/task/chunk cleanup assertions reported zero retained
-resources. The owned JVM exited 0, `clean=true`, `forced=false`; its loopback
-port 43475 was confirmed closed afterward, with no owned JVM remaining.
-Independent post-run validation checked the strict report against its catalog
-and original run window, summed the JUnit XML, and rehashed both deployed JARs
-and the pinned Paper JAR. The memory gate admitted 1536 MiB heap plus 1024 MiB
-reserve: guest available 6004 MiB and effective host available 3486 MiB
-(Windows 1419 MiB plus 2067 MiB conservative resident-cache allowance).
-The disposable profile retained authentication and used the shared lease.
-Artifact SHA256 values:
-
-- Production: `1ca28a2c3b79115e2b60e842cb748c50acf0aacf3f92a3e98a5098da43a7756f`
-- Companion: `8b284e952d4112722604f7905d6619cfbcbf5d4e5f7fcd2ff82381e78595c3fe`
-
-Earlier clean `a4673cf` passed 30 assertions; `0dd0fa7` run
-`33d78b17c5e04d00bc7b11e3308269d6` passed 31 before actor integration. The run
-above supplies the final integrated evidence. Subsequent evidence/PR updates
-are documentation only. Independent code/evidence review passed; final-head CI
-and lead merge remain pending.
-Physical arrow/native suppression, Windows smoke, authenticated-client/input/
-visual/multiplayer and performance gates are unrun.
-Next dependency: T05 consumes the frozen pre-cap basis for bounded scheduling;
-T08 and the final T04-informed adapter wire player-facing combat later.
+The 0.25/0 HP fractions are calibration choices, not Hypixel constants. Native
+suppression, physical adapters, authenticated/input/visual/multiplayer checks and
+performance remain separate. T05 consumes the frozen pre-cap basis; T08 and the
+T04-informed adapter connect player-facing combat later. No milestone advances.
 
 ### T02 item validation evidence
 
-Final clean runtime revision `7ebaa6b36521913058b578cf27522d3c2e10c463` includes
-the ordinary merge of main `586a170` and all eight registered scenarios. The
-`item-codec-v4` revision adds an explicit `owned_listeners_removed` requirement
-for the merged projectile harness; production code, item schema v1 and item
-catalog v2 are unchanged from the reviewed stats/item integration.
+[PR #24](https://github.com/Kav-K/OnlyDragons/pull/24) merged at `7c6d843` after
+independent review and final-head CI. Clean runtime
+`7ebaa6b36521913058b578cf27522d3c2e10c463` includes main `586a170`, all eight
+then-registered scenarios and `item-codec-v4`'s fourth listener-cleanup check.
+The schema remains v1 and the catalog remains v2. [Full original evidence and hashes](history/2026-09-05-foundation-evidence.md#t02-item-validation-evidence).
 
-Run `3ba703d666dc416782a77f59e2edaccc` returned exit 0 on Java `25.0.4.1`,
-Minecraft `26.2`, Paper `26.2-121-a2a42c5`, with all 35 assertions passing.
-Both wrapper builds passed with 54 production tests and zero failures/errors/skips.
-All eight native byte-round-tripped loadouts resolved through the production
-snapshot factory to damage 100/crit damage 50 and their expected crit/ferocity
-totals. An edited enchant/roll item resolved to crit chance 5/ferocity 3 without
-double-counting contributions. Identity, schema, presentation and rejection
-checks passed alongside all four listener/entity/task/chunk cleanup assertions.
-The shared lease and memory gate were used; the owned JVM exited 0 without
-forcing, its loopback port closed, and no owned JVM remained. Final-head CI and independent review passed; PR #24 merged at `7c6d843`.
-Authenticated player inventory and visuals remain
-unrun. Subsequent evidence updates are documentation only.
-
-- Production SHA256: `103efd337f5c6a109d3199581d5f9e19317df471c1a11304bdab2f883b426547`
-- Companion SHA256: `bf2959c2856cb0b9623193d06e302ee9eaa3573af91905d5eabddcfe9c2915f9`
+JDK 25.0.4.1 wrapper builds passed with 54 production tests and zero failures,
+errors or skips. Run `3ba703d666dc416782a77f59e2edaccc` passed all 35 assertions
+on Paper `26.2-121-a2a42c5`: all eight serialized bows resolved damage 100 / crit
+damage 50 and declared crit/ferocity totals through the production snapshot
+factory. The edited enchant/roll fixture resolved crit chance 5 / ferocity 3
+without duplicate contributions. Identity, schema, presentation and rejection
+checks passed. All four cleanup counters were zero; the owned JVM exited 0
+unforced, its loopback port closed, and the accepted EULA/shared lease/memory gate
+were used. Authenticated inventory/visual checks and gameplay milestones remain
+separate; T01b's later connected equipment evidence is above.
 
 #### Earlier codec-v2 evidence
 
-
-Earlier codec-v2 verification revision `2f66cc4bc54ed1131c6c13f65253b928726e4efe` was clean
-and included current main `e72fb2a` before verification (ordinary merge, retaining
-both context entries). That production/scenario code is `14d9b8b`, including the lead integration audit
-corrections; previous catalog-v1 evidence is superseded by this run. The isolated runner command
-was `python3 scripts/agent-tests/paper_test.py --scenario item-identity`, using
-the provisioned accepted EULA, shared lease and memory admission. Run
-`dc41a0c5fc8449bebda25bc20fe15198` returned exit 0 on Java `25.0.4.1`, Minecraft
-`26.2`, Paper `26.2-121-a2a42c5`, with mechanic revision `item-codec-v2`.
-
-- **Domain/build:** wrapper production and separate companion builds passed;
-  45 production tests, zero failures/errors/skips. Of these, 13 item-domain
-  cases cover trusted categories/levels, replacement edits, immutable inputs,
-  calibration contributions, allowlisted rolls and explicit rejection. Eleven
-  MockBukkit codec cases cover PDC/presentation/type/material/amount and the
-  server-thread boundary. The other 21 tests are existing contracts/starter
-  checks. API isolation passed. After merging main's stricter report validator,
-  its separate Python failure-contract suite also passed all 27 tests without
-  skips (`python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py' -v`). The companion itself has no JUnit tests;
-  its assertions execute on Paper. The integrated Symphony bridge suite also
-  passed all six tests after merging main; no bridge code is changed by T02.
-- **Actual Paper:** all 32 required assertions passed through the production
-  classloader. Eight loadouts preserved resolved data through native ItemStack
-  byte serialization. Two granted UUIDs stayed distinct through synthetic
-  inventory moves. Renaming an ordinary bow did not grant identity, and editing
-  a managed bow's text did not change identity or enchants. Base damage remained
-  100 with no duplicate weapon-damage modifier; Vicious and a custom trusted
-  roll preserved their modifiers. Catalog v2 contributes no crit-damage bonus
-  on any preset, leaving T01 baseline 50 unchanged (expected damage/crit damage
-  100/50 with the shared profile). The resolvedWeapon projection retained edited
-  Duplex II/Vicious III and the roll with base modifiers exactly once; #7 must
-  pass that projection once with only external additional sources. Actual
-  cross-task factory/equipment integration remains #7 work. Multiple ultimates
-  rejected on write/load;
-  invalid levels, unknown IDs/rolls, wrong types/UUIDs, unchecked stats/kinds,
-  schema 0/2, mismatched revisions, material and amount rejected explicitly.
-- **Cleanup:** loopback port 41017; all three required entity/task/chunk-ticket
-  cleanup assertions reported zero retained resources. This item-only scenario
-  created no entities/tasks/tickets; its synthetic inventory was cleared in
-  `finally`. The owned JVM exited 0, `forced=false`, `clean=true`.
-- **Artifacts:** production SHA256
-  `0da8e0ba22bc8922279c8e6c8eef929c3ca74443c26a2c351f0f9c3b8f559c66`;
-  companion SHA256
-  `c7e727011893b486bcd597a900807ddbd8f94d02cabbf4967a9d2925f1b12573`.
-  Raw reports remain ignored under `build/reports/agent-paper/<runId>/`.
-- **Remaining gates:** Windows smoke and authenticated client inventory moves,
-  anvil renames, lore/glint rendering and multiplayer remain unrun. They become
-  actionable through #7's grant/equipment integration. No firing/enchant-effect,
-  reload/restart persistence, anti-duplication or performance claim is made.
-  Lead review/merge precedes dependent #7/#9 integration; milestone gates remain
-  unaccepted. Follow-up context-only commits retain this exact runtime artifact.
-
-
+The [verbatim codec-v2 record](history/2026-09-05-foundation-evidence.md#earlier-codec-v2-evidence)
+preserves its 45-test / 32-assertion run, exact inputs, scope and then-pending gates.
 
 #### Earlier integrated stats and item evidence (v3)
 
-Clean runtime revision `bba2ea154381f30745633ad654eaa3174e98ee4d` integrates
-stats main `1efa7d`. Run `da51644d5f484ef4bb44d745495b459f` passed all 34
-`item-codec-v3` assertions on Paper 26.2 build 121, plus 54 production tests
-with zero failures/errors/skips. All eight serialized calibration loadouts
-resolved through the production snapshot factory to damage 100/crit damage 50
-and their expected crit/ferocity totals. The edited enchant/roll item resolved
-to crit chance 5/ferocity 3. All cleanup assertions passed; server exit 0,
-clean=true, forced=false. This covers codec-to-resolver integration with
-synthetic inventories, not equipment events, client input or visuals.
-
-Production SHA256 `103efd337f5c6a109d3199581d5f9e19317df471c1a11304bdab2f883b426547`.
-Companion SHA256 `4d3e96c6961e4d398d32976830f1cba2b6b97377654294835308c799e584a569`.
+The [verbatim codec-v3 record](history/2026-09-05-foundation-evidence.md#earlier-integrated-stats-and-item-evidence-v3)
+preserves its 54-test / 34-assertion run and superseded companion hash.
 
 ### T01a resolver validation
 
-GH-3 on `symphony/gh-3` is **Complete**, merged through [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23) at `1efa7d0`; issue #3 and PR #23 are closed. Clean runtime-code revision
-`36a7e23412c4271fc1fa76a980ceddb4c3740272` includes main `6f0ccfb` and its strict typed
-report validator from PR #19, merged normally before final verification. The ordinary
-wrapper build and both runner builds passed with JDK 25.0.4.1: 30 production
-tests, zero failures/errors/skips, including 9 new resolver behavior tests and
-API isolation. The resolver and source collection had all lines/branches covered;
-coverage supplements the explicit numeric and rejection assertions. The integrated
-runner suite also passed all 27 Python tests without skips.
+[PR #23](https://github.com/Kav-K/OnlyDragons/pull/23) merged at `1efa7d0` after
+independent review and final-head CI; issue #3 is closed. Clean runtime
+`36a7e23412c4271fc1fa76a980ceddb4c3740272` includes main `6f0ccfb` and its typed
+report validator. [Full original evidence, hashes and coverage detail](history/2026-09-05-foundation-evidence.md#t01a-resolver-validation).
 
-`python3 scripts/agent-tests/paper_test.py --scenario stats-resolution` returned
-exit 0 in run `50acd539aaae416481789e1b711bfa7f` on Paper
-`26.2-121-a2a42c5` / Minecraft 26.2, mechanic `stats-calibration-v1`.
-All 18 assertions passed. The scenario loaded the resolver from the production
-plugin classloader and verified complete snapshots, weapon base exactly once,
-crit damage baseline 50, raw crit 175 / ordinary probability 1, raw ferocity 750.5 / effective 500,
-and weapon damage 151.5 with step results 101, 151.5, 75.75, 151.5, 151.5.
-Input permutation retained the same explanation. Whole-source replacement
-changed damage to 111 and removed the source's crit/ferocity/multipliers while
-the old snapshot remained immutable. Invalid negative results failed.
+The JDK 25.0.4.1 wrapper/API-isolation checks passed with 30 production tests
+(nine new resolver cases) and zero failures/errors/skips; all 27 Python tests
+passed. Paper `26.2-121-a2a42c5` run `50acd539aaae416481789e1b711bfa7f` passed
+all 18 `stats-calibration-v1` assertions: complete snapshots, weapon base once,
+crit damage 50, raw crit 175 / probability 1, raw ferocity 750.5 / effective 500,
+and weapon damage 151.5 with steps 101/151.5/75.75/151.5/151.5. Permuted inputs
+kept explanations identical; replacing a source yielded damage 111 and removed
+its other contributions while preserving old snapshots. Invalid negatives failed.
+All three cleanup checks passed; the JVM exited 0 unforced, port 43443 closed,
+and the accepted EULA/shared lease/memory gate were used.
 
-Production SHA256:
-`7f229dd2de086fb6bb0822abcade29fd5ec0e484e57a9d98d00f5a8e2580d59f`.
-Companion SHA256:
-`072ad52ffdfdfbb4229b123c292cffdf4594dc2fc6e94fdd80490c8fbf63301f`.
-The runner reused the accepted EULA, shared lease, memory gate and disposable
-issue-local world on loopback port 43443. All three cleanup assertions passed;
-the scenario owned no entities, scheduled tasks or chunk tickets. Paper exited
-0 with `forced=false`, `clean=true`. Raw reports stay in ignored
-`build/reports/agent-paper/50acd539aaae416481789e1b711bfa7f/`.
-
-These are synthetic domain inputs executed on real Paper. Windows smoke,
-authenticated clients, equipment changes, mouse input, visuals and multiplayer
-were not run. T01b owns equipment/play integration after T01a and T02 merge;
-no gameplay milestone is accepted here. Independent review and final-head CI
-passed before merge. No research claims changed: the calibration rationale is recorded in
-document 02 rather than recasting document 01's upstream evidence.
-
-The integration lead also ran the exact Cursor Windows Build target on clean
-main `7c6d843` (`powershell.exe -NoProfile -ExecutionPolicy Bypass -File
-scripts/Dev.ps1 Build`): the wrapper build, all 54 production tests and API
-isolation passed. This started no human server and preserved the existing world.
-The authenticated #6 worker launched with the optional remote-plugin sync flag
-disabled and required MCP tools connected; the earlier cache-sync errors did not
-recur in that launch.
+These are synthetic domain inputs on Paper; later equipment/player coverage is
+recorded under T01b/T09c. No human, performance or gameplay milestone claim follows.
+The historical Windows Cursor Build on clean `7c6d843` passed 54 production tests
+and API isolation without starting a human server; [the archived record](history/2026-09-05-foundation-evidence.md#t01a-resolver-validation)
+also preserves its authenticated worker/MCP observations. Current operator-build
+counts are in the T09c entry above.
 
 ## 1. Team operating contract
 
