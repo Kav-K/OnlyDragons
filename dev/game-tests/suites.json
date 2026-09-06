@@ -117,6 +117,18 @@
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
     },
+    "practice-combat": {
+      "scenarioId": "practice-combat",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
+    },
+    "practice-lifecycle": {
+      "scenarioId": "practice-lifecycle",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
+    },
     "tracer-continuity": {
       "scenarioId": "tracer-continuity",
       "expectation": "positive",
@@ -146,6 +158,8 @@
       "enchants-procs",
       "dragon-definitions",
       "owned-firing",
+      "practice-combat",
+      "practice-lifecycle",
       "tracer-continuity"
     ],
     "harness-controls": [
@@ -184,6 +198,8 @@
       "dragon-definitions",
       "dragon-definitions-abort",
       "owned-firing",
+      "practice-combat",
+      "practice-lifecycle",
       "tracer-continuity",
       "tracer-cleanup-abort"
     ]
@@ -239,6 +255,8 @@
         "dragon-definitions",
         "dragon-definitions-abort",
         "owned-firing",
+        "practice-combat",
+        "practice-lifecycle",
         "tracer-continuity",
         "tracer-cleanup-abort"
       ],
@@ -247,7 +265,8 @@
         "items",
         "combat",
         "projectiles",
-        "enchants-procs"
+        "enchants-procs",
+        "practice-combat"
       ]
     },
     "stats": {
@@ -303,7 +322,8 @@
       ],
       "affects": [
         "enchants-procs",
-        "dragon-definitions"
+        "dragon-definitions",
+        "practice-combat"
       ]
     },
     "projectiles": {
@@ -325,7 +345,9 @@
         "tracer-continuity",
         "tracer-cleanup-abort"
       ],
-      "affects": []
+      "affects": [
+        "practice-combat"
+      ]
     },
     "player-fixture": {
       "paths": [
@@ -391,6 +413,7 @@
         "dev/game-tests/suites.json",
         "dev/game-tests/acceptance.json",
         "dev/game-tests/src/main/resources/*",
+        "dev/game-tests/src/test/java/*",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/Scenario.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/ScenarioContext.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/RestartPhase.java",
@@ -426,6 +449,8 @@
         "dragon-definitions",
         "dragon-definitions-abort",
         "owned-firing",
+        "practice-combat",
+        "practice-lifecycle",
         "tracer-continuity",
         "tracer-cleanup-abort"
       ],
@@ -445,7 +470,8 @@
         "equipment-player"
       ],
       "affects": [
-        "combat"
+        "combat",
+        "practice-combat"
       ]
     },
     "enchants-procs": {
@@ -462,7 +488,9 @@
         "combat-accounting",
         "enchants-procs"
       ],
-      "affects": []
+      "affects": [
+        "practice-combat"
+      ]
     },
     "dragon-definitions": {
       "paths": [
@@ -474,6 +502,18 @@
       "cases": [
         "dragon-definitions",
         "dragon-definitions-abort"
+      ],
+      "affects": []
+    },
+    "practice-combat": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/paper/encounter/*",
+        "src/main/java/com/kaveenk/onlydragons/command/PracticeCommand.java",
+        "src/test/java/com/kaveenk/onlydragons/PracticeCommandTest.java"
+      ],
+      "cases": [
+        "practice-combat",
+        "practice-lifecycle"
       ],
       "affects": []
     },

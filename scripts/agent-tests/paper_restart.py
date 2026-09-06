@@ -150,6 +150,8 @@ def verify_continuity(r, parent, descriptor, root):
         r.require(r.json_values_equal(phase['profile'], parent['profile'])
                   and r.json_values_equal(phase['artifacts'], parent['artifacts'])
                   and r.json_values_equal(phase['playerBuild'], parent['playerBuild']), 'Changed restart profile/artifacts')
+        r.require(isinstance(parent.get('build'), dict) and r.json_values_equal(phase.get('build'), parent['build']),
+                  'Changed restart build evidence')
         r.require(phase.get('artifactsBefore') == parent['stagedArtifacts'] == phase.get('artifactsAfter'),
                   'Changed artifacts between boots')
         root_phase = evidence_path(root, f'phase-{index}')

@@ -24,6 +24,10 @@ public final class CombatEncounter {
     private final Thread ownerThread = Thread.currentThread();
     private final CombatProfile profile;
     private final String variantId;
+    private final Optional<com.kaveenk.onlydragons.domain.encounter.definition.DragonCatalog.Selection> selection;
+    private long acceptedOrdinal;
+    private long lastCommitTick = -1;
+    private final Map<UUID, EncounterResult.CommitStamp> stamps = new LinkedHashMap<>();
     private final DamageCalculator calculator = new DamageCalculator();
     private final Map<UUID, DamageResult> accepted = new LinkedHashMap<>();
     private final Map<PhysicalImpact.Key, UUID> physicalClaims = new LinkedHashMap<>();
@@ -33,19 +37,37 @@ public final class CombatEncounter {
     private boolean ended;
 
     public CombatEncounter(TargetState target, String variantId, CombatProfile profile) {
+        this(target, variantId, profile, Optional.empty());
+    }
+
+    public CombatEncounter(TargetState target, String variantId, CombatProfile profile,
+                           Optional<com.kaveenk.onlydragons.domain.encounter.definition.DragonCatalog.Selection> selection) {
         this.target = Objects.requireNonNull(target, "target");
         if (!target.alive() || target.currentHealth() != target.maxHealth()) {
             throw new IllegalArgumentException("A new encounter must start at full positive health");
         }
         this.variantId = DomainChecks.text(variantId, "variantId");
         this.profile = Objects.requireNonNull(profile, "profile");
+        this.selection = Objects.requireNonNull(selection);
+        selection.ifPresent(value -> {
+            if (!value.identity().id().equals(variantId) || !value.combatProfile().equals(profile)
+                    || value.maxHealth() != target.maxHealth() || value.defense() != target.defense())
+                throw new IllegalArgumentException("Selection does not match encounter");
+        });
     }
 
     public TargetState target() { checkThread(); return target; }
     public Optional<EncounterResult> completion() { checkThread(); return Optional.ofNullable(completion); }
     public List<DamageResult> impacts() { checkThread(); return List.copyOf(accepted.values()); }
+    /** Bounded diagnostic projection; authoritative idempotency/accounting remains intact. */
+    public List<DamageResult> recentImpacts(int limit) {
+        checkThread(); if (limit < 0) throw new IllegalArgumentException("Negative impact limit");
+        return accepted.values().stream().skip(Math.max(0, accepted.size() - limit)).toList();
+    }
     public Map<UUID, EncounterResult.Contribution> contributions() { checkThread(); return Map.copyOf(contributions); }
     public void end() { checkThread(); ended = true; }
+    public long acceptedOrdinal() { checkThread(); return acceptedOrdinal; }
+    public Optional<EncounterResult.CommitStamp> stamp(UUID impact) { checkThread(); return Optional.ofNullable(stamps.get(impact)); }
 
     public DamageResult physical(ShotContext shot, PhysicalImpact impact, DamageModifiers modifiers,
                                  double effectiveFerocity, Optional<DamageResult.RejectionReason> adapterRejection) {
@@ -112,6 +134,9 @@ public final class CombatEncounter {
     private DamageResult commit(UUID id, Optional<UUID> parent, PhysicalImpact.Key origin, UUID player, UUID shot,
                                 DamageResult.Kind kind, long tick, CritOutcome crit, double ferocity,
                                 DamageCalculator.Calculation calculation) {
+        if (tick < lastCommitTick) throw new IllegalArgumentException("Encounter commit tick cannot move backwards");
+        long ordinal = Math.incrementExact(acceptedOrdinal);
+        var stamp = new EncounterResult.CommitStamp(tick, ordinal);
         double requested = calculation.cappedDamage() * (kind == DamageResult.Kind.FEROCITY ? profile.ferocityHealthFraction() : 1);
         double actual = Math.min(target.currentHealth(), requested);
         double score = calculation.cappedDamage();
@@ -121,17 +146,23 @@ public final class CombatEncounter {
         var previous = contributions.getOrDefault(player, new EncounterResult.Contribution(0, 0, 0, false));
         // Constructors reject non-finite accumulated totals before committing anything.
         var total = new EncounterResult.Contribution(previous.actualHealthDamage() + actual,
-                previous.contributionDamage() + score, 0, true);
+                previous.contributionDamage() + score, 0, true,
+                previous.firstParticipation().or(() -> Optional.of(stamp)),
+                previous.contributionDamage() + score > previous.contributionDamage()
+                        ? Optional.of(stamp) : previous.lastCreditIncrease());
         var next = new TargetState(target.encounterId(), target.targetId(), target.maxHealth(), target.currentHealth() - actual, target.defense());
         EncounterResult finished = null;
         if (!next.alive()) {
             var finalTotals = new TreeMap<>(contributions);
             finalTotals.put(player, total);
-            finished = new EncounterResult(id, target.encounterId(), variantId, profile.mechanic(), tick, finalTotals);
+            finished = new EncounterResult(id, target.encounterId(), variantId, profile.mechanic(), tick, finalTotals, ordinal, selection);
         }
         target = next;
         contributions.put(player, total);
         accepted.put(id, result);
+        stamps.put(id, stamp);
+        acceptedOrdinal = ordinal;
+        lastCommitTick = tick;
         if (finished != null) completion = finished;
         return result;
     }

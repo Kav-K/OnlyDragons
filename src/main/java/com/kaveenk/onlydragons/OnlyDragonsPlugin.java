@@ -14,6 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 // MockBukkit subclasses the entry point while loading it in tests.
 public class OnlyDragonsPlugin extends JavaPlugin {
+    private com.kaveenk.onlydragons.paper.encounter.ManagedCombatService combat;
+    public com.kaveenk.onlydragons.paper.encounter.ManagedCombatService combat() { return combat; }
     private com.kaveenk.onlydragons.paper.projectile.OwnedBowService bows;
     public com.kaveenk.onlydragons.paper.projectile.OwnedBowService bows() { return bows; }
     private GreetingService greetings;
@@ -35,6 +37,9 @@ public class OnlyDragonsPlugin extends JavaPlugin {
         bows = new com.kaveenk.onlydragons.paper.projectile.OwnedBowService(this, equipment, 2000, Math::random);
         getServer().getPluginManager().registerEvents(new com.kaveenk.onlydragons.paper.projectile.OwnedBowListener(bows), this);
         bows.start();
+        combat = new com.kaveenk.onlydragons.paper.encounter.ManagedCombatService(this, bows);
+        getServer().getPluginManager().registerEvents(new com.kaveenk.onlydragons.paper.encounter.ManagedCombatListener(combat), this);
+        combat.start();
         equipmentListener = new EquipmentListener(this, equipment);
         getServer().getPluginManager().registerEvents(equipmentListener, this);
         getServer().getOnlinePlayers().forEach(equipmentListener::queue);
@@ -57,8 +62,11 @@ public class OnlyDragonsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (bows != null) bows.close();
-        if (equipmentListener != null) equipmentListener.close();
+        try { if (combat != null) combat.close(); }
+        finally {
+            try { if (bows != null) bows.close(); }
+            finally { if (equipmentListener != null) equipmentListener.close(); }
+        }
         getLogger().info("OnlyDragons disabled");
     }
 }

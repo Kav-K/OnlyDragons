@@ -58,8 +58,8 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             Entity target = Bukkit.getEntity(registeredTargets.get(hit.impact().key().targetId()));
             settlementPhases.put(hit.projectile().shot().projectileId(), target instanceof EnderDragon dragon ? dragon.getPhase().name() : "NON_DRAGON");
             settlements.add(hit);
-        }; bows.receiver(receiver);
-        context.cleanup("owned-firing-service", () -> { if (encounter != null) bows.endEncounter(encounter); if (secondEncounter != null) bows.endEncounter(secondEncounter); bows.clearReceiver(receiver); });
+        }; var observation = context.production().combat().observeSettled(receiver);
+        context.cleanup("owned-firing-service", () -> { if (encounter != null) bows.endEncounter(encounter); if (secondEncounter != null) bows.endEncounter(secondEncounter); observation.close(); });
         players.await("both production actors", 300, players::allOnline, this::setup);
         context.harness().getLogger().info("OD_PLAYER_READY " + context.harness().runId());
     }

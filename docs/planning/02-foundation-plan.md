@@ -428,6 +428,39 @@ Eyes/rewards, healing, native entity mirroring and the full encounter lifecycle
 remain later work. Rejected calls return traceable results but are not retained
 in the accepted ledger. Bounded diagnostic retention remains an adapter concern.
 
+### T08 integration contract (implementation branch, acceptance pending)
+
+`ManagedCombatService` owns the plugin-lifetime settled-hit receiver. Each target
+has one `CombatEncounter`, bounded `ProcCoordinator`, exact activated session
+values, and a `TargetBackend`. It uses receiver commit time and captured
+Power/Snipe inputs; collision time is retained separately. It reconciles old
+sessions before every drain and never reapplies returned damage. `tickOutcomes`
+reports each failed child alongside committed results; a failed child is consumed,
+not blindly retried. Existing `tick` throws a typed `DrainFailure` carrying that
+partial outcome for legacy callers.
+
+`CombatEncounter` commits a nondecreasing tick and encounter-global accepted
+ordinal atomically with health, credit and participant stamps. Accepted zeros and
+rounded-away additions consume ordinals without changing a last-strict-increase
+stamp. First-successful-participation provenance survives zero-to-positive changes.
+Adapter Views retain at most 64 recent impacts and explicitly report total accepted
+and omitted counts; domain idempotency and ordinal history are not pruned. Captured
+parent diagnostics are released when no queued child needs them. Read-only claim
+observers cannot mutate the service during notification; subscriber failures do
+not interrupt later claims. Cleanup attempts every owned resource independently.
+`EncounterResult` freezes these stamps, terminal ordinal and optional full catalog
+Selection; legacy constructors explicitly have absent provenance. This supplies
+#40's ranking inputs without implementing ranking. #39 extends the native backend;
+its scoring terminal and resource-release phases are separate.
+
+The service retains completion and closes proc admission before native HP zero
+can reenter a death callback. T06's existing native-damage listener also rejects
+unmanaged/environmental damage to registered targets. Lifecycle listeners handle
+healing, no-drop/no-XP death, and player cleanup. Dummy commands use uncapped full,
+0.25 reduced or zero-HP ferocity calibration profiles; `scenario` labels an explicit
+four-sample fractional cycle. No production ferocity balance is selected.
+[Production-only Windows player procedure](../../dev/combat-play.md).
+
 ### Managed health
 
 Keep large boss HP in the domain model. The Paper dragon can carry a normalized health representation within native attribute limits; the custom boss bar displays domain HP. The adapter suppresses unmanaged native reductions and native crystal healing for owned targets, and mirrors authoritative changes without re-entering the damage engine.

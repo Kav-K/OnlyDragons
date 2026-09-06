@@ -9,7 +9,7 @@ import com.kaveenk.onlydragons.paper.item.codec.WeaponItemCodec;
 import com.kaveenk.onlydragons.paper.projectile.OwnedBowService;
 import com.kaveenk.onlydragons.paper.projectile.homing.ArrowContinuity;
 import java.util.*;
-import java.util.function.Consumer;
+import com.kaveenk.onlydragons.paper.encounter.ManagedCombatService;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -32,7 +32,7 @@ public final class TracerContinuityScenario implements Scenario, Listener {
     private final Map<UUID, List<ArrowContinuity.Frame>> frames = new HashMap<>();
     private final Map<UUID, String> collisions = new HashMap<>();
     private final List<Map<String, Object>> journal = new ArrayList<>();
-    private Consumer<SettledHit> receiver;
+    private ManagedCombatService.Observation observation;
     private boolean finished, moveTarget;
     private int nativeReleases;
     private boolean nativeVelocityMatches = true, nativeAgeReset;
@@ -42,8 +42,8 @@ public final class TracerContinuityScenario implements Scenario, Listener {
     @Override public void start(ScenarioContext context) throws Exception {
         this.context = context; context.mechanicRevision("tracer-continuity-v1");
         bows = context.production().bows(); players = new PlayerFixture(context);
-        receiver = hits::add; bows.receiver(receiver); context.listen(this);
-        context.cleanup("tracer-service", () -> { finished = true; publishEvidence(); if (encounter != null) bows.endEncounter(encounter); if (bows.taskCount() > 0) bows.clearReceiver(receiver); });
+        observation = context.production().combat().observeSettled(hits::add); context.listen(this);
+        context.cleanup("tracer-service", () -> { finished = true; publishEvidence(); if (encounter != null) bows.endEncounter(encounter); observation.close(); });
         players.await("tracer actor", 300, players::allOnline, this::setup);
         context.harness().getLogger().info("OD_PLAYER_READY " + context.harness().runId());
     }
@@ -250,7 +250,7 @@ public final class TracerContinuityScenario implements Scenario, Listener {
         context.check("native_velocity_matches_applied_steering", true, nativeVelocitySamples > 10 && nativeVelocityMatches);
         context.check("reset_releases_registry_frames_reservations", true, bows.capacityUsed() == 0 && bows.continuity().frameCount() == 0
                 && bows.continuity().tickets().reservedCount() == 0 && bows.continuity().tickets().demandCount() == 0);
-        bows.clearReceiver(receiver); bows.close();
+        observation.close(); bows.close();
         context.check("disable_releases_task_tickets", true, bows.taskCount() == 0 && bows.continuity().tickets().ticketCount() == 0);
         // Cleanup must remain safe after explicit terminal service close.
         encounter = null;

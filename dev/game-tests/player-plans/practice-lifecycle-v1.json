@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "planId": "practice-lifecycle-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "open",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev scenario full 1000"
+              }
+            },
+            {
+              "id": "old-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "old-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reconnect",
+              "action": "reconnect",
+              "args": {
+                "delayMillis": 250
+              }
+            }
+          ]
+        },
+        {
+          "id": "s2",
+          "steps": [
+            {
+              "id": "death-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "death-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "respawn",
+              "action": "respawn",
+              "args": {}
+            },
+            {
+              "id": "reset-airborne-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "reset-airborne-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev reset"
+              }
+            },
+            {
+              "id": "proc-open",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev scenario reduced 120"
+              }
+            },
+            {
+              "id": "proc-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "proc-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "compete-open",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev scenario full 75"
+              }
+            },
+            {
+              "id": "compete-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "compete-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "final-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev reset"
+              }
+            },
+            {
+              "id": "end",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "quit-shot-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "quit-shot-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reconnect",
+              "action": "reconnect",
+              "args": {
+                "delayMillis": 250
+              }
+            }
+          ]
+        },
+        {
+          "id": "s2",
+          "steps": [
+            {
+              "id": "exit-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "exit-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "late-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "late-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "compete-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "compete-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "end",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -12,8 +12,10 @@ P07/P10 with [final evidence](evidence/t07-suite.md). T06 retains its PR #52
 [firing acceptance](evidence/t06-suite.md); T09e retains its PR #50
 [restart acceptance](evidence/t09e-suite.md); T02b/T05 and bounded M0 retain
 their PR #48 [acceptance evidence](evidence/catalog-procs-suite.md). T08/#11
-remains active and is preparing peer integration in [PR #57](https://github.com/Kav-K/OnlyDragons/pull/57);
-its accounting evidence remains unaccepted and has priority for the playable checkpoint.
+is in review after completing peer integration in [PR #57](https://github.com/Kav-K/OnlyDragons/pull/57).
+The lead's [full hosted cohort 34043800507](https://github.com/Kav-K/OnlyDragons/actions/runs/34043800507)
+is running against original source `24ddf86` and base `2c0be58`; T08 acceptance
+remains pending and has priority for the playable checkpoint.
 The original T09c acceptance baseline was tested at `78c3de4`
 and merged through PR #32 at `73a8cc8`; subsequent validation runs retain their
 own input identities. The plugin still supplies starter status/reload commands and
@@ -44,7 +46,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T05 — Enchants/procs | Complete | [#8](https://github.com/Kav-K/OnlyDragons/issues/8), [PR #48](https://github.com/Kav-K/OnlyDragons/pull/48) | Merged at `3c35a85` after the full current-input suite, independent review/replay, task checkpoint and CI; 38 required proc assertions plus shared cleanup passed. [combined acceptance evidence](evidence/catalog-procs-suite.md). Physical P08/P09 and T08 composition remain later integration; old held worker runs retain their original disposition. |
 | T06 — Firing/Duplex | Complete | [#9](https://github.com/Kav-K/OnlyDragons/issues/9), [PR #52](https://github.com/Kav-K/OnlyDragons/pull/52) | Merged at `25891c0` after tested `f4178ba` passed all 24 hosted outcomes, independent raw replay/review, actual-main T06 checkpoint and current CI. Owned firing passed 115 assertion rows; repaired equipment passed 25; relevant builds report 182 production/28 client tests with no failures/errors/skips. [Final evidence, failed iteration and boundaries](evidence/t06-suite.md); [single-consumer API](evidence/t06-firing.md#consumer-contract). T08 accounting and human observations remain unaccepted. |
 | T07 — Tracer/continuity | Complete | [#10](https://github.com/Kav-K/OnlyDragons/issues/10), [PR #56](https://github.com/Kav-K/OnlyDragons/pull/56) | Merged at `2c0be58` after clean `576e394` passed all 26 hosted outcomes, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions; its abort control passed 10 checks with the exact expected exception; retained firing passed 115. [Final evidence](evidence/t07-suite.md); [consumer/broker contract and focused history](evidence/t07-tracer.md). Exactly P07/P10 are accepted; T08 integration and later milestones remain separate. |
-| T08 — Practice tools | In progress; priority for the playable checkpoint | Symphony / [#11 dispatch](https://github.com/Kav-K/OnlyDragons/issues/11#issuecomment-5559836724) | Repeatable player procedure, permissions, and explained damage remain pending. |
+| T08 — Practice tools | In review; focused Paper checks pass | [#11](https://github.com/Kav-K/OnlyDragons/issues/11), [draft PR #57](https://github.com/Kav-K/OnlyDragons/pull/57) | Lead complete cohort/replay/T08 checkpoint/current CI and human Windows Play/visuals remain pending; [combined focused evidence](evidence/t08-peer-integration.md). |
 | T08a — Managed dragon controls | Planned | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | After T08/T02b/T09e: real test-dragon backend and spawn/status/reset/result inspection through the existing shared lifecycle and T06 claims. All feature Paper/command evidence pending. |
 | T08b — Frozen damage ranking | Planned | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | After T08a: post-kill credited damage including ghost damage and overkill, unique placements under the lead-reviewed commit/ordinal tie rule. Deterministic and real multi-identity presentation gates pending. |
 | T08c — Personal loot simulation | Planned | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | After T02b/T08b: personal placement-dependent previews with hard item locks and explicit sample calibration. Real rewards always disabled; all resolver/no-grant Paper evidence pending. |
@@ -55,7 +57,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T11 — Eight-eye lifecycle | Planned, later | [#13](https://github.com/Kav-K/OnlyDragons/issues/13) | M3 accepted, then transaction, spawn, cancellation, and recovery gates. |
 | T12 — Variants/progression | Planned, later | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus separately agreed roster, rewards, and acquisition scope. |
 
-Bounded M0 contracts/feasibility is explicitly accepted; M1–M5 remain unaccepted. T02b/T05/T06/T07 are integrated; T08 accounting remains in progress. P02/P04 are accepted under T06 and P07/P10 under T07; the remaining P-series gates, including P01/P08/P09/P13, stay pending. Shared fixtures do not accept future gameplay behavior. A task's
+Bounded M0 contracts/feasibility is explicitly accepted; M1–M5 remain unaccepted. T02b/T05/T06/T07 are integrated; T08 accounting remains in review. P02/P04 are accepted under T06 and P07/P10 under T07; the remaining P-series gates, including P01/P08/P09/P13, stay pending. Shared fixtures do not accept future gameplay behavior. A task's
 full acceptance criteria below remain authoritative; this table is a summary.
 
 Use **Planned**, **In progress**, **In review**, **Blocked**, or **Complete** for
@@ -121,8 +123,8 @@ P07/P10 after the 26-case `576e394` cohort, independent raw replay/review,
 actual-main task checkpoints and current CI. [Accepted evidence and limits](evidence/t07-suite.md).
 Its scoped six-degree/current-part/UUID-tie/obstruction calibration and bounded
 shared ticket broker retain the existing bow registry/tick/retirement owner.
-[Consumer contract and earlier iterations](evidence/t07-tracer.md). T08 accounting
-remains active; no milestone or other task is advanced.
+[Consumer contract and earlier iterations](evidence/t07-tracer.md). At that acceptance,
+T08 remained active; no milestone or other task was advanced.
 
 PR #52 merged at `25891c0` on 6 September 2026: T06 completed after the
 24-case `f4178ba` cohort, independent raw replay/review, actual-main T06 and
@@ -476,6 +478,26 @@ type/loot definitions and eye scoping are split in the
 work packages are not dispatchable tasks or accepted gameplay.
 
 **Accept when:** one documented sequence gives a matching client a test kit and repeatable target; a non-admin cannot grant items or reset other players' fights; console calls handle player-only operations cleanly; the expected 25-ferocity behavior and coefficient experiments can be inspected without reading server internals.
+
+T08 implementation in [draft PR #57](https://github.com/Kav-K/OnlyDragons/pull/57)
+on `symphony/gh-11` is In review. The single receiver, shared combat/proc/native
+backend lifecycle, kit/dummy/scenario/last-hit commands and atomic frozen provenance
+are implemented. The bounded peer continuation normally merges reviewed T07
+`576e394` and migrates only its tracer observation to `combat().observeSettled(...)`.
+Clean combined `dacc6e7` passes 215 production, six companion and 28 client tests;
+Paper passes tracer (57), practice accounting (85), lifecycle (25) and existing
+firing (115), plus the exact tracer abort with 10 successful cleanup assertions.
+Nine additive command-only numeric/context matchers prevent automatic hit messages
+from satisfying last-hit inspection. Every parent fixture/assertion remains intact.
+[Exact peer integration evidence](evidence/t08-peer-integration.md) records clean
+inputs, artifacts, case replay and cleanup; [original T08 evidence](evidence/t08-focused.md)
+retains the previous cohort and superseded iterations. All 269 Python tests and
+static 28-case plan checks pass. The lead retains the complete combined hosted
+cohort, independent replay/T08 acceptance checkpoint, CI and merge. Lead-accepted T07 main `2c0be58` is normally integrated at
+`26684af`; complete relevant input identities match tested `dacc6e7`, and all five
+raw cases replay successfully after that merge. No focused result accepts T08
+or a milestone. Windows Build/Play, authentication, visuals and performance remain
+unrun. #39/#40 consume the published backend and frozen provenance contracts.
 
 ### T08a — Managed real-dragon backend and development controls
 

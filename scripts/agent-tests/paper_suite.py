@@ -483,7 +483,7 @@ def verify_case(project, record, case, descriptor, source, suite_root, restart_c
     require(build.get('wrapperInvoked') is True, 'Wrapper build evidence is missing')
     evidence = record.get('testEvidence')
     require(isinstance(evidence, list), 'JUnit evidence list is missing')
-    grouped, seen = {'production': [], 'player': []}, set()
+    grouped, seen = {'production': [], 'companion': [], 'player': []}, set()
     for item in evidence:
         require(isinstance(item, dict) and item.get('kind') in grouped, 'Unknown JUnit evidence kind')
         path = checked_file(project, item, 'path', 'sha256')
@@ -493,6 +493,9 @@ def verify_case(project, record, case, descriptor, source, suite_root, restart_c
         grouped[item['kind']].append(path)
     counts = junit_counts(grouped['production'])
     require(runner.json_values_equal(counts, build.get('unitTests')), 'Production JUnit totals differ from actual cases')
+    companion_counts = junit_counts(grouped['companion'])
+    require(runner.json_values_equal(companion_counts, build.get('companionUnitTests')),
+            'Companion JUnit totals differ from actual cases')
     client_identity = None
     if actor:
         action_plan = runner.player_actions.load_plan(project, descriptor) if case.get('testPlayer') == 'protocol-actions-v1' else None
@@ -550,7 +553,7 @@ def verify_case(project, record, case, descriptor, source, suite_root, restart_c
     else:
         require(not grouped['player'] and 'playerBuild' not in result and 'playerPath' not in record,
                 'Unexpected player evidence in authenticated scenario')
-    return {'assertions': assertion_count, 'unitTests': counts, 'artifacts': artifacts,
+    return {'assertions': assertion_count, 'unitTests': counts, 'companionUnitTests': companion_counts, 'artifacts': artifacts,
             'client': client_identity, 'expectedOutcome': case['expectation']}
 
 
@@ -599,13 +602,16 @@ def validate_suite_receipt(project, receipt_path):
 
 def capture_tests(project, suite_root, case_id, actor):
     result = []
-    roots = {'production': project / 'build/test-results/test'}
+    roots = {'production': project / 'build/test-results/test',
+             'companion': project / 'dev/game-tests/build/test-results/test'}
     if actor:
         roots['player'] = project / 'dev/player-client/build/test-results/test'
     for kind, root in roots.items():
+        files = sorted(root.glob('TEST-*.xml'))
+        require(files, kind + ' JUnit evidence is missing')
         destination = suite_root / case_id / kind
         destination.mkdir(parents=True)
-        for path in sorted(root.glob('TEST-*.xml')):
+        for path in files:
             target = destination / path.name
             shutil.copyfile(path, target)
             result.append({'kind': kind, 'path': target.relative_to(project).as_posix(), 'sha256': runner.sha256(target)})

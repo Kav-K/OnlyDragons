@@ -6,7 +6,7 @@ description: Main workspace for Minecraft Java plugin development.
 commands:
   onlydragons:
     description: Inspect stats, grant calibration gear, and manage plugin configuration.
-    usage: /onlydragons [status|reload|stats|dev]
+    usage: /onlydragons [status|reload|stats|combat|dev]
     aliases: [mcdev]
     permission: onlydragons.use
 permissions:
@@ -25,3 +25,9 @@ permissions:
   onlydragons.fire:
     description: Fire managed bows inside admitted OnlyDragons arenas.
     default: true
+  onlydragons.combat:
+    description: Inspect your last combat hit and captured inputs.
+    default: true
+  onlydragons.practice:
+    description: Grant practice kits and create or reset your practice target.
+    default: op

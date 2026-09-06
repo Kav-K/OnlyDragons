@@ -12,14 +12,17 @@ import org.bukkit.command.TabCompleter;
 public final class DevCommand implements CommandExecutor, TabCompleter {
     private final OnlyDragonsPlugin plugin;
     private final StatsCommand stats;
+    private final PracticeCommand practice;
 
     public DevCommand(OnlyDragonsPlugin plugin) {
         this.plugin = plugin;
         this.stats = new StatsCommand(plugin.equipment());
+        this.practice = new PracticeCommand(plugin);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length > 0 && practice.handles(args)) { practice.execute(sender, args); return true; }
         String action = args.length == 0 ? "status" : args[0].toLowerCase(Locale.ROOT);
         switch (action) {
             case "status" -> sender.sendMessage(Component.text("OnlyDragons ready | version "
@@ -33,7 +36,7 @@ public final class DevCommand implements CommandExecutor, TabCompleter {
                 plugin.reloadSettings();
                 sender.sendMessage(Component.text("OnlyDragons configuration reloaded."));
             }
-            default -> sender.sendMessage(Component.text("Usage: /" + label + " [status|reload|stats|dev]"));
+            default -> sender.sendMessage(Component.text("Usage: /" + label + " [status|reload|stats|combat|dev]"));
         }
         return true;
     }
@@ -47,9 +50,13 @@ public final class DevCommand implements CommandExecutor, TabCompleter {
             available.add("status");
             if (sender.hasPermission("onlydragons.admin")) available.add("reload");
             if (sender.hasPermission("onlydragons.stats")) available.add("stats");
-            if (sender.hasPermission("onlydragons.calibration")) available.add("dev");
+            if (sender.hasPermission("onlydragons.combat")) available.add("combat");
+            if (sender.hasPermission("onlydragons.calibration") || sender.hasPermission("onlydragons.practice")) available.add("dev");
             options = available;
-        } else options = stats.complete(sender, args);
+        } else {
+            var combined = new java.util.ArrayList<>(stats.complete(sender, args));
+            combined.addAll(practice.complete(sender, args)); options = combined;
+        }
         String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
         return options.stream().filter(option -> option.startsWith(prefix)).toList();
     }

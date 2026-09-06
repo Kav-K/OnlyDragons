@@ -16,6 +16,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.ofEntries(
+            Map.entry("practice-lifecycle", new com.kaveenk.onlydragons.gametests.combat.PracticeLifecycleScenario()),
+            Map.entry("practice-combat", new com.kaveenk.onlydragons.gametests.combat.PracticeCombatScenario()),
             Map.entry("tracer-cleanup-abort", new com.kaveenk.onlydragons.gametests.projectile.homing.TracerCleanupScenario()),
             Map.entry("tracer-continuity", new com.kaveenk.onlydragons.gametests.projectile.homing.TracerContinuityScenario()),
             Map.entry("owned-firing", new com.kaveenk.onlydragons.gametests.projectile.OwnedFiringScenario()),

@@ -1,0 +1,320 @@
+{
+  "schemaVersion": 1,
+  "planId": "practice-combat-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "denied",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev kit ordinary"
+              }
+            },
+            {
+              "id": "kit",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev kit ordinary"
+              }
+            },
+            {
+              "id": "stats",
+              "action": "command",
+              "args": {
+                "command": "onlydragons stats explain"
+              }
+            },
+            {
+              "id": "open",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev scenario full 1000"
+              }
+            },
+            {
+              "id": "ordinary-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "ordinary-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "last",
+              "action": "command",
+              "args": {
+                "command": "onlydragons combat last"
+              }
+            },
+            {
+              "id": "fero0-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "fero0-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "fero1-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "fero1-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "fero2-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "fero2-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "fero3-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "fero3-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "lethal-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reduced",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev scenario reduced 500"
+              }
+            },
+            {
+              "id": "volley-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "volley-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "lethal-volley-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-volley-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reset-reduced",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev reset"
+              }
+            },
+            {
+              "id": "score",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev scenario score-only 1000"
+              }
+            },
+            {
+              "id": "modifiers-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "modifiers-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reset-score",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev reset"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "native-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "native-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "denied-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev reset"
+              }
+            },
+            {
+              "id": "other-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev reset"
+              }
+            },
+            {
+              "id": "crit-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "crit-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "last-crit",
+              "action": "command",
+              "args": {
+                "command": "onlydragons combat last"
+              }
+            },
+            {
+              "id": "guard-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "guard-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "volley-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "volley-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "lethal-volley-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-volley-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "score-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "score-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "last-score",
+              "action": "command",
+              "args": {
+                "command": "onlydragons combat last"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

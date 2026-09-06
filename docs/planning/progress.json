@@ -231,7 +231,7 @@
       "notice": "PR #56 merged at 2c0be58 after the complete 26-case 576e394 cohort, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions and its cleanup control met the exact expected abort; retained firing passed 115. See evidence/t07-suite.md. Exactly P07/P10 are accepted; T08 accounting, T10 rehearsal and M1–M5 remain separate."
     },
     "T08": {
-      "status": "active",
+      "status": "in-review",
       "completedRequirements": [],
       "evidence": {}
     },

@@ -41,9 +41,10 @@ class OwnedBowLifecycleTest {
         assertThrows(IllegalArgumentException.class, () -> bows.openEncounter(UUID.randomUUID(), player.getWorld(),
                 new BoundingBox(-1, -1, -1, 1, 1, 1), new MechanicRevision("other", "v1")));
         java.util.function.Consumer<com.kaveenk.onlydragons.domain.projectile.SettledHit> receiver = hit -> {};
-        bows.receiver(receiver); assertThrows(IllegalStateException.class, () -> bows.receiver(hit -> {}));
-        bows.clearReceiver(hit -> {}); assertThrows(IllegalStateException.class, () -> bows.receiver(hit -> {}));
-        bows.clearReceiver(receiver); assertDoesNotThrow(() -> bows.receiver(hit -> {}));
+        var isolated = new OwnedBowService(plugin, plugin.equipment(), 10, () -> 0);
+        isolated.receiver(receiver); assertThrows(IllegalStateException.class, () -> isolated.receiver(hit -> {}));
+        isolated.clearReceiver(hit -> {}); assertThrows(IllegalStateException.class, () -> isolated.receiver(hit -> {}));
+        isolated.clearReceiver(receiver); assertDoesNotThrow(() -> isolated.receiver(hit -> {}));
     }
     @Test void directArenaTransferReplacesSessionWithoutWaitingForAnUnadmittedLocation() {
         bows.openEncounter(encounter, player.getWorld(), new BoundingBox(-10, -1000, -10, 10, 1000, 10), new MechanicRevision("calibration", "v1"));
