@@ -21,9 +21,10 @@ part of the worker's scope.
 | T02 | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | Complete: PR #24 merged at 7c6d843 | Item definitions, codec/PDC and enchant validation; 54 production tests, 35 Paper assertions, independent review and final-head CI passed. |
 | T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Resumed after T09b merged at 5b0e030; partial PR #22 integrated at 586a170 | Shooterless arrow/dragon findings are partial. Full acceptance still requires player-owned native suppression and semantic head/native-damage evidence; #9 stays blocked. |
 | T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | Complete: PR #27 merged at 5b0e030 | Final 1dd6ffe positive/early-exit/timeout calibration verified with dual reports and client/server cleanup; independent review and final-head CI passed. [Evidence](../../dev/agent-paper-tests.md#protocol-player-evidence). This does not accept the feature-specific T04 gates. |
-| T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | In review: PR #26; actor main 5b0e030 integrated | Clean 633d81c passed 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions with clean shutdown. [Evidence](03-agent-tasks-and-validation.md#t03-combat-validation). Final-head CI and lead merge remain. |
+| T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | Complete: PR #26 merged at 9092fbe | Clean 633d81c passed 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions with clean shutdown; independent review and final-head CI passed. [Evidence](03-agent-tasks-and-validation.md#t03-combat-validation). |
 | T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a/T02 integrated; active Symphony worker | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
-| T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | T01a, T02, T03 | Bounded procs and enchant state. |
+| T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | T01a/T02/T03 integrated; active Symphony worker | Bounded procs and enchant state. |
+| T09c | [#28](https://github.com/Kav-K/OnlyDragons/issues/28) | T00/T09a/T09b integrated; lead-delegated work | Shared regression suites, connected-player equipment fixture, and evidence/dependency checkpoints. No duplicate Symphony dispatch. |
 | T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b, T02, fully accepted T04; blocked | Bow/shortbow/Duplex capture and owned projectiles. Merging partial PR #22 or passing T09b alone does not release this gate. |
 | T07 | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | T04, T06 | Tracer steering and arrow continuity. |
 | T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | T01b, T03, T05, T06 | Playable dummy combat and explanations. |
@@ -32,8 +33,8 @@ part of the worker's scope.
 | T12 | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus agreed roster/reward/acquisition scope | Later bounded content/progression planning. |
 
 Symphony has three coding slots. Label only tasks whose prerequisites are
-integrated into main and whose manual gates are satisfied. #6 is in lead review,
-#7 remains active, and #20 is merged. The lead resumed #5 for its remaining
+integrated into main and whose manual gates are satisfied. #6 and #20 are merged,
+#7 and #8 are active. The lead resumed #5 for its remaining
 player-owned experiments; #9 must remain undispatched. Issue/PR state owns live claims;
 the lead reconciles this summary after each serial merge.
 All server scenarios share one lease and obey the memory gate, regardless of
