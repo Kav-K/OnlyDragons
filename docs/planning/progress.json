@@ -174,7 +174,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Draft PR #52 implements owned firing/session/settlement with 182 passing unit tests. The lead-reviewed lifecycle oracle distinguishes actual quit from synthetic pre-settlement clearSession coverage. Corrected clean feature run and full current-main T06 cohort/checkpoint remain required; see evidence/t06-firing.md. No T06 requirement is accepted."
+      "notice": "Draft PR #52: clean 49fa9ae (main 92147a2 integrated) passes 115 feature-specific real-Paper assertions and 182 production/28 client tests. Complete selected hosted cohort/T06 checkpoint, final review and CI remain pending; see evidence/t06-firing.md. No T06 requirement is accepted."
     },
     "T07": {
       "status": "blocked",

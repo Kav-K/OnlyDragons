@@ -113,10 +113,37 @@ defers connection-disconnect handling to the next tick. This explains the
 observed setup; it does not prove every possible earlier quit window impossible.
 Clean `f9350f2` focused run `f788f9f3c2f04dc3bfd5979cfb31bd99` passes the corrected lifecycle fixture. It predates the following independent review fixes and is not their acceptance evidence.
 
-Review comment 5559323208 identified owner death after arena exit retaining old arrows when no current session existed. Death now retires owned entities/claims independently of session lookup; stale-token cleanup and ordinary quit retention remain unchanged. A synthetic pending-claim death regression passes. The real fixture adds arena exit, actual death, other-owner isolation and packet respawn; negative controls require actor-correlated native launch/interact observations plus successful shortbow recovery. Actual child launch position/velocity are checked against the captured primary within `1e-9`, and launch tick must be exactly +1. Clean `7b8d1da` run `137c0a23d92e40f4aedf95a254940838` passes all 114 assertions, 182 production/28 client tests and both process cleanups. Independent review then required an explicit nonempty other-owner death-isolation precondition. The fixture now fires a fresh native alpha shot, requires it live immediately before beta death and checks identical UUID/entity and registry afterward. This strengthened input needs a new focused run before the full cohort.
+Review comment 5559323208 identified owner death after arena exit retaining old arrows when no current session existed. Death now retires owned entities/claims independently of session lookup; stale-token cleanup and ordinary quit retention remain unchanged. A synthetic pending-claim death regression passes. The real fixture adds arena exit, actual death, other-owner isolation and packet respawn; negative controls require actor-correlated native launch/interact observations plus successful shortbow recovery. Actual child launch position/velocity are checked against the captured primary within `1e-9`, and launch tick must be exactly +1. Clean `7b8d1da` run `137c0a23d92e40f4aedf95a254940838` passes all 114 assertions, 182 production/28 client tests and both process cleanups. Independent review then required an explicit nonempty other-owner death-isolation precondition. The fixture now fires a fresh native alpha shot, requires it live immediately before beta death and checks identical UUID/entity and registry afterward. The strengthened input passes in the clean focused run below.
 
-Feature runtime, complete selected cohort/T06 checkpoint,
-independent review and current CI remain outstanding. Human mouse/hold feel,
+## Current clean focused evidence
+
+Runtime/fixture revision `49fa9ae26dedf9f5fc070c1b5f60a4c25cc1bce9` includes
+main `92147a25c7dfd6f761f502bdbac0d00ffa261ef8`. The isolated runner command
+`python3 scripts/agent-tests/paper_test.py --scenario owned-firing --test-player protocol-actions-v1 --scenario-timeout 180`
+passes run `b16fe56485944069a70148af8b4f04a4`: all 115 assertions, 182 production
+and 28 client tests, zero failures/errors/skips. Actual Paper is 26.2 build 121
+with JDK 25.0.4.1. Both owned processes exit 0 without forced termination.
+
+| Input/evidence | SHA-256 |
+| --- | --- |
+| Production JAR | `9ff747e8b7a4e8cde7725131cf6b3eb1bbf6b476ea7149168a39aa0d4468dfd2` |
+| Companion JAR | `c6588df9dd568397d0a12f33ad4944052af0e37602407e9253777924201a0959` |
+| Player-client JAR | `16e2dbd6b7fa987cb91193d6d41d57741e1baac97aa02df5e041ffc94cdc501f` |
+| Raw result JSON | `09bd3210992571a937b92d080da3650eb0c7dadf8d5c6fb7794864988926a3fb` |
+
+Raw reports remain issue-local under
+`build/reports/agent-paper/b16fe56485944069a70148af8b4f04a4/`.
+The result binds actual launch/physical-event UUIDs and owners, phase/part
+geometry, immutable snapshots, cadence/ammo/veto controls, deferred terminal
+claims, reconnect tokens and sessionless death isolation. The real disconnect
+trial observes one child before quit and no kick event; it makes no stronger
+native lifecycle claim. Synthetic pending-claim/session cleanup tests retain
+their separate scope.
+
+The current plan checkpoint is valid and changed-area selection retains all 24
+cases. [The coordinated hosted full cohort and T06 checkpoint are requested](https://github.com/Kav-K/OnlyDragons/issues/9#issuecomment-5559410649)
+on these frozen inputs. No duplicate local full suite has run. Complete selected
+cohort/T06 checkpoint, independent final review and current CI remain outstanding. Human mouse/hold feel,
 rendered presentation, Windows Play/smoke and authenticated-client compatibility
 remain separate unrun observations. T08 owns full multiplayer HP/proc/ghost-score
 accounting; it is not a circular prerequisite of this producer.
