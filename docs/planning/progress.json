@@ -94,7 +94,7 @@
       }
     },
     "T04": {
-      "status": "in-review",
+      "status": "partial",
       "completedRequirements": [
         "projectile-observations",
         "listener-cleanup"
@@ -110,7 +110,7 @@
         }
       },
       "mergedRevision": "586a170",
-      "notice": "PR31 continuation clean 696fa1e passed complete16-case suite558f9bd2d44e4840999ac1dad6d6602d and replay, plus separate expected projectile early-exit; see projectile-player findings. Reviewed uniform1.0 part/three-phase policy recorded in foundation plan. T04 checkpoint still rejects deferredP02/P04 circular mapping pending separate lead reconciliation; no milestone or dependent dispatch accepted."
+      "notice": "PR31 continuation at clean 696fa1e passed the complete 16-case suite 558f9bd2d44e4840999ac1dad6d6602d and replay, plus separate expected projectile early-exit; see projectile-player findings. Reviewed uniform 1.0 part/three-phase policy is recorded in the foundation plan. T04 remains partial and In review; checkpoint rejects deferred P02/P04 circular mapping pending separate lead reconciliation. No milestone or dependent dispatch is accepted."
     },
     "T03": {
       "status": "complete",
