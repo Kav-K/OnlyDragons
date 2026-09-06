@@ -211,12 +211,12 @@
       "notice": "PR #52 merged at 25891c0 after the complete 24-case f4178ba cohort, independent raw replay/review, actual-main T06/combined task checkpoints and current CI. Owned firing passed 115 assertion rows; the repaired equipment case passed 25. See evidence/t06-suite.md for exact identities and preserved failed iteration. Bounded firing/physical claims are complete; T08 accounting, successor dispatch and M1–M5 remain separate."
     },
     "T07": {
-      "status": "blocked",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {}
     },
     "T08": {
-      "status": "blocked",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {}
     },
