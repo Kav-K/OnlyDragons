@@ -62,7 +62,7 @@ No hit is inferred from aim, distance, phase assignment or unchanged health.
   handling would also miss seated collisions, and managed terminal impacts need
   explicit owned-arrow retirement to prevent later re-collision.
 - A pre-spawn arrow traveled before dragon creation and later collided with that
-  dragon with the same UUID. Final trace: launch 243 < spawn 246 < impact 258.
+  dragon with the same UUID. Recorded trace: launch 243 < spawn 246 < impact 258.
   This is straight controlled flight, not a Tracer or human hatch rehearsal.
 
 - Airborne lifetime remained 1199 after eight ticking flight updates; the same
@@ -103,7 +103,7 @@ separate gates for T06/T07/T10 and the operator, not inferred passes from this s
 
 ## Verification record
 
-Final clean runtime-code revision: `e38bfaf40f44d5a1d17191c643330f5391de4eac`,
+Pre-integration clean runtime-code revision: `e38bfaf40f44d5a1d17191c643330f5391de4eac`,
 after ordinary merge of main `6f0ccfb` including strict typed report validation.
 Every run below reports `worktreeDirty=false` and identical artifact hashes.
 Later PR/context updates are documentation only.
@@ -128,6 +128,37 @@ Windows and Ubuntu CI passed at `e38bfaf`; Windows live smoke/client play remain
 Exploratory v1/v2 runs informed the explicit final assertions; their dirty-worktree
 results are not substituted for the clean runs above. All attempted part/phase
 cases remain in the report, including the vertical different-part hit.
+
+### Final verification after stats integration
+
+The ordinary merge of main `1efa7d0` produced clean runtime revision
+`a0938776f8a172b3d9eee67b92291cd077f3bf3c`. Both scenario catalogs were preserved:
+the companion contains stats resolution alongside all existing projectile and
+calibration scenarios. Production stats and companion artifact bytes changed,
+so the following controls were rerun sequentially through the shared lease:
+
+| Scenario | Run ID | Actual result |
+| --- | --- | --- |
+| projectile-feasibility v2 | `d4bf958be5694e18b9aa49e5b8d367e7` | 34/34 assertions; runner exit 0 |
+| projectile-cleanup-failure v1 | `41776874034a45dc983a513e14fe4470` | Expected exit 1; only deliberate `scenario_exception` fails; 4/4 cleanup assertions pass |
+| projectile-cleanup-abort v1 | `b157f3485e7e44c6b86647285fb3b888` | Expected exit 1; only abort `scenario_exception` fails; 4/4 cleanup assertions pass |
+
+All three reports identify that clean revision and identical artifact hashes.
+Both wrapper builds passed on every run: 30 production tests with zero
+failures/errors/skips. The runner suite passed 27 tests. Each JVM exited 0
+without forcing; all three loopback ports closed and no owned JVM remained.
+Runtime-head Windows/Linux CI passed at `a093877`; this evidence update changes
+documentation only.
+
+- Production SHA256: `7f229dd2de086fb6bb0822abcade29fd5ec0e484e57a9d98d00f5a8e2580d59f`
+- Companion SHA256: `f817f25813b5c3cfe889baae969619234124831aac4a993101e4e16024109d33`
+
+Java and Paper pins are unchanged. `ScenarioContext`, `CalibrationScenario`,
+and the projectile scenario classes are byte-identical to tested `e38bfaf`, so
+the prior lifecycle and deliberate-failure controls above remain their cleanup
+evidence; they were not rerun solely for this additive registration merge.
+T04 acceptance remains partial, player actor #20 remains the prerequisite for
+the remaining native-damage evidence, and T06/#9 stays blocked.
 
 API references (signatures additionally checked in the resolved build-121 JAR):
 [projectile cancellation](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html),
