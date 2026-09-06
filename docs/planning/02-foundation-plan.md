@@ -540,7 +540,7 @@ use UUID labels when no live name is available. No offline queue or persistent
 history is added. Diagnostic cancelled/admin/reset/abort paths publish no board.
 Result inspection still exposes separate HP and credit; no rewards are enabled.
 
-### T08d health UI and shared formatter (GH-64, implementation in progress)
+### T08d health UI and shared formatter (GH-64, In review in PR #74)
 
 `application.PresentationFormatter` is the reusable display-only Adventure boundary:
 `number(double)` supplies locale-independent grouping and up to two decimals;
@@ -570,8 +570,9 @@ production accounting, then samples actual received bar identity/title/percent/
 flags and message components for two actors. A named fixture-only score-only
 catalog uses the same deployed combat and UI adapters to distinguish 100 HP from
 200 credit. It is not a production balance selection. Existing restart fixtures
-add received empty/new/reset UI checks to their real two-boot evidence. These are
-pending verification, not human appearance/authentication or milestone acceptance.
+add received empty/new/reset UI checks to their real two-boot evidence. The [focused run](evidence/t08d-presentation.md) passed; complete-suite/restart
+verification remains pending, with human appearance/authentication and milestone
+acceptance separate.
 
 ### Managed health
 

@@ -558,17 +558,18 @@ planned and undispatched until that checkpoint and lead assignment.
 
 ### T08d — Persistent dragon health and combat presentation
 
-**In progress on `symphony/gh-64`, [#64](https://github.com/Kav-K/OnlyDragons/issues/64).**
-Dependencies T08a/T08b are integrated; current main `7a38040` is merged. The branch
-adds the read-only health UI, shared formatter, focused two-actor packet fixture,
-and additive restart UI checks under `dragon-bossbar` / `combat-presentation`.
-The initial doctor and plan checkpoint passed. The latest production build passed 235 tests; companion passed six tests and
-272 Python tests passed during iteration. The first focused Paper run passed
-through retirement/reset but failed on missing fixture configuration before the
-ghost trial; that setup is repaired and fresh verification is pending. No clean-source Paper receipt or completion
-is claimed yet. Human appearance/readability, authenticated-client compatibility,
-independent review/current CI and milestone acceptance remain pending. T02c/T06b
-consume the formatter boundary in document 02 after integration.
+**In review in [draft PR #74](https://github.com/Kav-K/OnlyDragons/pull/74),
+`symphony/gh-64`, [#64](https://github.com/Kav-K/OnlyDragons/issues/64).**
+Dependencies T08a/T08b and current main `7a38040` are integrated. The branch adds
+the read-only health UI, shared formatter, focused two-actor packet fixture and
+additive restart UI checks under `dragon-bossbar` / `combat-presentation`.
+[Focused clean-source evidence and failed iteration](evidence/t08d-presentation.md)
+record 235 production/six companion/30 client/273 Python tests and 18 Paper
+assertion rows plus 28 received-bar samples at `03e8af7`. Full changed-area suite,
+two-boot UI checks, strict replay and final task checkpoint remain pending.
+Human appearance/readability, authenticated-client compatibility, independent
+review/current CI and milestone acceptance remain separate. T02c/T06b consume
+the formatter boundary in document 02 after integration.
 
 ### T08c — Personal placement-based loot simulation
 

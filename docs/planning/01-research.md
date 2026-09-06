@@ -254,6 +254,17 @@ actual UUID disappearance after reset/restart. [Exact results and superseded
 iterations](evidence/t08a-focused-paper.md) preserve the earlier failed validity
 assumptions. Full-suite and human acceptance remain pending in [T08a status](03-agent-tasks-and-validation.md#t08a--managed-real-dragon-backend-and-development-controls).
 
+### T08d received plugin health bar (Paper 121)
+
+**Observed on pinned Paper, 6 September 2026:** clean runtime `03e8af7` sent
+one Adventure bar UUID to two protocol actors, preserved its identity through
+HP updates/reconnect and world return, retained zero HP through native animation,
+and removed it on actual retirement/reset/close. A labelled score-only fixture
+credited 200 with 100 HP removed; the received bar stayed at domain HP 900/1,000.
+[Exact artifact/run evidence and remaining suite/restart gates](evidence/t08d-presentation.md).
+This is received protocol/state evidence, not full-client appearance, human feel
+or a researched Hypixel mechanic. Existing combat/phase policy is unchanged.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.
