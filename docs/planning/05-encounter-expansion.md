@@ -1,10 +1,24 @@
 # Encounter expansion: development controls, results, types and eyes
 
-**6 September 2026 — proposed work packages, with product decisions pending.**
+**6 September 2026 — proposed work packages, with confirmed direction and remaining product decisions.**
 
-The user requested testing commands including dragon spawning, a damage leaderboard after death, per-type loot-table architecture, dragon types and Hypixel-like eye placement. This proposal responds to that scope; it does not approve unanswered design choices or change the dispatch DAG. Based on inspected main `1deb9a804480522738192f795914fc424ab2d330` and issues [#9](https://github.com/Kav-K/OnlyDragons/issues/9), [#11](https://github.com/Kav-K/OnlyDragons/issues/11), [#12](https://github.com/Kav-K/OnlyDragons/issues/12), [#13](https://github.com/Kav-K/OnlyDragons/issues/13) and [#14](https://github.com/Kav-K/OnlyDragons/issues/14). Reconcile the user's pending answers and current main before assigning implementation tasks. D1–D4 are proposed child labels, not Symphony task IDs.
+The user requested testing commands including dragon spawning, a damage leaderboard after death, per-type loot-table architecture, dragon types and Hypixel-like eye placement. This proposal responds to that scope; it does not approve unanswered design choices or change the dispatch DAG. Based on inspected main `1deb9a804480522738192f795914fc424ab2d330` and issues [#9](https://github.com/Kav-K/OnlyDragons/issues/9), [#11](https://github.com/Kav-K/OnlyDragons/issues/11), [#12](https://github.com/Kav-K/OnlyDragons/issues/12), [#13](https://github.com/Kav-K/OnlyDragons/issues/13) and [#14](https://github.com/Kav-K/OnlyDragons/issues/14). The initial proposal was integrated through PR #36 at main `9b554de`; the confirmed decisions below update that scope. Reconcile remaining answers and current main before assigning implementation tasks. D1–D4 are proposed child labels, not Symphony task IDs.
 
 Read this linked detail when working on those encounter/result/content tasks; the three original planning documents remain the common context. Nothing here is a command available in the current plugin.
+
+## User-confirmed direction
+
+| Topic | Confirmed decision | Still open |
+| --- | --- | --- |
+| Initial dragon | Start with one test dragon and preserve an extension path for later dragon types. | Its exact test definition and later roster, abilities, balance and selection probabilities. |
+| Post-kill ranking | After the kill, display players ranked by damage including ghost damage. Preserve separate actual-health and contribution records. | Exact ghost-damage interpretation, including reduced-health ferocity and lethal overkill; tie ranks (`1,1,3` versus `1,1,2`), display/audience and retention. |
+| Loot direction | Each eligible player receives a personal roll. Better leaderboard placement improves chances and also controls hard item-eligibility locks. | Participant eligibility, rank thresholds, eligible items, probabilities, roll counts and delivery rules; sample tables only versus real rewards in the initial scope. |
+
+These decisions do not choose an altar interaction or acquisition economy. The
+existing terminal boundary still rejects post-death impacts; clarifying ghost
+damage does not silently authorize score after death. The pending follow-ups
+cover ghost interpretation, tie policy and sample-versus-real rewards. Existing
+M3, real-content and economy gates remain in force; no task is dispatched here.
 
 ## Present implementation and constraints
 
@@ -24,9 +38,9 @@ Read this linked detail when working on those encounter/result/content tasks; th
 
 **Owner:** encounter adapter owner, coordinated with the #9 projectile owner and integration lead. Own the bounded encounter service and `paper.encounter` adapter. #9 owns projectile identity, part-to-parent mapping, settled physical claims, native-suppression/phase guards and retirement; this component consumes that boundary and invokes the established combat/proc services. The shared backlog and T06/T08 ownership text now make this split explicit.
 
-**Dependencies:** accepted T04, T03, T05, T06 and required T01b shot-time integration. This is a proposed bounded extension/split of #11/T08, not completion of #12 prefire or M3. Direct managed-dragon practice need not depend on the later eight-eye ritual.
+**Dependencies:** accepted T04, T03, T05, T06 and required T01b shot-time integration. Definition-backed integration consumes D4's published dragon-definition contract; later loot-policy and delivery work are not prerequisites. This is a proposed bounded extension/split of #11/T08, not completion of #12 prefire or M3. Direct managed-dragon practice need not depend on the later eight-eye ritual.
 
-**Deliverable:** one explicit encounter generation with owned native dragon identity and authoritative domain health, using the reviewed measured phase policy. Register and expose a target only after successful initialization. On managed lethal damage, freeze one result and drive the native death/presentation sequence once. Distinguish defeat from reset, removal, startup failure and shutdown; abort paths must not masquerade as a rewarded defeat. Use stable completion identity for consumers. Preserve existing ordinary/unowned entities and unrelated arenas. Select the permitted arenas, simultaneous encounter limit and configured target behavior only after the lead records the user's scope.
+**Deliverable:** one explicit encounter generation for the initial test dragon, with owned native identity and authoritative domain health, using the reviewed measured phase policy. Register and expose a target only after successful initialization. On managed lethal damage, freeze one result and drive the native death/presentation sequence once. Distinguish defeat from reset, removal, startup failure and shutdown; abort paths must not masquerade as a rewarded defeat. Use stable completion identity for consumers. Preserve existing ordinary/unowned entities and unrelated arenas. Select the permitted arenas, simultaneous encounter limit and configured target behavior only after the lead records the user's scope.
 
 **Automated acceptance:** actual Paper dragon and owned arrows; measured supported-phase admission and unsupported rejection; no native double damage; repeated part/event delivery claims once; two same-tick lethal candidates finalize once; late arrows/procs earn nothing; target registration/spawn failure unwinds owned state; reset/disable/entity removal cannot leave scheduled work or publish a second defeat. Verify native death observations separately from domain HP reaching zero. Repeated create/reset/death cycles return owned entities/listeners/tasks/chunk tickets and any session/result subscriptions to baseline.
 
@@ -64,9 +78,9 @@ Keep these under the existing development permission boundary. Defaulting to a c
 
 **Owner:** result/presentation owner. Own an ordinary pure result projection plus its command/display adapter; no new combat authority.
 
-**Dependencies:** T03's immutable result contract; D1 for a live defeat; D2 for inspection/testing. A pure projection can be implemented independently after metric/tie/display requirements are decided. Do not make D1 depend on presentation, creating a cycle.
+**Dependencies:** T03's immutable result contract; D1 for a live defeat; D2 for inspection/testing. A pure projection can be implemented independently after the remaining ghost-damage, tie and display requirements are decided. Do not make D1 depend on presentation, creating a cycle.
 
-**Deliverable:** deterministic projection of frozen participant totals. Preserve actual-health and contribution damage as distinct values; expose the selected primary ranking metric clearly. Bind the view to encounter/completion identity and avoid mutation by late hits, reconnects or later fights. Choose per-encounter versus persistent history, ranking/tie rules, visibility/audience, display format and retention policy explicitly. Names are presentation data; UUID remains identity. Persistence is not implied by a leaderboard request.
+**Deliverable:** deterministic projection of frozen participant totals. Rank post-kill damage including ghost damage, as confirmed by the user. Preserve actual-health and contribution damage as distinct values and document which recorded components the clarified ghost-damage rule includes. Bind the view to encounter/completion identity and avoid mutation by late hits, reconnects or later fights. The requested view is post-kill ranking for that encounter. Resolve ties, visibility/audience, display format and retention explicitly; persistent cross-encounter history requires separate scope. Names are presentation data; UUID remains identity. Persistence is not implied by a leaderboard request.
 
 **Automated acceptance:** multiple distinct players with unequal and tied totals; lethal overkill where contribution exceeds remaining HP; reduced-health/score-only proc profile where the ledgers differ; zero-damage/participation boundaries as selected; repeated result delivery produces no duplicate announcement; late hits and post-death equipment changes cannot reorder frozen totals; reconnect/name changes do not create a new participant; reset/aborted/test-only completion follows its explicit display policy. Use actual Paper/player messages for the renderer and pure tests for ordering. A single-player protocol fixture cannot establish multi-player attribution: add a bounded multi-actor fixture or leave that objective gate pending.
 
@@ -74,19 +88,19 @@ Keep these under the existing development permission boundary. Defaulting to a c
 
 ### D4 — Dragon-type and loot-definition foundation
 
-**Purpose:** preserve an extensible data boundary without selecting the launch roster, probabilities, drop contents or economy.
+**Purpose:** support the confirmed single test dragon with an extension path for later types and personal rank-based loot, without selecting the later roster, probabilities, drop contents or economy.
 
 **Owner:** definition/configuration owner, with the lead reviewing shared contracts. Type/loot definitions must not own Paper listeners, combat arithmetic or item grants.
 
-**Dependencies:** existing T00/T03 identities and D1's target interface. Design/schema work can be reviewed now. Any early runtime registry implementation is a separately authorized bounded foundation task; it does not dispatch #14/T12 or satisfy its roster/economy gate. Developer fixtures may use explicitly identified test definitions once approved, without presenting them as the launch roster.
+**Dependencies:** existing T00/T03 identities, T02 item definitions and T09a's validation environment. Publish the small definition boundary for D1 to consume; do not make the catalog depend on its future live adapter. Design/schema work can be reviewed now. Before early runtime registry work is dispatched, the lead must register its bounded task, issue and acceptance mappings; this does not dispatch #14/T12 or satisfy its roster/economy gate. The initial runtime scope is one test dragon. Additional pure definition fixtures may test registry isolation without adding playable types or presenting them as an approved roster.
 
 **Deliverable:** a small validated immutable dragon definition with stable type ID/revision and references to the selected combat/phase profile and reward-table ID. Keep reward-table definitions separate from dragon lifecycle. Validate a complete candidate, duplicate IDs, references and applicable numeric bounds before adoption; active encounters retain their selected revisions. Decide whether reward definitions are snapshotted into the final result or retained through a versioned lookup before wiring a reward consumer. Do not claim that `EncounterResult.variantId` alone supplies this provenance. Limit abstractions to actual consumers; no generic scripting or content framework.
 
-The proposed reward boundary is `frozen result + type/table revision + validated placement ledger → eligibility decision → seeded roll result → immutable grant plan → durable delivery`. A per-type table references validated item definitions; the roll model, pools/weights/counts and eligibility vocabulary are specified only after the user chooses the reward rules. A dry-run inspection may explain potential grants without delivering them. Neither rendering a leaderboard nor calling a loot-table resolver performs an inventory grant. This leaves table content editable later without embedding reward policy in each dragon or copying combat listeners.
+The proposed reward boundary is `frozen result + type/table revision + validated placement ledger → eligibility decision → seeded roll result → immutable grant plan → durable delivery`. A per-type table references validated item definitions. The confirmed model gives each eligible player a personal roll, with better leaderboard placement improving chances and imposing hard item-eligibility locks. Hard locks exclude disallowed items rather than merely reducing their chance. Exact participant rules, rank thresholds, pools, probabilities and roll counts remain pending; do not populate them as approved balance. A dry-run inspection may explain potential grants without delivering them. Neither rendering a leaderboard nor calling a loot-table resolver performs an inventory grant. This leaves table content editable later without embedding reward policy in each dragon or copying combat listeners.
 
-**Automated acceptance:** distinct test types resolve to distinct intended definitions/table references; duplicate/missing references, invalid numbers and incomplete candidates reject atomically; an active encounter/result retains its selected definition after a later configuration change; no cross-type table leakage. Seeded selection is tested only after a probability model is selected. A table definition alone never grants an item, consumes an eye or completes progression.
+**Automated acceptance:** distinct test types resolve to distinct intended definitions/table references; duplicate/missing references, invalid numbers and incomplete candidates reject atomically; an active encounter/result retains its selected definition after a later configuration change; no cross-type table leakage. Seeded selection is tested only after a probability model is selected. For explicitly labeled sample policies, test rank-threshold boundaries, exclusion of rank-locked items for every random outcome, and independent per-player resolution; these fixtures do not approve real reward values. A table definition alone never grants an item, consumes an eye or completes progression.
 
-**Human/design gates:** launch roster, selection probabilities, names/abilities/balance, table contents, primary eligibility metric and personal/shared delivery policy remain decisions. Visual type identity requires client review when actual content exists.
+**Human/design gates:** the initial scope is one test dragon and personal rank-based rolls. Later roster, selection probabilities, names/abilities/balance, table contents, participant eligibility, rank thresholds and reward delivery remain decisions. Sample-only tables versus initial real rewards is still pending. Visual type identity requires client review when actual content exists.
 
 ### Existing #12/T10 — Integrated hatch/prefire and load
 
@@ -108,19 +122,19 @@ Retain the existing dependency chain through T04/T05/T06/T07/T08. Reuse D1 from 
 
 **Dispatch gate:** T11 integrated and the **agreed variant roster, reward rules and acquisition scope** recorded. Keep this separate from D4's neutral schema work.
 
-**Proposed split:** (a) bounded chosen type/ability content; (b) pure eligibility/table resolution over a frozen encounter result plus validated eye provenance; (c) durable one-time grant delivery and recovery; (d) only the explicitly chosen eye/equipment acquisition sources. Do not infer shops, crafting, quests or a full economy from these interfaces.
+**Proposed split:** (a) bounded chosen type/ability content; (b) personal eligibility/table resolution over frozen encounter rankings plus validated eye provenance, applying the confirmed placement-based chance and hard-lock rules; (c) durable one-time grant delivery and recovery; (d) only the explicitly chosen eye/equipment acquisition sources. Do not infer shops, crafting, quests or a full economy from these interfaces.
 
 **Owner/dependencies:** content owner consumes D4/D1; reward resolver consumes the reviewed final result/type/table revisions and T11 placement outcome; grant owner consumes immutable grant plans with stable completion/player/reward identities. Keep one durable idempotency boundary. Inventory delivery occurs on the server thread; asynchronous persistence receives immutable values and stale callbacks cannot alter a later encounter/session.
 
-**Automated acceptance:** seeded deterministic resolution under the chosen rules; type-table isolation; damage/eye/participation eligibility boundaries; missing/old definition revisions; duplicate completion delivery; crash/restart around record/write/grant acknowledgement; offline players and full inventories under the selected delivery policy; retries cannot duplicate items or silently lose the recorded grant. Test-only completion and aborted encounters cannot enter real eligibility accidentally. Earned eyes use the same validated altar path as developer-granted eyes.
+**Automated acceptance:** seeded deterministic personal resolution under the chosen rules; type-table isolation; approved leaderboard-rank boundaries, better-placement chance behavior and hard item exclusion; damage/eye/participation eligibility boundaries; missing/old definition revisions; duplicate completion delivery; crash/restart around record/write/grant acknowledgement; offline players and full inventories under the selected delivery policy; retries cannot duplicate items or silently lose the recorded grant. Test-only completion and aborted encounters cannot enter real eligibility accidentally. Earned eyes use the same validated altar path as developer-granted eyes.
 
-**Human/design gates:** actual roster/drop tables, reward visibility/delivery policy, eligibility, rates, balance and legitimate acquisition remain unselected. Persistence technology follows the required recovery semantics rather than being chosen by this draft.
+**Human/design gates:** one initial test dragon and personal placement-based rolls are confirmed. Later actual roster/drop tables, reward visibility/delivery policy, participant qualification, exact rank thresholds, rates, balance and legitimate acquisition remain unselected. The pending sample-versus-real-reward answer must be reconciled without bypassing these gates. Persistence technology follows the required recovery semantics rather than being chosen by this draft.
 
 ## Integration and validation order
 
 1. Continue #5/#8 acceptance independently; reconcile pending decisions before their dependent proposed work packages are dispatched.
 2. Clarify #9/#11 physical-boundary ownership; integrate #9 after its prerequisites.
-3. Implement D1, then consume it from D2 and D3. Pure command/projection tests and D4 schema design can proceed in parallel only against agreed contracts and nonoverlapping ownership.
+3. Publish D4's bounded dragon-definition contract before D1's definition-backed integration, then consume D1 from D2 and D3. Later loot-policy/delivery work does not block that lifecycle. Pure command/projection tests and remaining schema design can proceed in parallel only against agreed contracts and nonoverlapping ownership.
 4. Complete existing #12/T10 with the shared lifecycle and preserve M3's external gates.
 5. Dispatch #13 only after M3 acceptance; dispatch the approved #14 subcomponents only after their existing design/economy gate.
 
@@ -129,9 +143,9 @@ For each dispatched component, add explicit implemented/deferred/external requir
 ## Decisions for the integration lead to reconcile
 
 - Intended development-command operations, target selection/location, arena isolation and test-completion semantics.
-- Per-fight versus persistent leaderboard, ranking metric/ties, display/audience and retention.
-- Initial dragon roster and whether a minimal versioned definition registry is wanted before the gated content phase.
-- Personal/shared loot, eligibility inputs and delivery behavior, without assigning drop rates or contents here.
+- Exact ghost-damage interpretation for the confirmed post-kill damage ranking, tie policy, display/audience and retention; persistent cross-encounter history is separate scope.
+- Exact definition for the confirmed one test dragon and the minimal versioned extension boundary; additional playable types remain later scope.
+- Participant qualification, rank-based chance thresholds and hard item locks for the confirmed personal rolls, plus delivery behavior and sample-only versus real-reward scope; no drop rates or contents are selected here.
 - Eye placement/removal/charging/refund/recovery rules and whether initial eyes remain development-only or have an explicitly scoped acquisition path.
 
-Four initial design questions are pending: first roster strategy; per-kill ranking/audience; personal versus shared reward direction; and eight-frame versus custom-altar placement with pre-lock removal. Further roster/balance, eligibility/acquisition, arena and recovery details follow those answers. The proposed command surface and delivery order are reviewable defaults, not recorded user decisions. This document advances no task or milestone.
+The initial roster direction, post-kill damage-including-ghost ranking and personal placement-based loot direction are confirmed above. Follow-up answers on the ghost definition, ties and sample-only versus real rewards are pending. Eight-frame versus custom-altar placement, pre-lock removal, detailed eligibility/acquisition, arenas and recovery policies also remain unresolved. The proposed command surface and delivery order remain reviewable defaults. This document advances no task or milestone.
