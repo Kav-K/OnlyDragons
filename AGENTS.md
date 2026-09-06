@@ -136,6 +136,12 @@ and authorized the lead to stop the existing dev server for this work.
   merge main into the issue branch, resolve conflicts without discarding others'
   changes, and rerun affected checks. Never rewrite a published branch's history.
   Shared-file changes go through the lead; ownership is recorded in each issue.
+- Refresh the assigned issue's owner comments and relevant dependency API notes
+  at implementation checkpoints, before expensive Paper runs, after merging main,
+  and before handoff. Reconcile shared calibration totals and adapter boundaries
+  before testing; publish concise API/ownership changes early. Avoid repeated
+  unchanged comments or polling after every tool call. Final acceptance reports
+  use a clean committed runtime-code revision; dirty runs are iteration evidence.
 - Use Symphony's github_api tool for issue comments and draft PRs. Use the
   configured Git credential helper for ordinary branch pushes. Never read or
   print authentication files, put tokens in URLs, or force-push.

@@ -123,12 +123,20 @@ than creating duplicate commits, comments, or pull requests.
    meaningful code changes. Inspect failures and test reports; skipped tests
    are not passes. For documentation-only changes, verify the affected commands
    and references without claiming a plugin build was run.
+   At implementation checkpoints, before an expensive Paper run, after merging
+   main, and before publishing, read this issue's latest owner comments and the
+   relevant dependency API notes. Reconcile changed contracts and calibration
+   totals before spending another test run. Record concise API/ownership changes
+   in the issue early; do not poll on every tool call or repeat unchanged comments.
 5. Run the feature's actual Paper scenarios using scripts/agent-tests/paper_test.py
    and dev/agent-paper-tests.md. Add meaningful scenario assertions for the
    production feature; do not substitute a boot test for behavior. Inspect the
    fresh run/scenario report, artifact hashes and cleanup result. A busy lease
    or low-memory response means wait/retry within the runner's bounded policy,
    not bypass the gate or claim a pass. Record separate remaining client checks.
+   Iteration runs may use uncommitted code, but final acceptance evidence must
+   identify a clean committed runtime-code revision. Distinguish later evidence-only
+   documentation commits; rerun whenever relevant production or scenario inputs change.
    Before final verification, fetch origin and merge origin/main into the issue
    branch, resolve conflicts without losing others' work, and rerun affected
    build and Paper checks. Keep history ordinary; never force-push a rebase.
