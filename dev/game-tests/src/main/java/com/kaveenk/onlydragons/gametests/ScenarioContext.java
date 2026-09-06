@@ -122,7 +122,8 @@ public final class ScenarioContext {
         report.put("observations", Map.copyOf(observations));
         plugin.publish(report);
     }
-    void abort() { if (!finished) fail(new IllegalStateException("Companion disabled before scenario completion")); }
+    /** Abort an incomplete scenario using the same path as companion shutdown. */
+    public void abort() { if (!finished) fail(new IllegalStateException("Companion disabled before scenario completion")); }
     private void requireActive() {
         if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Scenario state belongs to the server thread");
         if (finished) throw new IllegalStateException("Scenario is already complete");
