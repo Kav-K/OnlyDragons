@@ -1,7 +1,8 @@
 # T08 practice integration — focused evidence
 
 T08 is In review in [draft PR #57](https://github.com/Kav-K/OnlyDragons/pull/57)
-on `symphony/gh-11`. Final runtime/scenario inputs
+on `symphony/gh-11`. The subsequent [peer integration cohort](t08-peer-integration.md)
+records current combined verification. Original runtime/scenario inputs
 are clean commit `cb5ce17873657fe662d1bb45d6a82fe41a7ae241`, with main
 `89d584fab675ed111a1a1d733f667b3a1f3cbf53` and reviewed fixture diagnostics
 `b42920c040413e3f45c7f513b26c72f08b44ec4a` normally integrated. Subsequent
