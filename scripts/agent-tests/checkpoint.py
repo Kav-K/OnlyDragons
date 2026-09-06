@@ -81,6 +81,15 @@ def evidence_reference(value, label):
             'Evidence revision missing: ' + label)
 
 
+def validate_task_gates(key, tasks, progress, dependencies, milestone_gates):
+    missing = sorted(dep for dep in dependencies[key] if progress['tasks'][dep]['status'] != 'complete')
+    require(not missing, 'Unsatisfied task prerequisites for ' + key + ': ' + ', '.join(missing))
+    if tasks[key].get('manualGate'):
+        evidence_reference(progress['tasks'][key].get('manualGateEvidence'), key + ' manual gate')
+    missing = sorted(gate for gate in milestone_gates[key] if progress['milestones'][gate]['status'] != 'accepted')
+    require(not missing, 'Task requires accepted milestones for ' + key + ': ' + ', '.join(missing))
+
+
 def validate_plan(project, snapshot=None, now_ms=None):
     project = Path(project)
     backlog = load_json(project / 'docs/planning/backlog.json')
@@ -100,6 +109,8 @@ def validate_plan(project, snapshot=None, now_ms=None):
     for task in backlog['tasks']:
         require(isinstance(task, dict) and isinstance(task.get('id'), str), 'Invalid backlog task')
         require(task['id'] not in tasks, 'Duplicate backlog task: ' + task['id'])
+        if 'manualGate' in task:
+            require(isinstance(task['manualGate'], str) and task['manualGate'].strip(), 'Invalid manual gate: ' + task['id'])
         tasks[task['id']] = task
     require(isinstance(mapping, dict) and set(tasks) == set(mapping), 'Backlog/issue mapping drift')
     require(isinstance(plan.get('tasks'), dict) and set(tasks) == set(plan['tasks']), 'Backlog/acceptance task drift')
@@ -113,6 +124,8 @@ def validate_plan(project, snapshot=None, now_ms=None):
         numbers.append(entry['number'])
     require(len(numbers) == len(set(numbers)), 'Multiple tasks mapped to one issue')
     dependencies = {key: names(task.get('dependsOn'), key + ' dependencies') for key, task in tasks.items()}
+    milestone_gates = {key: names(task.get('requiredMilestones', []), key + ' required milestones')
+                       for key, task in tasks.items()}
     acyclic(dependencies, 'task')
 
     requirements = plan.get('requirements')
@@ -168,11 +181,6 @@ def validate_plan(project, snapshot=None, now_ms=None):
         for component in completed:
             require(requirements[component]['availability'] != 'deferred', 'Deferred component declared complete: ' + component)
             evidence_reference(state.get('evidence', {}).get(component), key + '/' + component)
-        if state['status'] in ('active', 'partial', 'in-review', 'complete'):
-            missing = [dep for dep in dependencies[key] if progress['tasks'][dep].get('status') != 'complete']
-            require(not missing, 'Unsatisfied task prerequisites for ' + key + ': ' + ', '.join(missing))
-            if tasks[key].get('manualGate'):
-                evidence_reference(state.get('manualGateEvidence'), key + ' manual gate')
         if state['status'] == 'complete':
             require(completed == task_requirements[key], 'Task complete with missing requirements: ' + key)
             require(isinstance(state.get('mergedRevision'), str) and re.fullmatch(r'[a-f0-9]{7,40}', state['mergedRevision']),
@@ -201,9 +209,22 @@ def validate_plan(project, snapshot=None, now_ms=None):
             for ref in refs:
                 require(requirements[ref]['availability'] != 'deferred', 'Milestone accepted with deferred evidence: ' + key + '/' + ref)
                 evidence_reference(state.get('evidence', {}).get(ref), key + '/' + ref)
+    combined = {}
+    for key, task in tasks.items():
+        require(milestone_gates[key] <= set(milestones), 'Unknown required milestone: ' + key)
+        combined['task:' + key] = {'task:' + dep for dep in dependencies[key]} | {
+            'milestone:' + gate for gate in milestone_gates[key]}
+    for key, milestone in milestones.items():
+        combined['milestone:' + key] = {'task:' + task for task in milestone['tasks']} | {
+            'milestone:' + dep for dep in milestone['dependsOn']}
+    acyclic(combined, 'task/milestone')
+    for key in tasks:
+        if progress['tasks'][key]['status'] in ('active', 'partial', 'in-review', 'complete'):
+            validate_task_gates(key, tasks, progress, dependencies, milestone_gates)
     if snapshot is not None:
         validate_live_snapshot(snapshot, mapping, progress, dependencies, now_ms)
     return {'plan': plan, 'progress': progress, 'dependencies': dependencies,
+            'backlogTasks': tasks, 'milestoneGates': milestone_gates,
             'summary': {'status': 'plan-valid', 'planValid': True, 'automatedReady': False, 'acceptanceApproved': False,
                         'taskStates': {key: value['status'] for key, value in progress['tasks'].items()},
                         'milestoneStates': {key: value['status'] for key, value in progress['milestones'].items()},
@@ -254,9 +275,15 @@ def validate_no_weakening(project, base, validated):
                                        cwd=project).decode().strip()
     previous = base_document(project, revision, 'docs/planning/backlog.json')
     if previous is not None:
+        current_tasks = {task['id']: task for task in load_json(Path(project) / 'docs/planning/backlog.json')['tasks']}
         for task in previous['tasks']:
             require(task['id'] in validated['dependencies'], 'Previously declared task removed: ' + task['id'])
             require(set(task['dependsOn']) <= validated['dependencies'][task['id']], 'Task dependency removed: ' + task['id'])
+            updated = current_tasks[task['id']]
+            require(set(task.get('requiredMilestones', [])) <= set(updated.get('requiredMilestones', [])),
+                    'Task milestone gate removed: ' + task['id'])
+            require(not task.get('manualGate') or updated.get('manualGate') == task['manualGate'],
+                    'Task manual gate removed or changed: ' + task['id'])
     current_scenarios = load_json(Path(project) / 'dev/game-tests/scenarios.json')
     previous = base_document(project, revision, 'dev/game-tests/scenarios.json')
     if previous is not None:
@@ -317,6 +344,11 @@ def validate_no_weakening(project, base, validated):
 
 def validate_acceptance(project, receipt_path, base, task_ids=(), suite_module=None):
     validated = validate_plan(project)
+    selected_tasks = names(list(task_ids), 'requested tasks')
+    require(selected_tasks <= set(validated['plan']['tasks']), 'Unknown requested task')
+    for key in selected_tasks:
+        validate_task_gates(key, validated['backlogTasks'], validated['progress'],
+                            validated['dependencies'], validated['milestoneGates'])
     suite = suite_module or sibling_module('paper_suite')
     project = Path(project).resolve()
     current = suite.source_identity(project)  # Rejects dirty/untracked inputs, even with a forged receipt flag.
@@ -329,8 +361,6 @@ def validate_acceptance(project, receipt_path, base, task_ids=(), suite_module=N
     changed = subprocess.check_output(['git', 'diff', '--no-renames', '--name-only', '-z', revision, 'HEAD', '--'], cwd=project).decode().split('\0')
     changed = [path for path in changed if path]
     required_cases = set(suite.required_cases(project, changed))
-    selected_tasks = names(list(task_ids), 'requested tasks')
-    require(selected_tasks <= set(validated['plan']['tasks']), 'Unknown requested task')
     pending, external = [], ['independent-review-of-current-inputs', 'current-head-ci']
     for key in selected_tasks:
         for requirement_id in validated['plan']['tasks'][key]:

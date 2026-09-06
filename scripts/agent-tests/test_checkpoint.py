@@ -128,6 +128,37 @@ class CheckpointTests(unittest.TestCase):
         self.change(PROGRESS, lambda value: value['tasks']['T06'].update(status='active'))
         self.reject_plan('Unsatisfied task prerequisites')
 
+    def prepare_milestone_dispatch(self):
+        # Isolate the milestone gate from ordinary task dependencies: this fixture's
+        # code prerequisite is already integrated, and its durable manual reference exists.
+        self.change(BACKLOG, lambda value: next(task for task in value['tasks'] if task['id'] == 'T11').update(dependsOn=['T00']))
+        self.change(PROGRESS, lambda value: value['tasks']['T11'].update(
+            status='active', manualGateEvidence={'url': 'https://github.com/Kav-K/OnlyDragons/pull/15', 'revision': SHA}))
+
+    def test_manual_reference_cannot_replace_required_milestone_acceptance(self):
+        task = next(task for task in self.read(BACKLOG)['tasks'] if task['id'] == 'T11')
+        self.assertEqual(['M3'], task['requiredMilestones'])
+        self.prepare_milestone_dispatch()
+        self.reject_plan('Task requires accepted milestones for T11: M3')
+
+    def test_accepted_milestone_and_manual_reference_release_declared_gate(self):
+        self.prepare_milestone_dispatch()
+        # A small completed milestone keeps this positive gate test independent of
+        # the future gameplay implementations still intentionally deferred in M3.
+        self.change(PLAN, lambda value: value['milestones']['M3'].update(
+            dependsOn=[], tasks=['T00'], requirements=['contract-consumers']))
+        self.change(PROGRESS, lambda value: value['milestones']['M3'].update(status='accepted', evidence={
+            'contract-consumers': {'url': 'https://github.com/Kav-K/OnlyDragons/pull/15', 'revision': SHA}}))
+        self.assertTrue(self.plan()['summary']['planValid'])
+
+    def test_unknown_and_circular_task_milestone_dependencies_rejected(self):
+        original = self.read(BACKLOG)
+        self.change(BACKLOG, lambda value: next(task for task in value['tasks'] if task['id'] == 'T11').update(requiredMilestones=['missing']))
+        self.reject_plan('Unknown required milestone: T11')
+        self.write(BACKLOG, original)
+        self.change(BACKLOG, lambda value: next(task for task in value['tasks'] if task['id'] == 'T00').update(requiredMilestones=['M0']))
+        self.reject_plan('task/milestone dependency cycle')
+
     def test_milestone_cannot_accept_partial_foundation(self):
         self.change(PROGRESS, lambda value: value['milestones']['M0'].update(status='accepted'))
         self.reject_plan('Milestone accepted with incomplete task')
@@ -172,7 +203,7 @@ class CheckpointTests(unittest.TestCase):
         self.assertFalse(result['acceptanceApproved'])
         self.assertEqual(['stats-resolution'], result['requiredCases'])
         self.assertEqual(['src/main/java/stats/Changed.java'], result['changedPaths'])
-        self.assertIn(('receipt', self.project / 'build/receipt.json'), self.suite.calls)
+        self.assertIn(('receipt', (self.project / 'build/receipt.json').resolve()), self.suite.calls)
         self.assertEqual(2, self.suite.calls.count('source'))
         self.assertIn('current-head-ci', result['externalGates'])
 
@@ -221,6 +252,32 @@ class CheckpointTests(unittest.TestCase):
         self.suite.receipt['cases'] = [{'caseId': 'stats-resolution'}]
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'protocol-player'):
             self.acceptance(['T09b'])
+
+    def test_blocked_selected_task_requires_completed_prerequisites(self):
+        self.change(PROGRESS, lambda value: value['tasks']['T09c'].update(status='blocked'))
+        self.change(PROGRESS, lambda value: value['tasks']['T09b'].update(status='blocked'))
+        self.assertTrue(self.plan()['summary']['planValid'])
+        with self.assertRaisesRegex(checkpoint.CheckpointError, 'Unsatisfied task prerequisites for T09c: T09b'):
+            self.acceptance(['T09c'])
+        self.assertEqual([], self.suite.calls)
+
+    def test_planned_selected_task_requires_milestone_and_manual_gates(self):
+        self.prepare_milestone_dispatch()
+        self.change(PROGRESS, lambda value: value['tasks']['T11'].update(status='planned'))
+        self.assertTrue(self.plan()['summary']['planValid'])
+        with self.assertRaisesRegex(checkpoint.CheckpointError, 'Task requires accepted milestones for T11: M3'):
+            self.acceptance(['T11'])
+        self.change(BACKLOG, lambda value: next(task for task in value['tasks'] if task['id'] == 'T12').update(dependsOn=['T00']))
+        with self.assertRaisesRegex(checkpoint.CheckpointError, 'Missing evidence reference: T12 manual gate'):
+            self.acceptance(['T12'])
+        self.assertEqual([], self.suite.calls)
+
+    def test_planned_task_with_satisfied_gates_can_verify_automated_components(self):
+        self.change(PROGRESS, lambda value: value['tasks']['T09c'].update(status='planned'))
+        result = self.acceptance(['T09c'])
+        self.assertTrue(result['automatedReady'])
+        self.assertFalse(result['acceptanceApproved'])
+        self.assertIn('checkpoint-unit-checks', result['externalGates'])
 
     def test_self_attested_pass_cannot_override_raw_evidence_failure(self):
         self.suite.receipt.update(passed=True, verified=True)
@@ -313,6 +370,20 @@ class CheckpointTests(unittest.TestCase):
         previous['areas']['stats']['cases'].append('item-identity')
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'Changed-area coverage weakened'):
             self.baseline({SUITES: previous})
+
+    def test_manual_and_milestone_dispatch_gates_cannot_silently_disappear(self):
+        original = self.read(BACKLOG)
+        for task_id in ('T11', 'T12'):
+            with self.subTest(task=task_id):
+                self.write(BACKLOG, original)
+                self.change(BACKLOG, lambda value: next(task for task in value['tasks'] if task['id'] == task_id).pop('manualGate'))
+                self.assertTrue(self.plan()['summary']['planValid'])
+                with self.assertRaisesRegex(checkpoint.CheckpointError, 'Task manual gate removed or changed: ' + task_id):
+                    self.baseline({BACKLOG: original})
+        self.write(BACKLOG, original)
+        self.change(BACKLOG, lambda value: next(task for task in value['tasks'] if task['id'] == 'T11').pop('requiredMilestones'))
+        with self.assertRaisesRegex(checkpoint.CheckpointError, 'Task milestone gate removed: T11'):
+            self.baseline({BACKLOG: original})
 
     def test_positive_case_cannot_be_relabeled_as_expected_failure(self):
         current = self.read(SUITES)

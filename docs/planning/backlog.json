@@ -88,7 +88,7 @@
       "coordination": "Serialize server/load scenarios and respect memory gate. M3 acceptance requires recorded human evidence even if automated-ready code is merged."
     },
     {
-      "id": "T11", "title": "Plan and implement the eight-eye encounter after M3 acceptance", "dependsOn": ["T10"], "manualGate": "M3 explicitly accepted with human prefire evidence",
+      "id": "T11", "title": "Plan and implement the eight-eye encounter after M3 acceptance", "dependsOn": ["T10"], "requiredMilestones": ["M3"], "manualGate": "M3 explicitly accepted with human prefire evidence",
       "scope": "Later milestone: eight distinct placements, idempotent consumption/refund, single transition, animation keyframes, cancellation/reset and crash-recovery policy.",
       "acceptance": "Concurrent final placement and duplicate inputs cannot duplicate eyes/bosses; failure/refund/restart paths are recoverable; one encounter result. Do not dispatch until the manual gate is satisfied.",
       "coordination": "See T11 in the shared plan. Keep later implementation behind measured combat/prefire foundation."
