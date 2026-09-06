@@ -121,8 +121,9 @@ design sections above are the current summary; this record explains changes.
 
 ### T01b equipment validation (GH-7)
 
-T01b is **In review** in [draft PR #29](https://github.com/Kav-K/OnlyDragons/pull/29),
-branch `symphony/gh-7`. Final clean runtime revision
+T01b's playable slice is **merged** in [PR #29](https://github.com/Kav-K/OnlyDragons/pull/29)
+at `a48ebd4`, after independent review and final-head Windows/Linux CI
+([run](https://github.com/Kav-K/OnlyDragons/actions/runs/34008900983)). Final clean runtime revision
 `4c28474b54e2a2aa25d6242d12525f8783c4ea1b` includes the ordinary merge of main
 `9092fbe` (combat PR #26). All eleven scenario registrations and existing
 assertion sets are retained with `Map.ofEntries`; both equipment and combat
@@ -184,14 +185,13 @@ Windows/Linux CI passed on runtime head `4c28474`
 The earlier `7751adc` runs remain integration history for main `5b0e030`; the
 three runs above supersede them for current-main handoff.
 
-**Remaining:** lead review/merge, final documentation-head CI, and Windows
-Cursor smoke/Build/Play. The lead's
-[#28](https://github.com/Kav-K/OnlyDragons/issues/28) fixture is now implementing
-objective real-player permission/grant, held-slot listener, same-UUID inventory
-change and session-cleanup assertions against this PR's clean 7751adc API. The
-lead requested delivery of this slice before integrating that additive fixture
-and rerunning the shared regression suite. Those automated gates remain pending
-#28 integration; they are not delegated to a blanket human checklist. Human
+**Remaining:** integrated shared-suite acceptance of the connected equipment
+fixture in [PR #32](https://github.com/Kav-K/OnlyDragons/pull/32), and Windows
+Cursor Build/Play environment checks. The fixture implements objective real-player
+permission/grant, received command text, held-slot listeners, same-UUID inventory
+changes, death/respawn and quit cleanup against the merged production API. These
+automated gates await the final shared baseline and review; they are not delegated
+to a blanket human checklist. Human
 visuals, authenticated account/multiplayer behavior and input feel remain distinct. T06 must still connect `refresh(Player)` at shot acceptance;
 `cached(UUID)` is diagnostic state and must not substitute for that recheck.
 No projectile integration, combat effects, player-health attributes, performance

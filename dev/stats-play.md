@@ -40,9 +40,9 @@ projectile shot-time capture, and the practice dummy are later tasks.
 Record the tested commit, client/version, account permission setup and observed
 chat/lore/input feel. **Windows Play/smoke, human visuals, authenticated account
 and multiplayer checks are pending** until an operator records them. Objective
-real-player command/equipment/lifecycle assertions are being added separately
-by the lead under [#28](https://github.com/Kav-K/OnlyDragons/issues/28); they remain
-pending automated integration, rather than requiring manual proof alone.
+real-player command/equipment/lifecycle assertions are implemented in
+`equipment-player` under [#28](https://github.com/Kav-K/OnlyDragons/issues/28);
+their final integrated suite and review remain pending, rather than requiring manual proof alone.
 MockBukkit events and synthetic Paper inventory/command senders do not establish
-real-player gates. The independent Paper scenarios are `equipment-stats` and the
-preserved `item-identity`, run only through `scripts/agent-tests/paper_test.py`.
+real-player gates. The shared suite includes `equipment-stats`, `item-identity`
+and `equipment-player`; follow [the agent validation guide](agent-validation.md).
