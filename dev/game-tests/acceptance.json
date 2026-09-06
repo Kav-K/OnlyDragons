@@ -534,6 +534,20 @@
         "projectile-feasibility"
       ]
     },
+    "projectile-player-observations": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Player-owned native-positive and cancellation/zero controls, actual part geometry, HOVER/CIRCLING/seated observations and three same-tick impacts; paired cleanup. Feature early-exit is a separate standalone control; shared protocol negatives remain in the suite.",
+      "fixtures": [
+        "projectile-player-feasibility"
+      ]
+    },
+    "projectile-impact-policy": {
+      "kind": "external-review",
+      "availability": "external",
+      "description": "Independent review of the measured single physical-impact authority and native-suppression boundary, uniform managed part scale 1.0 without a semantic-head claim, initially supported HOVER/CIRCLING/SEARCH_FOR_BREATH_ATTACK_TARGET phases and explicit rejection of unmeasured phases by the later production adapter. Record the scoped design decision separately from automated observation evidence.",
+      "fixtures": []
+    },
     "listener-cleanup": {
       "kind": "automated",
       "availability": "implemented",
@@ -737,14 +751,6 @@
       "availability": "external",
       "description": "User decision for the bounded variant roster, rewards and acquisition scope.",
       "fixtures": []
-    },
-    "projectile-player-observations": {
-      "kind": "automated",
-      "availability": "implemented",
-      "description": "Player-owned native-positive and cancellation/zero controls, actual part geometry, HOVER/CIRCLING/seated observations and three same-tick impacts; paired cleanup. Feature early-exit is a separate standalone control; shared protocol negatives remain in the suite.",
-      "fixtures": [
-        "projectile-player-feasibility"
-      ]
     }
   },
   "tasks": {
@@ -770,10 +776,9 @@
     ],
     "T04": [
       "projectile-observations",
+      "projectile-player-observations",
       "listener-cleanup",
-      "P02",
-      "P04",
-      "projectile-player-observations"
+      "projectile-impact-policy"
     ],
     "T03": [
       "combat-services"
@@ -786,7 +791,9 @@
       "bounded-procs"
     ],
     "T06": [
-      "firing-input"
+      "firing-input",
+      "P02",
+      "P04"
     ],
     "T07": [
       "P07",
@@ -876,8 +883,9 @@
       "requirements": [
         "contract-consumers",
         "projectile-observations",
-        "P02",
-        "P04"
+        "projectile-player-observations",
+        "listener-cleanup",
+        "projectile-impact-policy"
       ]
     },
     "M1": {
@@ -896,6 +904,8 @@
         "equipment-player",
         "combat-services",
         "P01",
+        "P02",
+        "P04",
         "P08",
         "P13"
       ]
