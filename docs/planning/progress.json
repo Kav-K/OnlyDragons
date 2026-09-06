@@ -151,10 +151,10 @@
       "evidence": {
         "bounded-procs": {
           "url": "https://github.com/Kav-K/OnlyDragons/pull/30",
-          "revision": "ee1721a4f8dbbb2c96d1df4f60023f6b1e504ac1"
+          "revision": "5284b66f086d3762bf9e3b269c50f57dd24e88fa"
         }
       },
-      "notice": "In review: current main 5e8cfbf integrated; clean ee1721a passed 136 production/7 client/130 Python tests, all 16 suite cases and automated T05 acceptance. Receipt/source/artifact evidence: dev/game-tests/findings/t05-suite.md. Lead review and final-head CI remain external; physical P08/P09 remain later integration."
+      "notice": "In review: main 799c01d integrated at e6c2b50. Clean runtime 5284b66 passed 136 production/7 client tests and all 16 cases; full receipt replay and automated T05 acceptance passed against identical current relevant inputs. Fresh recovery Python checks passed 135 tests. Receipt b7fd6bc562374f6f83b15da1f192caac and exact evidence: dev/game-tests/findings/t05-suite.md. Lead review and final-head CI remain external; physical P08/P09 and T08 composition wiring remain later integration."
     },
     "T06": {
       "status": "blocked",

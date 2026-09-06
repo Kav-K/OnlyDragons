@@ -66,7 +66,7 @@ Fresh clean `ee1721a` passed all 16 selected suite cases, 136 production tests,
 7 client tests, 130 Python tests and automated T05 checkpoint acceptance.
 All 38 proc assertions passed again on 72 Paper ticks; all cleanup counters
 were zero, all owned processes exited unforced and all 16 ports were closed.
-[Exact receipt/source/artifact identities and case results](../../dev/game-tests/findings/t05-suite.md)
+[Exact receipt/source/artifact identities and case results](t05-suite.md)
 supersede the historical runtime evidence above for this integration. Runtime-head
 Windows/Linux CI passed; final documentation-head CI and lead review are checked
 in the PR handoff. No task or milestone is marked Complete here.
