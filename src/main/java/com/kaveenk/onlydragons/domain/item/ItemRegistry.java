@@ -22,6 +22,16 @@ public final class ItemRegistry {
             enchantments = List.copyOf(enchantments);
             statModifiers = List.copyOf(statModifiers);
         }
+
+        /**
+         * Pass this projection once to the stat snapshot factory. It already includes all
+         * definition, enchant and roll modifiers; additional sources must be external gear/buffs.
+         */
+        public WeaponDefinition resolvedWeapon() {
+            WeaponDefinition base = definition.weapon();
+            return new WeaponDefinition(base.id(), base.schemaVersion(), base.revision(), base.firingMode(),
+                    base.baseDamage(), statModifiers, enchantments);
+        }
     }
 
     private final String revision;

@@ -28,7 +28,7 @@ import static com.kaveenk.onlydragons.domain.item.ItemValidationException.Code.*
 /** Real Paper items and a synthetic inventory; no authenticated actor or combat implementation. */
 public final class ItemIdentityScenario implements Scenario {
     @Override public void start(ScenarioContext context) {
-        context.mechanicRevision("item-codec-v1");
+        context.mechanicRevision("item-codec-v2");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
         context.check("production_enabled", true, context.production().isEnabled());
         context.check("codec_loaded_from_production", true,
@@ -42,6 +42,9 @@ public final class ItemIdentityScenario implements Scenario {
             if (result instanceof ItemReadResult.Valid valid && valid.item().equals(registry.resolve(instance))) roundtrips++;
         }
         context.check("all_loadouts_roundtrip", 8, roundtrips);
+        context.check("calibration_no_crit_bonus", true, registry.definitions().keySet().stream()
+                .map(id -> registry.resolve(registry.create(id)).resolvedWeapon())
+                .allMatch(weapon -> weapon.statModifiers().stream().noneMatch(modifier -> modifier.key() == StatKey.CRIT_DAMAGE)));
         var first = registry.create("duplex");
         var second = registry.create("duplex");
         context.check("distinct_instance_ids", true, !first.identity().instanceId().equals(second.identity().instanceId()));
@@ -107,11 +110,24 @@ public final class ItemIdentityScenario implements Scenario {
 
         var modifier = new StatModifier("roll:precision", StatKey.CRIT_CHANCE, ModifierOperation.FLAT, 5, 0);
         var rollRegistry = new ItemRegistry("roll-fixture-v1", List.of(new ItemDefinition(base.definition().weapon(),
-                "Roll fixture", "BOW", Set.of("precision"))), List.of(), Map.of("precision", List.of(modifier)));
+                "Roll fixture", "BOW", Set.of("precision"))), List.of(registry.enchant("vicious"), registry.enchant("duplex")),
+                Map.of("precision", List.of(modifier)));
         var rollCodec = new WeaponItemCodec(rollRegistry);
-        var rolled = rollRegistry.edit(rollRegistry.create("ordinary"), Map.of(), List.of("precision"));
+        var unrolled = rollRegistry.edit(rollRegistry.create("ordinary"), Map.of("duplex", 5), List.of());
+        var rolled = rollRegistry.edit(unrolled, Map.of("duplex", 2, "vicious", 3), List.of("precision"));
         var restored = (ItemReadResult.Valid) rollCodec.decode(bytes(rollCodec.encode(rolled)));
         context.check("trusted_roll_roundtrip", true, restored.item().instance().equals(rolled) && restored.item().statModifiers().contains(modifier));
+        var projected = restored.item().resolvedWeapon();
+        var expectedModifiers = new java.util.ArrayList<>(base.definition().weapon().statModifiers());
+        expectedModifiers.add(modifier);
+        expectedModifiers.add(new StatModifier("enchant:vicious", StatKey.FEROCITY, ModifierOperation.FLAT, 3, 0));
+        context.check("resolved_weapon_projection", true, projected.baseDamage() == 100
+                && projected.id().equals(rolled.identity().definitionId())
+                && projected.revision().equals(rolled.identity().definitionRevision())
+                && projected.statModifiers().equals(expectedModifiers.stream().sorted(StatModifier.EXPLANATION_ORDER).toList())
+                && projected.enchantments().equals(restored.item().enchantments())
+                && projected.enchantments().stream().anyMatch(enchant -> enchant.id().equals("duplex") && enchant.level() == 2)
+                && unrolled.enchantLevels().equals(Map.of("duplex", 5)));
         reject(context, codec, "unknown_roll_rejected", UNKNOWN_ROLL, changed(codec, registry, data -> {
             var rolls = data.get(key("rolls"), PersistentDataType.TAG_CONTAINER);
             rolls.set(key("damage_999999"), PersistentDataType.INTEGER, 1);

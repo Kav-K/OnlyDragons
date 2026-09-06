@@ -131,7 +131,11 @@ The additive implementation wraps the stable T00 `WeaponDefinition` in
 `ItemDefinition` for name/material/allowed rolls. `ItemInstance` carries its
 `WeaponIdentity`, registry revision, enchant ID/level selections and named roll
 IDs. `ItemRegistry.resolve` returns immutable trusted definition, enchant and
-modifier data for later equipment/snapshot consumers. It never adds
+modifier data for later equipment/snapshot consumers. Its `resolvedWeapon()`
+projection supplies the complete validated modifier/enchant lists on a T00
+weapon definition. #7 passes this projection once to T01
+`StatSnapshotFactory.create`, with only external gear/buffs in additionalSources;
+passing resolved item modifiers again would collide or double-count. It never adds
 `WeaponDefinition.baseDamage` again as a flat modifier. Create allocates a fresh
 UUID; edit replaces selections while retaining identity and validates both
 the original and replacement. Defaults apply on creation, not again on load.
@@ -149,9 +153,13 @@ This is a plugin data boundary, not a signature against privileged PDC writers
 or an anti-duplication ledger for cloned item UUIDs.
 
 `CalibrationLoadouts.registry()` is compiled development data at
-`calibration-items-v1`, ready for #7's later grant integration; it is not wired
+`calibration-items-v2`, ready for #7's later grant integration; it is not wired
 into root bootstrap/commands and is not reloadable configuration. All eight
-drawn bows supply base damage 100 and flat crit damage +50. Ordinary supplies
+drawn bows supply base damage 100 and no crit-damage modifier. The lead
+confirmed T01 owns baseline crit damage 50; the initial item +50 was removed
+before handoff to avoid resolving 100. With T01
+base crit chance/ferocity 0, expected damage/crit damage totals are 100/50 for
+all presets, with crit chance/ferocity as specified below. Ordinary supplies
 zero crit/ferocity, crit supplies +100 crit chance, and the ferocity presets
 supply +25/+100/+500 ferocity. Tracer and Duplex use level V with zero
 ferocity; Fatal Tempo V has +25 ferocity. Effective values/caps depend on T01's

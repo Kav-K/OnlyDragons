@@ -42,12 +42,13 @@
     ]
   },
   "item-identity": {
-    "mechanicRevision": "item-codec-v1",
+    "mechanicRevision": "item-codec-v2",
     "requiredAssertions": [
       "server_thread",
       "production_enabled",
       "codec_loaded_from_production",
       "all_loadouts_roundtrip",
+      "calibration_no_crit_bonus",
       "distinct_instance_ids",
       "inventory_move_identity",
       "presentation_generated",
@@ -70,6 +71,7 @@
       "wrong_material_rejected",
       "invalid_amount_rejected",
       "trusted_roll_roundtrip",
+      "resolved_weapon_projection",
       "unknown_roll_rejected",
       "owned_entities_removed",
       "owned_tasks_cancelled",

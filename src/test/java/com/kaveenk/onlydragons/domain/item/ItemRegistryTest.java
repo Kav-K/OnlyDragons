@@ -35,7 +35,8 @@ class ItemRegistryTest {
             assertEquals(row.getValue(), item.statModifiers().stream().filter(m -> m.key() == StatKey.FEROCITY).mapToDouble(StatModifier::amount).sum());
             assertEquals(row.getKey().equals("crit") ? 100 : 0,
                     item.statModifiers().stream().filter(m -> m.key() == StatKey.CRIT_CHANCE).mapToDouble(StatModifier::amount).sum());
-            assertEquals(50, item.statModifiers().stream().filter(m -> m.key() == StatKey.CRIT_DAMAGE).mapToDouble(StatModifier::amount).sum());
+            assertTrue(item.statModifiers().stream().noneMatch(m -> m.key() == StatKey.CRIT_DAMAGE),
+                    "T01 supplies baseline crit damage 50; items must not duplicate it");
         }
         var vicious = registry.edit(registry.create("ordinary"), Map.of("vicious", 5), List.of());
         assertTrue(registry.resolve(vicious).statModifiers().contains(
@@ -116,5 +117,29 @@ class ItemRegistryTest {
                 Set.of(WeaponDefinition.FiringMode.DRAWN_BOW), Map.of(1, List.of()));
         assertEquals(INCOMPATIBLE_ENCHANT, assertThrows(ItemValidationException.class,
                 () -> drawnOnly.validate(1, WeaponDefinition.FiringMode.SHORTBOW)).code());
+    }
+
+    @Test void resolvedWeaponProjectsEditedEnchantsAndRollsWithBaseModifiersExactlyOnce() {
+        var base = registry.definitions().get("ordinary");
+        var roll = new StatModifier("roll:precision", StatKey.CRIT_CHANCE, ModifierOperation.FLAT, 5, 0);
+        var custom = new ItemRegistry("projection-v1", List.of(new ItemDefinition(base.weapon(), "Projection", "BOW", Set.of("precision"))),
+                List.of(registry.enchant("vicious"), registry.enchant("duplex")), Map.of("precision", List.of(roll)));
+        var before = custom.edit(custom.create("ordinary"), Map.of("duplex", 5), List.of());
+        var edited = custom.edit(before, Map.of("duplex", 2, "vicious", 3), List.of("precision"));
+        var weapon = custom.resolve(edited).resolvedWeapon();
+        assertEquals(base.weapon().id(), weapon.id());
+        assertEquals(base.weapon().schemaVersion(), weapon.schemaVersion());
+        assertEquals(base.weapon().revision(), weapon.revision());
+        assertEquals(base.weapon().firingMode(), weapon.firingMode());
+        assertEquals(100, weapon.baseDamage());
+        assertEquals(List.of(new WeaponDefinition.Enchantment("duplex", 2, WeaponDefinition.EnchantmentKind.ULTIMATE),
+                new WeaponDefinition.Enchantment("vicious", 3, WeaponDefinition.EnchantmentKind.ORDINARY)), weapon.enchantments());
+        var expected = new ArrayList<>(base.weapon().statModifiers());
+        expected.add(roll);
+        expected.add(new StatModifier("enchant:vicious", StatKey.FEROCITY, ModifierOperation.FLAT, 3, 0));
+        assertEquals(expected.stream().sorted(StatModifier.EXPLANATION_ORDER).toList(), weapon.statModifiers());
+        assertEquals(4, weapon.statModifiers().size());
+        assertTrue(weapon.statModifiers().stream().noneMatch(m -> m.key() == StatKey.WEAPON_DAMAGE || m.key() == StatKey.CRIT_DAMAGE));
+        assertEquals(Map.of("duplex", 5), before.enchantLevels());
     }
 }

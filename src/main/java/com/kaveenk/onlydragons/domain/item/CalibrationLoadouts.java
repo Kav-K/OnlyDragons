@@ -11,7 +11,7 @@ import java.util.Set;
 
 /** Versioned development data, not final balance or grants. Effects are implemented by later tasks. */
 public final class CalibrationLoadouts {
-    public static final String REVISION = "calibration-items-v1";
+    public static final String REVISION = "calibration-items-v2";
     private CalibrationLoadouts() {}
 
     public static ItemRegistry registry() {
@@ -48,7 +48,6 @@ public final class CalibrationLoadouts {
         return new ItemDefinition(new WeaponDefinition(id, ItemRegistry.SCHEMA_VERSION, REVISION,
                 WeaponDefinition.FiringMode.DRAWN_BOW, 100,
                 List.of(flat("item:" + id, StatKey.CRIT_CHANCE, crit),
-                        flat("item:" + id, StatKey.CRIT_DAMAGE, 50),
                         flat("item:" + id, StatKey.FEROCITY, ferocity)), enchants), name, "BOW", Set.of());
     }
 

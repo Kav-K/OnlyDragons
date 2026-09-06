@@ -1,17 +1,19 @@
-# Calibration item catalog v1
+# Calibration item catalog v2
 
 `CalibrationLoadouts.registry()` is the authoritative immutable development
-catalog (`calibration-items-v1`). This is a compiled data factory, not a reloadable
+catalog (`calibration-items-v2`). This is a compiled data factory, not a reloadable
 configuration file or a grant command. Later equipment/grant integration (#7)
 calls `registry.create(id)`, then `new WeaponItemCodec(registry).encode(instance)`
 on the server thread. Each create allocates a new UUID; encode/moves/clones retain
 that identity. Cloning is not a new legitimate grant or an anti-duplication ledger.
 
 All eight presets are BOW / DRAWN_BOW, with weapon base damage 100 exactly once,
-flat crit damage +50, and flat crit chance/ferocity contributions below. These
+no crit-damage bonus, and flat crit chance/ferocity contributions below. These
 are OnlyDragons calibration contributions, not effective stats: T01 owns the
-base profile, aggregation, probability and caps. The crit preset guarantees
-crit only with a nonnegative base crit profile. The 500 preset supplies the
+base profile, aggregation, probability and caps. T01 supplies baseline crit damage 50 and baseline crit chance/ferocity 0.
+With that profile, expected resolved damage/crit damage is 100/50 for every
+preset; resolved crit chance/ferocity equals the two table columns.
+The crit preset therefore guarantees an ordinary critical hit. The 500 preset supplies the
 proposed cap value; this catalog does not enforce a cap.
 
 | ID | Crit chance contribution | Ferocity contribution | Default enchant |
@@ -27,6 +29,13 @@ proposed cap value; this catalog does not enforce a cap.
 
 `ItemRegistry.edit` replaces the full enchant/roll selection, retaining identity.
 Registry construction, create, edit, resolve and codec encode/decode validate.
+`registry.resolve(instance).resolvedWeapon()` projects metadata/baseDamage with
+all validated definition/enchant/roll modifiers and current enchant selections.
+Pass this projected weapon once to T01
+`StatSnapshotFactory.create(revision, weapon, additionalSources)`; additional
+sources must contain only external gear/buffs, never the resolved item
+modifiers again. Repeating them would collide with their stable source IDs or
+double-count contributions. Read `ResolvedItem.instance()` for UUID identity.
 Rolled stats are named trusted bundles, allowed per item definition, never raw
 numbers from PDC; these calibration presets permit no rolls. Future trusted
 registries may supply finite modifier bundles through the existing constructor.

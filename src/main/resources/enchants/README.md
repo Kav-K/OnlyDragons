@@ -1,4 +1,4 @@
-# Trusted calibration enchants v1
+# Trusted calibration enchants catalog v2
 
 `CalibrationLoadouts` supplies ID/level/category/compatibility tables. Dragon
 Tracer I–V, Power I–VII, Vicious I–V and Snipe I–IV are ordinary. Duplex I–V
