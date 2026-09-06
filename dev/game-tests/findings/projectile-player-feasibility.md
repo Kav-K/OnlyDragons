@@ -1,7 +1,7 @@
 # T04 player-owned dragon collision findings
 
 Target: Minecraft **26.2**, Paper **121** (`a2a42c5`), Temurin **25.0.4.1**.
-The continuation is ready for lead review; **#9 stays blocked and M0 unaccepted**
+The continuation is in review in [draft PR #31](https://github.com/Kav-K/OnlyDragons/pull/31); **#9 stays blocked and M0 unaccepted**
 until the full T04 evidence and impact policy are reviewed. This adds to, and
 preserves, the [shooterless/pre-spawn/lifetime findings](projectile-feasibility.md).
 No production combat adapter is introduced.
