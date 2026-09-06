@@ -31,7 +31,7 @@ public class OnlyDragonsPlugin extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         reloadSettings();
-        var items = CalibrationLoadouts.registry();
+        var items = CalibrationLoadouts.compatibleRegistry();
         dragonDefinitions = new DragonDefinitionRegistry(DragonCatalogLoader.calibration(items));
         equipment = new EquipmentStatsService(
                 items,

@@ -34,6 +34,7 @@ public final class ItemRegistry {
         }
     }
 
+    private final Map<String, ItemRegistry> catalogs;
     private final String revision;
     private final Map<String, ItemDefinition> items;
     private final Map<String, EnchantDefinition> enchants;
@@ -42,6 +43,7 @@ public final class ItemRegistry {
     public ItemRegistry(String revision, List<ItemDefinition> items, List<EnchantDefinition> enchants,
                         Map<String, List<StatModifier>> rolls) {
         if (revision == null || !revision.matches("[A-Za-z0-9._-]{1,64}")) throw new IllegalArgumentException("Invalid registry revision");
+        this.catalogs = Map.of();
         this.revision = revision;
         this.items = items.stream().collect(Collectors.toUnmodifiableMap(item -> item.weapon().id(), Function.identity()));
         this.enchants = enchants.stream().collect(Collectors.toUnmodifiableMap(EnchantDefinition::id, Function.identity()));
@@ -57,6 +59,33 @@ public final class ItemRegistry {
         }
     }
 
+    /** Exact revision routing; catalogs must have disjoint item IDs and cannot nest routers. */
+    public ItemRegistry(ItemRegistry primary, ItemRegistry expanded) {
+        if (!primary.catalogs.isEmpty() || !expanded.catalogs.isEmpty() || primary.revision.equals(expanded.revision))
+            throw new IllegalArgumentException("Catalog routing requires distinct concrete revisions");
+        var definitions = new java.util.HashMap<>(primary.items);
+        expanded.items.forEach((id, item) -> {
+            if (definitions.putIfAbsent(id, item) != null) throw new IllegalArgumentException("Ambiguous item grant ID: " + id);
+        });
+        var descriptors = new java.util.HashMap<>(primary.enchants);
+        descriptors.putAll(expanded.enchants);
+        catalogs = Map.of(primary.revision, primary, expanded.revision, expanded);
+        revision = primary.revision;
+        items = Map.copyOf(definitions);
+        enchants = Map.copyOf(descriptors);
+        rolls = Map.of();
+    }
+
+    /** Inert catalog bindings must resolve definitions inside their explicitly declared revision. */
+    public ItemRegistry catalog(String requestedRevision) {
+        if (catalogs.isEmpty() && revision.equals(requestedRevision)) return this;
+        var selected = catalogs.get(requestedRevision);
+        if (selected == null) throw new ItemValidationException(REVISION_MISMATCH, "Unsupported item catalog revision");
+        return selected;
+    }
+
+    public Map<String, EnchantDefinition> enchantments() { return enchants; }
+
     public String revision() { return revision; }
     public Map<String, ItemDefinition> definitions() { return items; }
     public EnchantDefinition enchant(String id) {
@@ -67,6 +96,11 @@ public final class ItemRegistry {
 
     /** A grant creates a fresh UUID; copying/moving an existing item preserves its UUID. */
     public ItemInstance create(String definitionId) {
+        if (!catalogs.isEmpty()) {
+            return catalogs.values().stream().filter(catalog -> catalog.items.containsKey(definitionId))
+                    .findFirst().orElseThrow(() -> new ItemValidationException(UNKNOWN_DEFINITION,
+                            "Unknown item definition: " + definitionId)).create(definitionId);
+        }
         ItemDefinition item = definition(definitionId);
         return resolve(new ItemInstance(identity(item, UUID.randomUUID()), revision,
                 item.weapon().enchantments().stream().collect(Collectors.toMap(
@@ -80,6 +114,7 @@ public final class ItemRegistry {
     }
 
     public ResolvedItem resolve(ItemInstance input) {
+        if (!catalogs.isEmpty()) return catalog(input.registryRevision()).resolve(input);
         WeaponIdentity identity = input.identity();
         if (identity.schemaVersion() != SCHEMA_VERSION) {
             throw new ItemValidationException(UNSUPPORTED_SCHEMA, "Unsupported item schema " + identity.schemaVersion() + "; no migration is defined");

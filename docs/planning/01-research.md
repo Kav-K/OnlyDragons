@@ -262,6 +262,16 @@ compares the exact float-rounded normalized native projection separately from
 full-precision domain HP/credit. This does not change damage or ranking policy.
 [Source and failed iteration](evidence/t05b-ghost.md#first-physical-iteration-not-accepted).
 
+### T03b declared expanded calibration
+
+The owner selected explicit Overload/Gravity tables on 6 September 2026 before
+implementation in [GH-67](https://github.com/Kav-K/OnlyDragons/issues/67#issuecomment-5561931960).
+These are **OnlyDragons decisions**, with no new claim about upstream internals.
+The [implementation contract](02-foundation-plan.md#t03b-expanded-bow-contract-gh-67)
+resolves our formerly deferred probability, multiplier order, Gravity VI and
+AIRBORNE classification. Earlier T05 evidence retains its original limited scope.
+Actual Paper evidence for this new profile remains pending in T03b's ledger.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

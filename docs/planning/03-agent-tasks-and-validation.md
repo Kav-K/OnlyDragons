@@ -107,6 +107,26 @@ its Symphony label after this context is reconciled. T08d/T08e remain In review
 pending their combined cohort, and T06c/T06b/T02c remain planned. Human appearance,
 authenticated compatibility, balance/feel and M1–M5 remain unaccepted.
 
+### T03b — Expanded bow enchants (GH-67)
+
+**In progress**, branch `symphony/gh-67`, based on integrated main `2babaee`.
+Owns combat/snapshot/effect and trusted catalog paths, with the published minimal
+capture/child/bootstrap seams. T05b/T06 prerequisites are integrated. The
+[contract](02-foundation-plan.md#t03b-expanded-bow-contract-gh-67) preserves old
+items/shots and registers ten descriptors; IQ/Flame consumers remain T06c-owned.
+
+The resumed candidate passed the JDK 25 wrapper build and API isolation; final
+clean runtime and focused actual-Paper evidence are pending. The feature fixture
+covers protocol releases and physical Dragon/Dummy collisions, fixture-paused
+swap arrows, custom backend/profile controls, and a deliberately restored positive
+native arrow-damage control. Its probe now watches each target and binds fresh
+native evidence to exact owner/projectile/target/tick windows. Pure tests cover
+random/level boundaries and exact cap/proc arithmetic. No runtime or milestone
+acceptance is claimed. Current-main integration (including pending PR76), the
+final receipt/checkpoint, independent review/CI and draft handoff remain required.
+Windows smoke, authenticated-client visuals/feel and performance are unrun.
+Next dependency: T06c consumes descriptors and the existing firing authority.
+
 ## Shared context update protocol
 
 Every agent reads all three planning files at task start under AGENTS.md.

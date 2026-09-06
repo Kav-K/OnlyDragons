@@ -174,10 +174,17 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
+    },
+    "expanded-bow": {
+      "scenarioId": "expanded-bow",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
     }
   },
   "suites": {
     "regression": [
+      "expanded-bow",
       "tempo-ghost",
       "lifecycle-calibration",
       "foundation-contracts",
@@ -216,6 +223,7 @@
       "tracer-cleanup-abort"
     ],
     "all": [
+      "expanded-bow",
       "tempo-ghost",
       "lifecycle-calibration",
       "foundation-contracts",
@@ -312,7 +320,8 @@
         "dragon-restart-legacy",
         "dragon-restart-animation",
         "dragon-ranking",
-        "tempo-ghost"
+        "tempo-ghost",
+        "expanded-bow"
       ],
       "affects": [
         "stats",
@@ -637,6 +646,17 @@
         "tempo-ghost",
         "dragon-ranking",
         "enchants-procs"
+      ],
+      "affects": []
+    },
+    "expanded-bow": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/domain/enchant/OverloadCapture.java",
+        "src/test/java/com/kaveenk/onlydragons/domain/enchant/ExpandedEnchantTest.java",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/enchant/ExpandedBowScenario.java"
+      ],
+      "cases": [
+        "expanded-bow"
       ],
       "affects": []
     }

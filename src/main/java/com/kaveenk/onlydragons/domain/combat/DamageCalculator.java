@@ -39,6 +39,16 @@ public final class DamageCalculator {
         double crit = shot.crit() == CritOutcome.CRITICAL ? 1 + shot.stats().effective(StatKey.CRIT_DAMAGE) / 100 : 1;
         explanation.put("criticalMultiplier", crit);
         damage = product(damage, crit);
+        if (shot.overload().level() > 0) {
+            var capture = shot.overload();
+            String source = "overload/" + capture.revision() + "/";
+            explanation.put(source + "level", (double) capture.level());
+            explanation.put(source + "rawCritChance", capture.rawCritChance());
+            explanation.put(source + "sample", capture.sample().orElseThrow());
+            explanation.put(source + "megaCritical", capture.megaCritical() ? 1d : 0d);
+            explanation.put(source + "multiplier", capture.multiplier());
+            damage = product(damage, capture.multiplier());
+        }
         double mitigated = profile.mitigate(damage, target.defense());
         return new Calculation(damage, mitigated, profile.cap(mitigated, target.maxHealth()), explanation);
     }
