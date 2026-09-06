@@ -597,7 +597,7 @@ Maintain one registry of managed airborne arrows and the active encounter's targ
 
 Start with current part positions rather than a complicated prediction algorithm. Keep the turn-rate parameter common across levels so the advertised level distinction remains radius. Unit-test vector math and zero-length cases, then tune moving-dragon accuracy with actual flight traces.
 
-### T07 scoped calibration (GH-10, pending review)
+### T07 scoped calibration (GH-10)
 
 `tracer-continuity/v1` implements inclusive surface radii 2/4/6/8/10,
 current nearest part-box aim, UUID ties, obstruction rays and a common six-degree
@@ -607,9 +607,12 @@ The existing bow service owns tick/retirement integration and immutable admissio
 views. A shared reference-counted ticket broker reserves bounded potential arena
 footprints before admission and loads only current demanded neighbourhoods;
 capacity rejection changes no admitted arena/session state. [Exact consumer,
-lifecycle, ticket calibration and pending evidence](evidence/t07-tracer.md).
+lifecycle and ticket calibration](evidence/t07-tracer.md) remain the consumer contract.
+PR #56 merged at `2c0be58` after the complete 26-case cohort, independent
+replay/review, T07 checkpoint and CI; [P07/P10 acceptance](evidence/t07-suite.md).
 These are adopted OnlyDragons sandbox rules, not researched upstream steering
-facts or P07/P10 acceptance. The single T06 registry/receiver remains authoritative.
+facts. The single T06 registry/receiver remains authoritative; T08 accounting,
+T10 rehearsal and M1–M5 remain separate.
 
 ### Continuity and lifecycle
 
