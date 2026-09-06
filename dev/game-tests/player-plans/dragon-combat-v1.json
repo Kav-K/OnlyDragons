@@ -20,7 +20,7 @@
               "id": "spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {
@@ -199,7 +199,7 @@
               "id": "spawn-again",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {
@@ -220,28 +220,28 @@
               "id": "failed0",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {
               "id": "failed1",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {
               "id": "failed2",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {
               "id": "proc-spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {
@@ -267,7 +267,7 @@
               "id": "cancel-spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {
@@ -293,7 +293,7 @@
               "id": "removal-spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {

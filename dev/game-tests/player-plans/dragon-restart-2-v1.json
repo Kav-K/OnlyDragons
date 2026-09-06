@@ -20,7 +20,7 @@
               "id": "spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration"
               }
             },
             {

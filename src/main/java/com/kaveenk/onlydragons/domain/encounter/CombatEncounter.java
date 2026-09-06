@@ -29,6 +29,7 @@ public final class CombatEncounter {
     private long lastCommitTick = -1;
     private final Map<UUID, EncounterResult.CommitStamp> stamps = new LinkedHashMap<>();
     private final DamageCalculator calculator = new DamageCalculator();
+    private final Map<UUID, ProcHealthSnapshot> procPolicies = new LinkedHashMap<>();
     private final Map<UUID, DamageResult> accepted = new LinkedHashMap<>();
     private final Map<PhysicalImpact.Key, UUID> physicalClaims = new LinkedHashMap<>();
     private final Map<UUID, EncounterResult.Contribution> contributions = new TreeMap<>();
@@ -71,7 +72,18 @@ public final class CombatEncounter {
 
     public DamageResult physical(ShotContext shot, PhysicalImpact impact, DamageModifiers modifiers,
                                  double effectiveFerocity, Optional<DamageResult.RejectionReason> adapterRejection) {
+        return physical(shot, impact, modifiers, effectiveFerocity, adapterRejection,
+                new com.kaveenk.onlydragons.domain.enchant.TempoState(0, 0));
+    }
+
+    /** Coordinator supplies the pre-hit shared state; commit binds it to this physical identity. */
+    public DamageResult physical(ShotContext shot, PhysicalImpact impact, DamageModifiers modifiers,
+                                 double effectiveFerocity, Optional<DamageResult.RejectionReason> adapterRejection,
+                                 com.kaveenk.onlydragons.domain.enchant.TempoState activeTempo) {
         checkThread();
+        Objects.requireNonNull(activeTempo);
+        if (activeTempo.bonusPercent() > 0 && activeTempo.expiresAt() <= impact.tick())
+            throw new IllegalArgumentException("Pre-hit Tempo must already be expired");
         Objects.requireNonNull(modifiers, "modifiers");
         Objects.requireNonNull(adapterRejection, "adapterRejection");
         DomainChecks.nonNegative(effectiveFerocity, "effectiveFerocity");
@@ -88,9 +100,13 @@ public final class CombatEncounter {
                 kind, impact.tick(), shot.crit(), effectiveFerocity, reason.get());
         if (impact.tick() < shot.launchTick()) throw new IllegalArgumentException("Impact precedes launch");
         var calculation = calculator.physical(shot, modifiers, target, profile);
+        var policy = new ProcHealthSnapshot(activeTempo.bonusPercent(), activeTempo.sourceLevel(),
+                activeTempo.bonusPercent() == 0 ? 0 : activeTempo.expiresAt(),
+                profile.ferocityHealthFraction(activeTempo.sourceLevel()), calculation.cappedDamage());
         var result = commit(id, Optional.empty(), impact.key(), shot.ownerId(), shot.shotId(), kind,
-                impact.tick(), shot.crit(), effectiveFerocity, calculation);
+                impact.tick(), shot.crit(), effectiveFerocity, calculation, 1);
         physicalClaims.put(impact.key(), id);
+        procPolicies.put(id, policy);
         return result;
     }
 
@@ -114,7 +130,26 @@ public final class CombatEncounter {
         }
         return commit(command.procId(), Optional.of(command.parentImpactId()), command.origin(), command.ownerId(),
                 command.shotId(), DamageResult.Kind.FEROCITY, tick, command.crit(), parent.effectiveFerocity(),
-                calculator.proc(parent, target, profile));
+                calculator.proc(parent, target, profile), procFraction(command, parent));
+    }
+
+    public ProcHealthSnapshot procHealthSnapshot(UUID parentImpactId) {
+        checkThread();
+        var policy = procPolicies.get(parentImpactId);
+        if (policy == null) throw new IllegalArgumentException("No accepted physical parent policy");
+        return policy;
+    }
+
+    private double procFraction(ProcCommand command, DamageResult parent) {
+        if (command.healthSnapshot().isEmpty()) {
+            if (profile.ferocityHealthPolicy() != CombatProfile.FerocityHealthPolicy.FIXED)
+                throw new IllegalArgumentException("Missing frozen proc HP policy");
+            return profile.ferocityHealthFraction();
+        }
+        var snapshot = command.healthSnapshot().orElseThrow();
+        if (!snapshot.equals(procPolicies.get(parent.impactId())))
+            throw new IllegalArgumentException("Proc HP policy does not match accepted parent");
+        return snapshot.healthFraction();
     }
 
     /** Stable across duplicate delivery; part names and event source deliberately do not enter this key. */
@@ -133,11 +168,11 @@ public final class CombatEncounter {
 
     private DamageResult commit(UUID id, Optional<UUID> parent, PhysicalImpact.Key origin, UUID player, UUID shot,
                                 DamageResult.Kind kind, long tick, CritOutcome crit, double ferocity,
-                                DamageCalculator.Calculation calculation) {
+                                DamageCalculator.Calculation calculation, double healthFraction) {
         if (tick < lastCommitTick) throw new IllegalArgumentException("Encounter commit tick cannot move backwards");
         long ordinal = Math.incrementExact(acceptedOrdinal);
         var stamp = new EncounterResult.CommitStamp(tick, ordinal);
-        double requested = calculation.cappedDamage() * (kind == DamageResult.Kind.FEROCITY ? profile.ferocityHealthFraction() : 1);
+        double requested = calculation.cappedDamage() * healthFraction;
         double actual = Math.min(target.currentHealth(), requested);
         double score = calculation.cappedDamage();
         var result = new DamageResult(id, parent, origin, player, shot, kind, tick, profile.mechanic(),

@@ -23,8 +23,9 @@ public final class DragonCommand {
                     say(sender, "Dragon arena saved. " + dragons.status());
                 }
                 case "spawn" -> {
-                    if (args.length != 3) { usage(sender); return; }
-                    dragons.spawn(); say(sender, "Dragon spawned. " + dragons.status());
+                    if (args.length != 3 && !(args.length == 4 && (args[3].equalsIgnoreCase("training") || args[3].equalsIgnoreCase("calibration")))) { usage(sender); return; }
+                    dragons.spawn(args.length == 3 ? DevelopmentDragonService.SpawnMode.STANDARD
+                            : args[3].equalsIgnoreCase("training") ? DevelopmentDragonService.SpawnMode.TRAINING : DevelopmentDragonService.SpawnMode.CALIBRATION); say(sender, "Dragon spawned. " + dragons.status());
                 }
                 case "status" -> { if (args.length > 3) { usage(sender); return; } say(sender, dragons.status()); }
                 case "reset" -> {
@@ -47,10 +48,11 @@ public final class DragonCommand {
         if (args.length == 2) return List.of("dragon");
         if (!handles(args)) return List.of();
         if (args.length == 3) return List.of("setup", "spawn", "status", "reset", "result");
+        if (args.length == 4 && args[2].equalsIgnoreCase("spawn")) return List.of("training", "calibration");
         if (args.length == 4 && (args[2].equalsIgnoreCase("reset") || args[2].equalsIgnoreCase("result")))
             return dragons.generation().map(id -> List.of(id.toString())).orElse(List.of());
         return List.of();
     }
-    private static void usage(CommandSender sender) { say(sender, "Usage: /onlydragons dev dragon setup <world-key> <x> <y> <z> <radius 16-48> <test_dragon> | spawn | status | reset [generation] | result [generation]"); }
+    private static void usage(CommandSender sender) { say(sender, "Usage: /onlydragons dev dragon setup <world-key> <x> <y> <z> <radius 16-48> <test_dragon> | spawn [training|calibration] | status | reset [generation] | result [generation]"); }
     private static void say(CommandSender sender, String text) { sender.sendMessage(Component.text(text)); }
 }

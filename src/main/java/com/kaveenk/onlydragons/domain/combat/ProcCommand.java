@@ -3,6 +3,7 @@ package com.kaveenk.onlydragons.domain.combat;
 import com.kaveenk.onlydragons.domain.DomainChecks;
 import com.kaveenk.onlydragons.domain.MechanicRevision;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -12,7 +13,15 @@ import java.util.UUID;
  */
 public record ProcCommand(UUID procId, UUID parentImpactId, PhysicalImpact.Key origin,
                           UUID ownerId, UUID shotId, long dueTick, double preCapDamage,
-                          CritOutcome crit, MechanicRevision mechanic, int fatalTempoSourceLevel) {
+                          CritOutcome crit, MechanicRevision mechanic, int fatalTempoSourceLevel,
+                          Optional<ProcHealthSnapshot> healthSnapshot) {
+    /** Legacy fixed-profile command. Level-based profiles require explicit admission provenance. */
+    public ProcCommand(UUID procId, UUID parentImpactId, PhysicalImpact.Key origin, UUID ownerId,
+                       UUID shotId, long dueTick, double preCapDamage, CritOutcome crit,
+                       MechanicRevision mechanic, int fatalTempoSourceLevel) {
+        this(procId, parentImpactId, origin, ownerId, shotId, dueTick, preCapDamage, crit, mechanic,
+                fatalTempoSourceLevel, Optional.empty());
+    }
     public ProcCommand {
         Objects.requireNonNull(procId, "procId");
         Objects.requireNonNull(parentImpactId, "parentImpactId");
@@ -24,6 +33,7 @@ public record ProcCommand(UUID procId, UUID parentImpactId, PhysicalImpact.Key o
         DomainChecks.nonNegative(preCapDamage, "preCapDamage");
         Objects.requireNonNull(crit, "crit");
         Objects.requireNonNull(mechanic, "mechanic");
+        Objects.requireNonNull(healthSnapshot, "healthSnapshot");
         if (fatalTempoSourceLevel < 0 || fatalTempoSourceLevel > 5) {
             throw new IllegalArgumentException("fatalTempoSourceLevel must be 0 (ineligible) or 1-5");
         }

@@ -104,7 +104,7 @@ public final class DragonRankingScenario implements Scenario, Listener {
         });
     }
     void spawn(Runnable next){
-        generation=dragons.spawn();dragon=(EnderDragon)Bukkit.getEntity(view().entityId());probe.watch(dragon);dragons.subscribe(generation,completions::add);
+        generation=dragons.spawn(DevelopmentDragonService.SpawnMode.CALIBRATION);dragon=(EnderDragon)Bukkit.getEntity(view().entityId());probe.watch(dragon);dragons.subscribe(generation,completions::add);
         players.await("native parts initialized",100,()->dragon.getParts().stream().allMatch(part->part.getLocation().getY()>75),next::run);
     }
     void prepare(String actor){
