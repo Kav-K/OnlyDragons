@@ -1,0 +1,763 @@
+{
+  "schemaVersion": 1,
+  "repository": "Kav-K/OnlyDragons",
+  "description": "Requirement bindings are reviewed contracts, not proof that assertions are behaviorally sufficient. Implemented fixtures remain bounded by their declared scope. Deferred functional cases are not human gates.",
+  "fixtures": {
+    "lifecycle-calibration": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "production_command_registered",
+        "production_service_initialized",
+        "paper_item_pdc_roundtrip",
+        "test_chunk_entity_ticking",
+        "native_arrow_still_valid",
+        "native_arrow_uuid_continuous",
+        "server_ticks_advanced",
+        "native_arrow_moved",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "lifecycle-calibration"
+      ],
+      "scope": "Owned runner lifecycle and real Arrow; no gameplay acceptance."
+    },
+    "deliberate-failure": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "production_command_registered",
+        "production_service_initialized",
+        "paper_item_pdc_roundtrip",
+        "test_chunk_entity_ticking",
+        "native_arrow_still_valid",
+        "native_arrow_uuid_continuous",
+        "server_ticks_advanced",
+        "native_arrow_moved",
+        "deliberate_failure",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "deliberate-failure"
+      ],
+      "scope": "Intentional failed assertion control; expected negative runner result."
+    },
+    "foundation-contracts": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "contracts_loaded_from_production",
+        "test_chunk_entity_ticking",
+        "native_arrow_valid",
+        "native_arrow_uuid_captured",
+        "server_ticks_advanced",
+        "native_arrow_moved",
+        "snapshot_revision_retained",
+        "weapon_damage_capture_immutable",
+        "raw_crit_retained_above_100",
+        "ordinary_crit_probability_capped",
+        "source_provenance_retained",
+        "captured_enchants_survive_swap",
+        "snapshot_map_read_only",
+        "snapshot_provenance_read_only",
+        "shot_enchants_read_only",
+        "one_ultimate_enforced",
+        "nonfinite_stat_rejected",
+        "ordinary_critical_fixture_210",
+        "ferocity_requested_hp_52_5",
+        "ferocity_actual_hp_20",
+        "ferocity_contribution_210",
+        "ferocity_parent_retained",
+        "rejected_hit_cannot_earn_score",
+        "zero_hp_target_is_dead",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "foundation-contracts"
+      ],
+      "scope": "Immutable production DTO consumers on Paper with synthetic inputs."
+    },
+    "protocol-player-calibration": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "disposable_protocol_mode",
+        "offline_fixture",
+        "real_player_join",
+        "player_uuid",
+        "player_loopback",
+        "player_not_op",
+        "real_selected_slot_event",
+        "selected_slot_new",
+        "selected_bow_applied",
+        "real_bow_use_event",
+        "server_observed_bow_draw",
+        "real_bow_release_event",
+        "full_bow_draw_force",
+        "native_arrow_projectile",
+        "native_projectile_shooter",
+        "native_projectile_live",
+        "native_projectile_moving",
+        "real_player_quit",
+        "player_removed_after_quit",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "owned_listeners_removed"
+      ],
+      "caseIds": [
+        "protocol-player-calibration",
+        "protocol-player-early-exit",
+        "protocol-player-idle"
+      ],
+      "scope": "Actual offline protocol join/slot/bow/quit, not feature equipment or dragon damage."
+    },
+    "item-identity": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "codec_loaded_from_production",
+        "all_loadouts_roundtrip",
+        "calibration_no_crit_bonus",
+        "distinct_instance_ids",
+        "inventory_move_identity",
+        "presentation_generated",
+        "rename_cannot_grant",
+        "renamed_managed_identity",
+        "base_damage_once",
+        "trusted_vicious_modifier",
+        "single_ultimate_rejected",
+        "write_boundary_rejected",
+        "invalid_level_rejected",
+        "unknown_enchant_rejected",
+        "unknown_definition_rejected",
+        "malformed_type_rejected",
+        "malformed_uuid_rejected",
+        "raw_stats_rejected",
+        "forged_kind_rejected",
+        "legacy_schema_rejected",
+        "future_schema_rejected",
+        "revision_mismatch_rejected",
+        "wrong_material_rejected",
+        "invalid_amount_rejected",
+        "trusted_roll_roundtrip",
+        "resolved_weapon_projection",
+        "unknown_roll_rejected",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "all_loadouts_production_snapshots",
+        "edited_item_production_snapshot"
+      ],
+      "caseIds": [
+        "item-identity"
+      ],
+      "scope": "Real ItemStack/PDC serialization and production item-to-snapshot projection; no player events."
+    },
+    "stats-resolution": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "resolver_loaded_from_production",
+        "complete_snapshot",
+        "weapon_base_once",
+        "raw_crit_above_100",
+        "ordinary_probability",
+        "crit_damage_baseline",
+        "ferocity_cap",
+        "explanation_values",
+        "deterministic_order",
+        "source_replacement",
+        "old_snapshot_immutable",
+        "invalid_result_rejected",
+        "profile_revision",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "stats-resolution"
+      ],
+      "scope": "Production numeric resolver with synthetic inputs; no player equipment."
+    },
+    "projectile-feasibility": {
+      "assertions": [
+        "server_thread",
+        "test_chunks_entity_ticking",
+        "cow_NATIVE_collision",
+        "cow_NATIVE_health",
+        "cow_CANCEL_HIT_collision",
+        "cow_CANCEL_HIT_health",
+        "cow_CANCEL_DAMAGE_collision",
+        "cow_CANCEL_DAMAGE_health",
+        "cow_ZERO_DAMAGE_collision",
+        "cow_ZERO_DAMAGE_health",
+        "cancel_hit_blocks_damage_event",
+        "damage_cancellation_observed",
+        "real_dragon_parts",
+        "part_parent_mapping",
+        "pre_spawn_native_flight",
+        "pre_spawn_uuid_continuous",
+        "pre_spawn_launch_before_spawn",
+        "lifetime_setter_roundtrip",
+        "airborne_lifetime_uuid_valid",
+        "lifetime_reset_roundtrip",
+        "multipart_collision_observed",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "hit_event_precedes_damage_event",
+        "body_geometry_collision",
+        "three_distinct_same_tick_impacts",
+        "dragon_hit_without_damage_event",
+        "pre_spawn_collision_after_spawn",
+        "grounded_native_collision",
+        "cancel_hit_does_not_prevent_block_collision",
+        "grounded_age_control_despawns",
+        "grounded_age_reset_survives"
+      ],
+      "caseIds": [
+        "projectile-feasibility"
+      ],
+      "scope": "Shooterless physical Arrow/dragon observations only; partial T04."
+    },
+    "projectile-cleanup-failure": {
+      "assertions": [
+        "scenario_exception",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "projectile-cleanup-failure"
+      ],
+      "scope": "Intentional scenario exception and owned listener/entity/task/chunk cleanup."
+    },
+    "projectile-cleanup-abort": {
+      "assertions": [
+        "scenario_exception",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "projectile-cleanup-abort"
+      ],
+      "scope": "Direct context abort and cleanup; not a plugin unload."
+    },
+    "combat-accounting": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "services_loaded_from_production",
+        "crit_baseline_and_raw_chance",
+        "crit_threshold",
+        "golden_critical_210",
+        "named_modifier",
+        "duplicate_physical",
+        "separate_health_score_floor",
+        "late_descendant",
+        "second_lethal_candidate",
+        "single_frozen_completion",
+        "final_totals",
+        "result_immutable",
+        "same_tick_physical_lethals",
+        "historical_cap_boundaries",
+        "cap_adjacent_boundaries",
+        "uncapped_profile",
+        "inherited_parent_and_crit",
+        "mitigation_and_single_child_cap",
+        "duplicate_proc",
+        "recursive_child_rejected",
+        "duplex_score_only_inheritance",
+        "ended_generation",
+        "settled_cancellation",
+        "overflow_atomic",
+        "profile_retained",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "combat-accounting"
+      ],
+      "scope": "Production combat services with synthetic physical inputs; no native damage adapter."
+    }
+  },
+  "requirements": {
+    "contract-consumers": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Immutable shared DTO behavior, revisions and bounded ancestry.",
+      "fixtures": [
+        "foundation-contracts"
+      ]
+    },
+    "runner-lifecycle": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Real pinned Paper lifecycle and native Arrow with cleanup.",
+      "fixtures": [
+        "lifecycle-calibration"
+      ]
+    },
+    "runner-negative": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Deliberate assertion failure must fail the runner.",
+      "fixtures": [
+        "deliberate-failure"
+      ]
+    },
+    "protocol-input": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Real protocol player join, selected-slot, bow use/release, native shooter, quit and early-exit/timeout controls.",
+      "fixtures": [
+        "protocol-player-calibration"
+      ]
+    },
+    "stats-resolver": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Production resolver numeric order, raw/effective values and source replacement.",
+      "fixtures": [
+        "stats-resolution"
+      ]
+    },
+    "item-codec": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Production identity/edit validation and real serialized item-to-snapshot values.",
+      "fixtures": [
+        "item-identity"
+      ]
+    },
+    "projectile-observations": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Partial shooterless collision, phase, simultaneous and pre-spawn observations; not player-owned native damage.",
+      "fixtures": [
+        "projectile-feasibility"
+      ]
+    },
+    "listener-cleanup": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Scenario-owned listener/resource cleanup on exception and direct context abort.",
+      "fixtures": [
+        "projectile-cleanup-failure",
+        "projectile-cleanup-abort"
+      ]
+    },
+    "combat-services": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Production combat accounting, duplicate/lifecycle rejection, caps and separate health/score.",
+      "fixtures": [
+        "combat-accounting"
+      ]
+    },
+    "suite-baseline": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Fresh full registered regression and expected-failure baseline on exact clean source inputs.",
+      "fixtures": [
+        "lifecycle-calibration",
+        "deliberate-failure",
+        "foundation-contracts",
+        "protocol-player-calibration",
+        "item-identity",
+        "stats-resolution",
+        "projectile-feasibility",
+        "projectile-cleanup-failure",
+        "projectile-cleanup-abort",
+        "combat-accounting"
+      ]
+    },
+    "equipment-service": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Production equipment cache, main-hand provenance, same-UUID edit refresh and command boundaries.",
+      "fixtures": []
+    },
+    "equipment-player": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Actual protocol player equipment/held events, grant permissions, refresh and quit cleanup; synthetic UUIDs or command sender proxies cannot satisfy this.",
+      "fixtures": []
+    },
+    "bounded-procs": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Production ferocity queue, nonrecursive children, expiry and lifecycle integration.",
+      "fixtures": []
+    },
+    "firing-input": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Actual player bow/shortbow trigger/cadence, immutable shot ownership and ammo/cancellation behavior.",
+      "fixtures": []
+    },
+    "P01": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Real owned Arrow into a managed dummy: one physical impact/ledger entry and no native double damage.",
+      "fixtures": []
+    },
+    "P02": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Actual player-owned Arrow into dragon parts: evidenced parent/part policy and semantic head/native-damage classification.",
+      "fixtures": []
+    },
+    "P03": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Several real eligible projectiles on one tick: each counted once through the production adapter without hurt-window loss.",
+      "fixtures": []
+    },
+    "P04": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Player-owned arrows against flying/perched dragons: measured native damage/immunity and suppression policy.",
+      "fixtures": []
+    },
+    "P05": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Production countdown/hatch: launch before hatch before physical impact with continuous projectile UUID.",
+      "fixtures": []
+    },
+    "P06": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Early/late/off-angle/obstructed shots produce real misses, without phantom damage.",
+      "fixtures": []
+    },
+    "P07": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "All Dragon Tracer levels and moving targets respect acquisition/steering boundaries.",
+      "fixtures": []
+    },
+    "P08": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Physical Duplex plus bounded ferocity integration produces correct counts/scales without recursion.",
+      "fixtures": []
+    },
+    "P09": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Actual two-bow Fatal Tempo/Duplex swap preserves captured ownership and expiry eligibility.",
+      "fixtures": []
+    },
+    "P10": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Accepted production projectile ageing/chunk-boundary lifecycle with bounded ticket ownership.",
+      "fixtures": []
+    },
+    "P11": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Production death/reset/disconnect/shutdown: one completion, no late score and no retained owned resources.",
+      "fixtures": []
+    },
+    "P12": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Representative volleys/load: measured tick, memory, queue/projectile and repeated-cleanup envelope.",
+      "fixtures": []
+    },
+    "P13": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Actual cancelled launch/hit in the production adapter grants no damage or duplicate ammunition consumption.",
+      "fixtures": []
+    },
+    "P14": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Production configuration revision adoption leaves airborne shots unchanged and updates only subsequent encounters.",
+      "fixtures": []
+    },
+    "eye-transactions": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Concurrent placements and restart/refund recovery prevent duplicated eyes or encounters.",
+      "fixtures": []
+    },
+    "durable-progression": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Durable reward/grant identity and bounded acquisition rules survive replay/restart.",
+      "fixtures": []
+    },
+    "runner-unit-checks": {
+      "kind": "ci",
+      "availability": "implemented",
+      "description": "CI must execute Python report-validator and failure-contract tests without failures or skips.",
+      "fixtures": []
+    },
+    "bridge-unit-checks": {
+      "kind": "ci",
+      "availability": "implemented",
+      "description": "CI must execute Symphony bridge protocol/sandbox tests; required MCP/skills startup evidence remains separately recorded.",
+      "fixtures": []
+    },
+    "checkpoint-unit-checks": {
+      "kind": "ci",
+      "availability": "implemented",
+      "description": "CI must exercise checkpoint false-green, DAG, coverage, stale and missing receipt regressions.",
+      "fixtures": []
+    },
+    "human-input-feel": {
+      "kind": "human",
+      "availability": "external",
+      "description": "Human mouse/hold cadence and subjective usability evidence.",
+      "fixtures": []
+    },
+    "human-prefire-visuals": {
+      "kind": "human",
+      "availability": "external",
+      "description": "Human visual hatch cue/prefire timing rehearsal.",
+      "fixtures": []
+    },
+    "authenticated-multiplayer": {
+      "kind": "human",
+      "availability": "external",
+      "description": "Actual authenticated multiple-player ownership and interaction evidence.",
+      "fixtures": []
+    },
+    "roster-acquisition-scope": {
+      "kind": "design",
+      "availability": "external",
+      "description": "User decision for the bounded variant roster, rewards and acquisition scope.",
+      "fixtures": []
+    }
+  },
+  "tasks": {
+    "T00": [
+      "contract-consumers"
+    ],
+    "T09a": [
+      "runner-lifecycle",
+      "runner-negative"
+    ],
+    "T09b": [
+      "protocol-input"
+    ],
+    "T09c": [
+      "suite-baseline",
+      "checkpoint-unit-checks"
+    ],
+    "T01a": [
+      "stats-resolver"
+    ],
+    "T02": [
+      "item-codec"
+    ],
+    "T04": [
+      "projectile-observations",
+      "listener-cleanup",
+      "P02",
+      "P04"
+    ],
+    "T03": [
+      "combat-services"
+    ],
+    "T01b": [
+      "equipment-service",
+      "equipment-player"
+    ],
+    "T05": [
+      "bounded-procs"
+    ],
+    "T06": [
+      "firing-input"
+    ],
+    "T07": [
+      "P07",
+      "P10"
+    ],
+    "T08": [
+      "P01",
+      "P13"
+    ],
+    "T10": [
+      "P03",
+      "P05",
+      "P06",
+      "P08",
+      "P09",
+      "P11",
+      "P12",
+      "P14",
+      "human-prefire-visuals",
+      "authenticated-multiplayer"
+    ],
+    "T11": [
+      "eye-transactions"
+    ],
+    "T12": [
+      "durable-progression",
+      "roster-acquisition-scope"
+    ],
+    "MAINT-17": [
+      "runner-unit-checks"
+    ],
+    "MAINT-18": [
+      "bridge-unit-checks"
+    ]
+  },
+  "paperCases": {
+    "P01": [
+      "P01"
+    ],
+    "P02": [
+      "P02"
+    ],
+    "P03": [
+      "P03"
+    ],
+    "P04": [
+      "P04"
+    ],
+    "P05": [
+      "P05"
+    ],
+    "P06": [
+      "P06"
+    ],
+    "P07": [
+      "P07"
+    ],
+    "P08": [
+      "P08"
+    ],
+    "P09": [
+      "P09"
+    ],
+    "P10": [
+      "P10"
+    ],
+    "P11": [
+      "P11"
+    ],
+    "P12": [
+      "P12"
+    ],
+    "P13": [
+      "P13"
+    ],
+    "P14": [
+      "P14"
+    ]
+  },
+  "milestones": {
+    "M0": {
+      "dependsOn": [],
+      "tasks": [
+        "T00",
+        "T04"
+      ],
+      "requirements": [
+        "contract-consumers",
+        "projectile-observations",
+        "P02",
+        "P04"
+      ]
+    },
+    "M1": {
+      "dependsOn": [
+        "M0"
+      ],
+      "tasks": [
+        "T01b",
+        "T02",
+        "T03",
+        "T05",
+        "T06",
+        "T08"
+      ],
+      "requirements": [
+        "equipment-player",
+        "combat-services",
+        "P01",
+        "P08",
+        "P13"
+      ]
+    },
+    "M2": {
+      "dependsOn": [
+        "M1"
+      ],
+      "tasks": [
+        "T05",
+        "T06",
+        "T07"
+      ],
+      "requirements": [
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "human-input-feel"
+      ]
+    },
+    "M3": {
+      "dependsOn": [
+        "M2"
+      ],
+      "tasks": [
+        "T10"
+      ],
+      "requirements": [
+        "P03",
+        "P05",
+        "P06",
+        "P11",
+        "P12",
+        "P14",
+        "human-prefire-visuals",
+        "authenticated-multiplayer"
+      ]
+    },
+    "M4": {
+      "dependsOn": [
+        "M3"
+      ],
+      "tasks": [
+        "T11"
+      ],
+      "requirements": [
+        "eye-transactions"
+      ]
+    },
+    "M5": {
+      "dependsOn": [
+        "M4"
+      ],
+      "tasks": [
+        "T12"
+      ],
+      "requirements": [
+        "durable-progression",
+        "roster-acquisition-scope"
+      ]
+    }
+  }
+}

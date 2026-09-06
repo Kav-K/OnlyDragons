@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "repository": "Kav-K/OnlyDragons",
+  "baselineRevision": "9092fbe233319aab7d4933eea011d78089d7c07c",
+  "notice": "Historical integrated state and durable references only. Fresh machine evidence, independent review and current CI are checked separately. No milestone is accepted.",
+  "tasks": {
+    "T00": {
+      "status": "complete",
+      "mergedRevision": "be920d0",
+      "completedRequirements": [
+        "contract-consumers"
+      ],
+      "evidence": {
+        "contract-consumers": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/15",
+          "revision": "be920d0"
+        }
+      }
+    },
+    "T09a": {
+      "status": "complete",
+      "mergedRevision": "140f11c",
+      "completedRequirements": [
+        "runner-lifecycle",
+        "runner-negative"
+      ],
+      "evidence": {
+        "runner-lifecycle": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/16",
+          "revision": "140f11c"
+        },
+        "runner-negative": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/16",
+          "revision": "140f11c"
+        }
+      }
+    },
+    "T09b": {
+      "status": "complete",
+      "mergedRevision": "5b0e030",
+      "completedRequirements": [
+        "protocol-input"
+      ],
+      "evidence": {
+        "protocol-input": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/27",
+          "revision": "5b0e030"
+        }
+      }
+    },
+    "T09c": {
+      "status": "active",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T01a": {
+      "status": "complete",
+      "mergedRevision": "1efa7d0",
+      "completedRequirements": [
+        "stats-resolver"
+      ],
+      "evidence": {
+        "stats-resolver": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/23",
+          "revision": "1efa7d0"
+        }
+      }
+    },
+    "T02": {
+      "status": "complete",
+      "mergedRevision": "7c6d843",
+      "completedRequirements": [
+        "item-codec"
+      ],
+      "evidence": {
+        "item-codec": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/24",
+          "revision": "7c6d843"
+        }
+      }
+    },
+    "T04": {
+      "status": "partial",
+      "completedRequirements": [
+        "projectile-observations",
+        "listener-cleanup"
+      ],
+      "evidence": {
+        "projectile-observations": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/22",
+          "revision": "586a170"
+        },
+        "listener-cleanup": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/22",
+          "revision": "586a170"
+        }
+      },
+      "mergedRevision": "586a170"
+    },
+    "T03": {
+      "status": "complete",
+      "mergedRevision": "9092fbe",
+      "completedRequirements": [
+        "combat-services"
+      ],
+      "evidence": {
+        "combat-services": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/26",
+          "revision": "9092fbe"
+        }
+      }
+    },
+    "T01b": {
+      "status": "active",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T05": {
+      "status": "active",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T06": {
+      "status": "blocked",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T07": {
+      "status": "blocked",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T08": {
+      "status": "blocked",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T10": {
+      "status": "blocked",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T11": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T12": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "MAINT-17": {
+      "status": "complete",
+      "mergedRevision": "6f0ccfb",
+      "completedRequirements": [
+        "runner-unit-checks"
+      ],
+      "evidence": {
+        "runner-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/19",
+          "revision": "6f0ccfb"
+        }
+      }
+    },
+    "MAINT-18": {
+      "status": "complete",
+      "mergedRevision": "e72fb2a",
+      "completedRequirements": [
+        "bridge-unit-checks"
+      ],
+      "evidence": {
+        "bridge-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/21",
+          "revision": "e72fb2a"
+        }
+      }
+    }
+  },
+  "milestones": {
+    "M0": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M1": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M2": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M3": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M4": {
+      "status": "not-accepted",
+      "evidence": {}
+    },
+    "M5": {
+      "status": "not-accepted",
+      "evidence": {}
+    }
+  }
+}
