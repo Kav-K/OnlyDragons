@@ -118,9 +118,15 @@ record 82 production / 7 client / 136 Python tests and runtime-head Windows/Linu
 CI. The lead's terminal-claim/veto clarification is recorded in document 02;
 production P02/P04 remain deferred under T06/M1. T04 stays In review, #9 blocked
 and M0 unaccepted pending current-input and policy acceptance.
-The lead independently reviewed this fresh 16-case receipt and requested handoff
-pending PR #44 integration. Next: redispatch this same branch, ordinarily merge
-that baseline, and run its final affected suite before lead T04 acceptance.
+The lead independently reviewed that 16-case receipt. PR #44 is now integrated
+into this branch by ordinary merge `6936c6f`, including main `9def91f`. All
+projectile and T09d registrations/coverage survive the additive reconciliation.
+The actual-sandbox doctor is ready and the plan checkpoint passes; changed-area
+selection requires 18 cases. Per the latest GH-5 owner instruction, the lead
+will dispatch the hosted suite and independently replay its evidence on the
+handed-back clean head. Current-input Paper acceptance and CI remain pending;
+the older receipt does not certify this reconciliation. See the
+[PR44 reconciliation handoff](../../dev/game-tests/findings/projectile-player-feasibility.md#pr44-reconciliation-handoff).
 
 Keep new decisions concise and update the current ledger/design in place. The
 [archived change record](history/2026-09-05-foundation-evidence.md#context-change-record)
@@ -340,8 +346,9 @@ single physical candidate source are recorded in document 02. No semantic head
 identifier or production adapter is claimed. [Exact current and historical evidence](../../dev/game-tests/findings/projectile-player-feasibility.md)
 preserves misses, failed iterations, pre-spawn/lifetime observations and cleanup.
 Main `799c01d` is integrated at clean `77c94a2`; the full affected suite and
-corrected T04 automated checkpoint passed on those inputs. External current-input
-and policy acceptance remain separate; P02/P04 are deferred T06/M1 adapter acceptance.
+corrected T04 automated checkpoint passed on those historical inputs. The current
+PR44 reconciliation and pending 18-case hosted verification are recorded above.
+External current-input and policy acceptance remain separate; P02/P04 are deferred T06/M1 adapter acceptance.
 T04 stays In review, #9 blocked and M0 unaccepted.
 
 PR #22 is a bounded partial delivery: shooterless native arrows establish useful

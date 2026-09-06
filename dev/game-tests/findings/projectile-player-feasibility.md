@@ -6,6 +6,34 @@ until the full T04 evidence and impact policy are reviewed. This adds to, and
 preserves, the [shooterless/pre-spawn/lifetime findings](projectile-feasibility.md).
 No production combat adapter is introduced.
 
+## PR44 reconciliation handoff
+
+Ordinary merge `6936c6f20b3b9e436389256e1e8c522619191839` integrates
+main `9def91f75d655caaccd6c7fa01313e4ba3a0ea54` into the existing PR #31.
+Catalog/acceptance/suite conflicts were resolved additively: the unchanged
+`projectile-player-v3` and all 52 assertions coexist with both T09d
+player-action/damage/abort fixtures. The shared runner/client, generic admission,
+corrected ERROR matcher and lead-authored terminal-claim/veto policy are retained.
+No production adapter or new collision behavior is introduced.
+
+Actual worker doctor: `state=ready`, 16 readable fixtures/context files,
+JDK 25.0.4.1, existing EULA readable, shared lease writable/available;
+required memory 2816 MiB, guest available 8495 MiB, effective host available
+4459 MiB, `errors=[]`, `waiting=[]`. This is access evidence only.
+Plan checkpoint passes with `automatedReady=false`, `acceptanceApproved=false`.
+Changed-area selection requires **18 cases: 12 positives and six intended
+failures**, including both T09d cases and the preserved projectile-player case.
+
+Per the [latest owner instruction](https://github.com/Kav-K/OnlyDragons/issues/5),
+the lead will dispatch the complete hosted Paper suite and independently replay
+its exported evidence on the handed-back clean head. No local full Paper run is
+claimed for this reconciliation. The reviewed `77c94a2` / `bf523a75` observations
+below are preserved historical evidence, not current-input acceptance. T04
+remains In review, T06 blocked and M0 unaccepted pending hosted evidence,
+current CI and lead review. Natural End-cycle/all-phase automation, production
+adapter enforcement, Windows live smoke, authenticated-client/multiplayer,
+human input/visual/feel and performance gates remain pending.
+
 ## Fixture and reproduction
 
 ```bash

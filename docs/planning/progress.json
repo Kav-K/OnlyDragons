@@ -110,7 +110,7 @@
         }
       },
       "mergedRevision": "586a170",
-      "notice": "PR31 recovery at clean 77c94a2 includes main 799c01d. Fresh full 16-case suite bf523a75bc114b89ae70e6e9da4b5869, replay, separate expected feature early-exit and T04 automated checkpoint passed; see current projectile-player findings. Runtime-head Windows/Linux CI and 136 Python tests passed. The former comparison-base/infrastructure blockers are resolved. Lead terminal-claim/veto clarification and uniform 1.0 part/three-phase policy are recorded in the foundation plan. External current-input/policy acceptance remains with the lead; P02/P04 remain deferred T06/M1 work. T04 stays partial/In review, #9 blocked and M0 unaccepted."
+      "notice": "PR31 now integrates PR44/main 9def91f by ordinary merge 6936c6f, preserving every projectile/T09d fixture and acceptance mapping. Actual worker doctor is ready; plan checkpoint passes and changed-area selection requires all 18 cases. Per the latest owner instruction, the lead will dispatch the hosted Paper suite and independently replay evidence on the handed-back clean head. Current-input Paper acceptance and CI remain pending. Historical 77c94a2/bf523a75 observations remain independently reviewed but cannot certify these reconciled inputs. See projectile-player findings for the handoff. Uniform 1.0 part/three-phase and terminal-claim/veto policies remain unchanged. T04 stays partial/In review, #9 blocked and M0 unaccepted; P02/P04 remain deferred T06/M1 work."
     },
     "T03": {
       "status": "complete",
