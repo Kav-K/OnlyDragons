@@ -33,7 +33,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T02 — Items | Complete | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Final clean 7ebaa6b after main 586a170: 54 production tests and 35 item-codec-v4 Paper assertions passed, including real serialized loadouts through production snapshots and four cleanup checks. [Evidence](#t02-item-validation-evidence). Merged at 7c6d843 after independent review and final-head CI; authenticated inventory/visual checks are separate. #7 equipment/grants are integrated in PR #29/#32; #9 firing remains deferred. |
 | T02b — Test dragon definitions | In review | [#38](https://github.com/Kav-K/OnlyDragons/issues/38), [draft PR #46](https://github.com/Kav-K/OnlyDragons/pull/46) | Prerequisites integrated; one immutable 1,000-HP test definition, strict atomic production loader/registry and inert T02 item bindings implemented on `symphony/gh-38`. JDK 25 wrapper build passed 109 production tests (zero failures/errors/skips); Clean `90b5cf6`: 30-assertion production-loader Paper scenario passed; 15-assertion abort control produced only its intended exception and restored the catalog. [Focused evidence/hashes](evidence/t02b-focused-paper.md). Lead-owned combined suite/T02b checkpoint and merge remain pending. No spawn engine or real rewards. |
 | T03 — Combat/ledger | Complete | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Merged at 9092fbe after independent review and final-head Windows/Linux CI. Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Physical adapter/native suppression and human checks are separate. |
-| T04 — Paper feasibility | In review (player-owned follow-up delivered) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). Player-owned follow-up is in draft PR #31 with native positive controls, cancellation/zero-damage observations, part geometry, phase and simultaneous-hit evidence. Issue #5 records the reviewed bounded phase/part policy; its worker still owns foundation-plan reconciliation and actual current-main suite evidence. T04 remains partial, #9 stays blocked and M0 unaccepted. |
+| T04 — Paper feasibility | In review (player-owned follow-up delivered) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). Player-owned follow-up is in draft PR #31 with native positive controls, cancellation/zero-damage observations, part geometry, phase and simultaneous-hit evidence. Issue #5 records the reviewed bounded phase/part policy; the foundation plan records that policy and clean `77c94a2` passed the full 16-case suite, feature early-exit and T04 automated checkpoint; [fresh evidence](../../dev/game-tests/findings/projectile-player-feasibility.md#recovery-verification-on-current-main). External current-input/policy acceptance remains with the lead. T04 remains partial, #9 stays blocked and M0 unaccepted. |
 | T05 — Enchants/procs | In review | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Draft PR #30 passed independent source review, 128 production tests and 38 real-Paper assertions. Current head `ee1721a` contains main `5e8cfbf` and passed [Windows/Linux CI](https://github.com/Kav-K/OnlyDragons/actions/runs/34014552319). Shared-suite evidence and lead acceptance remain pending. |
 | T06 — Firing/Duplex | Blocked | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b/T02 are complete; wait for accepted T04 impact/native-damage evidence. Partial PR #22 and a passing T09b calibration alone cannot satisfy this gate. Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence remain required. |
 | T07 — Tracer/continuity | Planned | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |
@@ -108,6 +108,28 @@ This instruction does not authorize implementing unassigned work packages.
 
 ### Context change record
 
+T04 recovery at clean `77c94a2` integrates main `799c01d`; former access,
+network and comparison-base blockers are resolved. Fresh full 16-case suite
+`bf523a75bc114b89ae70e6e9da4b5869`, independent replay and the separate feature
+early-exit control met their declared outcomes. T04 automated checkpoint is
+ready, with merge acceptance false. [Current receipt, hashes and observed
+geometry](../../dev/game-tests/findings/projectile-player-feasibility.md#recovery-verification-on-current-main)
+record 82 production / 7 client / 136 Python tests and runtime-head Windows/Linux
+CI. The lead's terminal-claim/veto clarification is recorded in document 02;
+production P02/P04 remain deferred under T06/M1. T04 stays In review, #9 blocked
+and M0 unaccepted pending current-input and policy acceptance.
+The lead independently reviewed that 16-case receipt. PR #44 is now integrated
+into this branch by ordinary merge `6936c6f`, including main `9def91f`. Final
+merge `37cd803` includes PR #45/main `4cfb7b9` and preserves its completed
+T09d context. All
+projectile and T09d registrations/coverage survive the additive reconciliation.
+The actual-sandbox doctor is ready and the plan checkpoint passes; changed-area
+selection requires 18 cases. Per the latest GH-5 owner instruction, the lead
+will dispatch the hosted suite and independently replay its evidence on the
+handed-back clean head. Current-input Paper acceptance and CI remain pending;
+the older receipt does not certify this reconciliation. See the
+[PR44 reconciliation handoff](../../dev/game-tests/findings/projectile-player-feasibility.md#pr44-reconciliation-handoff).
+
 Keep new decisions concise and update the current ledger/design in place. The
 [archived change record](history/2026-09-05-foundation-evidence.md#context-change-record)
 preserves earlier rationale and delivery claims verbatim. Stat/item/combat API
@@ -122,6 +144,7 @@ remain authoritative.
 | 2026-09-06 | Terminal-workspace retention maintenance, complete via PR #44 | Replace the source-only cleanup archive with an atomic same-filesystem rename of the complete terminal checkout. Preserve ignored runtime evidence/caches and avoid slow recursive WSL deletion during dispatcher startup. Validate operator/workspace/results boundaries and unique destinations. | 25 Linux Symphony tests passed, including 14 retention cases and the real shell hook in disposable fixtures; independent review, runtime CI and [final documentation-head CI](https://github.com/Kav-K/OnlyDragons/actions/runs/34025800244) passed. PR #44 merged at `9def91f`; the operator checkout is updated. [Retention behavior and the pinned upstream hook-failure limitation](../symphony.md#terminal-workspace-retention). This maintenance does not complete a gameplay task or milestone. |
 | 2026-09-05 | Agent execution/context audit maintenance, [PR #35](https://github.com/Kav-K/OnlyDragons/pull/35) | Reconcile integrated item/equipment facts, archive superseded validation chronology, and correct the T04/M0 dependency cycle: feasibility observations and explicit impact-policy review belong to T04/M0; deferred production P02/P04 behavior remains under T06/M1. Improve bounded context reads and useful tool routing. | Clean runtime `472aaed` passed the full 15-case Paper suite, 135 Linux runner/checkpoint tests and Windows/Linux CI. Independent replay verified raw reports, artifacts, JUnit, cleanup and closed ports. [Exact receipt/source identities and audit findings](../agent-audit-2026-09-05.md#validation-of-the-correction); PR #35 records final evidence-head CI and integration status. No gameplay task, P01–P14 requirement or M0–M5 milestone is advanced by this maintenance. |
 | 2026-09-05 | Worker skill-update sandbox maintenance, complete via [PR #34](https://github.com/Kav-K/OnlyDragons/pull/34) | Grant only the real issue-local `.agents` directory alongside existing Git/lease roots so an ordinary upstream skill merge works. Reject missing/file/symlink or changed checkout paths on launch/each transformed turn; retain trusted operator MCP configuration and the other policy/input fields. | Eleven Linux bridge tests and the explicit Codex 0.153.4 no-model sandbox smoke passed: real two-parent skill merge preserved worker content; `.codex`/sibling writes remained EROFS; owned app-server exit 0 and scratch cleanup passed. Independent review and final-head Windows/Linux CI passed; merged at `5e8cfbf`. Resumed GH-5/GH-8 workers completed ordinary main merges and their actual-sandbox doctor checks passed. [Scope and runnable smoke](../symphony.md#start-and-stop). No new Paper or gameplay acceptance is claimed; prior receipts retain their recorded input identities. |
+
 | 2026-09-05 | T09c / #28 and T01b / #7, complete via [PR #32](https://github.com/Kav-K/OnlyDragons/pull/32) | Integrated strict shared suites/checkpoints, objective player equipment and received command text, catalog-declared actor admission, and the callback/disconnect lock-cycle fix with delayed-quit soak. | Reviewed head `78c3de4` merged at `73a8cc8`; fresh 15-case baseline (10 positive, 5 intended negative), 82 production and 7 client tests; 130 Linux Python, 124 Windows Python plus 6 Linux-only exclusions. [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). The Windows operator Cursor Build target passed on clean main 73a8cc8 (82 tests, zero failures/errors/skips); Windows Play/smoke and authenticated/multiplayer/visual/feel checks remain unrun. P01–P14/M0–M5 remain pending. |
 | 2026-09-05 | User-confirmed execution policy | Authorized feature agents to test against isolated real Minecraft, parallel coding, and lead merges of reviewed/tested PRs into main. Reuse existing local EULA acceptance; preserve human worlds and serialize JVM tests. | Existing managed dev server stopped cleanly with user permission. Fourteen issues created; T00/T09a agents started in separate clones. Bridge tests include the narrow shared lease directory (6 pass); client/milestone gates remain distinct. |
 
@@ -317,10 +340,24 @@ In a disposable profile, create a real dragon and real arrows. Observe part-to-p
 
 **Accept when:** a report demonstrates a viable public-API approach for one damage application per physical hit, same-tick volleys, and pre-spawn arrows. If an API limitation prevents those requirements, report the measured limitation and revise the design before building full combat around it. Do not “pass” with a mock dragon or teleported arrows.
 
+The player-owned continuation in [PR #31](https://github.com/Kav-K/OnlyDragons/pull/31)
+uses `projectile-player-feasibility-v3` with generic catalog-declared actor
+admission. Its native client release and separate API-spawned player-owned arrows
+establish native-positive/suppression controls, measured part geometry, three
+phases and simultaneous physical hits. The reviewed uniform 1.0 part policy and
+single physical candidate source are recorded in document 02. No semantic head
+identifier or production adapter is claimed. [Exact current and historical evidence](../../dev/game-tests/findings/projectile-player-feasibility.md)
+preserves misses, failed iterations, pre-spawn/lifetime observations and cleanup.
+Main `799c01d` is integrated at clean `77c94a2`; the full affected suite and
+corrected T04 automated checkpoint passed on those historical inputs. The current
+PR44 reconciliation and pending 18-case hosted verification are recorded above.
+External current-input and policy acceptance remain separate; P02/P04 are deferred T06/M1 adapter acceptance.
+T04 stays In review, #9 blocked and M0 unaccepted.
+
 PR #22 is a bounded partial delivery: shooterless native arrows establish useful
 collision/cancellation observations, but cannot establish player-owned native
 dragon damage suppression or semantic head/native-damage behavior. Keep #5 open
-and #9 undispatched until those remaining experiments and the supported impact
+and #9 undispatched until the continuation evidence and supported impact
 policy are accepted. T09b supplies a protocol actor for the follow-up; its initial
 bow calibration does not itself finish T04.
 

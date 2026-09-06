@@ -70,6 +70,11 @@
       "testPlayer": "protocol-calibration",
       "scenarioTimeout": 120
     },
+    "projectile-player-feasibility": {
+      "scenarioId": "projectile-player-feasibility",
+      "expectation": "positive",
+      "testPlayer": "protocol-calibration"
+    },
     "headless-player-primitives": {
       "scenarioId": "headless-player-primitives",
       "expectation": "positive",
@@ -103,6 +108,7 @@
       "equipment-stats",
       "equipment-player",
       "protocol-player-soak",
+      "projectile-player-feasibility",
       "headless-player-primitives",
       "dragon-definitions"
     ],
@@ -131,6 +137,7 @@
       "equipment-stats",
       "equipment-player",
       "protocol-player-soak",
+      "projectile-player-feasibility",
       "headless-player-primitives",
       "headless-player-cleanup-abort",
       "dragon-definitions",
@@ -179,6 +186,7 @@
         "equipment-stats",
         "equipment-player",
         "protocol-player-soak",
+        "projectile-player-feasibility",
         "headless-player-primitives",
         "headless-player-cleanup-abort",
         "dragon-definitions",
@@ -255,7 +263,8 @@
         "combat-accounting",
         "projectile-feasibility",
         "projectile-cleanup-failure",
-        "projectile-cleanup-abort"
+        "projectile-cleanup-abort",
+        "projectile-player-feasibility"
       ],
       "affects": []
     },
@@ -269,6 +278,7 @@
         "protocol-player-early-exit",
         "protocol-player-idle",
         "protocol-player-soak",
+        "projectile-player-feasibility",
         "headless-player-primitives",
         "headless-player-cleanup-abort"
       ],
@@ -344,6 +354,7 @@
         "equipment-stats",
         "equipment-player",
         "protocol-player-soak",
+        "projectile-player-feasibility",
         "headless-player-primitives",
         "headless-player-cleanup-abort",
         "dragon-definitions",

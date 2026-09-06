@@ -64,6 +64,23 @@ class PlayerActorContractTests(unittest.TestCase):
         for scenario in ('protocol-player-calibration', 'equipment-player'):
             self.assertTrue(runner.player_mode('protocol-calibration', scenario, 'calibrate', actual))
 
+    def test_projectile_catalog_admission_retains_failure_controls(self):
+        catalog = runner.strict_json(Path(__file__).resolve().parents[2] / 'dev/game-tests/scenarios.json')
+        scenario = 'projectile-player-feasibility'
+        for control in ('calibrate', 'early-exit', 'idle'):
+            with self.subTest(control=control):
+                self.assertTrue(runner.player_mode('protocol-calibration', scenario, control, catalog))
+                with self.assertRaises(runner.ValidationError):
+                    runner.player_mode(None, scenario, control, catalog)
+        for unknown in ('projectile-feasibility', scenario + '-extra', scenario.upper(), ''):
+            with self.subTest(scenario=unknown), self.assertRaises(runner.ValidationError):
+                runner.player_mode('protocol-calibration', unknown, 'calibrate', catalog)
+        undeclared = {scenario: {}}
+        with self.assertRaises(runner.ValidationError):
+            runner.player_mode('protocol-calibration', scenario, 'calibrate', undeclared)
+        with self.assertRaises(runner.ValidationError):
+            runner.player_mode('protocol-calibration', scenario, 'repeat-shots', catalog)
+
     def test_default_authenticated_settings_and_input_are_preserved(self):
         source = {'online-mode': 'true', 'server-ip': '0.0.0.0', 'level-name': 'human-world'}
         original = dict(source)
