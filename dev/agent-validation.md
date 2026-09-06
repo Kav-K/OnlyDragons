@@ -73,7 +73,7 @@ Use real Paper public APIs for setup and observations. Use the protocol player
 for actual supported input packets; do not manufacture Bukkit events and call
 that player input. Catalog-declared actor scenarios still require the explicit
 runner mode, a unique synthetic offline identity and a fresh loopback-only world.
-The client and companion remain separate from the production plugin.
+The client and companion remain separate from the production plugin. The full baseline includes a 40-second connected-player soak to exercise keepalive/callback activity and delayed quit; deterministic client concurrency tests cover the network-close lock boundary. This is a bounded lifecycle regression, not a load-performance claim.
 
 ## Progress and acceptance
 

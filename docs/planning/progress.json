@@ -124,9 +124,10 @@
       "notice": "Playable equipment/commands merged at a48ebd4; connected-player acceptance awaits T09c full suite/review."
     },
     "T05": {
-      "status": "active",
+      "status": "in-review",
       "completedRequirements": [],
-      "evidence": {}
+      "evidence": {},
+      "notice": "Draft PR30 reviewed at3477ed0; current-main/T09c integration and affected-suite/current CI remain pending."
     },
     "T06": {
       "status": "blocked",

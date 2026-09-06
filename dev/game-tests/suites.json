@@ -63,6 +63,12 @@
       "scenarioId": "equipment-player",
       "expectation": "positive",
       "testPlayer": "protocol-calibration"
+    },
+    "protocol-player-soak": {
+      "scenarioId": "protocol-player-soak",
+      "expectation": "positive",
+      "testPlayer": "protocol-calibration",
+      "scenarioTimeout": 120
     }
   },
   "suites": {
@@ -75,7 +81,8 @@
       "projectile-feasibility",
       "protocol-player-calibration",
       "equipment-stats",
-      "equipment-player"
+      "equipment-player",
+      "protocol-player-soak"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -98,7 +105,8 @@
       "protocol-player-early-exit",
       "protocol-player-idle",
       "equipment-stats",
-      "equipment-player"
+      "equipment-player",
+      "protocol-player-soak"
     ]
   },
   "areas": {
@@ -193,7 +201,8 @@
       "cases": [
         "protocol-player-calibration",
         "protocol-player-early-exit",
-        "protocol-player-idle"
+        "protocol-player-idle",
+        "protocol-player-soak"
       ],
       "affects": [
         "equipment"
@@ -260,7 +269,8 @@
         "protocol-player-early-exit",
         "protocol-player-idle",
         "equipment-stats",
-        "equipment-player"
+        "equipment-player",
+        "protocol-player-soak"
       ],
       "affects": []
     },
