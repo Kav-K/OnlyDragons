@@ -169,6 +169,18 @@ This supplies a bounded actor for future T04/#5 and equipment/#7 experiments;
 it does not establish player-owned dragon damage, human visuals, authentication
 or multiplayer behavior, and changes no researched Hypixel mechanic.
 
+### T05 measured proc and enchant boundary (Paper 121)
+
+**Observed on exact pin, 2026-09-05:** clean `a7a8cd7` exercised the production
+proc coordinator over 72 owned Paper scheduler ticks. Stable bounded children,
+captured crit/mitigated damage, explicit capacity rejection, Tempo expiry/swap
+eligibility and session/target cleanup passed. A native serialized item also
+passed codec → stat factory → effects → combat without a second Vicious bonus.
+See [T05 evidence](03-agent-tasks-and-validation.md#t05-enchant-and-proc-validation).
+These are OnlyDragons calibration fixtures, not Hypixel measurements, native
+physical-hit proof or authenticated-client evidence. Gravity/Overload formulas
+and ferocity health coefficients remain unresolved; no upstream claim changed.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

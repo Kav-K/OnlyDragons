@@ -30,7 +30,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T02 — Items | Complete | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Final clean 7ebaa6b after main 586a170: 54 production tests and 35 item-codec-v4 Paper assertions passed, including real serialized loadouts through production snapshots and four cleanup checks. [Evidence](#t02-item-validation-evidence). Merged at 7c6d843 after independent review and final-head CI; authenticated inventory/visual checks are separate. #7 equipment/grants and #9 firing integrate later. |
 | T03 — Combat/ledger | In review | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [draft PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Independent code/evidence review passed; final-head CI and lead merge remain. Physical adapter/native suppression and human checks are separate. |
 | T04 — Paper feasibility | In progress (player-owned follow-up resumed) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). T09b merged at 5b0e030, allowing the lead to resume #5. Player-owned native dragon damage suppression and semantic head/native-damage classification still require their own experiments; #9 remains blocked and M0 unaccepted. |
-| T05 — Enchants/procs | In progress | [#8](https://github.com/Kav-K/OnlyDragons/issues/8), `symphony/gh-8` | Production coordinator and enchant rules implemented from integrated T03 main 9092fbe; domain/build checks pass. Final clean Paper and #28 shared suite/checkpoint pending; see [T05 evidence](#t05-enchant-and-proc-validation). |
+| T05 — Enchants/procs | In review | [#8](https://github.com/Kav-K/OnlyDragons/issues/8), [draft PR #30](https://github.com/Kav-K/OnlyDragons/pull/30), `symphony/gh-8` | Clean a7a8cd7 on integrated T03 main 9092fbe passed 128 production tests and 38 enchants-procs Paper assertions. #28 shared suite/checkpoint, CI and lead review remain pending; see [T05 evidence](#t05-enchant-and-proc-validation). |
 | T06 — Firing/Duplex | Blocked | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | Wait for T01b/T02 and accepted T04 impact/native-damage evidence. Partial PR #22 and a passing T09b calibration alone cannot satisfy this gate. Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence remain required. |
 | T07 — Tracer/continuity | Planned | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |
 | T08 — Practice tools | Planned | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | Repeatable player procedure, permissions, and explained damage. |
@@ -106,7 +106,7 @@ design sections above are the current summary; this record explains changes.
 
 | Date | Task / reference | Change and rationale | Evidence / remaining work |
 | --- | --- | --- | --- |
-| 2026-09-05 | T05 / #8 | Adopted bounded whole-group proc admission, session-token liveness, exclusive Tempo expiry and continuous launch-displacement Snipe; Gravity/Overload stay explicit deferred extensions. | Domain/build iteration checks pass; clean Paper and #28 suite/checkpoint pending. See T05 evidence and document 02 section 8. |
+| 2026-09-05 | T05 / #8 | Adopted bounded whole-group proc admission, session-token liveness, exclusive Tempo expiry and continuous launch-displacement Snipe; Gravity/Overload stay explicit deferred extensions. | Clean a7a8cd7 passed 128 production tests and 38 real-Paper assertions; #28 suite/checkpoint and lead review pending in draft PR #30. See T05 evidence and document 02 section 8. |
 | 2026-09-05 | T03 / #6 | Adopted immutable versioned combat policy and a single-thread encounter authority while preserving T00 DTOs. Physical/proc identity and inherited mitigated basis prevent duplicate or recursive credit. | Clean 633d81c after actor main 5b0e030: 74 production tests, 36 runner tests and 31 production-service Paper assertions passed with clean shutdown. See T03 evidence below. Native suppression and human gates remain unaccepted. |
 | 2026-09-05 | Shared-context setup; user request | Made the three planning documents required project context and added an agent maintenance/handoff protocol. | Starter-only source inventory reconciled; all gameplay tasks remain planned. Shared reading routes are in AGENTS.md, Cursor rules, and WORKFLOW.md. |
 | 2026-09-05 | Shared agent tooling; user request | Bundled three Minecraft skills with references/provenance; configured Context7 and project-scoped Serena for Cursor, Codex, and isolated Symphony workers. | All three skill validators passed; Windows/Linux MCP initialize/tool-list and Java-symbol checks passed. A fresh Linux issue clone discovered all three skills, connected Context7 (2 tools) and Serena (8), queried Paper docs and production lifecycle symbols. Direct Codex from a nested directory also connected. Five bridge tests and scaffold skill-preservation checks passed. No gameplay milestone advanced; see dev/agent-tools.md. |
@@ -130,13 +130,48 @@ are in document 02 section 8. No shared DTO, item registry/loadout revision,
 production bootstrap/listener, equipment or player-scenario admission was changed.
 All ten previous scenario registrations and all four cleanup assertions remain.
 
-Iteration checks: JDK 25 wrapper build passed 128 tests, zero failures/errors/skips;
-36 Python runner tests passed; separate companion build passed. The random-input preflight regression also passed. Final clean runtime revision,
-Paper report IDs/hashes, and actual totals will be recorded after the run.
-The lead's #28 suite/checkpoint must be integrated and exercised when available
-before final acceptance. Windows smoke, authenticated input/visual/multiplayer
-and performance are unrun; composition-root/equipment/physical adapter integration
-remains assigned to its owners, not claimed from synthetic session fixtures.
+Clean runtime revision `a7a8cd7ef3b3a3521864557bea299643cdb3330c` includes
+main `9092fbe` (fetched/merged before verification; still current afterward).
+`bash ./gradlew build --console=plain` and both isolated runner builds passed
+on JDK 25.0.4.1: 128 production tests (54 T05 cases), zero failures/errors/skips,
+plus API isolation. All 36 Python runner tests passed. The companion has no
+JUnit tests; its assertions ran on actual Paper.
+
+`python3 scripts/agent-tests/paper_test.py --scenario enchants-procs` returned
+exit 0 in run `25a65e2d8e5141caa3d50d397d8d285f`, mechanic `enchants-procs-v1`,
+Paper `26.2-121-a2a42c5` / Minecraft 26.2. All 38 required assertions passed.
+The production coordinator executed on 72 actual Paper ticks: five stable
+children inherited 75 damage, no recursion occurred, whole-group rejection
+reported five children, and the first child arrived exactly two ticks later.
+The main test reached 525 contribution / 99,475 remaining HP; captured Duplex
+and its child each retained the 15-damage scaled basis. Tempo reached +200%,
+remained live immediately before expiry and was zero at the boundary without a
+Duplex refresh. Session replacement/late quit, stale-source rejection, ended
+target zero credit, terminal close and late callback checks passed.
+
+A real Paper byte-serialized item passed codec → trusted registry → production
+snapshot → enchant modifiers → combat/queue. Power V and Snipe IV at ten blocks
+produced +0.4/+0.04, 72 mitigated damage, and the inherited child retained 72;
+Vicious V remained exactly 5 captured ferocity, with baseline crit damage 50.
+These are synthetic settled impacts and session tokens, not native collision or
+production equipment-listener acceptance. They do establish objective item,
+modifier, combat, queue and scheduler contracts without a client.
+
+- Production SHA256: `eac1efb7106fc7b1c283ef7cd3e2556eef2fae97889ba57a945af456a28a75f4`.
+- Companion SHA256: `58010607fbf4ceb2bafa4b5946950f717003a83d10a4eabed920114cc6f06e35`.
+
+The run reused accepted EULA, shared lease/memory admission, authenticated default
+profile with no player, and disposable issue-local world on loopback port 47989.
+All four owned cleanup counters were zero; Paper exited 0 with `forced=false`
+and `clean=true`. The port closed and no Java process for that run remained.
+Raw reports stay ignored under `build/reports/agent-paper/<runId>/`.
+
+Draft PR #30 is In review. The lead's #28 suite/checkpoint must be integrated
+and exercised when available before final acceptance. Windows smoke,
+authenticated input/visual/multiplayer and performance are unrun;
+composition-root/equipment/physical adapter integration remains assigned to its
+owners. No milestone is accepted. Later evidence-only documentation commits do
+not change the tested runtime inputs; relevant integration changes require reruns.
 
 ### T03 combat validation
 
