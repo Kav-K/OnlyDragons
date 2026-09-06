@@ -1,6 +1,6 @@
 # T07 Tracer and continuous arrows (GH-10)
 
-Implementation in progress on `symphony/gh-10`; no gameplay acceptance yet.
+Implementation ready for review on `symphony/gh-10`; no gameplay acceptance yet.
 T06's accepted registry/physical-hit contract remains authoritative. T07 adds
 pure homing rules and an attachment owned by the existing `OwnedBowService`
 tick/retirement lifetime, without a second registry, receiver or scheduler.
@@ -81,3 +81,50 @@ P07/P10 remain unaccepted. Production countdown/hatch/P05/P06 and human prefire
 visual rehearsal belong to T10/M3. Windows Play/smoke, authenticated clients,
 visual/weapon feel and performance remain separate unrun gates. The lead owns
 independent shared-lifecycle review and the final hosted baseline/feature cohort.
+
+## Final focused evidence — 6 September 2026
+
+Clean runtime/scenario revision `fc0b9b9ac3bea768028015f04de52e82de60c80a`
+includes main `89d584fab675ed111a1a1d733f667b3a1f3cbf53`; the final fetch/merge
+reported already up to date. Later handoff commits change evidence/status only.
+Wrapper builds passed 192 production tests (zero failures/errors/skips); protocol
+runs also passed 28 client tests. Exact pinned Paper 121 / Minecraft 26.2 / JDK 25
+runs through the isolated runner:
+
+| Scenario | Run ID | Observed outcome |
+| --- | --- | --- |
+| `tracer-continuity` | `2895ecb8dcba4a198fbc5f7cedc1495a` | 57 assertions passed, including moving native targets at all five levels, same-UUID prefire/acquisition and no-player distant chunk progression. |
+| `tracer-cleanup-abort` | `0eeab18d177f46209e91aa951c873f42` | Expected runner exit 1: only `scenario_exception`; 10 successful assertions plus intentional abort, including released demands/reservations/tasks and preserved borrowed native ticket. |
+| `owned-firing` | `149de535ecba4d06b5650c35ec5e8797` | Existing 115-assertion two-actor T06 regression passed. |
+
+All owned server/client processes exited 0 without forced termination and their
+ports closed. The unchanged shared `paper_suite.verify_case` accepted each case,
+including the precise abort outcome, artifacts, XML tests and cleanup. Raw reports
+remain under `build/reports/agent-paper/<run ID>`; captured case/XML replay is
+`build/reports/agent-paper-focused/fc0b9b9/cases.json`, SHA-256
+`03044f047776bfb4379ab1d2e8c05ee5ca6149fa3e5c52fe5aa783bdc8b2b454`.
+This is an individual focused-case replay, **not** a complete shared-suite receipt
+or acceptance checkpoint. Runtime source-input SHA-256:
+`14ad387a3c38b332b9558148088ff57286cbbb26a9920164faa3edfd9453ccc8`.
+
+Identical artifacts across the three cases:
+
+- Production: `6a059d417f2b843106a93e730ef76871cdc839a77bb52ad19763b4a9c4fe03f8`.
+- Companion: `b6eb0a34ad502eaeae198d33fe3315802185d9d2f74419d1c31f2f7957bb77ca`.
+- Protocol client (the two player cases): `16e2dbd6b7fa987cb91193d6d41d57741e1baac97aa02df5e041ffc94cdc501f`.
+
+Reproduce with `python3 scripts/agent-tests/paper_test.py --scenario NAME`;
+add `--test-player protocol-actions-v1 --scenario-timeout 180` for the two player
+cases. The complete catalog retains the 24 existing cases and adds these two
+Tracer cases (26 total). Final `checkpoint.py plan` and `paper_suite.py --suite all --plan` passed;
+plan validity is structural only. Per owner dispatch,
+the lead owns the complete hosted cohort, current CI, independent lifecycle review
+and T07 acceptance checkpoint. P07/P10 and all other previously pending gates stay
+unaccepted. Human gates listed above remain unrun.
+
+Integration dependency: T08 is developing a plugin-lifetime production receiver
+and read-only settled-hit observer. On integration, migrate the Tracer fixture's
+current T06-style receiver observation to that seam alongside the existing firing
+fixture; never install a competing production receiver. T08 accounting is not
+claimed by these physical-hit assertions. The shared broker/admission additions
+require lead review before merge; no separate registry or scheduler was added.
