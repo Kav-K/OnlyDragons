@@ -177,10 +177,14 @@ The protocol client SHA256 is
 using the exact protocol 776 publication, dependency lock and strict verification
 metadata integrated by T09b; the run report records all 77 staged client JARs.
 
-**Remaining:** lead review/final-head CI, Windows smoke/Build/Play, authenticated
-inventory/anvil/chat/visual and multiplayer checks. Equipment-specific protocol
-commands/swaps/quit assertions need separate lead admission; the desired fixture
-is recorded on GH-7. T06 must still connect `refresh(Player)` at shot acceptance;
+**Remaining:** lead review/final-head CI and Windows smoke/Build/Play. The lead's
+[#28](https://github.com/Kav-K/OnlyDragons/issues/28) fixture is now implementing
+objective real-player permission/grant, held-slot listener, same-UUID inventory
+change and session-cleanup assertions against this PR's clean 7751adc API. The
+lead requested delivery of this slice before integrating that additive fixture
+and rerunning the shared regression suite. Those automated gates remain pending
+#28 integration; they are not delegated to a blanket human checklist. Human
+visuals, authenticated account/multiplayer behavior and input feel remain distinct. T06 must still connect `refresh(Player)` at shot acceptance;
 `cached(UUID)` is diagnostic state and must not substitute for that recheck.
 No projectile integration, combat effects, player-health attributes, performance
 claim or gameplay milestone is accepted here.

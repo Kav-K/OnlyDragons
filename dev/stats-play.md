@@ -37,9 +37,12 @@ projectile shot-time capture, and the practice dummy are later tasks.
    compiled item/stat catalogs require a restart.
 7. After edits use `.\mcdev restart`, reconnect, then finish with `.\mcdev stop`.
 
-Record the tested commit, client/version, account permission setup, observed
-chat/lore and each inventory action. **Authenticated-client, Windows Play/smoke,
-visual and multiplayer checks are pending** until an operator records them.
+Record the tested commit, client/version, account permission setup and observed
+chat/lore/input feel. **Windows Play/smoke, human visuals, authenticated account
+and multiplayer checks are pending** until an operator records them. Objective
+real-player command/equipment/lifecycle assertions are being added separately
+by the lead under [#28](https://github.com/Kav-K/OnlyDragons/issues/28); they remain
+pending automated integration, rather than requiring manual proof alone.
 MockBukkit events and synthetic Paper inventory/command senders do not establish
-these gates. The independent Paper scenarios are `equipment-stats` and the
+real-player gates. The independent Paper scenarios are `equipment-stats` and the
 preserved `item-identity`, run only through `scripts/agent-tests/paper_test.py`.
