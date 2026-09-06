@@ -450,10 +450,10 @@
       "mergedRevision": "29f0cf3969e7d256b2f678a54f846d836ca6db9f"
     },
     "T03b": {
-      "status": "active",
+      "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Lead-assigned T03b/#67 with T05b and T06 integrated; Symphony dispatch follows the lead label after accepted-context reconciliation. Own expanded-bow-enchantments under the recorded v2 contract; no implementation or completed evidence claimed. T06c/T06b/T02c remain downstream; rewards and milestone gates are unchanged."
+      "notice": "Draft PR79: captured Overload/Gravity and exact v2/v3 compatibility. Focused clean 5bdb0ee passes 49 feature, 25 equipment, 30 catalog checks and exact abort control; see docs/planning/evidence/t03b-focused-paper.md. PR76 main integration and lead-owned final hosted cohort/replay/checkpoint remain pending; no completed requirements or milestone acceptance."
     },
     "T06b": {
       "status": "planned",

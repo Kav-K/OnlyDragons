@@ -270,7 +270,8 @@ These are **OnlyDragons decisions**, with no new claim about upstream internals.
 The [implementation contract](02-foundation-plan.md#t03b-expanded-bow-contract-gh-67)
 resolves our formerly deferred probability, multiplier order, Gravity VI and
 AIRBORNE classification. Earlier T05 evidence retains its original limited scope.
-Actual Paper evidence for this new profile remains pending in T03b's ledger.
+[Focused Paper evidence](evidence/t03b-focused-paper.md) verifies the declared
+physical controls; final combined acceptance remains pending in T03b's ledger.
 
 ## Decisions still open
 
