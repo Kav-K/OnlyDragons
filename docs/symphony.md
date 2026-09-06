@@ -68,6 +68,25 @@ and [GitHub permission definitions](https://docs.github.com/en/rest/authenticati
 
 ## Start and stop
 
+`codex.stall_timeout_ms` is explicitly 1,200,000 (20 minutes). The pinned
+Symphony 0.0.2 default of five minutes interrupted GH-67 during a quiet code
+generation interval on 6 September 2026, forcing a new session to recover its
+workspace and context. The longer bound permits these responses while retaining
+automatic recovery for a worker that stops producing activity. The independent
+one-hour turn timeout and the four-minute initialization/read timeout remain
+unchanged. This does not relax Paper scenario or process-cleanup deadlines.
+
+The pinned workflow store reloads valid `WORKFLOW.md` changes on its one-second
+poll, and the orchestrator reads the current stall timeout during reconciliation.
+Changing this value therefore does not require stopping active workers or WSL.
+Malformed configuration retains the last known good settings and logs an error.
+Use the structured dashboard state and relevant service logs to distinguish a
+slow generation, failed build, waiting test lease and actual worker restart.
+
+Source: [pinned config schema](https://github.com/openai/symphony/blob/v0.0.2/elixir/lib/symphony_elixir/config/schema.ex),
+[workflow reload](https://github.com/openai/symphony/blob/v0.0.2/elixir/lib/symphony_elixir/workflow_store.ex)
+and [stall reconciliation](https://github.com/openai/symphony/blob/v0.0.2/elixir/lib/symphony_elixir/orchestrator.ex).
+
 The Windows launcher runs Symphony v0.0.2 and Codex in WSL, defaulting to the
 Ubuntu-24.04 distribution, with a Linux runtime and JDK 25. The local runtime,
 credentials, and workspaces live under the ignored .symphony directory. A fresh
