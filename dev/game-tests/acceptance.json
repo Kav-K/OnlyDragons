@@ -825,7 +825,8 @@
         "exit_retains_airborne_before_death",
         "actual_death_without_session_retires_owned",
         "owner_death_preserves_other_registry",
-        "post_death_respawn_and_no_stale_delivery"
+        "post_death_respawn_and_no_stale_delivery",
+        "other_owner_live_before_death"
       ],
       "caseIds": [
         "owned-firing"

@@ -232,10 +232,19 @@ public final class OwnedFiringScenario implements Scenario, Listener {
         });
     }
     private void deathAfterExit() {
+        Player alpha = players.player("alpha");
+        players.setupPosition("alpha", new Location(alpha.getWorld(), 0.5, 100, 0.5, 0, -70));
+        kit("alpha", "ordinary", 10);
+        draw("alpha", "death-isolation", this::deathWithOtherOwnerPresent);
+    }
+    private void deathWithOtherOwnerPresent() {
         Player beta = players.player("beta"); UUID owner = beta.getUniqueId();
         players.setupPosition("beta", new Location(beta.getWorld(), 500, 100, 0.5));
         players.await("session cleared outside both arenas", 60, () -> bows.currentSession(owner).isEmpty(), () -> {
             var retained = owner("beta"); var alpha = owner("alpha");
+            var alphaEntities = alpha.stream().map(a -> bows.arrow(a.shot().projectileId()).orElseThrow()).toList();
+            context.check("other_owner_live_before_death", true, !alpha.isEmpty()
+                    && alpha.stream().allMatch(a -> bows.arrow(a.shot().projectileId()).map(Arrow::isValid).orElse(false)));
             context.check("exit_retains_airborne_before_death", true, !retained.isEmpty()
                     && retained.stream().allMatch(a -> bows.arrow(a.shot().projectileId()).map(Arrow::isValid).orElse(false)));
             context.observe("ownerDeathSetup", "Public setHealth(0) after actual arena-exit session cleanup; real PlayerDeathEvent, then declared packet respawn. No client attack claim.");
@@ -243,7 +252,8 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             context.check("actual_death_without_session_retires_owned", true, deaths == 1 && owner("beta").isEmpty()
                     && retained.stream().allMatch(a -> bows.arrow(a.shot().projectileId()).isEmpty())
                     && bows.reservedCapacity() == 0 && bows.pendingClaims() == 0);
-            context.check("owner_death_preserves_other_registry", true, alpha.equals(owner("alpha")));
+            context.check("owner_death_preserves_other_registry", true, !alpha.isEmpty() && alpha.equals(owner("alpha"))
+                    && alphaEntities.stream().allMatch(a -> a.isValid() && bows.arrow(a.getUniqueId()).orElse(null) == a));
             context.later(3, () -> {
                 players.request("beta", "respawn-after-exit");
                 players.await("real respawn after sessionless death", 100, () -> respawns == 1 && !players.player("beta").isDead(), () -> {

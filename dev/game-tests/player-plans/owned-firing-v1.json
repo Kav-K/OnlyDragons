@@ -46,6 +46,18 @@
               "args": {}
             },
             {
+              "id": "death-isolation-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "death-isolation-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
               "id": "dragon-0-use",
               "action": "useItem",
               "args": {

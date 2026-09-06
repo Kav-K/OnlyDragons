@@ -1,8 +1,8 @@
 # T06 owned firing boundary (GH-9)
 
 Implementation is in review in [draft PR #52](https://github.com/Kav-K/OnlyDragons/pull/52)
-on `symphony/gh-9`. Ordinary merge `5390ebf` integrates main
-`7b8ff0f5eaa57800e8b7d1d08ea02e5aa79afe05`, preserving all 24 selected cases
+on `symphony/gh-9`. Ordinary merge `7b8d1da` integrates main
+`92147a25c7dfd6f761f502bdbac0d00ffa261ef8`, preserving all 24 selected cases
 and accepted T02b/T05/M0 context. No T06 acceptance is claimed yet.
 
 ## Consumer contract
@@ -113,7 +113,7 @@ defers connection-disconnect handling to the next tick. This explains the
 observed setup; it does not prove every possible earlier quit window impossible.
 Clean `f9350f2` focused run `f788f9f3c2f04dc3bfd5979cfb31bd99` passes the corrected lifecycle fixture. It predates the following independent review fixes and is not their acceptance evidence.
 
-Review comment 5559323208 identified owner death after arena exit retaining old arrows when no current session existed. Death now retires owned entities/claims independently of session lookup; stale-token cleanup and ordinary quit retention remain unchanged. A synthetic pending-claim death regression passes. The real fixture adds arena exit, actual death, other-owner isolation and packet respawn; negative controls require actor-correlated native launch/interact observations plus successful shortbow recovery. Actual child launch position/velocity are checked against the captured primary within `1e-9`, and launch tick must be exactly +1. A new clean feature run and full cohort remain pending.
+Review comment 5559323208 identified owner death after arena exit retaining old arrows when no current session existed. Death now retires owned entities/claims independently of session lookup; stale-token cleanup and ordinary quit retention remain unchanged. A synthetic pending-claim death regression passes. The real fixture adds arena exit, actual death, other-owner isolation and packet respawn; negative controls require actor-correlated native launch/interact observations plus successful shortbow recovery. Actual child launch position/velocity are checked against the captured primary within `1e-9`, and launch tick must be exactly +1. Clean `7b8d1da` run `137c0a23d92e40f4aedf95a254940838` passes all 114 assertions, 182 production/28 client tests and both process cleanups. Independent review then required an explicit nonempty other-owner death-isolation precondition. The fixture now fires a fresh native alpha shot, requires it live immediately before beta death and checks identical UUID/entity and registry afterward. This strengthened input needs a new focused run before the full cohort.
 
 Feature runtime, complete selected cohort/T06 checkpoint,
 independent review and current CI remain outstanding. Human mouse/hold feel,
