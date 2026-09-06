@@ -540,6 +540,15 @@ The existing Windows `mcdev smoke` verifies startup/status/commands and clean sh
 
 Server commands here are existing lab commands. In-game development subcommands are proposed interfaces and become usable only when T08 lands.
 
+The user requested that objective behavior need very little human intervention.
+The checklist below is a qualitative rehearsal of feel, presentation and actual
+authenticated-client compatibility. Numeric results, permissions, input cadence,
+duplicate prevention, ownership, expiry and cleanup remain automated acceptance
+requirements, using real protocol/Paper fixtures as the features arrive. They
+must not be assigned to a human merely because the current fixture is missing.
+Track those gaps in `dev/game-tests/acceptance.json`; the shared suite/checkpoint
+workflow is in [agent validation](../../dev/agent-validation.md).
+
 1. From the OnlyDragons terminal run `.\mcdev play`. Use a client matching the printed server version and connect to `127.0.0.1:25565`. Any launcher is fine.
 2. If needed, use `.\mcdev console -Command 'op YourMinecraftName'` locally. Enter the practice arena through the future developer command; obtain a named test loadout.
 3. Inspect `/onlydragons stats explain`. Shoot the dummy with ordinary and guaranteed-critical presets. Compare the target HP reduction and last-hit explanation.
