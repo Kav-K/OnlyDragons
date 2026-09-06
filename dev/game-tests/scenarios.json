@@ -223,7 +223,7 @@
     ]
   },
   "projectile-player-feasibility": {
-    "mechanicRevision": "projectile-player-v2",
+    "mechanicRevision": "projectile-player-v3",
     "requiredAssertions": [
       "server_thread",
       "production_enabled",
@@ -262,7 +262,21 @@
       "control_ZERO_DAMAGE_collision",
       "control_ZERO_DAMAGE_suppressed",
       "control_CANCEL_HIT_no_damage_event",
-      "control_CANCEL_DAMAGE_cancelled_event"
+      "control_CANCEL_DAMAGE_cancelled_event",
+      "cancelled_arrow_crosses_multiple_parts",
+      "small_geometry_actual_uuid",
+      "small_geometry_native_damage",
+      "large_geometry_actual_collision",
+      "large_geometry_native_damage",
+      "flying_collision_phase",
+      "flying_dragon_moved",
+      "seated_collision_phase",
+      "seated_no_damage_event",
+      "seated_native_health_unchanged",
+      "seated_arrow_rebound_fire",
+      "three_distinct_player_owned_same_tick_impacts",
+      "volley_native_damage_event_count",
+      "volley_native_health_loss"
     ]
   }
 }

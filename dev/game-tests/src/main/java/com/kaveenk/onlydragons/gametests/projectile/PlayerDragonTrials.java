@@ -134,6 +134,42 @@ final class PlayerDragonTrials {
                                 damage.size() == 1 && Boolean.TRUE.equals(damage.getFirst().get("cancelled")));
                     }
                 }
+                if (mode == ImpactProbe.Mode.CANCEL_HIT) context.check("cancelled_arrow_crosses_multiple_parts", true,
+                        hit.stream().map(e -> e.get("entity")).distinct().count() > 1);
+                if (index == 4) {
+                    context.check("small_geometry_actual_uuid", true, hit.size() == 1
+                            && hit.getFirst().get("entity").equals(aim.getUniqueId().toString())
+                            && aim.getBoundingBox().getWidthX() == 1 && aim.getBoundingBox().getHeight() == 1);
+                    context.check("small_geometry_native_damage", 4.0, before - target.getHealth());
+                }
+                if (index == 5) {
+                    context.check("large_geometry_actual_collision", true, hit.size() == 1
+                            && target.getParts().stream().anyMatch(p -> p.getUniqueId().toString().equals(hit.getFirst().get("entity"))
+                            && p.getBoundingBox().getWidthX() == 5 && p.getBoundingBox().getHeight() == 3));
+                    context.check("large_geometry_native_damage", 2.0, before - target.getHealth());
+                }
+                if (index == 12 || index == 13) {
+                    var geometry = impactGeometry.stream().filter(g -> g.get("arrow").equals(arrow.getUniqueId().toString())).toList();
+                    context.check(index == 12 ? "flying_collision_phase" : "seated_collision_phase", true,
+                            geometry.size() == 1 && geometry.getFirst().get("phase").equals(phase.name()));
+                    if (index == 12) context.check("flying_dragon_moved", true,
+                            !row.get("dragonStart").equals(row.get("dragonAfter")));
+                    else {
+                        context.check("seated_no_damage_event", 0, damage.size());
+                        context.check("seated_native_health_unchanged", before, target.getHealth());
+                        context.check("seated_arrow_rebound_fire", true, arrow.isValid()
+                                && arrow.getFireTicks() > 0 && arrow.getVelocity().getZ() < 0);
+                    }
+                }
+                if (index == 14) {
+                    var volley = arrows.stream().flatMap(a -> hits(a, target).stream()).toList();
+                    context.check("three_distinct_player_owned_same_tick_impacts", true, volley.size() == 3
+                            && volley.stream().map(e -> e.get("arrow")).distinct().count() == 3
+                            && volley.stream().map(e -> e.get("tick")).distinct().count() == 1);
+                    context.check("volley_native_damage_event_count", 1L,
+                            arrows.stream().flatMap(a -> probe.forArrow(a.getUniqueId(), "damage_monitor").stream()).count());
+                    context.check("volley_native_health_loss", 2.0, before - target.getHealth());
+                }
                 arrows.forEach(Arrow::remove); target.remove(); trial(index + 1);
             });
         });
