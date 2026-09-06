@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.ofEntries(
+            Map.entry("practice-combat", new com.kaveenk.onlydragons.gametests.combat.PracticeCombatScenario()),
             Map.entry("owned-firing", new com.kaveenk.onlydragons.gametests.projectile.OwnedFiringScenario()),
             Map.entry("same-profile-restart", new com.kaveenk.onlydragons.gametests.fixtures.RestartScenario(false)),
             Map.entry("same-profile-restart-abort", new com.kaveenk.onlydragons.gametests.fixtures.RestartScenario(true)),

@@ -112,7 +112,7 @@ public final class OwnedBowService implements AutoCloseable {
         check(); if (this.receiver != null) throw new IllegalStateException("Receiver already registered");
         this.receiver = Objects.requireNonNull(receiver);
     }
-    public void clearReceiver(Consumer<SettledHit> receiver) { check(); if (this.receiver == receiver) this.receiver = null; }
+    public void clearReceiver(Consumer<SettledHit> receiver) { thread(); if (this.receiver == receiver) this.receiver = null; }
     public Optional<UUID> currentSession(UUID owner) { thread(); return Optional.ofNullable(sessions.get(owner)); }
     public boolean isCurrentSession(UUID owner, UUID token) { thread(); return token.equals(sessions.get(owner)); }
     public List<OwnedProjectile> projectiles() { thread(); return registry.snapshot(); }
@@ -228,6 +228,12 @@ public final class OwnedBowService implements AutoCloseable {
         if (candidate != null && event.isCancelled()) candidate.nativeVeto = true;
         // All owned native damage is inert, including unrelated targets: no second combat authority.
         event.setDamage(0); event.setCancelled(true);
+    }
+    /** All native damage to registered managed targets is inert; settlement remains the one authority. */
+    void protectTarget(EntityDamageEvent event) {
+        check(); Entity entity = event.getEntity();
+        UUID id = entity instanceof EnderDragonPart part ? part.getParent().getUniqueId() : entity.getUniqueId();
+        if (targets.containsKey(id)) { event.setDamage(0); event.setCancelled(true); }
     }
     private void tick() {
         if (closed) return;

@@ -28,7 +28,7 @@ class OwnedBowBoundaryTest {
         player = server.addPlayer(); player.setGameMode(GameMode.SURVIVAL);
         bows = plugin.bows(); encounter = UUID.randomUUID();
         bows.openEncounter(encounter, player.getWorld(), new BoundingBox(-1000, -1000, -1000, 1000, 1000, 1000), new MechanicRevision("calibration", "v1"));
-        bows.receiver(hits::add);
+        plugin.combat().observeSettled(hits::add);
     }
     @AfterEach void cleanup() { MockBukkit.unmock(); }
     Arrow shoot(String loadout) {

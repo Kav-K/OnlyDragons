@@ -833,6 +833,94 @@
         "owned-firing"
       ],
       "scope": "Two real protocol identities exercise deployed T06 native draw, shortbow/hold, Duplex, captured sessions, ammo/cancellation, actual dragon part/phase settlement and terminal cleanup. Uniform 1.0 part policy; no semantic head or T08 HP/proc/score accounting claim."
+    },
+    "practice-combat": {
+      "assertions": [
+        "two_real_actors",
+        "non_admin_kit_denied",
+        "production_kit_and_ammo",
+        "unmanaged_native_positive_control",
+        "online_proc_sessions_activated",
+        "non_admin_reset_denied",
+        "owner_reset_isolation",
+        "cancelled_production_claim",
+        "native_guard_event_and_identity",
+        "physical_lethal_one_frozen_completion",
+        "physical_lethal_totals",
+        "completion_precedes_native_death",
+        "terminal_queue_and_native_cleanup",
+        "late_tick_does_not_republish",
+        "simultaneous_two_owner_physical_commits",
+        "reduced_hp_credit_separate",
+        "score_only_child_health_zero",
+        "captured_power_snipe_numeric",
+        "all_claims_independently_observed",
+        "repeated_reset_cleanup",
+        "quit_explanations_cleared",
+        "captured_ferocity25_0",
+        "captured_ferocity25_1",
+        "captured_ferocity25_2",
+        "captured_ferocity25_3",
+        "ordinary_hp",
+        "ordinary_native_hp",
+        "ordinary_alpha",
+        "ordinary_beta",
+        "ordinary_impacts",
+        "critical_hp",
+        "critical_native_hp",
+        "critical_alpha",
+        "critical_beta",
+        "critical_impacts",
+        "ferocity25_0_hp",
+        "ferocity25_0_native_hp",
+        "ferocity25_0_alpha",
+        "ferocity25_0_beta",
+        "ferocity25_0_impacts",
+        "ferocity25_1_hp",
+        "ferocity25_1_native_hp",
+        "ferocity25_1_alpha",
+        "ferocity25_1_beta",
+        "ferocity25_1_impacts",
+        "ferocity25_2_hp",
+        "ferocity25_2_native_hp",
+        "ferocity25_2_alpha",
+        "ferocity25_2_beta",
+        "ferocity25_2_impacts",
+        "ferocity25_3_hp",
+        "ferocity25_3_native_hp",
+        "ferocity25_3_alpha",
+        "ferocity25_3_beta",
+        "ferocity25_3_impacts",
+        "cancelled_hp",
+        "cancelled_native_hp",
+        "cancelled_alpha",
+        "cancelled_beta",
+        "cancelled_impacts",
+        "native_plus_managed_hp",
+        "native_plus_managed_native_hp",
+        "native_plus_managed_alpha",
+        "native_plus_managed_beta",
+        "native_plus_managed_impacts",
+        "reduced_two_owner_hp",
+        "reduced_two_owner_native_hp",
+        "reduced_two_owner_alpha",
+        "reduced_two_owner_beta",
+        "reduced_two_owner_impacts",
+        "score_only_hp",
+        "score_only_native_hp",
+        "score_only_alpha",
+        "score_only_beta",
+        "score_only_impacts",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "owned_listeners_removed",
+        "owned_resources_released"
+      ],
+      "caseIds": [
+        "practice-combat"
+      ],
+      "scope": "Two actual protocol actors through production practice commands, physical/proc accounting and independent native HP/event/numeric expectations; calibration only, no human or dragon acceptance."
     }
   },
   "requirements": {
@@ -980,9 +1068,11 @@
     },
     "P01": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Real owned Arrow into a managed dummy: one physical impact/ledger entry and no native double damage.",
-      "fixtures": []
+      "fixtures": [
+        "practice-combat"
+      ]
     },
     "P02": {
       "kind": "automated",
@@ -1056,9 +1146,12 @@
     },
     "P13": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Actual cancelled launch/hit in the production adapter grants no damage or duplicate ammunition consumption.",
-      "fixtures": []
+      "fixtures": [
+        "practice-combat",
+        "owned-firing"
+      ]
     },
     "P14": {
       "kind": "automated",
@@ -1193,9 +1286,11 @@
     },
     "automated-multiplayer-attribution": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "At least two real protocol player identities exercise the production physical/proc accounting path, swaps, cancellation, same-tick and lethal ordering; exact accepted HP and ghost score are independently expected. Generic fixture calibration is insufficient.",
-      "fixtures": []
+      "fixtures": [
+        "practice-combat"
+      ]
     },
     "same-profile-restart": {
       "kind": "automated",

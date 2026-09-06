@@ -22,7 +22,10 @@ public final class OwnedBowListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void hit(ProjectileHitEvent event) { service.hit(event); }
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void damage(EntityDamageByEntityEvent event) { service.damage(event); }
+    public void damage(EntityDamageEvent event) {
+        if (event instanceof EntityDamageByEntityEvent byEntity) service.damage(byEntity);
+        service.protectTarget(event);
+    }
     @EventHandler public void join(PlayerJoinEvent event) { service.activate(event.getPlayer()); }
     @EventHandler public void quit(PlayerQuitEvent event) {
         service.currentSession(event.getPlayer().getUniqueId()).ifPresent(token -> service.clearSession(event.getPlayer().getUniqueId(), token, false));

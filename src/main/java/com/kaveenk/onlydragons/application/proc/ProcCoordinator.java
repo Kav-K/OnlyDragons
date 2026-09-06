@@ -34,6 +34,16 @@ public final class ProcCoordinator implements AutoCloseable {
     }
     public record Metrics(int queued, int sessions, int tempoStates, long capacityRejectedChildren,
                           long inactiveRejectedChildren, long clearedChildren) {}
+    public record ChildFailure(ProcCommand command, String reason) {}
+    public record Drain(List<DamageResult> results, List<ChildFailure> failures) {
+        public Drain { results = List.copyOf(results); failures = List.copyOf(failures); }
+    }
+    /** Earlier children remain committed; callers can reconcile without retrying the consumed tick. */
+    public static final class DrainFailure extends IllegalArgumentException {
+        private final Drain drain;
+        private DrainFailure(Drain drain) { super("Proc drain failed: " + drain.failures()); this.drain = drain; }
+        public Drain drain() { return drain; }
+    }
     private record Pending(ProcCommand command, Session session) {}
 
     private final Thread ownerThread = Thread.currentThread();
@@ -126,20 +136,32 @@ public final class ProcCoordinator implements AutoCloseable {
 
     /** Bounded work even after a late tick; repeated calls at the same tick cannot bypass the budget. */
     public List<DamageResult> tick(long tick) {
+        Drain drain = tickOutcomes(tick);
+        if (!drain.failures().isEmpty()) throw new DrainFailure(drain);
+        return drain.results();
+    }
+
+    /** Per-child transaction boundary; a failed child is consumed and explicitly reported. */
+    public Drain tickOutcomes(long tick) {
         requireOpen(); advance(tick);
-        if (lastDrain == tick) return List.of();
+        if (lastDrain == tick) return new Drain(List.of(), List.of());
         lastDrain = tick;
         var results = new ArrayList<DamageResult>();
+        var failures = new ArrayList<ChildFailure>();
         for (int processed = 0; processed < limits.maxDuePerTick() && !queue.isEmpty()
                 && queue.peek().command().dueTick() <= tick; processed++) {
             Pending pending = queue.remove();
             if (!live(pending.session())) { inactiveRejected++; continue; }
-            var result = encounter.proc(pending.command(), tick);
-            results.add(result);
-            if (result.accepted()) buildTempo(pending.session(), pending.command().fatalTempoSourceLevel());
+            try {
+                var result = encounter.proc(pending.command(), tick);
+                results.add(result);
+                if (result.accepted()) buildTempo(pending.session(), pending.command().fatalTempoSourceLevel());
+            } catch (IllegalArgumentException | ArithmeticException invalid) {
+                failures.add(new ChildFailure(pending.command(), invalid.getMessage()));
+            }
             // No child count/admission call here: eligible children build tempo, never descendants.
         }
-        return List.copyOf(results);
+        return new Drain(results, failures);
     }
 
     public Metrics metrics() {

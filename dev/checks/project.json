@@ -15,6 +15,22 @@
     {
       "command": "onlydragons dev loadout ordinary",
       "expect": "This command requires a player\\."
+    },
+    {
+      "command": "onlydragons combat last",
+      "expect": "This command requires a player\\."
+    },
+    {
+      "command": "onlydragons dev kit ordinary",
+      "expect": "This command requires a player\\."
+    },
+    {
+      "command": "onlydragons dev dummy full",
+      "expect": "This command requires a player\\."
+    },
+    {
+      "command": "onlydragons dev reset",
+      "expect": "This command requires a player\\."
     }
   ]
 }

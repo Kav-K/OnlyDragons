@@ -461,6 +461,16 @@ work packages are not dispatchable tasks or accepted gameplay.
 
 **Accept when:** one documented sequence gives a matching client a test kit and repeatable target; a non-admin cannot grant items or reset other players' fights; console calls handle player-only operations cleanly; the expected 25-ferocity behavior and coefficient experiments can be inspected without reading server internals.
 
+T08 implementation branch `symphony/gh-11` adds the single receiver, shared
+combat/proc/native backend lifecycle, kit/dummy/scenario/last-hit commands and
+atomic participant/completion provenance. Starting doctor was ready; plan was
+valid with acceptance false. The first wrapper build after adapter regressions
+passes 194 production tests with no skipped tests. New two-player Paper scenarios
+and receipt mappings are being implemented; no Paper acceptance is claimed.
+The lead owns the complete final hosted baseline, independent replay/checkpoint,
+CI and merge per issue dispatch. Focused clean Paper evidence is worker-owned.
+Windows Build/Play, authenticated-client compatibility and visuals remain pending.
+
 ### T08a — Managed real-dragon backend and development controls
 
 **Owner:** encounter adapter/command agent, [#39](https://github.com/Kav-K/OnlyDragons/issues/39). **Dependencies:** T08, T02b, T09e.

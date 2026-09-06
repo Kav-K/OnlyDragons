@@ -205,6 +205,23 @@ class ProcCoordinatorTest {
         assertEquals(0, coordinator.tempoBonus(session, 10));
     }
 
+    @Test void partialDrainRetainsEarlierChildAndReportsConsumedOverflowWithoutRetry() {
+        var scoreOnly = new CombatProfile(profile.mechanic(), CombatProfile.Mitigation.NONE, CombatProfile.Cap.NONE, 0);
+        encounter = new CombatEncounter(new TargetState(encounterId, target, Double.MAX_VALUE, Double.MAX_VALUE, 0), "test", scoreOnly);
+        var coordinator = coordinator(20, 20);
+        var shot = shot(200, 0, false);
+        var parent = coordinator.physical(shot, impact(shot, 10), new DamageModifiers(Map.of(), Map.of("large", 4e305)), session, Optional.empty());
+        assertEquals(6e307, parent.damage().amounts().contributionDamage(), 1e292);
+        var drain = coordinator.tickOutcomes(20);
+        assertEquals(1, drain.results().size()); assertEquals(1, drain.failures().size());
+        assertEquals(0, drain.results().getFirst().amounts().actualHealthDamage());
+        assertEquals(1.2e308, encounter.contributions().get(owner).contributionDamage(), 1e293);
+        assertEquals(2, encounter.acceptedOrdinal()); assertEquals(2, encounter.impacts().size());
+        assertEquals(0, coordinator.metrics().queued());
+        assertTrue(coordinator.tickOutcomes(20).results().isEmpty());
+        assertTrue(coordinator.tick(21).isEmpty());
+    }
+
     private ProcCoordinator coordinator(int capacity, int budget) {
         var coordinator = new ProcCoordinator(encounter, new ProcCoordinator.Limits(capacity, budget, 1, 2), () -> 0);
         assertTrue(coordinator.activate(session));

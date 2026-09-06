@@ -116,6 +116,12 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
+    },
+    "practice-combat": {
+      "scenarioId": "practice-combat",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
     }
   },
   "suites": {
@@ -135,7 +141,8 @@
       "same-profile-restart",
       "enchants-procs",
       "dragon-definitions",
-      "owned-firing"
+      "owned-firing",
+      "practice-combat"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -171,7 +178,8 @@
       "enchants-procs",
       "dragon-definitions",
       "dragon-definitions-abort",
-      "owned-firing"
+      "owned-firing",
+      "practice-combat"
     ]
   },
   "areas": {
@@ -231,7 +239,8 @@
         "items",
         "combat",
         "projectiles",
-        "enchants-procs"
+        "enchants-procs",
+        "practice-combat"
       ]
     },
     "stats": {
@@ -287,7 +296,8 @@
       ],
       "affects": [
         "enchants-procs",
-        "dragon-definitions"
+        "dragon-definitions",
+        "practice-combat"
       ]
     },
     "projectiles": {
@@ -307,7 +317,9 @@
         "projectile-player-feasibility",
         "owned-firing"
       ],
-      "affects": []
+      "affects": [
+        "practice-combat"
+      ]
     },
     "player-fixture": {
       "paths": [
@@ -423,7 +435,8 @@
         "equipment-player"
       ],
       "affects": [
-        "combat"
+        "combat",
+        "practice-combat"
       ]
     },
     "enchants-procs": {
@@ -440,7 +453,9 @@
         "combat-accounting",
         "enchants-procs"
       ],
-      "affects": []
+      "affects": [
+        "practice-combat"
+      ]
     },
     "dragon-definitions": {
       "paths": [
@@ -452,6 +467,16 @@
       "cases": [
         "dragon-definitions",
         "dragon-definitions-abort"
+      ],
+      "affects": []
+    },
+    "practice-combat": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/paper/encounter/*",
+        "src/main/java/com/kaveenk/onlydragons/command/PracticeCommand.java"
+      ],
+      "cases": [
+        "practice-combat"
       ],
       "affects": []
     }

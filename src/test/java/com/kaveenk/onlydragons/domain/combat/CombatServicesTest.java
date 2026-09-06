@@ -126,7 +126,7 @@ class CombatServicesTest {
         assertRejected(TARGET_DEAD, session.proc(child(first, 9, 210, CritOutcome.CRITICAL), 22));
         assertRejected(TARGET_DEAD, hit(session, shot(5, 100, CritOutcome.CRITICAL, profile, 1, 1, Optional.empty()), POWER));
         assertSame(result, session.completion().orElseThrow());
-        assertEquals(new EncounterResult.Contribution(230, 420, 0, true), result.participants().get(OWNER));
+        assertEquals(new EncounterResult.Contribution(230, 420, 0, true, Optional.of(new EncounterResult.CommitStamp(20, 1)), Optional.of(new EncounterResult.CommitStamp(22, 2))), result.participants().get(OWNER));
         assertEquals(2, session.impacts().size());
         assertThrows(UnsupportedOperationException.class, () -> result.participants().clear());
     }
@@ -238,8 +238,8 @@ class CombatServicesTest {
                 other, 20, first.launchPosition(), Optional.empty());
         session.physical(second, secondImpact, DamageModifiers.none(), 0, Optional.empty());
         var totals = session.completion().orElseThrow().participants();
-        assertEquals(new EncounterResult.Contribution(100, 100, 0, true), totals.get(OWNER));
-        assertEquals(new EncounterResult.Contribution(200, 250, 0, true), totals.get(other));
+        assertEquals(new EncounterResult.Contribution(100, 100, 0, true, Optional.of(new EncounterResult.CommitStamp(20, 1)), Optional.of(new EncounterResult.CommitStamp(20, 1))), totals.get(OWNER));
+        assertEquals(new EncounterResult.Contribution(200, 250, 0, true, Optional.of(new EncounterResult.CommitStamp(20, 3)), Optional.of(new EncounterResult.CommitStamp(20, 3))), totals.get(other));
     }
 
     @Test void contributionOverflowCannotPartiallyCommitOrConsumeAChildId() {
