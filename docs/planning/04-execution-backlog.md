@@ -4,6 +4,12 @@ The three original planning documents remain required shared context. This file
 tracks execution order; `backlog.json` contains each bounded task specification
 and `github-issues.json` maps task IDs to repository issues.
 
+The [6 September encounter expansion proposal](05-encounter-expansion.md) scopes
+the user's next request without dispatching unapproved roster, reward or altar
+policies. It identifies child work packages for the existing T08/T10/T11/T12
+parents. Their final task/issue/acceptance bindings must be reviewed before
+dispatch; the current dependency and milestone gates remain in force.
+
 The user authorized parallel implementation, real Minecraft integration tests
 in isolated agent environments, and integration-lead merges of reviewed/tested
 PRs into **main**. The managed human dev server was stopped cleanly with explicit
