@@ -131,11 +131,44 @@ milestone or repeated blocker, sample context/tool use and failure causes again.
 Count verified integrated outcomes and resolved defects as progress, rather than
 worker activity, token totals or test counts alone.
 
+## Validation of the correction
+
 The maintenance change passed all 135 runner/checkpoint tests on Linux; the
 checkpoint module passed all 50 tests on both Windows and Linux with zero skips.
 Archived evidence wording was compared with its original block after reversing
-link-only path rebasing; all 59 local planning/archive links resolved and original
-task definitions remained unchanged. The manifest change selects the complete
-15-case Paper baseline. Its fresh suite, current-head CI and final independent
-review are recorded in the maintenance PR when completed; these initial scoped
-checks do not claim that those pending gates already passed.
+link-only path rebasing. Independent review checked 60 local links/anchors and
+confirmed the original task definitions and matrices remained unchanged.
+
+Clean runtime `472aaedee490d840a5aa8f6c4783b1c9ae4433bb` passed the complete
+15-case Paper baseline selected by this manifest change. Receipt
+`96238e01967b4094abeab9ce581bbf79` independently replayed all ten positive cases
+and five exact expected rejections, raw report/staged artifact hashes, copied
+JUnit and source identity. There were 82 production tests and seven client tests,
+with zero failures/errors/skips. Every owned cleanup counter returned to zero,
+all 15 ports closed, no run-owned Java remained and all shutdowns were unforced.
+Connected equipment passed 47 assertions and its eight required message checks;
+soak `2989541644d54d9d92fe0d4f349d07f7` passed 27 assertions with 40,896 ms online
+before normal quit. Elapsed suite time was 1,826.435 seconds while sharing the
+serialized test resources with feature workers; this is not a controlled speed
+comparison with the earlier 18.67-minute baseline.
+
+```text
+receipt SHA256: a4d49daadf6ef512948105c495ea0271a37b03d42e00836032c1c0c7f45485d7
+source SHA256:  bd8b46ba59be2df89fefe18b623ebadfd167ae8049fe1b30c85660a7b79066db
+tree SHA256:    425b82d1b0f999564e3686d1f6fa94a5224cd31373bf8a63d2f00246864a2e90
+```
+
+[Runtime-head Windows/Linux CI](https://github.com/Kav-K/OnlyDragons/actions/runs/34015657916)
+passed. [PR #35](https://github.com/Kav-K/OnlyDragons/pull/35) records final
+evidence-only head validation, independent review and integration status.
+A fresh complete 18-issue snapshot also passed the structural checkpoint with
+`automatedReady=false`, `acceptanceApproved=false` and all M0–M5 unaccepted.
+
+During the audit, both feature workers completed independently replayed 16-case
+suites: PR #30 at runtime `ee1721a`, PR #31 at runtime `696fa1e`. Their PR summaries
+now identify fresh evidence and retain their physical-integration/human gates.
+The lead instructed the remaining worker to hand off while waiting for the shared
+plan merge, avoiding repeated unchanged polling. Later main integration must
+validate the new source cohort. The existing integration monitor now samples
+context drift and failure causes at meaningful checkpoints and preserves this
+gate ownership; it does not repeat the whole audit on every unchanged run.
