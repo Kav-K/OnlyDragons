@@ -474,6 +474,88 @@
         "projectile-player-feasibility"
       ],
       "scope": "Real protocol bow release and API-spawned player-owned native arrows against real dragons; bounded phase/geometry and suppression observations, no production adapter or semantic head identifier."
+    },
+    "headless-player-primitives": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "two_distinct_real_players",
+        "loopback_nonop_players",
+        "packet_permission_denial_no_grant",
+        "packet_command_granted_managed_item",
+        "three_real_command_events",
+        "deployed_stats_api_exact_weapon_damage",
+        "real_selected_slot",
+        "real_look_and_movement",
+        "real_swing_event",
+        "real_swap_hands_events",
+        "real_drop_inventory_delta",
+        "real_block_interaction_effect",
+        "real_cancelled_damage_observed",
+        "cancelled_damage_preserves_health",
+        "accepted_damage_health_matches_final_event",
+        "two_player_damage_attribution",
+        "real_bow_release_and_projectile_damage",
+        "projectile_damage_health_matches_event",
+        "damage_probe_event_sequence",
+        "damage_probe_cohort_membership",
+        "damage_probe_dispatch_health",
+        "damage_probe_observed_health",
+        "damage_probe_fields_and_tick_boundaries",
+        "real_death_and_packet_respawn",
+        "reconnect_same_uuid_new_player",
+        "all_actor_sessions_cleanly_quit",
+        "production_sessions_cleared",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "inventory_cursor_0",
+        "inventory_cursor_1",
+        "inventory_cursor_2",
+        "inventory_cursor_3",
+        "inventory_identity_and_slots_0",
+        "inventory_identity_and_slots_1",
+        "inventory_identity_and_slots_2",
+        "inventory_identity_and_slots_3",
+        "real_inventory_click_transactions"
+      ],
+      "caseIds": [
+        "headless-player-primitives"
+      ],
+      "scope": "Two real offline protocol identities, bounded typed actions, real Paper acceptance/cancellation, native damage health observations, deployed stats API, respawn/reconnect and cleanup. No production dragon adapter or account/visual acceptance."
+    },
+    "headless-player-cleanup-abort": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "two_distinct_real_players",
+        "loopback_nonop_players",
+        "cleanup_permissions_initially_absent",
+        "cleanup_permissions_created",
+        "abort_blocks_restored",
+        "cleanup_blocks_changed",
+        "cleanup_entity_created",
+        "cleanup_delayed_task_created",
+        "abort_permissions_removed",
+        "abort_delayed_task_cancelled",
+        "alpha_real_uncancelled_command",
+        "beta_real_uncancelled_command",
+        "command_dispatch_settled_before_abort",
+        "both_actors_online_at_abort",
+        "resources_live_at_abort",
+        "scenario_exception",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "headless-player-cleanup-abort"
+      ],
+      "scope": "Intended companion abort with two connected real actors, executed commands and live owned permissions/blocks/entity/task. Requires graceful client closure and exact resource restoration."
     }
   },
   "requirements": {
@@ -751,6 +833,75 @@
       "availability": "external",
       "description": "User decision for the bounded variant roster, rewards and acquisition scope.",
       "fixtures": []
+    },
+    "dragon-definition-catalog": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "One production test-dragon/versioned definition registry: atomic validation, stable retained revisions and explicit type isolation on real Paper. Additional type fixtures are calibration-only.",
+      "fixtures": []
+    },
+    "sample-loot-table-bindings": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Inert versioned sample table/item references validate without reward calculation, grant enabling or inventory mutation; no real product drop values approved.",
+      "fixtures": []
+    },
+    "managed-dragon-development": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Shared T08 lifecycle plus T06 physical claims on a real managed test dragon: supported phase/native damage boundary, one completion, permission-gated controls, reset/failure cleanup and no real rewards.",
+      "fixtures": []
+    },
+    "frozen-damage-ranking": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Post-kill unique ranking by frozen credited damage including reduced/zero-HP procs and lethal overkill, excluding post-death impacts. Compare total descending, then receiver commit tick of last strict represented-total increase and encounter-global monotonic committed accepted-impact ordinal. Zero-only existing combat participants instead use immutable first-successful-participation tick/ordinal after positive totals; repeated zeros cannot move it and zero-to-positive selects the credit stamp without choosing loot eligibility. Require complete production provenance, no backdated-input influence, unchanged-total and transitivity controls plus actual multi-identity Paper presentation.",
+      "fixtures": []
+    },
+    "personal-loot-preview": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Deterministic personal rank-based simulations with hard item exclusion, visible calibration provenance and actual no-grant side effects. Real rewards always disabled; cannot be enabled by configuration or command.",
+      "fixtures": []
+    },
+    "headless-player-primitives": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Reusable typed real-player commands, movement, look, hands, block/entity interaction, drop, bow, respawn and reconnect with exact action plans and independently observed Paper effects.",
+      "fixtures": [
+        "headless-player-primitives",
+        "headless-player-cleanup-abort"
+      ]
+    },
+    "headless-damage-primitives": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Reusable real event observation of initial/settled/final damage, cancellation, actor/target identity and post-tick health cohorts. Native calibration is distinct from production physical accounting.",
+      "fixtures": [
+        "headless-player-primitives",
+        "headless-player-cleanup-abort"
+      ]
+    },
+    "offline-paper-bootstrap": {
+      "kind": "automated",
+      "availability": "implemented",
+      "description": "Checksum-verified fresh-profile bootstrap from the pinned Paper and its embedded Mojang metadata, exercised by actual Paper startup and independently replayed artifact hashes.",
+      "fixtures": [
+        "headless-player-primitives",
+        "headless-player-cleanup-abort"
+      ]
+    },
+    "automated-multiplayer-firing": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "At least two real protocol player identities exercise production firing, immutable shot/weapon ownership, registry isolation, simultaneous physical claims, cancellation/ammo accounting and owned cleanup. Observe each actual projectile and its owner through the T06 boundary; generic fixture calibration is insufficient. Full combat/proc HP and ghost-score accounting remains the separate T08/M3 attribution requirement.",
+      "fixtures": []
+    },
+    "automated-multiplayer-attribution": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "At least two real protocol player identities exercise the production physical/proc accounting path, swaps, cancellation, same-tick and lethal ordering; exact accepted HP and ghost score are independently expected. Generic fixture calibration is insufficient.",
+      "fixtures": []
     }
   },
   "tasks": {
@@ -793,7 +944,10 @@
     "T06": [
       "firing-input",
       "P02",
-      "P04"
+      "P04",
+      "headless-player-primitives",
+      "headless-damage-primitives",
+      "automated-multiplayer-firing"
     ],
     "T07": [
       "P07",
@@ -801,7 +955,10 @@
     ],
     "T08": [
       "P01",
-      "P13"
+      "P13",
+      "headless-player-primitives",
+      "headless-damage-primitives",
+      "automated-multiplayer-attribution"
     ],
     "T10": [
       "P03",
@@ -827,6 +984,26 @@
     ],
     "MAINT-18": [
       "bridge-unit-checks"
+    ],
+    "T02b": [
+      "dragon-definition-catalog",
+      "sample-loot-table-bindings"
+    ],
+    "T08a": [
+      "managed-dragon-development"
+    ],
+    "T08b": [
+      "frozen-damage-ranking"
+    ],
+    "T08c": [
+      "personal-loot-preview"
+    ],
+    "T09d": [
+      "headless-player-primitives",
+      "headless-damage-primitives",
+      "offline-paper-bootstrap",
+      "suite-baseline",
+      "checkpoint-unit-checks"
     ]
   },
   "paperCases": {
@@ -942,7 +1119,8 @@
         "P12",
         "P14",
         "human-prefire-visuals",
-        "authenticated-multiplayer"
+        "authenticated-multiplayer",
+        "automated-multiplayer-attribution"
       ]
     },
     "M4": {
@@ -950,10 +1128,16 @@
         "M3"
       ],
       "tasks": [
-        "T11"
+        "T11",
+        "T02b",
+        "T08a",
+        "T08b"
       ],
       "requirements": [
-        "eye-transactions"
+        "eye-transactions",
+        "dragon-definition-catalog",
+        "managed-dragon-development",
+        "frozen-damage-ranking"
       ]
     },
     "M5": {

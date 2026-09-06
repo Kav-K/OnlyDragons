@@ -145,12 +145,21 @@ tests with the shared lease and wait for memory headroom. Stop only the JVMs
 started by that run, including on failure/cancellation. Never use human profiles,
 personal worlds, exposed network ports, or mcdev play/restart/start/run (those
 commands can coordinate unrelated human sessions). The runner's explicitly named
-`--test-player protocol-calibration` mode may use one synthetic offline player
-only in its newly created loopback disposable profile. Keep default tests and
-human profiles authenticated. Reserve both JVMs' memory and hold the shared
+`--test-player protocol-calibration` mode may use one synthetic offline player;
+`--test-player protocol-actions-v1` admits the exact one-to-four identities in
+the tracked bounded action plan, in one client JVM. Both modes are restricted
+to newly created loopback disposable profiles. Keep default tests and
+human profiles authenticated. Reserve both JVMs' total memory and hold the shared
 lease through client and server cleanup. Authenticated multiplayer and client
 visuals remain separate human gates. The user authorized this isolated testing policy
 and authorized the lead to stop the existing dev server for this work.
+
+Use [the headless fixture cookbook](dev/game-tests/PLAYER-FIXTURES.md) for player,
+damage and lifecycle scenarios. Keep actual client input, server setup, native
+event observations and production API results distinct in evidence. Generic
+fixture calibration does not certify a feature's damage accounting. Reuse
+checksum-verified Paper/Mojang bootstrap inputs; never copy a human world or
+plugin directory into a test profile.
 
 ## Repository and Symphony work
 

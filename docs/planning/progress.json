@@ -205,6 +205,64 @@
           "revision": "e72fb2a"
         }
       }
+    },
+    "T02b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T08a": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T08b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T08c": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T09d": {
+      "status": "in-review",
+      "completedRequirements": [
+        "headless-player-primitives",
+        "headless-damage-primitives",
+        "offline-paper-bootstrap",
+        "suite-baseline",
+        "checkpoint-unit-checks"
+      ],
+      "evidence": {
+        "headless-player-primitives": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024646724",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        },
+        "headless-damage-primitives": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024646724",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        },
+        "offline-paper-bootstrap": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024646724",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        },
+        "suite-baseline": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024646724",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        },
+        "checkpoint-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024649057",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        }
+      },
+      "reviewedRevision": "3047a56b0ed0c634034841b776752e71b55ac857",
+      "notice": "Implementation and all five automated requirements verified: full 17-case hosted suite, independent unchanged-artifact replay and task checkpoint, 82 production/28 client tests, 238 Linux runner/checkpoint tests and passing current-runtime CI. Exact evidence: docs/planning/evidence/t09d-suite.md. PR #44 has not merged; retain in-review and omit mergedRevision until actual integration. Downstream dispatch waits for that merge. Generic calibration does not complete production multiplayer firing/accounting, T04, P01-P14, human authentication/visual/feel checks or any milestone."
     }
   },
   "milestones": {
