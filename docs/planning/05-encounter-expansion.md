@@ -58,15 +58,16 @@ same-tick zero participants and zero-to-positive transitions.
 | T08b | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | T08a | D3 frozen credited-damage projection, unique placements and received player output. |
 | T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b, T08b | Personal rank-based loot evaluation with hard locks and actual grants disabled. |
 
-All begin planned with deferred automated requirements; only integrated
-prerequisites plus lead assignment permit dispatch. T10 additionally consumes
+Task registration began planned with deferred automated requirements; the current
+ledger records later implementation/evidence. Only integrated prerequisites plus
+lead assignment permit dispatch. T10 additionally consumes
 T08a's shared backend. Original T10 dependencies and all T11/M3/T12 gates remain.
 
 ## Present implementation and constraints
 
 - Production commands provide status/reload, stats explanation and calibration loadout/bonus/clear. There is no managed dragon spawn/reset/completion command or player-facing leaderboard.
 - `CombatEncounter` owns one target/generation on its construction thread, tracks distinct actual-health and contribution totals, and freezes one immutable `EncounterResult` at lethal managed damage. Late impacts cannot add score. It does not prove physical collision, suppress native damage, synchronize an entity, or publish a death notification.
-- `EncounterResult` contains completion/encounter IDs, `variantId`, mechanic revision and UUID-keyed contributions. This is not ranked presentation or durable result storage. `variantId` is only a nonblank string; no dragon-definition registry exists.
+- `EncounterResult` contains completion/encounter IDs, `variantId`, mechanic revision and UUID-keyed contributions. This is not ranked presentation or durable result storage. `variantId` is only a nonblank string; T02b now supplies a separate immutable resolved selection on its implementation branch (see document 02), pending automated evidence and merge. A live result consumer must retain that selection explicitly.
 - `eyesPlaced` exists in the contribution DTO, but `CombatEncounter` currently always writes zero. Eye-only placers are not represented by that combat ledger. No placement transactions, loot resolver or reward-grant persistence exists.
 - T04's measured collision/native-damage policy and T05's proc implementation must finish their current-main review/acceptance. #9/T06 then supplies production firing/ownership and the required physical boundary. Existing standalone fixtures are evidence of their stated scope, not a playable managed encounter.
 - Keep public Paper APIs, one composition root, one physical-impact authority, server-thread entity access, immutable snapshots across asynchronous boundaries, and owned cleanup. Do not add a second independent damage listener or a new framework/database service merely to scaffold these tasks.

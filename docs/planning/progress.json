@@ -206,10 +206,10 @@
       }
     },
     "T02b": {
-      "status": "planned",
+      "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+      "notice": "Owner-dispatched implementation on symphony/gh-38: one lead-reviewed 1000-HP test dragon, immutable resolved references and inert sample table. JDK 25 wrapper build passed 107 production tests with no failures/errors/skips. Full 18-case Paper suite and T02b acceptance evidence pending; no milestone or live dragon/reward gate accepted."
     },
     "T08a": {
       "status": "planned",

@@ -81,6 +81,10 @@
       "expectation": "cleanup-abort",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 60
+    },
+    "dragon-definitions": {
+      "scenarioId": "dragon-definitions",
+      "expectation": "positive"
     }
   },
   "suites": {
@@ -95,7 +99,8 @@
       "equipment-stats",
       "equipment-player",
       "protocol-player-soak",
-      "headless-player-primitives"
+      "headless-player-primitives",
+      "dragon-definitions"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -122,7 +127,8 @@
       "equipment-player",
       "protocol-player-soak",
       "headless-player-primitives",
-      "headless-player-cleanup-abort"
+      "headless-player-cleanup-abort",
+      "dragon-definitions"
     ]
   },
   "areas": {
@@ -168,7 +174,8 @@
         "equipment-player",
         "protocol-player-soak",
         "headless-player-primitives",
-        "headless-player-cleanup-abort"
+        "headless-player-cleanup-abort",
+        "dragon-definitions"
       ],
       "affects": [
         "stats",
@@ -210,7 +217,8 @@
       ],
       "affects": [
         "combat",
-        "equipment"
+        "equipment",
+        "dragon-definitions"
       ]
     },
     "combat": {
@@ -225,7 +233,9 @@
         "foundation-contracts",
         "combat-accounting"
       ],
-      "affects": []
+      "affects": [
+        "dragon-definitions"
+      ]
     },
     "projectiles": {
       "paths": [
@@ -271,7 +281,8 @@
         "src/test/java/com/kaveenk/onlydragons/service/GreetingServiceTest.java"
       ],
       "cases": [
-        "lifecycle-calibration"
+        "lifecycle-calibration",
+        "dragon-definitions"
       ],
       "affects": [
         "shared-contracts",
@@ -326,7 +337,8 @@
         "equipment-player",
         "protocol-player-soak",
         "headless-player-primitives",
-        "headless-player-cleanup-abort"
+        "headless-player-cleanup-abort",
+        "dragon-definitions"
       ],
       "affects": []
     },
@@ -346,6 +358,18 @@
       "affects": [
         "combat"
       ]
+    },
+    "dragon-definitions": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/domain/encounter/definition/*",
+        "src/main/resources/encounters/*",
+        "src/test/java/com/kaveenk/onlydragons/domain/encounter/definition/*",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/definition/*"
+      ],
+      "cases": [
+        "dragon-definitions"
+      ],
+      "affects": []
     }
   },
   "ignoredChanges": [

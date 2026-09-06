@@ -496,6 +496,34 @@ The animation is driven by configured tick keyframes for sound, particles, egg m
 
 An immutable `EncounterResult` includes the selected variant, contribution and actual-health totals per player, eyes placed, participation, and completion ID. A future reward service consumes it once. An `EyeSource` and `ItemGrantService` let later drops, shops, crafting, or quests issue the same validated items used by development tools. The first milestone does not implement those economies.
 
+### T02b test-dragon catalog contract (GH-38)
+
+Adopted within scope and reviewed by the lead: exactly one `test_dragon`, schema
+1/revision v1, named Test Dragon (Calibration), with **1,000 HP / zero defense**.
+The lead selected 1,000 HP so the existing 100-damage ordinary bow can support a
+short future kill/ranking rehearsal. This is test calibration, not production
+balance. The existing `combat-calibration/v1` remains uncapped with full ferocity
+health. `test-dragon-phase-contract/v1` declares compatible combat revisions only;
+it cannot widen T06's measured phase admission or implement movement/spawning.
+
+`DragonCatalogLoader` validates both bundled resources and all type/table/item/
+profile references before `DragonDefinitionRegistry.replace` atomically publishes
+an immutable snapshot. Failure retains the whole prior catalog. HP is finite in
+(0, 1e9], defense in [0, 1e9]; unsupported schemas, duplicate/missing IDs or fields,
+unknown fields and incompatible/stale references reject. Bootstrap shares T02's
+item registry with equipment. No new commands, callbacks or listeners are added;
+existing reload still handles greetings only.
+
+Future consumers retain `DragonCatalog.Selection`: full catalog/type identities,
+frozen HP/defense and combat/phase profiles, table catalog/table identities, and
+trusted item definitions with exact item/catalog revisions. Revisions must change
+with content. Full retained values survive replacement/removal without a historical
+lookup service; `EncounterResult.variantId` alone remains insufficient. T08a owns
+attaching this value to its future lifecycle/result, without changing T00/T03 here.
+The separate sample table references the ordinary calibration bow only. There is
+no eligibility, random roll, rank band, quantity, grant switch, inventory/drop/XP/
+currency mutation or eye system. [Schema and API details](../../src/main/resources/encounters/README.md).
+
 ## 12. Configuration, diagnostics, and future versions
 
 Keep versioned resources for stats, item definitions, enchant parameters, and mechanic profiles. Validate an entire candidate before adopting it. Active encounters and accepted shots retain their revisions; a config reload must not rewrite an airborne arrow. Queue gameplay-balance changes for the next encounter. Require restart for structural/plugin changes, preserving the existing no-`/reload` workflow.

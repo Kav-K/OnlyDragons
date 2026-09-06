@@ -496,6 +496,43 @@
         "headless-player-cleanup-abort"
       ],
       "scope": "Intended companion abort with two connected real actors, executed commands and live owned permissions/blocks/entity/task. Requires graceful client closure and exact resource restoration."
+    },
+    "dragon-definitions": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "loader_from_production",
+        "one_shipped_type",
+        "shipped_calibration",
+        "explicit_profiles",
+        "resolved_item_provenance",
+        "all_required_fields_rejected_atomically",
+        "duplicate_ids_and_properties",
+        "unknown_stale_references",
+        "nonfinite_out_of_range_rejected",
+        "inclusive_numeric_boundaries",
+        "unsupported_schemas",
+        "incompatible_profiles_rejected",
+        "reward_fields_fail_closed",
+        "distinct_type_table_isolation",
+        "whole_candidate_rollback_after_adoption",
+        "retained_definition_table_revisions",
+        "immutable_selection",
+        "io_failure_rollback",
+        "bundled_catalog_restored",
+        "no_inventory_mutation",
+        "no_entities_items_or_xp_spawned",
+        "no_production_tasks_or_listeners",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-definitions"
+      ],
+      "scope": "Production dragon loader/registry/bootstrap with synthetic candidates on Paper; immutable revision retention and inert bindings. No live dragon, player, reward policy or grant acceptance."
     }
   },
   "requirements": {
@@ -773,15 +810,19 @@
     },
     "dragon-definition-catalog": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "One production test-dragon/versioned definition registry: atomic validation, stable retained revisions and explicit type isolation on real Paper. Additional type fixtures are calibration-only.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-definitions"
+      ]
     },
     "sample-loot-table-bindings": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Inert versioned sample table/item references validate without reward calculation, grant enabling or inventory mutation; no real product drop values approved.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-definitions"
+      ]
     },
     "managed-dragon-development": {
       "kind": "automated",
