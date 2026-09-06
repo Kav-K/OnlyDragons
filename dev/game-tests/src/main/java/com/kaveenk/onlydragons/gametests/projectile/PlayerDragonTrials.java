@@ -87,7 +87,7 @@ final class PlayerDragonTrials {
         EnderDragon.Phase phase = index == 12 ? EnderDragon.Phase.CIRCLING
                 : index == 13 ? EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET : EnderDragon.Phase.HOVER;
         EnderDragon target = dragon(phase);
-        context.later(10, () -> {
+        context.later(2, () -> {
             var parts = target.getParts().stream().map(p -> (EnderDragonPart) p)
                     .sorted(Comparator.comparingDouble((EnderDragonPart p) -> p.getBoundingBox().getWidthX())
                             .thenComparingDouble(p -> p.getBoundingBox().getCenterZ())
@@ -114,13 +114,15 @@ final class PlayerDragonTrials {
             row.put("aimBox", box(aim));
             row.put("mode", mode.name());
             row.put("requestedPhase", phase.name());
-            context.later(12, () -> {
+            context.later(8, () -> {
                 record(row, target, arrows, before);
                 Arrow arrow = arrows.getFirst();
                 var hit = hits(arrow, target);
                 var damage = probe.forArrow(arrow.getUniqueId(), "damage_monitor");
                 if (index < 4) {
-                    context.check(id + "_collision", true, hit.size() == 1);
+                    context.check(id + "_collision", true, mode == ImpactProbe.Mode.CANCEL_HIT
+                            ? !hit.isEmpty() && hit.stream().allMatch(e -> Boolean.TRUE.equals(e.get("cancelled")))
+                            : hit.size() == 1);
                     if (mode == ImpactProbe.Mode.NATIVE) {
                         context.check(id + "_damage_positive", true, target.getHealth() < before && !damage.isEmpty());
                         context.check("native_hit_before_damage", true, hit.size() == 1 && damage.size() == 1

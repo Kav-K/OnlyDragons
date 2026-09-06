@@ -223,7 +223,7 @@
     ]
   },
   "projectile-player-feasibility": {
-    "mechanicRevision": "projectile-player-v1",
+    "mechanicRevision": "projectile-player-v2",
     "requiredAssertions": [
       "server_thread",
       "production_enabled",

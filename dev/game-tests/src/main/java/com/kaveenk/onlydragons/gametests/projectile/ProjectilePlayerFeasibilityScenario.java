@@ -26,7 +26,7 @@ import org.bukkit.inventory.ItemStack;
 /** Validates a real loopback protocol player; no manufactured Bukkit callbacks. */
 public final class ProjectilePlayerFeasibilityScenario implements Scenario {
     @Override public void start(ScenarioContext context) {
-        context.mechanicRevision("projectile-player-v1");
+        context.mechanicRevision("projectile-player-v2");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
         context.check("production_enabled", true, context.production().isEnabled());
         context.check("disposable_protocol_mode", "protocol-calibration", System.getProperty("onlydragons.test.playerMode", ""));
