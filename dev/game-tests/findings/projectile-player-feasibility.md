@@ -16,8 +16,8 @@ python3 scripts/agent-tests/paper_test.py --scenario projectile-feasibility
 
 Use the existing operator environment from [agent testing](../../agent-paper-tests.md).
 The second command must fail; inspect both reports and cleanup rather than counting
-its nonzero exit as gameplay success. Admission permits only this additional exact
-scenario ID and the existing calibration. The fixed select/draw/release/quit client,
+its nonzero exit as gameplay success. Catalog-declared admission now includes
+this scenario and preserves every main fixture. The fixed select/draw/release/quit client,
 locked artifacts, loopback/offline disposable identity, authenticated defaults,
 memory gate, lease and paired cleanup are unchanged.
 
@@ -87,7 +87,7 @@ Explicitly retire accepted terminal arrows: both zero damage and hit cancellatio
 can leave live arrows. The scenario measures these boundaries; the production
 adapter must still implement and test its own claim, cancellation and retirement.
 
-**Part policy remains uniform managed scaling pending lead review.** The measured
+**Lead-reviewed calibration policy uses managed scale 1.0 for every part.** The measured
 1×1×1 versus 5×3×5 native damage difference is real player-owned evidence, not a
 robust semantic head/body selector. All eight names are `Ender Dragon`; the pinned
 public `EnderDragonPart` signature adds only `getParent()` and no semantic ID.
@@ -100,7 +100,11 @@ Natural End landing/flight cycles, all phase/part/cancellation combinations,
 encounter-long persistence/unload, human mouse feel/visuals, authenticated clients,
 multiplayer and performance remain separate unrun gates. The player-owned
 native-damage boundary is automated evidence; it is no longer deferred wholesale
-to a human test. The broader #28 suite/checkpoint integration remains lead-owned.
+to a human test. The continuation integrates the merged #28 suite/checkpoint with additive coverage.
+Only HOVER, CIRCLING and SEARCH_FOR_BREATH_ATTACK_TARGET impacts are initially
+admitted by the reviewed calibration design, including managed seated hits;
+other phases require an explicit unsupported-phase rejection until measured.
+Production enforcement remains pending in assigned adapter tasks.
 
 ## Verification
 
@@ -143,5 +147,7 @@ yielded five multipart events, disproving the fixture's exactly-one assumption.
 Its longer trial sequence did not complete client quit; the scenario timed out
 and client cleanup required forced termination (Paper exited 0 unforced). This
 is not accepted evidence. Shorter bounded windows completed in v2/v3; the cause
-of the longer client's stalled quit remains unresolved, and no general long-lived
-actor reliability is claimed or client protocol changed.
+of the longer client's stalled quit was not isolated by this run. PR #32 later
+fixed a possible callback/disconnect lock cycle and validated a delayed-quit soak.
+The continuation retains that shared client fix and reruns the soak; this earlier
+failure remains historical evidence, not a current-client pass.
