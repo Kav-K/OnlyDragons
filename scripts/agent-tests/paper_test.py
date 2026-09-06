@@ -70,6 +70,19 @@ def strict_json(path):
         raise ValidationError(f'Malformed scenario report: {error}') from error
 
 
+def json_values_equal(expected, observed):
+    """Compare JSON values recursively; numbers may agree across int/float, booleans may not."""
+    if type(expected) is not type(observed):
+        return type(expected) in (int, float) and type(observed) in (int, float) and expected == observed
+    if isinstance(expected, dict):
+        return expected.keys() == observed.keys() and all(
+            json_values_equal(value, observed[key]) for key, value in expected.items())
+    if isinstance(expected, list):
+        return len(expected) == len(observed) and all(
+            json_values_equal(left, right) for left, right in zip(expected, observed))
+    return expected == observed
+
+
 def validate_report(path, expected, issued_ms, deadline_ms, now_ms=None):
     """Reject missing, stale, truncated, failed, or incomplete evidence, even after a clean boot."""
     report = strict_json(Path(path))
@@ -98,7 +111,7 @@ def validate_report(path, expected, issued_ms, deadline_ms, now_ms=None):
         require(isinstance(name, str) and name and name not in seen, 'Missing or duplicate assertion ID')
         seen.add(name)
         require('expected' in assertion and 'observed' in assertion, f'Assertion has no expected/observed values: {name}')
-        if assertion.get('passed') is not True or assertion['expected'] != assertion['observed']:
+        if assertion.get('passed') is not True or not json_values_equal(assertion['expected'], assertion['observed']):
             failures.append(name)
     require(set(expected['requiredAssertions']).issubset(seen), 'Required scenario assertions are missing')
     require(not failures, 'Failed scenario assertions: ' + ', '.join(failures))

@@ -69,6 +69,49 @@ class ReportContractTests(unittest.TestCase):
             with self.assertRaisesRegex(runner.ValidationError, 'Failed scenario assertions: one'):
                 self.validate()
 
+    def test_boolean_and_numeric_assertions_never_match(self):
+        for boolean, number in ((True, 1), (True, 1.0), (False, 0), (False, 0.0)):
+            for expected, observed in ((boolean, number), (number, boolean)):
+                with self.subTest(expected=expected, observed=observed):
+                    report = copy.deepcopy(self.report)
+                    report['assertions'][0].update(expected=expected, observed=observed, passed=True)
+                    self.write(report)
+                    with self.assertRaisesRegex(runner.ValidationError, 'Failed scenario assertions: one'):
+                        self.validate()
+
+    def test_nested_boolean_numeric_mismatches_fail_despite_forged_flags(self):
+        for expected, observed in (([True], [1]), ({'value': False}, {'value': 0.0}),
+                                   ({'values': [1, {'active': True}]}, {'values': [1.0, {'active': 1}]})):
+            for left, right in ((expected, observed), (observed, expected)):
+                with self.subTest(expected=left, observed=right):
+                    report = copy.deepcopy(self.report)
+                    report['assertions'][0].update(expected=left, observed=right, passed=True)
+                    self.write(report)
+                    with self.assertRaisesRegex(runner.ValidationError, 'Failed scenario assertions: one'):
+                        self.validate()
+
+    def test_matching_json_types_and_equivalent_numeric_values_pass(self):
+        for expected, observed in ((True, True), (False, False), (None, None), ('1', '1'),
+                                   (1, 1.0), (0.0, 0), ([], []), ({}, {}),
+                                   ({'active': True, 'values': [None, 2, {'fraction': 0.5}]},
+                                    {'values': [None, 2.0, {'fraction': 0.5}], 'active': True})):
+            with self.subTest(expected=expected, observed=observed):
+                report = copy.deepcopy(self.report)
+                report['assertions'][0].update(expected=expected, observed=observed, passed=True)
+                self.write(report)
+                self.assertTrue(self.validate()['passed'])
+
+    def test_recursive_comparison_preserves_structure_order_and_value_checks(self):
+        for expected, observed in (('1', 1), (None, False), ([1], 1), ([1], [1, 2]),
+                                   ([1, 2], [2, 1]), ({'one': 1}, {'two': 1}),
+                                   ({'values': [1]}, {'values': [2]}), (True, False)):
+            with self.subTest(expected=expected, observed=observed):
+                report = copy.deepcopy(self.report)
+                report['assertions'][0].update(expected=expected, observed=observed, passed=True)
+                self.write(report)
+                with self.assertRaisesRegex(runner.ValidationError, 'Failed scenario assertions: one'):
+                    self.validate()
+
     def test_false_overall_result_fails_even_if_assertions_pass(self):
         self.write(dict(self.report, passed=False))
         with self.assertRaisesRegex(runner.ValidationError, 'reports failure'):
