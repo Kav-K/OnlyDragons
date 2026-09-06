@@ -228,6 +228,13 @@
               }
             },
             {
+              "id": "recovery",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
               "id": "transfer-use",
               "action": "useItem",
               "args": {
@@ -263,6 +270,11 @@
         {
           "id": "second",
           "steps": [
+            {
+              "id": "respawn-after-exit",
+              "action": "respawn",
+              "args": {}
+            },
             {
               "id": "volley-use",
               "action": "useItem",

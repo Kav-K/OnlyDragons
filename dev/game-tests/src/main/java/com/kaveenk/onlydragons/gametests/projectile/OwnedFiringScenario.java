@@ -26,6 +26,7 @@ public final class OwnedFiringScenario implements Scenario, Listener {
     private boolean transferLaunch, immediateQuit, pendingAtQuit;
     private long observationSequence, disconnectRequestOrder, quitOrder, quitTick;
     private boolean kickObserved;
+    private int launchVetoEvents, inputVetoEvents, permissionDeniedEvents, deaths, respawns;
     private OwnedProjectile immediateShot, transferShot;
     private final List<OwnedProjectile> emissions = new ArrayList<>();
     private final List<SettledHit> settlements = new ArrayList<>();
@@ -88,6 +89,11 @@ public final class OwnedFiringScenario implements Scenario, Listener {
                     && child.shot().launchPosition().equals(airborne.shot().launchPosition()) && child.shot().initialVelocity().equals(airborne.shot().initialVelocity())
                     && child.shot().crit() == airborne.shot().crit() && child.shot().projectileScale() == 0.2
                     && child.shot().launchTick() == airborne.shot().launchTick() + 1);
+            var childLaunch = nativeLaunches.get(child.shot().projectileId());
+            context.check("duplex_native_launch_matches_captured_transform", true,
+                    vectorMatches(childLaunch.get("position"), airborne.shot().launchPosition())
+                    && vectorMatches(childLaunch.get("velocity"), airborne.shot().initialVelocity())
+                    && ((Number) childLaunch.get("tick")).longValue() == airborne.shot().launchTick() + 1);
             context.check("native_flight_continuous", true, bows.arrow(airborne.shot().projectileId()).orElseThrow().getLocation().toVector()
                     .distance(new org.bukkit.util.Vector(airborne.shot().launchPosition().x(), airborne.shot().launchPosition().y(), airborne.shot().launchPosition().z())) > 1);
             context.check("single_native_ammo_debit", 19, ammo("alpha"));
@@ -158,11 +164,12 @@ public final class OwnedFiringScenario implements Scenario, Listener {
         players.request("beta", "empty");
         context.later(5, () -> {
             collect(); context.check("empty_ammo_no_emission_or_reservation", true, owner("beta").size() == before && bows.reservedCapacity() == 0);
-            kit("beta", "shortbow_v1", 10); cancelLaunch = true;
+            kit("beta", "shortbow_v1", 10); cancelLaunch = true; int vetoBefore = launchVetoEvents;
             players.request("beta", "launch-veto");
             context.later(5, () -> {
                 cancelLaunch = false; collect(); context.check("launch_veto_refunds_and_releases", true, owner("beta").size() == before && ammo("beta") == 10
                         && bows.pendingGroups() == 0 && bows.reservedCapacity() == 0);
+                context.check("actual_owned_launch_veto_observed", vetoBefore + 1, launchVetoEvents);
                 players.player("beta").getInventory().setItemInOffHand(context.production().equipment().createLoadout("shortbow_v1"));
                 players.request("beta", "offhand");
                 context.later(4, () -> {
@@ -173,16 +180,24 @@ public final class OwnedFiringScenario implements Scenario, Listener {
         });
     }
     private void inputControls() {
-        int before = owner("beta").size(); cancelInput = true;
+        int before = owner("beta").size(); cancelInput = true; int vetoBefore = inputVetoEvents;
         players.request("beta", "input-veto");
         context.later(5, () -> {
             cancelInput = false;
             context.check("final_input_veto_no_debit", true, owner("beta").size() == before && ammo("beta") == 10);
+            context.check("actual_input_veto_observed", vetoBefore + 1, inputVetoEvents);
             var permission = players.permission("beta", "onlydragons.fire", false);
+            int deniedBefore = permissionDeniedEvents;
             players.request("beta", "permission-denied");
             context.later(5, () -> {
                 context.check("fire_permission_denial", true, owner("beta").size() == before && ammo("beta") == 10);
-                players.removePermission(permission); transfer();
+                context.check("actual_permission_denied_input_observed", deniedBefore + 1, permissionDeniedEvents);
+                players.removePermission(permission);
+                players.request("beta", "recovery");
+                players.await("successful shortbow after negative controls", 60, () -> owner("beta").size() == before + 2, () -> {
+                    context.check("shortbow_recovery_group_and_debit", true, owner("beta").size() == before + 2 && ammo("beta") == 9);
+                    transfer();
+                });
             });
         });
     }
@@ -212,9 +227,39 @@ public final class OwnedFiringScenario implements Scenario, Listener {
                         "quitTick", quitTick, "kickEventObserved", kickObserved,
                         "scope", "Real client disconnect/quit after native launch; synthetic adapter regression separately covers clearSession before delayed settlement."));
                 context.check("immediate_quit_old_token_inactive", true, !bows.isCurrentSession(players.identity("beta"), immediateShot.sessionToken()));
-                dragon(0);
+                deathAfterExit();
             }));
         });
+    }
+    private void deathAfterExit() {
+        Player beta = players.player("beta"); UUID owner = beta.getUniqueId();
+        players.setupPosition("beta", new Location(beta.getWorld(), 500, 100, 0.5));
+        players.await("session cleared outside both arenas", 60, () -> bows.currentSession(owner).isEmpty(), () -> {
+            var retained = owner("beta"); var alpha = owner("alpha");
+            context.check("exit_retains_airborne_before_death", true, !retained.isEmpty()
+                    && retained.stream().allMatch(a -> bows.arrow(a.shot().projectileId()).map(Arrow::isValid).orElse(false)));
+            context.observe("ownerDeathSetup", "Public setHealth(0) after actual arena-exit session cleanup; real PlayerDeathEvent, then declared packet respawn. No client attack claim.");
+            beta.setInvulnerable(false); beta.setHealth(0);
+            context.check("actual_death_without_session_retires_owned", true, deaths == 1 && owner("beta").isEmpty()
+                    && retained.stream().allMatch(a -> bows.arrow(a.shot().projectileId()).isEmpty())
+                    && bows.reservedCapacity() == 0 && bows.pendingClaims() == 0);
+            context.check("owner_death_preserves_other_registry", true, alpha.equals(owner("alpha")));
+            context.later(3, () -> {
+                players.request("beta", "respawn-after-exit");
+                players.await("real respawn after sessionless death", 100, () -> respawns == 1 && !players.player("beta").isDead(), () -> {
+                    Player current = players.player("beta"); current.setAllowFlight(true); current.setFlying(true); current.setInvulnerable(true);
+                    context.check("post_death_respawn_and_no_stale_delivery", true, current.getHealth() > 0 && retained.stream().noneMatch(a ->
+                            settlements.stream().anyMatch(h -> h.projectile().shot().projectileId().equals(a.shot().projectileId()))));
+                    dragon(0);
+                });
+            });
+        });
+    }
+    private static boolean vectorMatches(Object raw, Vector3 expected) {
+        if (!(raw instanceof List<?> values) || values.size() != 3) return false;
+        double[] target = {expected.x(), expected.y(), expected.z()};
+        for (int i = 0; i < 3; i++) if (!(values.get(i) instanceof Number number) || Math.abs(number.doubleValue() - target[i]) > 1e-9) return false;
+        return true;
     }
     private void dragon(int index) {
         if (index == 6) { volley(); return; }
@@ -431,10 +476,25 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             context.observe("immediateQuit", Map.of("tick", quitTick, "sequence", quitOrder, "launchTick", immediateShot.shot().launchTick(), "pendingGroups", bows.pendingGroups(), "validPrimary", validPrimary));
         }
     }
-    @EventHandler(priority = EventPriority.MONITOR) public void interact(PlayerInteractEvent event) { interactions++; if (cancelInput) event.setUseItemInHand(Event.Result.DENY); }
+    @EventHandler(priority = EventPriority.MONITOR) public void interact(PlayerInteractEvent event) {
+        interactions++;
+        if (!event.getPlayer().getUniqueId().equals(players.identity("beta")) || event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND) return;
+        if (cancelInput) {
+            event.setUseItemInHand(Event.Result.DENY); inputVetoEvents++;
+            context.observe("inputVetoEvent", Map.of("owner", event.getPlayer().getUniqueId().toString(),
+                    "tick", Bukkit.getCurrentTick(), "action", event.getAction().name(), "hand", event.getHand().name(),
+                    "useItem", event.useItemInHand().name()));
+        }
+        if (!event.getPlayer().hasPermission("onlydragons.fire")) {
+            permissionDeniedEvents++;
+            context.observe("permissionDeniedEvent", Map.of("owner", event.getPlayer().getUniqueId().toString(),
+                    "tick", Bukkit.getCurrentTick(), "action", event.getAction().name(), "hand", event.getHand().name(),
+                    "permission", false));
+        }
+    }
     @EventHandler(priority = EventPriority.MONITOR) public void launch(ProjectileLaunchEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow) || !(arrow.getShooter() instanceof Player shooter)) return;
-        if (cancelLaunch) event.setCancelled(true);
+        if (cancelLaunch) { event.setCancelled(true); if (shooter.getUniqueId().equals(players.identity("beta")) && bows.projectile(arrow.getUniqueId()).isPresent()) launchVetoEvents++; }
         var owned = bows.projectile(arrow.getUniqueId());
         nativeLaunches.put(arrow.getUniqueId(), Map.of("projectile", arrow.getUniqueId().toString(), "shooter", shooter.getUniqueId().toString(),
                 "sequence", ++observationSequence,
@@ -446,6 +506,12 @@ public final class OwnedFiringScenario implements Scenario, Listener {
     }
     @EventHandler(priority = EventPriority.LOW) public void nativeDamage(EntityDamageByEntityEvent event) {
         if (nativeGuard && event.getDamager() instanceof Arrow arrow && bows.projectile(arrow.getUniqueId()).isPresent()) event.setCancelled(true);
+    }
+    @EventHandler(priority = EventPriority.HIGH) public void death(PlayerDeathEvent event) {
+        if (event.getPlayer().getUniqueId().equals(players.identity("beta"))) { deaths++; event.getDrops().clear(); event.setDroppedExp(0); }
+    }
+    @EventHandler(priority = EventPriority.MONITOR) public void respawn(PlayerRespawnEvent event) {
+        if (event.getPlayer().getUniqueId().equals(players.identity("beta"))) respawns++;
     }
     @EventHandler(priority = EventPriority.HIGHEST) public void phase(EnderDragonChangePhaseEvent event) {
         // Declared server setup keeps each isolated trial in its named phase during native drawing.

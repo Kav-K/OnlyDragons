@@ -1092,7 +1092,16 @@
       "owned_tasks_cancelled",
       "owned_chunk_tickets_removed",
       "owned_listeners_removed",
-      "owned_resources_released"
+      "owned_resources_released",
+      "duplex_native_launch_matches_captured_transform",
+      "actual_owned_launch_veto_observed",
+      "actual_input_veto_observed",
+      "actual_permission_denied_input_observed",
+      "shortbow_recovery_group_and_debit",
+      "exit_retains_airborne_before_death",
+      "actual_death_without_session_retires_owned",
+      "owner_death_preserves_other_registry",
+      "post_death_respawn_and_no_stale_delivery"
     ]
   }
 }

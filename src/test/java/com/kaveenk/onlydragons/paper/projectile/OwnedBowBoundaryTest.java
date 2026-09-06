@@ -94,4 +94,13 @@ class OwnedBowBoundaryTest {
         assertEquals(4, arrow.getDamage()); assertTrue(arrow.isCritical()); assertTrue(arrow.isValid());
         assertEquals(0, bows.pendingClaims()); bows.endEncounter(encounter); assertTrue(arrow.isValid());
     }
+    @Test void deathAfterSessionExitRetiresRetainedArrowAndPendingClaim() {
+        Arrow arrow = shoot("duplex"); UUID token = bows.currentSession(player.getUniqueId()).orElseThrow();
+        bows.clearSession(player.getUniqueId(), token, false); assertTrue(arrow.isValid());
+        bows.hit(new ProjectileHitEvent(arrow, target(), null, null)); assertEquals(1, bows.pendingClaims());
+        player.setHealth(0);
+        assertTrue(bows.currentSession(player.getUniqueId()).isEmpty()); assertFalse(arrow.isValid());
+        assertEquals(0, bows.capacityUsed()); assertEquals(0, bows.pendingClaims());
+        server.getScheduler().performOneTick(); assertTrue(hits.isEmpty());
+    }
 }

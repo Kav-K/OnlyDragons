@@ -146,7 +146,15 @@ public final class OwnedBowService implements AutoCloseable {
     }
     void ownerDied(PlayerDeathEvent event) {
         check(); refundDeath = event;
-        try { currentSession(event.getPlayer().getUniqueId()).ifPresent(token -> clearSession(event.getPlayer().getUniqueId(), token, true)); }
+        try {
+            UUID owner = event.getPlayer().getUniqueId();
+            currentSession(owner).ifPresent(token -> clearSession(owner, token, true));
+            // Arena exit/quit can already have invalidated the session while preserving airborne ownership.
+            // Death retires that ownership independently of whether a live token still exists.
+            for (Group group : List.copyOf(groups.values())) if (group.owner.equals(owner)) fail(group);
+            for (var arrow : registry.snapshot()) if (arrow.shot().ownerId().equals(owner))
+                retire(arrow.shot().projectileId(), Retirement.OWNER_DEATH);
+        }
         finally { refundDeath = null; }
     }
     void targetDied(LivingEntity entity) {

@@ -70,7 +70,7 @@ remaining failures below prevent feature acceptance.
 ## Validation state
 
 Initial doctor: ready; starting checkpoint: plan-valid, automated readiness false.
-JDK 25 wrapper build now passes 181 tests, zero failures/errors/skips, including
+JDK 25 wrapper build now passes 182 tests, zero failures/errors/skips, including
 domain capacity/child/clock boundaries and synthetic adapter final-veto,
 target-replacement, old-session impact and reset-before-settlement regressions.
 MockBukkit cannot simulate airborne `isInBlock`; retained-airborne physics is
@@ -111,7 +111,9 @@ coverage. No client-schema or production-timing change is needed.
 Pinned Paper's [disconnect implementation](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/patches/sources/net/minecraft/server/network/ServerCommonPacketListenerImpl.java.patch#L303-L308)
 defers connection-disconnect handling to the next tick. This explains the
 observed setup; it does not prove every possible earlier quit window impossible.
-The corrected current-input feature run and full cohort remain pending.
+Clean `f9350f2` focused run `f788f9f3c2f04dc3bfd5979cfb31bd99` passes the corrected lifecycle fixture. It predates the following independent review fixes and is not their acceptance evidence.
+
+Review comment 5559323208 identified owner death after arena exit retaining old arrows when no current session existed. Death now retires owned entities/claims independently of session lookup; stale-token cleanup and ordinary quit retention remain unchanged. A synthetic pending-claim death regression passes. The real fixture adds arena exit, actual death, other-owner isolation and packet respawn; negative controls require actor-correlated native launch/interact observations plus successful shortbow recovery. Actual child launch position/velocity are checked against the captured primary within `1e-9`, and launch tick must be exactly +1. A new clean feature run and full cohort remain pending.
 
 Feature runtime, complete selected cohort/T06 checkpoint,
 independent review and current CI remain outstanding. Human mouse/hold feel,
