@@ -134,8 +134,10 @@ production bootstrap/listeners, trusted item revisions and actor admission remai
 unchanged. All existing scenarios and four cleanup requirements are preserved.
 
 Main `4cfb7b9` (PR44/PR45) is reconciled additively in the bounded 6 September
-resume. Actual-sandbox doctor is ready; focused local checks accompany the
-handoff. All 17 main cases plus T05 are retained. The lead's raw-log audit found
+resume. Actual-sandbox doctor is ready. Clean merge `581e0e3` passed root/API-isolation
+and companion builds; Gradle reused 136 unchanged production results. Fresh
+client tests passed 28, runner/checkpoint tests 238 and Symphony tests 25. Plan
+validation passed with automated readiness and acceptance false. All 17 main cases plus T05 are retained. The lead's raw-log audit found
 console ERROR lines missed by the historical matcher in receipt `b7fd6bc`;
 its former automated-ready flag cannot establish acceptance. PR44's corrected
 matcher remains intact. No fresh Paper acceptance is claimed by this resume.

@@ -19,10 +19,45 @@ JDK 25.0.4.1, existing accepted EULA readable, shared lease writable/available;
 errors/waiting empty. Guest memory was 8223 MiB and effective host memory 6589 MiB
 against 2816 required. This establishes access only, not runtime acceptance.
 
-Focused build/client/runner checks and the final committed source identity are
-recorded below and in PR30's handoff. Changed-area selection is the complete
-18-case baseline: the 17 main cases plus `enchants-procs` (12 positives and six
-intended failures). Plan validity is distinct from automated readiness.
+## Focused verification on clean merge 581e0e3
+
+Exact tested source: `581e0e394a485724d932ab627bff1e2f79a9dfc2`.
+Final fetch still resolved main to `4cfb7b9525a186c1f6591173a550565fed3efd53`.
+
+- `bash ./gradlew build --console=plain`: passed including API isolation.
+  Gradle reused unchanged production test results: 136 tests, zero failures,
+  errors or skips. This resume made no production/test Java edits.
+- `bash ./gradlew -p dev/game-tests build --console=plain`: passed; the combined
+  companion recompiled successfully. It has no standalone unit test sources.
+- `bash ./gradlew -p dev/player-client build installDist --dependency-verification
+  strict --console=plain`: passed; 28 client tests ran with zero failures/errors/skips.
+- `python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py'`:
+  238 tests passed. Symphony discovery under `scripts/symphony/tests`: 25 passed.
+- `checkpoint.py plan --project .`: plan-valid, `automatedReady=false`,
+  `acceptanceApproved=false`. No acceptance receipt supplied or replay claimed.
+- Additive comparison against main verified every prior scenario definition,
+  suite membership and other task's progress. The runner/error-matcher regression
+  files are byte-identical to main; all four cleanup assertions remain present.
+
+`paper_suite.py --changed-since origin/main --plan` selects all 18 cases (12
+positive, six intended failures): lifecycle-calibration, foundation-contracts,
+stats-resolution, item-identity, combat-accounting, projectile-feasibility,
+protocol-player-calibration, deliberate-failure, projectile-cleanup-failure,
+projectile-cleanup-abort, protocol-player-early-exit, protocol-player-idle,
+equipment-stats, equipment-player, protocol-player-soak,
+headless-player-primitives, headless-player-cleanup-abort and enchants-procs.
+Selection alone is not runtime evidence; the future combined branch must plan
+again after integrating the other features.
+
+| Identity | SHA256 |
+| --- | --- |
+| Current actual source inputs | `f34a88a468c6d74d3c8955811c19f04ae8b772700c5aabb33e74c7a6aa20be8d` |
+| Production JAR (build output, not staged to Paper) | `851df13d2721eb4d4079d86741375a1613d66e53cad0b49c9265457a32ca0257` |
+| Companion JAR (build output, not staged to Paper) | `7f4fd73a9f73e1843f4e21ec3b9fe8d192ecc83dbdb860a6c236648e9cb159d6` |
+
+Final documentation-head CI is recorded in PR30's handoff; historical CI is not
+claimed for this changed head. This evidence-only follow-up does not change
+runtime inputs or require repeating these focused checks.
 
 ## Runtime acceptance held
 
