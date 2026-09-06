@@ -3,7 +3,27 @@
 GH-64 / [draft PR #74](https://github.com/Kav-K/OnlyDragons/pull/74),
 `symphony/gh-64`. Implementation is In review, not accepted.
 
-## Focused clean runtime
+## Final clean focused candidate
+
+Final candidate `ae7953861f2506056607a7800212afa0f7fcd47f` includes main
+`7a380408e02fe59d1820163bd7cfa68169e85e4b` and the stricter received-packet
+validator. Fresh run `85f6373c252940cd8cb3b7ae84868ce4` passed at that revision
+with `worktreeDirty: false`: 18 assertion rows and 28 complete received-bar
+samples, 235 production/six companion/30 client tests, zero failures/errors/skips.
+The 273 Python tests and static plan checkpoint also pass. Both JVMs exited 0,
+unforced and clean. Production/companion artifacts match the hashes below.
+
+Raw evidence under `build/reports/agent-paper/85f6373c252940cd8cb3b7ae84868ce4/`:
+
+- `result.json`: `15efab9a6d1dfe93bd62bbadbbd78f646c3d9865ded17fcc82ad525b17805959`.
+- `scenario.json`: `add9441b518ab11c1131ba68b9187757b96a2a615e7e2847e1e803b5a360fd45`.
+- `player.json`: `ef8ea09774f653556bfead8fa86e1e58cc43428194880b17772661fb68f87105`.
+
+Later handoff commits update Markdown/progress notices only; they do not change
+runtime/scenario/validator inputs. The earlier focused evidence remains below
+with its original revision. No complete suite receipt is claimed.
+
+## First clean focused runtime
 
 Paper `26.2-121-a2a42c5`, JDK 25, protocol 776. Run
 `857114829e3343f8b54e8e46c402a0b8` passed at clean runtime
@@ -74,10 +94,30 @@ under runner cleanup, both unforced. Missing later assertions were not removed.
 
 ## Remaining gates
 
-The complete changed-area suite receipt, strict replay and final T08d automated
-checkpoint are pending. Per lead sequencing comment `5562197128`, incorporate
-T05b/#66 from main before starting that cohort; its explicit calibration mode
-must be preserved in the T08d fixtures. Independent review,
+Per [lead comment 5562281339](https://github.com/Kav-K/OnlyDragons/issues/64#issuecomment-5562281339),
+the lead owns merging T05b/#66, combining the clean #64/#65 histories, resolving
+their shared seams, and running one complete current-main cohort plus both task
+checkpoints before integration. The worker was explicitly instructed not to
+duplicate that cohort locally. The full suite receipt/replay, final T08d automated
+checkpoint and combined-source acceptance remain pending.
+
+Integration notes for that lead-owned branch:
+
+- Preserve #66's standard/training/calibration spawn modes. Change the two T08d
+  plan spawn commands to `spawn calibration` and its fixture-only score-profile
+  call to `spawn(SpawnMode.CALIBRATION)` so the independent HP/name oracles keep
+  testing their declared legacy profile. The T08d fixture does not select balance.
+- Extend compact DragonCommand status detection for #66's added `mode=` field
+  before `generation=`; retain both formatted headings and exact diagnostic text.
+- Keep T08e's `entityMotion` observation additive beside bounded
+  `bossBars`/`styledMessages`; preserve strict plan-scoped field admission and
+  both independent validators. Merge all case/area/acceptance registrations.
+- The UI presenter owns only its read-only synchronous loop. Preserve shutdown
+  ordering (UI before dragon/combat), the single combat authority, and T08e's
+  backend/motion/ticket ownership. The display-only formatter in document 02 is
+  available to T02c/T06b after integration.
+
+Independent review,
 current CI, Windows smoke/Play and human visual/readability/authenticated-client
 observations remain separate. A connected presenter-close packet test is not a
 claim that a disconnected client received shutdown packets. Actual process
