@@ -109,22 +109,23 @@ design sections above are the current summary; this record explains changes.
 | 2026-09-05 | Shared agent tooling; user request | Bundled three Minecraft skills with references/provenance; configured Context7 and project-scoped Serena for Cursor, Codex, and isolated Symphony workers. | All three skill validators passed; Windows/Linux MCP initialize/tool-list and Java-symbol checks passed. A fresh Linux issue clone discovered all three skills, connected Context7 (2 tools) and Serena (8), queried Paper docs and production lifecycle symbols. Direct Codex from a nested directory also connected. Five bridge tests and scaffold skill-preservation checks passed. No gameplay milestone advanced; see dev/agent-tools.md. |
 | 2026-09-05 | User-confirmed execution policy | Authorized feature agents to test against isolated real Minecraft, parallel coding, and lead merges of reviewed/tested PRs into main. Reuse existing local EULA acceptance; preserve human worlds and serialize JVM tests. | Existing managed dev server stopped cleanly with user permission. Fourteen issues created; T00/T09a agents started in separate clones. Bridge tests include the narrow shared lease directory (6 pass); client/milestone gates remain distinct. |
 | 2026-09-05 | T09a / #2 / PR #16 | Integrated an isolated Linux/WSL runner and same-Paper companion with a shared lease, memory admission, strict reports, and owned-process cleanup. | Merged into main at 140f11c. Clean 946858d positive and deliberate-failure controls produced the expected outcomes and clean shutdown; [calibration evidence](../../dev/agent-paper-tests.md#accepted-calibration-evidence). Broader T09 gameplay and human gates remain. |
-| 2026-09-05 | T01a / #3 | Adopted named calibration defaults/ranges/caps and deterministic arithmetic policy within task scope; stable T00 records preserved. See document 02 section 3. | Clean 20eff9e: 30 production tests (9 new resolver tests), zero failures/errors/skips; 18 production-resolver Paper assertions and clean unforced shutdown. See [evidence](#t01a-resolver-validation). T01b equipment integration and human play remain separate. |
+| 2026-09-05 | T01a / #3 | Adopted named calibration defaults/ranges/caps and deterministic arithmetic policy within task scope; stable T00 records preserved. See document 02 section 3. | Clean 36a7e23: 30 production tests (9 new resolver tests), zero failures/errors/skips; 18 production-resolver Paper assertions and clean unforced shutdown. See [evidence](#t01a-resolver-validation). T01b equipment integration and human play remain separate. |
 | 2026-09-05 | T00 / #1 / PR #15 | Established shared immutable domain contracts without introducing resolver/combat engines or choosing unresolved balance rules. | Clean 53f7e20: 21 production tests, no failures/errors/skips; real Paper passed 29 assertions with clean unforced shutdown. Independent review and final e3a9e68 Windows/Linux CI passed; merged at be920d0. [Versions, hashes, and scope](../../dev/agent-paper-tests.md#foundation-contract-evidence). |
 | 2026-09-05 | Report validation / [#17](https://github.com/Kav-K/OnlyDragons/issues/17), In review | Reject boolean/number equivalence recursively in assertion evidence, even with forged pass flags; preserve integer/float numeric equivalence and JSON structure/order checks. | Implementation 4aa62f4: Ubuntu 24.04 / Python 3.12.3, `python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py' -v` passed all 27 tests without skips. Revalidated unchanged stored T09 positive (13 assertions), negative (only `deliberate_failure` rejected), and T00 (29 assertions) reports within their original run windows. No new Paper JVM or gameplay gate; independent review/CI pending. |
 
 ### T01a resolver validation
 
 GH-3 on `symphony/gh-3` is **In review**. Clean runtime-code revision
-`20eff9e4243f5b06916e6428d703576430e1fb2f` includes main `a795adb`; fetch/merge
-before and after runtime verification found main already integrated. The ordinary
+`36a7e23412c4271fc1fa76a980ceddb4c3740272` includes main `6f0ccfb` and its strict typed
+report validator from PR #19, merged normally before final verification. The ordinary
 wrapper build and both runner builds passed with JDK 25.0.4.1: 30 production
 tests, zero failures/errors/skips, including 9 new resolver behavior tests and
 API isolation. The resolver and source collection had all lines/branches covered;
-coverage supplements the explicit numeric and rejection assertions.
+coverage supplements the explicit numeric and rejection assertions. The integrated
+runner suite also passed all 27 Python tests without skips.
 
 `python3 scripts/agent-tests/paper_test.py --scenario stats-resolution` returned
-exit 0 in run `a4bdee4953654617bb51c3cc367e5779` on Paper
+exit 0 in run `50acd539aaae416481789e1b711bfa7f` on Paper
 `26.2-121-a2a42c5` / Minecraft 26.2, mechanic `stats-calibration-v1`.
 All 18 assertions passed. The scenario loaded the resolver from the production
 plugin classloader and verified complete snapshots, weapon base exactly once,
@@ -139,10 +140,10 @@ Production SHA256:
 Companion SHA256:
 `072ad52ffdfdfbb4229b123c292cffdf4594dc2fc6e94fdd80490c8fbf63301f`.
 The runner reused the accepted EULA, shared lease, memory gate and disposable
-issue-local world on loopback port 47367. All three cleanup assertions passed;
+issue-local world on loopback port 43443. All three cleanup assertions passed;
 the scenario owned no entities, scheduled tasks or chunk tickets. Paper exited
 0 with `forced=false`, `clean=true`. Raw reports stay in ignored
-`build/reports/agent-paper/a4bdee4953654617bb51c3cc367e5779/`.
+`build/reports/agent-paper/50acd539aaae416481789e1b711bfa7f/`.
 
 These are synthetic domain inputs executed on real Paper. Windows smoke,
 authenticated clients, equipment changes, mouse input, visuals and multiplayer
