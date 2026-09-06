@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Preserve Symphony's sandbox while permitting Git metadata in its issue clone."""
+"""Bind worker tools and permit only issue Git metadata plus the shared test lease."""
 import copy
 import json
 import os
@@ -57,7 +57,14 @@ def validate_workspace(workspace, source):
     return workspace
 
 
-def transform_message(message, workspace):
+def validate_coordination(source):
+    expected = Path(source).resolve(strict=True) / '.symphony/test-coordination'
+    if expected.is_symlink() or not expected.is_dir() or expected.resolve(strict=True) != expected:
+        raise ValueError('Invalid shared Paper-test coordination directory.')
+    return expected
+
+
+def transform_message(message, workspace, coordination=None):
     """Change only a workspaceWrite turn's roots; leave every other message intact."""
     if not isinstance(message, dict) or message.get('method') != 'turn/start':
         return message
@@ -77,10 +84,17 @@ def transform_message(message, workspace):
     roots = policy.get('writableRoots', [])
     if not isinstance(roots, list) or not all(isinstance(root, str) for root in roots):
         raise ValueError('Invalid writable roots in turn policy.')
-    if str(git_dir) in roots:
+    additions = [str(git_dir)]
+    if coordination is not None:
+        coordination = Path(coordination)
+        if coordination.is_symlink() or coordination.resolve(strict=True) != coordination:
+            raise ValueError('Shared Paper-test coordination directory changed.')
+        additions.append(str(coordination))
+    missing = [root for root in additions if root not in roots]
+    if not missing:
         return message
     updated = copy.deepcopy(message)
-    updated['params']['sandboxPolicy']['writableRoots'] = [*roots, str(git_dir)]
+    updated['params']['sandboxPolicy']['writableRoots'] = [*roots, *missing]
     return updated
 
 
@@ -89,6 +103,7 @@ def main():
     if not source:
         raise ValueError('Start workers through Symphony.cmd.')
     workspace = validate_workspace(Path.cwd(), source)
+    coordination = validate_coordination(source)
     stopping = threading.Event()
     for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
         signal.signal(signum, lambda *_: stopping.set())
@@ -112,7 +127,7 @@ def main():
         except (ValueError, UnicodeDecodeError):
             child.stdin.write(line)
         else:
-            transformed = transform_message(original, workspace)
+            transformed = transform_message(original, workspace, coordination)
             child.stdin.write(line if transformed is original else json.dumps(transformed).encode() + b'\n')
         child.stdin.flush()
 

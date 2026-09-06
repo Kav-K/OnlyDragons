@@ -13,14 +13,17 @@ systems. The previous setup validation passed 11 starter tests and built the
 artifacts on Linux. That is tooling evidence, not evidence for T00–T12 or M0–M5.
 The existing lab is available; the proposed gameplay runner does not yet exist.
 
-Symphony is configured for one concurrent worker, GitHub Issues, and draft PR
-handoff. At this baseline, GitHub authentication and the initial source push
-are pending; no real issue-to-PR run has been verified. Update this setup note
-when that integration is actually exercised.
+GitHub authentication is configured and the source/shared context is published
+on main. Fourteen issues now define the execution backlog. Symphony is prepared
+for three parallel coding workers and draft PR handoff; the lead may merge
+reviewed/tested PRs under the user's authorization. Actual Paper tests are
+serialized through the isolated runner being delivered in T09a. Local delegated
+agents started T00 and T09a; the automated Symphony issue-to-PR path remains to
+be exercised. See [execution order](04-execution-backlog.md).
 
 | Task | Implementation state | Owner / issue / PR | Remaining acceptance gate |
 | --- | --- | --- | --- |
-| T00 — Contracts | Planned | Unassigned | Shared consumers/fixtures compile; domain signatures and decisions agreed. |
+| T00 — Contracts | In review | [#1](https://github.com/Kav-K/OnlyDragons/issues/1), [PR #15](https://github.com/Kav-K/OnlyDragons/pull/15) | Domain contracts/build reviewed at d363c5a; 21 tests pass, 0 skips. Actual Paper contract fixture pending T09a. |
 | T01 — Stats | Planned | Unassigned | Resolver, snapshot, and equipment provenance acceptance cases. |
 | T02 — Items | Planned | Unassigned | PDC/schema/identity and one-ultimate validation cases. |
 | T03 — Combat/ledger | Planned | Unassigned | Numeric fixtures, one impact authority, health/score/death invariants. |
@@ -29,7 +32,7 @@ when that integration is actually exercised.
 | T06 — Firing/Duplex | Planned | Unassigned | Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence. |
 | T07 — Tracer/continuity | Planned | Unassigned | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |
 | T08 — Practice tools | Planned | Unassigned | Repeatable player procedure, permissions, and explained damage. |
-| T09 — Gameplay validation | Planned | Unassigned | Independent Paper scenarios and report failure-path validation. |
+| T09 — Gameplay validation | In progress (T09a environment) | [#2](https://github.com/Kav-K/OnlyDragons/issues/2) | Runner/companion under development; required positive and deliberate-failure real-Paper checks remain gates. Feature scenario suite extends as features land. |
 | T10 — Prefire/performance | Planned | Unassigned | Integrated traces, human rehearsal, and measured load/cleanup gates. |
 | T11 — Eight-eye lifecycle | Planned, later | Unassigned | M3 accepted, then transaction, spawn, cancellation, and recovery gates. |
 | T12 — Variants/progression | Planned, later | Unassigned | T11 plus separately agreed roster, rewards, and acquisition scope. |
@@ -103,16 +106,19 @@ design sections above are the current summary; this record explains changes.
 | --- | --- | --- | --- |
 | 2026-09-05 | Shared-context setup; user request | Made the three planning documents required project context and added an agent maintenance/handoff protocol. | Starter-only source inventory reconciled; all gameplay tasks remain planned. Shared reading routes are in AGENTS.md, Cursor rules, and WORKFLOW.md. |
 | 2026-09-05 | Shared agent tooling; user request | Bundled three Minecraft skills with references/provenance; configured Context7 and project-scoped Serena for Cursor, Codex, and isolated Symphony workers. | All three skill validators passed; Windows/Linux MCP initialize/tool-list and Java-symbol checks passed. A fresh Linux issue clone discovered all three skills, connected Context7 (2 tools) and Serena (8), queried Paper docs and production lifecycle symbols. Direct Codex from a nested directory also connected. Five bridge tests and scaffold skill-preservation checks passed. No gameplay milestone advanced; see dev/agent-tools.md. |
+| 2026-09-05 | User-confirmed execution policy | Authorized feature agents to test against isolated real Minecraft, parallel coding, and lead merges of reviewed/tested PRs into main. Reuse existing local EULA acceptance; preserve human worlds and serialize JVM tests. | Existing managed dev server stopped cleanly with user permission. Fourteen issues created; T00/T09a agents started in separate clones. Bridge tests include the narrow shared lease directory (6 pass); client/milestone gates remain distinct. |
+| 2026-09-05 | T00 / #1 / PR #15 | Established shared immutable domain contracts without introducing resolver/combat engines or choosing unresolved balance rules. | d363c5a WSL Java25 wrapper build: 21 tests, no failures/errors/skips; API isolation and independent code review passed. Real Paper contract-consumer fixture pending before merge. |
 
 ## 1. Team operating contract
 
 A practical team is one integration lead plus three implementation agents. Each work package has one owner, a bounded file area, dependencies, and observable acceptance criteria. The owner writes behavior tests with the feature; the validation agent independently exercises integrations and failure cases.
 
 This is a suggested coordination model, not a request to start four workers.
-The active orchestrator configuration controls concurrency (currently one
-Symphony worker). Under its current Linux worker policy, real Paper/server and
-human/client checks are operator-run gates. Prepare test code and instructions
-within scope, and keep those gates pending until their evidence is supplied.
+The active orchestrator configuration controls concurrency (up to three coding
+workers). Under the updated user-authorized policy, feature agents run real
+Paper scenarios through the isolated runner, with per-issue worlds/ports and a
+shared serialized test lease plus memory gate. Authenticated-client/input/visual
+checks remain distinct human gates. Keep every unrun gate visible.
 
 The integration lead owns `OnlyDragonsPlugin`, `plugin.yml`, Gradle/settings files, pins, the shared DTO/interface contract, and the top-level command registration. Other agents request changes to those files through the lead. Keep independently edited feature packages separate. Do not have every agent redesign `DamageContext` or install its own global damage listener.
 

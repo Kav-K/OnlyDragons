@@ -25,6 +25,15 @@ jobs:
       - name: Build, test, and generate coverage
         shell: bash
         run: bash ./gradlew build --console=plain
+      - name: Compile the isolated Paper test companion
+        shell: bash
+        run: bash ./gradlew -p dev/game-tests build --console=plain
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify runner failure and provenance contracts
+        shell: bash
+        run: python -m unittest discover -s scripts/agent-tests -p 'test_*.py' -v
       - uses: actions/upload-artifact@v4
         if: always()
         with:

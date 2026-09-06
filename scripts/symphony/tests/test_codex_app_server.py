@@ -27,6 +27,8 @@ class BridgeTests(unittest.TestCase):
         )
         self.workspace = self.source / '.symphony/workspaces/issue'
         (self.workspace / '.git').mkdir(parents=True)
+        self.coordination = self.source / '.symphony/test-coordination'
+        self.coordination.mkdir()
         self.turn = {
             'id': 7, 'method': 'turn/start',
             'params': {
@@ -55,6 +57,17 @@ class BridgeTests(unittest.TestCase):
                 changed = json.loads(json.dumps(self.turn))
                 changed['params']['cwd'] = cwd
                 bridge.transform_message(changed, self.workspace)
+
+    def test_shared_lease_is_narrow_and_rejects_symlink_redirection(self):
+        self.assertEqual(self.coordination, bridge.validate_coordination(self.source))
+        changed = bridge.transform_message(self.turn, self.workspace, self.coordination)
+        self.assertEqual([str(self.workspace / '.git'), str(self.coordination)], changed['params']['sandboxPolicy']['writableRoots'])
+        self.coordination.rmdir()
+        self.coordination.symlink_to(self.source, target_is_directory=True)
+        with self.assertRaises(ValueError):
+            bridge.validate_coordination(self.source)
+        with self.assertRaises(ValueError):
+            bridge.transform_message(self.turn, self.workspace, self.coordination)
 
     def test_git_symlink_is_rejected_on_launch_and_later_turn(self):
         (self.workspace / '.git').rmdir()
@@ -107,7 +120,7 @@ class BridgeTests(unittest.TestCase):
                     self.assertEqual(untouched, proc.stdout.readline())
                     proc.stdin.write(json.dumps(self.turn) + '\n')
                     proc.stdin.flush()
-                    self.assertEqual(bridge.transform_message(self.turn, self.workspace), json.loads(proc.stdout.readline()))
+                    self.assertEqual(bridge.transform_message(self.turn, self.workspace, self.coordination), json.loads(proc.stdout.readline()))
                     if shutdown == 'eof':
                         proc.stdin.close()
                     elif shutdown == 'signal':

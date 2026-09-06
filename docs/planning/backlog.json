@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "repository": "Kav-K/OnlyDragons",
+  "defaultBranch": "main",
+  "tasks": [
+    {
+      "id": "T00", "title": "Establish shared stats, item, and combat contracts", "dependsOn": [],
+      "scope": "Plain Java shared DTOs/interfaces and fixture consumers under domain and application. Define units, IDs, revisions, immutable snapshot/provenance, shot/proc ancestry, target liveness, separate health and contribution. Preserve starter behavior. No full feature engines yet.",
+      "acceptance": "Consumers compile without Paper types in domain signatures; immutable inputs reject invalid finite/identity state; an ordinary crit fixture explains 210 damage and a ferocity fixture separates HP/score. Run the wrapper build and, after T09a lands, a real Paper contract-consumer scenario.",
+      "coordination": "Integration-lead-owned shared contract files. Publish the exact API before T01a/T02 start. Root bootstrap, plugin descriptor, Gradle and pins require lead integration."
+    },
+    {
+      "id": "T09a", "title": "Provide isolated real-Paper integration environments for agents", "dependsOn": [],
+      "scope": "Create a Linux runner and separate same-Paper-pin gameplay companion under scripts/agent-tests and dev/game-tests. Each agent invokes it in its own checkout with disposable worlds, separate loopback port, exact built artifacts, explicit accepted EULA, global test lease, memory gate and owned-process cleanup.",
+      "acceptance": "Real pinned Paper lifecycle/calibration scenario passes. Deliberate failed assertion fails the process. Missing, stale, incomplete, timed-out and failed structured reports fail reliably. Reports carry run/scenario IDs, actual versions, revision and artifact hashes. Clean shutdown runs on success, failure and cancellation. No production packaging of the test companion.",
+      "coordination": "Own harness lifecycle/report schema/runner; feature agents own scenario classes in separate packages. Coordinate root Gradle integration with lead. Human worlds/profiles are never used."
+    },
+    {
+      "id": "T01a", "title": "Implement the base stats resolver and immutable explained snapshots", "dependsOn": ["T00", "T09a"],
+      "scope": "Implement domain.stats resolution, validated versioned defaults and source-keyed modifier collections. Follow base/flat/additive-percent/ordered-multiplier/cap order. Preserve raw crit chance above 100; derive bounded ordinary probability separately. Replace a source's whole contribution on refresh. No equipment adapter or combat engine ownership.",
+      "acceptance": "Deterministic order/source replacement, cap boundaries, fractional values, non-finite/overflow rejection and immutable old snapshots pass domain tests. A real Paper scenario invokes the production resolver and verifies matching values and explanations on this branch's built artifact.",
+      "coordination": "Own resolver/config/tests under domain.stats and stats scenario package. Shared T00 types are stable; propose contract changes to lead. T01b later integrates player equipment."
+    },
+    {
+      "id": "T02", "title": "Implement weapon identity, PDC round-trips, and enchant validation", "dependsOn": ["T00", "T09a"],
+      "scope": "Definition/instance separation, versioned item schema, validated PDC codec, generated presentation, single-ultimate enforcement and calibration loadouts. Own domain.item, paper.item.codec, item resources/tests and item scenario package.",
+      "acceptance": "Real Paper ItemStack/PDC round-trips preserve distinct instances. Renaming an ordinary item cannot grant behavior. Invalid schema/levels and multiple ultimates reject clearly; compatibility fixtures migrate or reject explicitly. Domain and actual-server results recorded separately.",
+      "coordination": "Do not edit paper.item.equipment or shared command registration. Request integration-lead changes to shared contracts and bootstrap."
+    },
+    {
+      "id": "T04", "title": "Measure real arrow and multipart dragon collision behavior", "dependsOn": ["T00", "T09a"],
+      "scope": "Implement isolated real entity scenarios and a concise findings note. Observe event ordering/cancellation, part-to-parent mapping, native suppression, head/body hits, flying/perched behavior, simultaneous impacts, pre-spawn identity and lifetime controls. Use public Paper APIs only.",
+      "acceptance": "Evidence identifies a viable single impact authority and native-damage boundary on the exact Paper pin. Real arrows and real dragons are required; retain missed/unsupported cases as findings. No teleported arrows, mock dragons or inferred passes. Revise unsupported design before dependent adapters start.",
+      "coordination": "Own dev/game-tests projectile feasibility scenario package and findings note. Coordinate harness extension points with T09a; do not implement the final combat adapter prematurely."
+    },
+    {
+      "id": "T03", "title": "Implement combat math, caps, health and contribution accounting", "dependsOn": ["T00", "T01a"],
+      "scope": "No-Strength offensive calculation, explicit crit outcome, modifiers, mitigation/cap profiles, health/score separation, idempotent impacts, target lifecycle and immutable encounter results. Own domain.combat and agreed target/result portions of domain.encounter.",
+      "acceptance": "Golden numeric and cap-boundary fixtures, repeated impact rejection, HP floor, separate score, simultaneous lethal candidates and late descendants pass. Real Paper scenario invokes the production services and agrees with fixtures. Experimental ferocity coefficients stay labeled calibration values.",
+      "coordination": "Do not register competing Bukkit damage listeners. Shared DTO changes go through lead; final physical adapter follows T04 findings."
+    },
+    {
+      "id": "T01b", "title": "Connect equipment provenance and playable stats inspection", "dependsOn": ["T01a", "T02"],
+      "scope": "Equipment fingerprint/cache and source refresh, player session cleanup, temporary overrides, and /onlydragons stats explain. Add permission-gated calibration loadout grants through the validated item path. Own paper.item.equipment and agreed application/command files; integrate shared registration through lead.",
+      "acceptance": "Equip/unequip/offhand refresh cannot stack stats; changed item data invalidates cache; accepted snapshots remain unchanged; quit clears session state. Real Paper tests cover production codec/service/command integration and invalid console/permission paths where possible. Document a short Cursor Play + in-game procedure and leave actual authenticated-client evidence explicit.",
+      "coordination": "This is the first human-playable stats slice. Do not claim projectile shot-time integration until T06 connects it. Preserve/update existing status/reload behavior and smoke assertions."
+    },
+    {
+      "id": "T05", "title": "Implement bounded ferocity and enchant effect state", "dependsOn": ["T01a", "T02", "T03"],
+      "scope": "Ferocity counts/child identity and queue, captured damage inheritance, Fatal Tempo eligibility/expiry, ordinary Power/Vicious/Snipe modifiers, explicit Gravity profile and Overload extension. Own domain.enchant and agreed proc coordinator.",
+      "acceptance": "Controlled 0/25/100/250/500 cases, zero-base tempo, stack/expiry boundaries and two-bow swaps pass; child hits cannot recurse; capacity rejection is observable; Snipe cannot reward homing loops. Real Paper scheduler/lifecycle scenarios validate the same production coordinator. Unchosen formulas remain deferred.",
+      "coordination": "Use shared shot and damage contracts. Do not add independent event listeners or change item validation ownership."
+    },
+    {
+      "id": "T06", "title": "Implement owned bow, shortbow and Duplex projectiles", "dependsOn": ["T01b", "T02", "T04"],
+      "scope": "Native drawn-bow capture, shortbow trigger/cooldown, one-time ammo/capacity reservation, immutable shot inputs, real Arrow registry and distinct Duplex child. Own firing/lifecycle subpackages of domain.projectile and paper.projectile.",
+      "acceptance": "Real Paper UUID traces show physical primary/child identity and ownership, no duplicate emission/consumption on cancellation or offhand events, exact one Duplex child, and cleanup after failures. Shot-time equipment verification uses T01b. Authenticated mouse/hold input remains a separate client gate.",
+      "coordination": "Use T04's measured impact/event decisions. Do not implement Tracer steering in this issue; publish registry contracts for T07."
+    },
+    {
+      "id": "T07", "title": "Implement Dragon Tracer and continuous pre-spawn arrows", "dependsOn": ["T04", "T06"],
+      "scope": "Deterministic acquisition/steering, radius/angle/obstruction policies, ballistic behavior without target, reacquisition, owned-arrow ageing control, chunk tickets and reasoned removal. Own steering/acquisition subpackages and corresponding scenarios.",
+      "acceptance": "All five level boundaries and vector edge cases pass; actual pre-spawn arrow UUID survives and can acquire a real dragon; walls/misses remain meaningful; grounded arrows do not rearm; teardown releases owned arrows/tickets/tasks. No replacement arrows conceal removal.",
+      "coordination": "Build on merged T06 registry. Changes to shared lifecycle methods require lead review, not duplicate registries."
+    },
+    {
+      "id": "T08", "title": "Integrate the playable dummy combat sandbox and explanations", "dependsOn": ["T01b", "T03", "T05", "T06"],
+      "scope": "Practice target, one physical damage adapter, native suppression per T04, stats/last-hit UI, development loadouts and deterministic scenario controls. Integrate one composition root and one command tree.",
+      "acceptance": "Real owned-arrow hit changes managed HP/score once, cancellation grants neither damage nor duplicated consumption, reports agree with deterministic math, non-admin operations reject, and teardown is clean. A fresh main checkout builds and starts through existing Cursor Play/Run tasks with a documented in-game test sequence.",
+      "coordination": "Integration-lead-owned bootstrap/descriptor/command registration. Revalidate latest main and existing status smoke checks before merge."
+    },
+    {
+      "id": "T10", "title": "Integrate real-dragon prefire rehearsal and measured load gates", "dependsOn": ["T04", "T05", "T06", "T07", "T08"],
+      "scope": "Countdown/marker, atomic real dragon hatch, same-projectile continuity, combat integration, teardown and versioned scenario reports. Sweep timing/angle/obstruction controls and measure representative load.",
+      "acceptance": "Successful arrows existed before hatch; early/off-angle/blocked controls miss; simultaneous hits are retained; no post-death score; repeated reset returns state to baseline. Record actual performance envelope. Human visual timing and multiplayer gates remain unaccepted until independently observed.",
+      "coordination": "Serialize server/load scenarios and respect memory gate. M3 acceptance requires recorded human evidence even if automated-ready code is merged."
+    },
+    {
+      "id": "T11", "title": "Plan and implement the eight-eye encounter after M3 acceptance", "dependsOn": ["T10"], "manualGate": "M3 explicitly accepted with human prefire evidence",
+      "scope": "Later milestone: eight distinct placements, idempotent consumption/refund, single transition, animation keyframes, cancellation/reset and crash-recovery policy.",
+      "acceptance": "Concurrent final placement and duplicate inputs cannot duplicate eyes/bosses; failure/refund/restart paths are recoverable; one encounter result. Do not dispatch until the manual gate is satisfied.",
+      "coordination": "See T11 in the shared plan. Keep later implementation behind measured combat/prefire foundation."
+    },
+    {
+      "id": "T12", "title": "Refine variants, rewards and progression after encounter acceptance", "dependsOn": ["T11"], "manualGate": "Agreed variant roster, reward rules and acquisition scope",
+      "scope": "Later planning task to split bounded variant/abilities/content and durable progression work. Preserve configurable registries and idempotent result consumption; do not infer an entire SkyBlock economy.",
+      "acceptance": "Written bounded implementation tasks and balance/acquisition decisions before coding; later seeded selection, deterministic abilities and durable one-time rewards must pass their own runtime/recovery checks.",
+      "coordination": "Do not dispatch until the manual gate is satisfied. Foundation-default authorization does not choose the entire later economy."
+    }
+  ]
+}

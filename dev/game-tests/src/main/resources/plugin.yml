@@ -1,0 +1,13 @@
+name: OnlyDragonsGameTests
+version: '1.0.0'
+main: com.kaveenk.onlydragons.gametests.GameTestsPlugin
+api-version: '${apiVersion}'
+depend: [OnlyDragons]
+description: Test-only real Paper scenarios; never deploy to human play profiles.
+commands:
+  odgametest:
+    description: Run one isolated scenario from the local test runner.
+    permission: onlydragons.gametests.run
+permissions:
+  onlydragons.gametests.run:
+    default: op
