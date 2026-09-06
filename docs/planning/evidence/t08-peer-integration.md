@@ -1,5 +1,11 @@
 # T08/T07 peer composition — focused verification
 
+**Final acceptance:** PR #57 merged at `3505d6cc58cd2cf9b09c2d21ac38ec6eca3f4c45`
+after the complete `24ddf86` hosted cohort, independent replay/review, original/latest-main
+checkpoints and current CI; [final T08 evidence](t08-suite.md). The original
+focused-stage status and pending gates below remain historical, with unchanged
+run identities. They are not a substitute for the final full cohort.
+
 Bounded continuation of [GH-11](https://github.com/Kav-K/OnlyDragons/issues/11#issuecomment-5560209249)
 in [draft PR #57](https://github.com/Kav-K/OnlyDragons/pull/57). T08 remains In review;
 this focused evidence does not accept T08 or a milestone. T07 was subsequently
