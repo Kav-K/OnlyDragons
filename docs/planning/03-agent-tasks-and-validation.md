@@ -8,7 +8,8 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 Baseline reconciled **5 September 2026** against main `5e8cfbf` and repository
 issue/PR state. The last accepted shared Paper baseline remains the historical
-PR #32 run at `73a8cc8`; later maintenance does not rewrite that input identity. The plugin still supplies starter status/reload commands and
+PR #32 baseline tested at `78c3de4` and merged at `73a8cc8`; later maintenance
+does not rewrite that input identity. The plugin still supplies starter status/reload commands and
 welcome messages. T00 contracts, the T01a stat resolver, T02 items, and the
 T09a/T09b isolated Paper runner and protocol actor are integrated. T03 combat merged in PR #26;
 T01b equipment inspection and calibration grants merged in PR #29;
