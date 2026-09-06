@@ -28,7 +28,7 @@ be exercised. See [execution order](04-execution-backlog.md).
 | T01 — Stats | Planned (T01a ready) | [#3 resolver](https://github.com/Kav-K/OnlyDragons/issues/3), [#7 equipment/play](https://github.com/Kav-K/OnlyDragons/issues/7) | Resolver, snapshot, and equipment provenance acceptance cases. T01b waits for stats and item integration. |
 | T02 — Items | Planned (ready) | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | PDC/schema/identity and one-ultimate validation cases. |
 | T03 — Combat/ledger | Planned | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | Numeric fixtures, one impact authority, health/score/death invariants. |
-| T04 — Paper feasibility | Planned (ready) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Isolated real dragon/projectile scenarios and durable findings; client observations remain separate. |
+| T04 — Paper feasibility | In progress | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Companion scenario measured hit authority, same-tick and pre-spawn collisions; [findings](../../dev/game-tests/findings/projectile-feasibility.md). 34 exploratory assertions passed; final clean-revision/exception verification pending; authenticated native damage and semantic head classification remain separate. |
 | T05 — Enchants/procs | Planned | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Bounded ferocity, tempo expiry/swap, and modifier fixtures. |
 | T06 — Firing/Duplex | Planned | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence. |
 | T07 — Tracer/continuity | Planned | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |

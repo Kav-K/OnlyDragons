@@ -134,6 +134,18 @@ World/entity mutation belongs on the server thread; asynchronous work is for imm
 
 API signatures do **not** prove multipart collision delivery, seated-dragon arrow behavior, exact event ordering, or same-tick damage behavior. The implementation plan starts with a bounded real-Paper experiment for those uncertainties. MockBukkit remains valuable for lifecycle, commands, inventory metadata, and event routing, but it is not a physics simulator.
 
+### T04 measured collision boundary (Paper 121)
+
+**Observed on exact pin, 2026-09-05:** real shooterless arrows delivered multipart
+`ProjectileHitEvent`s without damage events, including three distinct same-tick
+impacts and an arrow created before the dragon. Cows established hit-before-damage
+ordering and distinct cancellation behavior. Unchanged dragon HP does not prove
+native suppression because the shooterless native control also lost no HP.
+Part names are identical; a small-part aim hit a different part and is not a
+head-hit pass. See the [bounded findings and remaining gates](../../dev/game-tests/findings/projectile-feasibility.md).
+These observations are OnlyDragons test evidence, not Hypixel mechanics or
+player-owned dragon damage proof.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.
