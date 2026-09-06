@@ -643,6 +643,39 @@ crit chance; no probability or mega-crit formula is adopted. Enchant tables and
 trusted loadouts remain T02/lead-owned and unchanged. These compiled calibration
 rules are not a hot-reload system; a later balance change must carry a new revision.
 
+### T05b level-based ghost policy (GH-66, in progress)
+
+The user-confirmed `dragon-tempo/v2` policy keeps uncapped sandbox physical damage,
+zero-defense test targets and full proc credit. Only proc HP changes: no active
+Tempo = 100%; latest accepted source I–V = 90/80/70/60/50%. Legacy fixed-fraction
+profiles and `combat-calibration/v1` remain unchanged. These are OnlyDragons
+choices, not researched Hypixel coefficients.
+
+The coordinator expires state before a physical commit, samples captured base
+Ferocity with that owner's live shared bonus once (whole hundreds plus strict
+fraction, cap 500), then builds/refreshes only after an accepted captured FT hit.
+Each eligible FT child may refresh after its fixed damage commits, never recurse.
+The latest source wins even when lower; all levels share +200%/60-tick state.
+Ordinary/Duplex impacts benefit without gaining refresh eligibility.
+
+`TempoState` now retains the source level. `ProcCommand.fatalTempoSourceLevel`
+still means captured refresh eligibility; its separate immutable `healthSnapshot`
+contains pre-hit bonus, source level, expiry, HP fraction and full resolved credit.
+`CombatEncounter` binds that exact snapshot to the accepted physical parent;
+changed internally valid policies reject before commit. The old constructor is
+supported only for fixed legacy profiles. Old arrows use captured equipment;
+queued children preserve HP policy across expiry, later stacks and swaps. Existing
+session, terminal, reset and ranking guards remain authoritative.
+
+`DevelopmentDragonService.spawn(SpawnMode)` freezes a matching full Selection
+before opening: STANDARD (also no-argument spawn) selects 1,000 HP with v2 Tempo,
+TRAINING selects 100,000 HP with distinct training catalog/type revisions, and
+CALIBRATION retains the unchanged v1 selection at 1,000 HP. All use the sole
+`test_dragon`, zero defense and existing native backend. Command forms are
+`dev dragon spawn`, `spawn training`, and `spawn calibration`; status states mode,
+profile and maximum HP. Full selection/maxHP survives through the ordinary view
+and frozen result. No live HP mutation, extra type, reward or progression is added.
+
 ## 9. Real bows and Dragon Tracer
 
 ### Two firing modes

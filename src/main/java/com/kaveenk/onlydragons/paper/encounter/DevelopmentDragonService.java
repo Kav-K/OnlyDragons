@@ -16,6 +16,7 @@ public final class DevelopmentDragonService implements AutoCloseable {
     private UUID generation;
     private DragonBackend backend;
     private DragonCatalog.Selection selection;
+    private SpawnMode spawnMode;
     public record Completion(UUID generation, UUID nativeId, com.kaveenk.onlydragons.domain.encounter.EncounterResult result, String nativeOutcome) {}
     public interface Subscription extends AutoCloseable { @Override void close(); }
     private record Registration(UUID token, java.util.function.Consumer<Completion> consumer) {}
@@ -64,15 +65,20 @@ public final class DevelopmentDragonService implements AutoCloseable {
         check(); if (active()) throw new IllegalArgumentException("Reset the active dragon generation before setup.");
         arena.save(candidate);
     }
-    public UUID spawn() {
+    public enum SpawnMode { STANDARD, TRAINING, CALIBRATION }
+    public UUID spawn() { return spawn(SpawnMode.STANDARD); }
+    public UUID spawn(SpawnMode mode) {
+        Objects.requireNonNull(mode);
         check(); if (active()) throw new IllegalArgumentException("Dragon already active; reset its generation first.");
         var config = arena.current().orElseThrow(() -> new IllegalArgumentException(arena.problem()));
-        var selected = config.validate(definitions.snapshot());
+        var validated = config.validate(definitions.snapshot());
+        var selected = mode == SpawnMode.CALIBRATION ? validated
+                : com.kaveenk.onlydragons.domain.encounter.definition.TrainingDragonSelection.select(validated, mode == SpawnMode.TRAINING);
         DragonBackend candidate = new DragonBackend(config.location(), tickets, this::completed, value -> { if (backend == value) retirePresentation(); });
         try {
             UUID id = combat.open(owner, candidate, config.bounds(), selected.maxHealth(), selected.defense(),
                     selected.identity().id(), selected.combatProfile(), Optional.of(selected), Math::random);
-            retirePresentation(); backend = candidate; generation = id; selection = selected;
+            retirePresentation(); backend = candidate; generation = id; selection = selected; spawnMode = mode;
             leaderboard.begin(id); subscribe(id, leaderboard::accept); return id;
         } catch (RuntimeException failure) { candidate.close(); throw failure; }
     }
@@ -99,13 +105,13 @@ public final class DevelopmentDragonService implements AutoCloseable {
         var v = view.get();
         double hp = v.contributions().values().stream().mapToDouble(c -> c.actualHealthDamage()).sum();
         double credit = v.contributions().values().stream().mapToDouble(c -> c.contributionDamage()).sum();
-        return config + " | generation=" + generation + " native=" + v.entityId() + " state=" + v.state()
+        return config + " | mode=" + spawnMode.name().toLowerCase(Locale.ROOT) + " generation=" + generation + " native=" + v.entityId() + " state=" + v.state()
                 + " nativePresent=" + !backend.released() + " nativeHP=" + backend.entity().getHealth()
                 + " animation=" + backend.entity().getDeathAnimationTicks() + " nativeOutcome=" + backend.outcome()
                 + " | definition=" + selection.identity() + " catalog=" + selection.catalogIdentity()
                 + " combat=" + selection.combatProfile().mechanic() + " phase=" + selection.phaseProfile().mechanic()
                 + " table=" + selection.table().identity() + " | remainingHP=" + v.target().currentHealth()
-                + " HP removed=" + hp + " credit=" + credit + " | rewards disabled";
+                + " maxHP=" + v.target().maxHealth() + " HP removed=" + hp + " credit=" + credit + " | rewards disabled";
     }
     public void close() { combat.requireMutationAllowed(); if (closed) return; if (active()) combat.reset(owner); retirePresentation(); closed = true; }
     public Optional<com.kaveenk.onlydragons.domain.encounter.RankedEncounterResult> ranking() { thread(); return leaderboard.ranking(); }

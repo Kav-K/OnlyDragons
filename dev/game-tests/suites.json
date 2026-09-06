@@ -168,6 +168,12 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
+    },
+    "tempo-ghost": {
+      "scenarioId": "tempo-ghost",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
     }
   },
   "suites": {
@@ -195,7 +201,8 @@
       "dragon-restart-fresh",
       "dragon-restart-legacy",
       "dragon-restart-animation",
-      "dragon-ranking"
+      "dragon-ranking",
+      "tempo-ghost"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -241,7 +248,8 @@
       "dragon-restart-fresh",
       "dragon-restart-legacy",
       "dragon-restart-animation",
-      "dragon-ranking"
+      "dragon-ranking",
+      "tempo-ghost"
     ]
   },
   "areas": {
@@ -303,7 +311,8 @@
         "dragon-restart-fresh",
         "dragon-restart-legacy",
         "dragon-restart-animation",
-        "dragon-ranking"
+        "dragon-ranking",
+        "tempo-ghost"
       ],
       "affects": [
         "stats",
@@ -502,7 +511,8 @@
         "dragon-restart-fresh",
         "dragon-restart-legacy",
         "dragon-restart-animation",
-        "dragon-ranking"
+        "dragon-ranking",
+        "tempo-ghost"
       ],
       "affects": []
     },
@@ -536,7 +546,8 @@
         "stats-resolution",
         "item-identity",
         "combat-accounting",
-        "enchants-procs"
+        "enchants-procs",
+        "tempo-ghost"
       ],
       "affects": [
         "practice-combat"
@@ -595,7 +606,8 @@
         "dragon-combat",
         "dragon-restart-fresh",
         "dragon-restart-legacy",
-        "dragon-restart-animation"
+        "dragon-restart-animation",
+        "tempo-ghost"
       ],
       "affects": []
     },
@@ -611,6 +623,20 @@
       ],
       "cases": [
         "dragon-ranking"
+      ],
+      "affects": []
+    },
+    "tempo-ghost": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/domain/combat/ProcHealthSnapshot.java",
+        "src/test/java/com/kaveenk/onlydragons/application/proc/TempoGhostPolicyTest.java",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/enchant/TempoGhostScenario.java",
+        "dev/game-tests/player-plans/tempo-ghost-v2.json"
+      ],
+      "cases": [
+        "tempo-ghost",
+        "dragon-ranking",
+        "enchants-procs"
       ],
       "affects": []
     }

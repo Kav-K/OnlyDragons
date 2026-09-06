@@ -81,6 +81,20 @@ GitHub issues/PRs own live assignments and review state; this ledger records the
 reconciled project summary. Read relevant open PRs before duplicating work. A
 status edit in an unmerged branch does not reserve the task globally.
 
+### T05b — Global Tempo ghost scaling (GH-66)
+
+In progress on `symphony/gh-66`. T05/T08a/T08b are integrated and the lead
+applied dispatch. The scoped [v2 contract](02-foundation-plan.md#t05b-level-based-ghost-policy-gh-66-in-progress)
+adds parent-bound immutable HP provenance and explicit standard/training/calibration
+spawn selections. The additive `tempo-ghost` native-player scenario covers physical
+P08/P09 and training accounting/result/reset; preserved legacy dragon fixture setup
+now explicitly selects calibration. Existing assertions remain intact.
+
+Startup doctor and static checkpoint passed. Build, focused actual Paper and the
+complete source-bound suite are still pending; no completed requirement or
+milestone is claimed. Human appearance/feel and authenticated compatibility remain
+separate. Next consumer is T03b/#67 after lead acceptance and merge.
+
 ## Shared context update protocol
 
 Every agent reads all three planning files at task start under AGENTS.md.

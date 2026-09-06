@@ -19,7 +19,10 @@ needs only OnlyDragons; the game-test companion and protocol client are test too
    atomic persistence retain the prior arena. Other config.yml settings survive.
 5. Move into that cube and use `/onlydragons dev kit ordinary`, equip the bow,
    then `/onlydragons dev dragon spawn`. The stationary HOVER dragon has 1,000
-   domain HP, zero defense and the immutable `test_dragon` calibration selection.
+   domain HP, zero defense and the immutable `test_dragon` Tempo v2 selection.
+   Use `spawn training` for 100,000 HP, or `spawn calibration` for the preserved
+   v1 full-HP Ferocity fixture. Standard and training procs use 100% HP without
+   active Tempo, then 90/80/70/60/50% for active source levels I–V, with full credit.
    Native AI remains enabled so Paper updates the multipart hitboxes and death animation.
    This is a development combat target, not flight AI or a prefire rehearsal.
 6. Shoot the actual dragon parts with full draws. Ordinary arrows remove/credit
