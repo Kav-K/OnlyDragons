@@ -36,7 +36,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T05 — Enchants/procs | Complete | [#8](https://github.com/Kav-K/OnlyDragons/issues/8), [PR #48](https://github.com/Kav-K/OnlyDragons/pull/48) | Merged at `3c35a85` after the full current-input suite, independent review/replay, task checkpoint and CI; 38 required proc assertions plus shared cleanup passed. [combined acceptance evidence](evidence/catalog-procs-suite.md). Physical P08/P09 and T08 composition remain later integration; old held worker runs retain their original disposition. |
 | T06 — Firing/Duplex | Complete | [#9](https://github.com/Kav-K/OnlyDragons/issues/9), [PR #52](https://github.com/Kav-K/OnlyDragons/pull/52) | Merged at `25891c0` after tested `f4178ba` passed all 24 hosted outcomes, independent raw replay/review, actual-main T06 checkpoint and current CI. Owned firing passed 115 assertion rows; repaired equipment passed 25; relevant builds report 182 production/28 client tests with no failures/errors/skips. [Final evidence, failed iteration and boundaries](evidence/t06-suite.md); [single-consumer API](evidence/t06-firing.md#consumer-contract). T08 accounting and human observations remain unaccepted. |
 | T07 — Tracer/continuity | In progress | Symphony / [#10 dispatch](https://github.com/Kav-K/OnlyDragons/issues/10#issuecomment-5559839786) | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence remain pending. |
-| T08 — Practice tools | In progress; priority for the playable checkpoint | Symphony / [#11 dispatch](https://github.com/Kav-K/OnlyDragons/issues/11#issuecomment-5559836724) | Repeatable player procedure, permissions, and explained damage remain pending. |
+| T08 — Practice tools | In review; focused Paper checks pass | [#11](https://github.com/Kav-K/OnlyDragons/issues/11), `symphony/gh-11` | Lead complete cohort/replay/T08 checkpoint/current CI and human Windows Play/visuals remain pending; [evidence](evidence/t08-focused.md). |
 | T08a — Managed dragon controls | Planned | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | After T08/T02b/T09e: real test-dragon backend and spawn/status/reset/result inspection through the existing shared lifecycle and T06 claims. All feature Paper/command evidence pending. |
 | T08b — Frozen damage ranking | Planned | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | After T08a: post-kill credited damage including ghost damage and overkill, unique placements under the lead-reviewed commit/ordinal tie rule. Deterministic and real multi-identity presentation gates pending. |
 | T08c — Personal loot simulation | Planned | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | After T02b/T08b: personal placement-dependent previews with hard item locks and explicit sample calibration. Real rewards always disabled; all resolver/no-grant Paper evidence pending. |
@@ -461,17 +461,19 @@ work packages are not dispatchable tasks or accepted gameplay.
 
 **Accept when:** one documented sequence gives a matching client a test kit and repeatable target; a non-admin cannot grant items or reset other players' fights; console calls handle player-only operations cleanly; the expected 25-ferocity behavior and coefficient experiments can be inspected without reading server internals.
 
-T08 implementation branch `symphony/gh-11` adds the single receiver, shared
-combat/proc/native backend lifecycle, kit/dummy/scenario/last-hit commands and
-atomic participant/completion provenance. Starting doctor was ready; plan was
-valid with acceptance false. The first wrapper build after adapter regressions
-passes 194 production tests with no skipped tests. New two-player Paper scenarios
-and receipt mappings are implemented; focused verification is in progress.
-[Iteration evidence and unrun gates](evidence/t08-focused.md) retain failed runs;
-no Paper acceptance is claimed.
-The lead owns the complete final hosted baseline, independent replay/checkpoint,
-CI and merge per issue dispatch. Focused clean Paper evidence is worker-owned.
-Windows Build/Play, authenticated-client compatibility and visuals remain pending.
+T08 implementation on `symphony/gh-11` is In review. The single receiver,
+shared combat/proc/native backend lifecycle, kit/dummy/scenario/last-hit commands
+and atomic participant/completion provenance are implemented. Clean `cb5ce17`
+passes 205 production, six companion and 28 client tests, plus two-player Paper
+practice accounting (85 assertions), lifecycle (25) and existing owned-firing (115).
+[Exact focused evidence and superseded iterations](evidence/t08-focused.md) record
+artifacts, native observations, cleanup and shared case verification. All 269
+Python harness tests and the static 26-case selection/plan checks pass.
+The lead owns the complete final hosted baseline, independent replay/T08 checkpoint,
+CI and merge per dispatch. No requirement/milestone acceptance is inferred from
+focused results. Windows Build/Play, authentication, visuals and performance remain
+unrun. T07 PR #56 needs its fixture receiver migrated during lead composition;
+#39/#40 consume the published backend and frozen provenance contracts.
 
 ### T08a — Managed real-dragon backend and development controls
 
