@@ -1,6 +1,10 @@
 # T04: native arrow / multipart dragon feasibility
 
 Target: Minecraft 26.2, Paper **121** (`a2a42c5`), Temurin JDK 25.0.4.1.
+**Acceptance: partial / [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) in review.**
+Native player-owned dragon damage suppression remains unaccepted; do not unblock
+T06/#9 or accept M0 from these results.
+
 Scope: companion-only experiments with real API-spawned arrows, cows and dragons.
 No arrow is teleported, recreated, or given a manufactured collision event. Gravity
 is disabled for controlled aim; native drag and collision still run. These are
@@ -14,12 +18,14 @@ Use the operator-provided environment from [agent testing](../../agent-paper-tes
 ```bash
 python3 scripts/agent-tests/paper_test.py --scenario projectile-feasibility --scenario-timeout 90
 python3 scripts/agent-tests/paper_test.py --scenario projectile-cleanup-failure
+python3 scripts/agent-tests/paper_test.py --scenario projectile-cleanup-abort
 ```
 
-The second command is an intentional exception control: expected exit **1**, a
+The last two commands are intentional exception/direct-context-abort controls: expected exit **1**, a
 failed `scenario_exception`, all resource cleanup assertions passing, and clean
 unforced server exit. It must never be reported as a passing gameplay scenario.
-All trials have bounded tick waits, 25 owned ticking chunks and owned entities;
+Direct abort exercises the same context path used by shutdown; it does not disable
+or unload a plugin. All trials have bounded tick waits, 25 owned ticking chunks and owned entities;
 listeners belong to `ScenarioContext.listen`, including exception/disable cleanup.
 The lifecycle extension was documented on GH-5 before changing the harness.
 
@@ -55,7 +61,7 @@ No hit is inferred from aim, distance, phase assignment or unchanged health.
   handling would also miss seated collisions, and managed terminal impacts need
   explicit owned-arrow retirement to prevent later re-collision.
 - A pre-spawn arrow traveled before dragon creation and later collided with that
-  dragon with the same UUID. Initial trace: launch 226 < spawn 229 < impact 241.
+  dragon with the same UUID. Final trace: launch 243 < spawn 246 < impact 258.
   This is straight controlled flight, not a Tracer or human hatch rehearsal.
 
 - Airborne lifetime remained 1199 after eight ticking flight updates; the same
@@ -96,13 +102,31 @@ separate gates for T06/T07/T10 and the operator, not inferred passes from this s
 
 ## Verification record
 
-Initial exploratory revision v1: run `8f62d04b1b0c4dd2bc5f3b1d1cfebdc2`, 25/25
-assertions, runner exit 0, server exit 0 without forcing. Root build: 21 tests,
-zero failures/errors/skips. Runner failure-contract suite: 23 tests passed.
-Exploratory v2: run `6d8151f66beb457f84b9eb36b803911e`, 34/34 assertions,
-runner/server exit 0 without forcing. Grounded lifetime/block cancellation and
-horizontal small-part collision were observed. Final clean-revision rerun and
-exception-control evidence follow before handoff.
+Final clean runtime-code revision: `e38bfaf40f44d5a1d17191c643330f5391de4eac`,
+after ordinary merge of main `6f0ccfb` including strict typed report validation.
+Every run below reports `worktreeDirty=false` and identical artifact hashes.
+Later PR/context updates are documentation only.
+
+| Scenario | Run ID | Actual result |
+| --- | --- | --- |
+| projectile-feasibility v2 | `2e4793b495584643b735f8f1b158ad94` | 34/34 assertions; runner exit 0 |
+| projectile-cleanup-failure v1 | `e1bd237b27444f9ea5234a26b13c2818` | Expected runner exit 1; only deliberate `scenario_exception` fails; 4/4 cleanup assertions pass |
+| projectile-cleanup-abort v1 | `c9116581db8c4c4194e83ff4f286df62` | Expected runner exit 1; only abort `scenario_exception` fails; 4/4 cleanup assertions pass |
+| lifecycle-calibration | `6b77b45e9fd64c5eb51484929b251874` | 14/14 assertions; runner exit 0 |
+| deliberate-failure | `d03dcbace97246c49dfe71165fe6ebe4` | Expected runner exit 1; only `deliberate_failure` fails; 14 other assertions pass |
+
+All five owned servers exited **0 without forcing**, with clean resource reports.
+Both wrapper builds passed on every run; production tests: 21, zero
+failures/errors/skips. The integrated runner suite passed all 27 tests.
+Windows and Ubuntu CI passed at `e38bfaf`; Windows live smoke/client play remain unrun.
+
+- Production SHA256: `6b746b637e289fbdc58e62aa79fcfdcf837422aa3195a0060f7ca4e27361e156`
+- Companion SHA256: `c0012181b8001e34409513359b61dedf79896d074e4838edc2eb68ac830fb243`
+- Paper SHA256: `0de30efb024bc8b83c9c7d507d11802897ad8056b6110ec09fe1a91d126ccb54`
+
+Exploratory v1/v2 runs informed the explicit final assertions; their dirty-worktree
+results are not substituted for the clean runs above. All attempted part/phase
+cases remain in the report, including the vertical different-part hit.
 
 API references (signatures additionally checked in the resolved build-121 JAR):
 [projectile cancellation](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html),
