@@ -9,6 +9,8 @@ import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.Listener;
+import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitTask;
 
 /** Owns one scenario's server-thread state, temporary entities, tasks, and assertions. */
@@ -22,6 +24,7 @@ public final class ScenarioContext {
     private final List<Entity> entities = new ArrayList<>();
     private final List<BukkitTask> tasks = new ArrayList<>();
     private final List<Chunk> chunks = new ArrayList<>();
+    private final List<Listener> listeners = new ArrayList<>();
     private String mechanicRevision = "harness-v1";
     private boolean finished;
 
@@ -42,6 +45,12 @@ public final class ScenarioContext {
     }
     public void observe(String name, Object value) { requireActive(); observations.put(name, value); }
     public <T extends Entity> T own(T entity) { requireActive(); entities.add(entity); return entity; }
+    /** Register before use so exception, completion and disable share cleanup. */
+    public void listen(Listener listener) {
+        requireActive();
+        listeners.add(Objects.requireNonNull(listener));
+        Bukkit.getPluginManager().registerEvents(listener, plugin);
+    }
     /** Make a fresh test chunk tick without players; release only force-loads owned by this scenario. */
     public void tickChunk(Chunk chunk) {
         requireActive();
@@ -74,6 +83,14 @@ public final class ScenarioContext {
             if (!task.isCancelled()) uncancelled++;
         }
         tasks.clear();
+        int retainedListeners = 0;
+        for (Listener listener : listeners) {
+            HandlerList.unregisterAll(listener);
+            if (HandlerList.getRegisteredListeners(plugin).stream()
+                    .anyMatch(registration -> registration.getListener() == listener)) retainedListeners++;
+        }
+        listeners.clear();
+        check("owned_listeners_removed", 0, retainedListeners);
         int retained = 0;
         for (Entity entity : entities) {
             try { entity.remove(); if (entity.isValid()) retained++; }
@@ -105,7 +122,8 @@ public final class ScenarioContext {
         report.put("observations", Map.copyOf(observations));
         plugin.publish(report);
     }
-    void abort() { if (!finished) fail(new IllegalStateException("Companion disabled before scenario completion")); }
+    /** Abort an incomplete scenario using the same path as companion shutdown. */
+    public void abort() { if (!finished) fail(new IllegalStateException("Companion disabled before scenario completion")); }
     private void requireActive() {
         if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Scenario state belongs to the server thread");
         if (finished) throw new IllegalStateException("Scenario is already complete");
