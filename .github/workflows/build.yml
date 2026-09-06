@@ -28,6 +28,9 @@ jobs:
       - name: Compile the isolated Paper test companion
         shell: bash
         run: bash ./gradlew -p dev/game-tests build --console=plain
+      - name: Build and verify the isolated protocol player
+        shell: bash
+        run: bash ./gradlew -p dev/player-client build installDist --dependency-verification strict --console=plain
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
