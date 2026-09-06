@@ -75,6 +75,10 @@ forced termination fails validation. It never finds JVMs by name or PID lists.
 - Keeps its test chunk entity-ticking without a player, then removes the owned
   entity, cancels scenario tasks, and releases its chunk force-load before writing results.
 
+Chunk force-loading does not make native entities tick immediately. The scenario
+waits up to 200 server ticks for Paper's actual `ENTITY_TICKING` load level before
+spawning the arrow; it fails if readiness never arrives.
+
 These are **synthetic test actors**. This calibrates the environment and report
 path; it does not establish OnlyDragons' planned stats, item codec, damage,
 dragon collision, prefire, multiplayer input, or client visuals. T04 and the
@@ -141,3 +145,32 @@ python3 -m unittest discover -s scripts/agent-tests -p 'test_*.py' -v
 It checks stale/missing/incomplete/failed reports, deadlines, approved-EULA
 handling, resource waits, exclusive leases, owned-process cleanup, forced
 termination failure, and preservation of an unrelated fixture process.
+
+## Accepted calibration evidence
+
+On 2026-09-05, both real-Paper controls ran from clean revision
+`946858d645d1ac6c8741917991287c25e40a3fdb`, using Java `25.0.4.1` and pinned
+Paper `26.2-121-a2a42c5`. Both wrapper builds passed, including 11 production
+tests with no failures, errors, or skips. The separate Linux runner suite passed
+23 tests, including actual child-process and signal cleanup fixtures.
+
+| Scenario | Run ID | Result |
+| --- | --- | --- |
+| `lifecycle-calibration` | `c9ef3afa53d84497a94dcbd62a8cd597` | Exit 0; all 13 assertions passed |
+| `deliberate-failure` | `1e41db25253540f6936ddf5aaad36c44` | Exit 1; only `deliberate_failure` failed among 14 assertions |
+
+Both runs used production SHA256
+`6bc6188bdfbedcc2a3a2a9df343030f7a22176fe092c9d966692b9b47ba4c623`
+and companion SHA256
+`69bb263d2123f11f60dcde2b5a0694eabb3311d47b2560d76229d2f2f40796d8`.
+The actual native arrow moved 3.8627654068769 blocks over eight server ticks in
+each run. Cold chunks reached entity-ticking readiness after 18 and 20 ticks.
+Both JVMs stopped with exit 0, without forced termination; a post-run check found
+both loopback ports closed, no owned JVM remaining, and the shared lease free.
+
+The positive admission check measured 7063 MiB Linux available, 975 MiB Windows
+available, and a 3113 MiB discounted resident-cache allowance, satisfying the
+2560 MiB guest and combined-host budgets. After both runs, Linux available was
+7163 MiB and Windows available was 1697 MiB. These observations establish this
+calibration and cleanup behavior; gameplay mechanics still require their own
+scenarios. Raw reports and worlds stay in the ignored checkout-local paths.
