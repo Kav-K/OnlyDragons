@@ -1,8 +1,10 @@
 # T08b frozen ranking: focused worker evidence
 
-[Draft PR #62](https://github.com/Kav-K/OnlyDragons/pull/62) / GH-40 is In review; focused verification is not final task/milestone acceptance.
+Historical worker evidence for [PR #62](https://github.com/Kav-K/OnlyDragons/pull/62) / GH-40.
+The later [full cohort and lead acceptance](t08b-suite.md) record the actual merge;
+these focused runs retain their original identities and do not constitute that full cohort.
 Runtime/source revision **`bdde815229b6a9b5f90800b8c386b59a4e9ebdf5`** includes
-current main **`88d27c5c06705f72d576939e3ea012b134260636`** by ordinary fetch/merge
+then-current main **`88d27c5c06705f72d576939e3ea012b134260636`** by ordinary fetch/merge
 (already up to date). Both final runs began and ended with unchanged clean inputs.
 Later context/PR-link commits are documentation-only. No pins or combat arithmetic changed.
 
@@ -22,8 +24,10 @@ stored credit and its earlier strict-increase stamp remain unchanged.
 Reproduce each with `python3 scripts/agent-tests/paper_test.py --scenario NAME
 --test-player protocol-actions-v1 --scenario-timeout 180` (join the displayed
 command onto one line). Use only the provisioned accepted EULA, disposable
-loopback profiles, shared lease and memory gate. Final guest/host availability
-was 7665/5493 MiB and 7710/5528 MiB against a 2816 MiB reservation. Paper and client
+loopback profiles, shared lease and memory gate. Final guest/effective-host availability
+was 7665/5493 MiB and 7710/5528 MiB against a 2816 MiB reservation. Effective host
+figures include the permitted WSL cache allowance; raw Windows availability was
+4270/4297 MiB. Paper and client
 exit codes were all 0, clean and unforced. Both server logs have no ERROR/Exception
 matches. The first Paper process exited before the second began; post-run socket
 checks found ports 36053 and 55847 closed. Cleanup assertions returned owned
@@ -85,12 +89,15 @@ not committed or relabeled as hosted cohort evidence.
 The changed-area suite plan retains all 32 baseline cases plus `dragon-ranking`
 (33 total), with explicit ranking coverage/acceptance bindings and no removed
 gates. Per the owner dispatch, the worker ran only the new ranking scenario and
-the directly affected dragon-combat regression. **The complete hosted suite
-receipt, independent raw/source replay, automated acceptance checkpoint and
-current CI remain lead-owned and pending.** No local full-suite receipt is claimed.
-Human Windows Build/Play/smoke, authenticated multiplayer, chat readability and
-visual/feel checks remain unrun; no performance or M1–M5 acceptance is claimed.
-T08c is the next dependent consumer after lead acceptance/integration; real rewards
+the directly affected dragon-combat regression. At that worker handoff, the complete
+hosted suite receipt, independent raw/source replay, automated acceptance checkpoint
+and current CI were lead-owned and pending. They subsequently passed and PR #62
+merged; [the full acceptance note](t08b-suite.md) records that separate evidence.
+No local full-suite receipt is claimed. Windows Build/Play/smoke and human checks
+were unrun at this focused handoff; later operator build/smoke/Play readiness observations are in
+the full note. Authenticated multiplayer, chat readability and visual/feel checks
+remain separate; no performance or M1–M5 acceptance is claimed. T08c remains planned
+and undispatched pending the first human checkpoint and lead assignment; real rewards
 remain disabled. No researched upstream mechanic changed, so document 01 is unchanged.
 
 Earlier attempts are preserved as iteration evidence only:

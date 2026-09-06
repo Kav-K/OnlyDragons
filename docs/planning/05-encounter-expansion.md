@@ -59,17 +59,17 @@ same-tick zero participants and zero-to-positive transitions.
 | T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b, T08b | Personal rank-based loot evaluation with hard locks and actual grants disabled. |
 
 Task registration began planned with deferred automated requirements; the current
-ledger records T02b complete through PR #48 and T08a complete through PR #60 at `889a3db`; T08b is In review in [PR #62](https://github.com/Kav-K/OnlyDragons/pull/62), with [focused evidence](evidence/t08b-focused-paper.md); T08c remains planned. [Combined evidence](evidence/catalog-procs-suite.md). Only integrated prerequisites plus
+ledger records T02b complete through PR #48 and T08a complete through PR #60 at `889a3db`; T08b is accepted through [PR #62](https://github.com/Kav-K/OnlyDragons/pull/62) at `1149169`, with [full evidence](evidence/t08b-suite.md). T08c remains planned and undispatched pending the first human checkpoint and lead assignment. [Combined catalog/proc evidence](evidence/catalog-procs-suite.md). Only integrated prerequisites plus
 lead assignment permit dispatch. T10 additionally consumes
 T08a's shared backend. Original T10 dependencies and all T11/M3/T12 gates remain.
 
 ## Present implementation and constraints
 
-- Production includes accepted stats/calibration, dummy combat and managed dragon setup/spawn/status/reset/result commands. T08b still owns the player-facing leaderboard; [T08a evidence](evidence/t08a-suite.md).
+- Production includes accepted stats/calibration, dummy combat and managed dragon setup/spawn/status/reset/result commands, plus T08b's automatic post-kill leaderboard. [T08a evidence](evidence/t08a-suite.md) and [T08b evidence](evidence/t08b-suite.md).
 - `CombatEncounter` owns one target/generation on its construction thread, tracks distinct actual-health and contribution totals, and freezes one immutable `EncounterResult` at lethal managed damage. Late impacts cannot add score. That pure class does not own native effects; accepted T06/T08/T08a compose physical claims, suppression, native projection and ordinary-defeat notification around it.
-- `EncounterResult` contains completion/encounter IDs, `variantId`, mechanic revision and UUID-keyed contributions. This is not ranked presentation or durable result storage. `variantId` is only a nonblank string; T02b now supplies a separate immutable resolved selection integrated through PR #48 (see document 02 and the combined evidence). Accepted T08/T08a retain the full Selection and receiver-commit/ordinal provenance in live frozen results; T08b must consume those immutable values.
+- `EncounterResult` contains completion/encounter IDs, `variantId`, mechanic revision and UUID-keyed contributions. This is not ranked presentation or durable result storage. `variantId` is only a nonblank string; T02b now supplies a separate immutable resolved selection integrated through PR #48 (see document 02 and the combined evidence). Accepted T08/T08a retain the full Selection and receiver-commit/ordinal provenance in live frozen results; T08b consumes those immutable values.
 - `eyesPlaced` exists in the contribution DTO, but `CombatEncounter` currently always writes zero. Eye-only placers are not represented by that combat ledger. No placement transactions, loot resolver or reward-grant persistence exists.
-- T04/T05/T06/T07/T08 and T08a are accepted within their documented boundaries. The direct managed test-dragon loop is available; countdown/prefire, ranking, ritual and rewards remain separate work.
+- T04/T05/T06/T07/T08, T08a and T08b are accepted within their documented boundaries. The direct managed test-dragon loop and frozen leaderboard are available; countdown/prefire, ritual and rewards remain separate work.
 - Keep public Paper APIs, one composition root, one physical-impact authority, server-thread entity access, immutable snapshots across asynchronous boundaries, and owned cleanup. Do not add a second independent damage listener or a new framework/database service merely to scaffold these tasks.
 - The integration lead owns bootstrap, descriptors, shared DTO changes and registration. Keep published history ordinary and integrate prerequisites before dispatch. Each feature extends the shared scenario/suite/acceptance mappings and verifies the exact clean source cohort before handoff.
 

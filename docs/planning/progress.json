@@ -342,16 +342,25 @@
       "mergedRevision": "889a3db3ca7d43ebdd98bae262a61cccf20cca3a"
     },
     "T08b": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "Draft PR #62 (https://github.com/Kav-K/OnlyDragons/pull/62) implements immutable credited ranking and per-spawn received presentation. Clean bdde815 passed 231 production/6 companion/28 client tests and focused ranking (24 assertions, ten message matchers) plus dragon-combat (49 assertions); docs/planning/evidence/t08b-focused-paper.md preserves exact inputs/hashes and prior iterations. Full hosted receipt, independent replay/CI and final acceptance remain lead-owned; human readability/authentication unrun. No completed requirement or milestone advanced."
+      "status": "complete",
+      "completedRequirements": [
+        "frozen-damage-ranking"
+      ],
+      "evidence": {
+        "frozen-damage-ranking": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34053344463",
+          "revision": "e1724561e67c5e31d05497801cbf296f84876f91"
+        }
+      },
+      "notice": "PR #62 merged at 114916905c68f5574b2ee437b8db5bd2a187e390 after the complete 33-case hosted cohort, independent raw/source review, strict replay, actual-main checkpoint and current CI. Exact evidence: docs/planning/evidence/t08b-suite.md. Exactly frozen-damage-ranking completes. Earlier focused iterations retain their original identities. Human observations and M1-M5 remain separate; T08c remains planned and undispatched pending the first human checkpoint and lead assignment.",
+      "reviewedRevision": "aac3fe2445b99ed42ba177841e580e4932c94849",
+      "mergedRevision": "114916905c68f5574b2ee437b8db5bd2a187e390"
     },
     "T08c": {
       "status": "planned",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+      "notice": "T02b/T08b are integrated. Planned and undispatched pending the first human checkpoint and lead assignment. Personal rank-based simulation remains unimplemented, with no completed requirements or evidence; real rewards stay disabled and existing T11/T12 gates remain unchanged."
     },
     "T09d": {
       "status": "complete",

@@ -12,7 +12,7 @@ game, alongside [confirmed encounter decisions](05-encounter-expansion.md).
 
 The present accepted baseline provides contracts, arithmetic, item/equipment
 behavior, process cleanup and protocol-player fixtures. The separately accepted T08a direct development fight is linked below;
-this does not establish countdown/prefire, ranking or ritual completion. PR #31's player-owned observations and scoped
+this does not establish countdown/prefire or ritual completion. Ranking has its separate acceptance below. PR #31's player-owned observations and scoped
 policy are accepted at `705de34`; [exact evidence](evidence/t04-suite.md) retains
 their boundaries. PR #48 integrated the bounded proc coordinator and T02b catalog
 at `3c35a85` after the full 21-case cohort, independent replay/review and CI;
@@ -24,8 +24,8 @@ cohort and independent acceptance of P07/P10; [exact evidence](evidence/t07-suit
 PR #57 integrates T08 connected dummy accounting at `3505d6c` after the
 complete 28-case cohort and independent acceptance; [exact evidence](evidence/t08-suite.md).
 T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md).
-T08b/#40 is lead-assigned and awaiting its Symphony dispatch label; no running worker or ranking acceptance is claimed.
-Ranking and loot simulation require their own evidence; M1–M5 remain unaccepted.
+T08b/#40 is accepted through [PR #62](https://github.com/Kav-K/OnlyDragons/pull/62) at `1149169`; [full ranking evidence](evidence/t08b-suite.md).
+Loot simulation remains planned and undispatched pending the first human checkpoint and lead assignment. M1–M5 remain unaccepted.
 PR #50 integrated T09e at `7b8ff0f` after the complete 23-case cohort and
 independent acceptance; [generic restart evidence](evidence/t09e-suite.md)
 is supplemented by T08a's separate managed-encounter recovery evidence.
@@ -42,7 +42,7 @@ is supplemented by T08a's separate managed-encounter recovery evidence.
 | One extensible test-dragon definition and inert table bindings | T02b / #38 | Accepted `dragon-definition-catalog`, `sample-loot-table-bindings` through PR #48: whole-candidate validation, retained selections and real production-loader/abort checks | One initial test dragon only; test definitions do not approve later content or production drop numbers |
 | Reusable persisted configuration and same-world restart validation | T09e / #49, complete through PR #50 at `7b8ff0f` | Accepted `same-profile-restart`: two actual boots, saved configuration, independent phase plans/reports, connected commands and exact positive/abort outcomes in the [23-case cohort](evidence/t09e-suite.md) | T08a separately accepts its managed-dragon disable/start recovery; human/client gates remain separate |
 | Managed real dragon plus spawn/status/reset/result inspection | T08a / #39 after shared T08/T06 path | Accepted `managed-dragon-development`: native/domain death, permissions/output, failed spawn/reset and restart; [full evidence](evidence/t08a-suite.md) | No engine clone; no real grants; direct spawning does not accept prefire or the altar |
-| Post-kill damage ranking including ghost damage and overkill | T08b / #40 | `frozen-damage-ranking`: unique placements, strict-increase commit provenance, same-tick ordinal ties, no late credit and actual distinct-player attribution/messages | Cosmetic presentation and authenticated full-client compatibility remain separate |
+| Post-kill damage ranking including ghost damage and overkill | T08b / #40 | Accepted `frozen-damage-ranking`: unique placements, strict-increase commit provenance, same-tick ordinal ties, no late credit and actual distinct-player attribution/messages; [full evidence](evidence/t08b-suite.md) | Cosmetic presentation and authenticated full-client compatibility remain separate |
 | Personal placement-based rolls, improved chances and hard item locks | T08c / #41 | `personal-loot-preview`: seeded sample policies, hard exclusion, per-player/type isolation, visible simulation and no inventory/XP/currency/grant side effects | Real rewards always disabled; sample probabilities and items are not production balance |
 | Eight tagged eyes, one summon, cancellation/refunds and animated hatch | T11 / #13 | `eye-transactions`: real block/inventory interactions, both hands, duplicate/final-placement concurrency, failed spawn and stored restart recovery | T10 integrated and M3 explicitly accepted first; altar/removal/refund/acquisition choices still need decisions |
 | Initial playable encounter completion | M4, T11 plus T02b/T08a/T08b | Existing eye gate plus definition catalog, managed dragon and frozen ranking evidence; one ritual uses the same backend/result boundary | Confirmed initial scope is one test dragon. Extra variants and abilities remain gated future content |

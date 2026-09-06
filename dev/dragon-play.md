@@ -1,6 +1,6 @@
 # Managed test dragon in Cursor
 
-Use a clean checkout of main after the T08a PR is merged. This production feature
+Use a clean checkout of main containing accepted PR #60 and PR #62. This production feature
 needs only OnlyDragons; the game-test companion and protocol client are test tools.
 
 1. Open `OnlyDragons.code-workspace`. Run **Tasks: Run Task → Minecraft: Build and
@@ -26,7 +26,8 @@ needs only OnlyDragons; the game-test companion and protocol client are test too
    100 each. `/onlydragons combat last` explains the captured hit. Dragon `status`
    shows generation/native UUID, selected revisions, domain state, native outcome,
    animation ticks and separate HP/credit. Dragon `result` inspects the frozen
-   completion. Ranking and personal loot previews are separate future tasks.
+   completion. The leaderboard arrives automatically on an ordinary defeat;
+   personal loot previews remain a separate future task.
 7. `/onlydragons dev dragon reset` affects only the current development generation.
    `reset <generation-uuid>` and `result <generation-uuid>` support explicit
    generation checks; tab completion offers the current UUID. Stale UUIDs reject;
