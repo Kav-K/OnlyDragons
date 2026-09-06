@@ -359,7 +359,7 @@ physical hits can omit it. [Player-owned evidence](../../dev/game-tests/findings
 records the positive controls and limits. These scoped decisions revise the
 unsupported semantic/phase assumptions; production end-to-end claim, veto,
 retirement and phase-rejection tests remain assigned to later adapter tasks.
-T04 remains In review; #9 stays blocked and M0 unaccepted pending lead acceptance.
+T04 is accepted and merged at `705de34`; [final evidence and separate policy review](evidence/t04-suite.md) record the decision. T06 is eligible for lead dispatch; M0 remains unaccepted.
 No production adapter is introduced by the feasibility scenario.
 
 A proposed simple damage model is:
@@ -601,9 +601,10 @@ is separate from gameplay acceptance. The explicitly named runner mode uses one
 offline synthetic identity only in its fresh loopback disposable profile,
 with both JVMs in the shared memory/lease lifecycle. Default tests and human
 profiles remain authenticated. PR #32 supplies reviewed catalog-declared actor
-admission, connected equipment assertions and a delayed-quit soak. T04 still
-requires its own reviewed player-owned damage/phase evidence; calibration alone
-does not settle native dragon suppression or change this combat design.
+admission, connected equipment assertions and a delayed-quit soak. T04's separate
+player-owned damage/phase evidence and scoped policy are now accepted in PR #31;
+[final evidence](evidence/t04-suite.md) distinguishes those observations from
+calibration and the still-deferred production adapter.
 
 T09d implements reusable multi-player/action and damage-observation primitives plus
 verified offline bootstrap. Its [brief coverage and fixture contract](06-brief-coverage.md)

@@ -94,23 +94,34 @@
       }
     },
     "T04": {
-      "status": "partial",
+      "status": "complete",
       "completedRequirements": [
         "projectile-observations",
-        "listener-cleanup"
+        "projectile-player-observations",
+        "listener-cleanup",
+        "projectile-impact-policy"
       ],
       "evidence": {
         "projectile-observations": {
-          "url": "https://github.com/Kav-K/OnlyDragons/pull/22",
-          "revision": "586a170"
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34026523246",
+          "revision": "96ef4b3725aafe0674c4b057ffe7fd21df263ca7"
+        },
+        "projectile-player-observations": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34026523246",
+          "revision": "96ef4b3725aafe0674c4b057ffe7fd21df263ca7"
         },
         "listener-cleanup": {
-          "url": "https://github.com/Kav-K/OnlyDragons/pull/22",
-          "revision": "586a170"
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34026523246",
+          "revision": "96ef4b3725aafe0674c4b057ffe7fd21df263ca7"
+        },
+        "projectile-impact-policy": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/31#issuecomment-5558603858",
+          "revision": "96ef4b3725aafe0674c4b057ffe7fd21df263ca7"
         }
       },
-      "mergedRevision": "586a170",
-      "notice": "PR31 integrates PR44/main 9def91f by ordinary merge 6936c6f and PR45/main 4cfb7b9 at merge 37cd803, preserving every projectile/T09d fixture, acceptance mapping and completed T09d context. Actual worker doctor is ready; plan checkpoint passes and changed-area selection requires all 18 cases. Per the latest owner instruction, the lead will dispatch the hosted Paper suite and independently replay evidence on the handed-back clean head. Current-input Paper acceptance and CI remain pending. Historical 77c94a2/bf523a75 observations remain independently reviewed but cannot certify these reconciled inputs. See projectile-player findings for the handoff. Uniform 1.0 part/three-phase and terminal-claim/veto policies remain unchanged. T04 stays partial/In review, #9 blocked and M0 unaccepted; P02/P04 remain deferred T06/M1 work."
+      "mergedRevision": "705de34cfbe497d970067a1ddebaef2a85d75125",
+      "notice": "PR #31 merged at 705de34cfbe497d970067a1ddebaef2a85d75125 after the current-input 18-case hosted suite, independent raw replay/review, current CI and separate external impact-policy acceptance. Exact runtime/artifact/receipt and policy references: docs/planning/evidence/t04-suite.md. Earlier PR #22 and player-owned findings retain their historical identities. Uniform 1.0 parts, three measured phases and the terminal-claim/veto contract are accepted; production P02/P04 and multiplayer firing remain deferred T06 work. T06 is eligible for lead dispatch; no milestone is accepted.",
+      "reviewedRevision": "96ef4b3725aafe0674c4b057ffe7fd21df263ca7"
     },
     "T03": {
       "status": "complete",
@@ -151,9 +162,10 @@
       "notice": "In review: main 4cfb7b9 (PR44/PR45) reconciled additively for bounded local checks. Historical b7fd6bc acceptance held: old console matcher missed ERROR lines. No fresh Paper acceptance claimed. Lead owns combined current suite/raw replay and T05 checkpoint after T04 integration and T02b/T05 reconciliation. See dev/game-tests/findings/t05-suite.md; physical P08/P09 and T08 composition remain later integration."
     },
     "T06": {
-      "status": "blocked",
+      "status": "planned",
       "completedRequirements": [],
-      "evidence": {}
+      "evidence": {},
+      "notice": "T01b, T02 and accepted T04 are integrated; eligible for the lead's dispatch label. T09d is available for final production multiplayer firing tests. P02/P04, firing-input and automated-multiplayer-firing remain deferred; no accepted-M0 prerequisite or milestone acceptance is introduced."
     },
     "T07": {
       "status": "blocked",
