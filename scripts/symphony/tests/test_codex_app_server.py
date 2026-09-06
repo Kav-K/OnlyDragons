@@ -85,6 +85,7 @@ class BridgeTests(unittest.TestCase):
         (self.workspace / '.codex').mkdir()
         (self.workspace / '.codex/config.toml').write_text('[mcp_servers.serena]\ncommand="unreviewed"\n')
         command = bridge.codex_command(self.workspace, self.source)
+        self.assertEqual(['codex', '--disable', 'remote_plugin'], command[:3])
         servers = tomllib.loads(next(arg for arg in command if arg.startswith('mcp_servers=')))['mcp_servers']
         self.assertEqual('node', servers['serena']['command'])
         self.assertEqual(str(self.workspace), servers['serena']['cwd'])
@@ -118,6 +119,17 @@ class BridgeTests(unittest.TestCase):
                     proc.stdin.write(untouched)
                     proc.stdin.flush()
                     self.assertEqual(untouched, proc.stdout.readline())
+                    # Host-provided tools, model selection and approval
+                    # policy remain protocol data; remote-plugin sync is separate.
+                    thread = {'method': 'thread/start', 'params': {
+                        'cwd': str(self.workspace), 'model': 'operator-model',
+                        'sandbox': 'workspace-write', 'approvalPolicy': 'never',
+                        'dynamicTools': [{'name': 'github_api', 'description': 'Host-owned GitHub tool',
+                                          'inputSchema': {'type': 'object', 'properties': {}}}],
+                    }}
+                    proc.stdin.write(json.dumps(thread) + '\n')
+                    proc.stdin.flush()
+                    self.assertEqual(thread, json.loads(proc.stdout.readline()))
                     proc.stdin.write(json.dumps(self.turn) + '\n')
                     proc.stdin.flush()
                     self.assertEqual(bridge.transform_message(self.turn, self.workspace, self.coordination), json.loads(proc.stdout.readline()))

@@ -107,6 +107,24 @@ user profile. A changed MCP command in an issue branch does not replace the
 operator's configuration. Install/review tool updates in the operator checkout
 before dispatching workers that need them.
 
+Each worker app-server invocation disables Codex's optional `remote_plugin`
+feature with `--disable remote_plugin`. Concurrent workers share a local
+`CODEX_HOME`; automatic account-plugin synchronization was racing over that
+home's plugin cache. The worker still loads the three repository skills and
+the reviewed Context7/Serena configuration, while Symphony supplies its own
+`github_api` tool through the app-server protocol. Authentication, model
+selection, and sandbox policy retain their existing paths. The setting applies
+when the next worker starts; it does not change active workers or personal
+Codex/Cursor settings. Optional account-synchronized plugins are outside the
+unattended worker tool set.
+
+The Codex 0.153.4 CLI reports `remote_plugin` as a stable feature; the generated
+worker command resolves it to `false`. The bridge regression suite preserves
+host-supplied tools and launch policy and runs in Linux CI without starting a
+model or MCP service. A local unauthenticated app-server check with the feature
+disabled still discovered all three repository skills, connected Context7 (two
+tools) and Serena (eight), and returned documentation and Java lifecycle symbols.
+
 `Symphony.cmd check` checks local tool prerequisites alongside auth and GitHub.
 For an actual MCP smoke check, use an expendable clean issue clone under the
 operator checkout's `.symphony/workspaces/` and run this from that clone in WSL
