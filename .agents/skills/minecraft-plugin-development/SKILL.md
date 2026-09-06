@@ -14,8 +14,9 @@ within the current user's task and execution permissions. Examples do not assign
 backlog work, authorize server actions, or change the project's API policy.
 OnlyDragons uses public Paper/Bukkit APIs and excludes NMS, CraftBukkit internals,
 and reflection into them, including where a generic reference discusses adapters.
-Its unattended Symphony workers leave server launches, EULA acceptance, and server
-profile/world actions to the operator under `WORKFLOW.md`.
+Its Symphony workers use only the isolated real-Paper runner allowed by
+`WORKFLOW.md`, reusing the operator's accepted EULA and taking the shared test
+lease. They do not use human profiles/worlds or accept new terms.
 
 When this checkout contains the OnlyDragons planning documents under
 `docs/planning/`, read [the project routing reference](references/onlydragons-routing.md)

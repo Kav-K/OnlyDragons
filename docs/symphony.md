@@ -96,8 +96,10 @@ Cursor also exposes `Symphony: check`, `Symphony: start`, `Symphony: stop`, and
 
 The pinned Codex CLI uses the `granular` approval-policy schema. A small local
 app-server adapter grants each worker write access to that checkout's `.git`
-directory so it can commit under workspace-write restrictions. It leaves the
-remaining sandbox policy intact. Gradle's cache stays inside each issue
+directory so it can commit under workspace-write restrictions. It also grants
+the exact shared `.symphony/test-coordination` directory for the Paper-test
+lease. The source tree and other issue clones are not added as writable roots.
+Gradle's cache stays inside each issue
 workspace. The adapter also supplies the operator's reviewed MCP configuration
 and binds Serena to the issue clone and shared runtime installation. Revalidate
 this adapter when upgrading Codex or Symphony.
@@ -115,16 +117,21 @@ python3 -m unittest discover -s scripts/symphony/tests -v
    can be selected after the owner reviews their scope.
 2. As the repository owner, add the **symphony** label to authorize that issue
    for a worker. The issue must remain open. The service polls every 15 seconds
-   and runs one worker at a time, with at most 20 turns per agent invocation.
+   and runs up to three workers, with at most 20 turns per agent invocation.
+   The integration lead labels only tasks whose dependencies are integrated.
+   Coding is parallel; actual Paper runs share a serialized lease and memory gate.
 3. The worker prepares an isolated checkout, implements on **symphony/gh-N**,
    reads the three shared planning documents, runs appropriate checks, updates
    affected project context with status and evidence, pushes the branch, and
    opens a **draft PR**. Its context entry remains In review until accepted.
 4. It comments with the result and verification, then removes only the symphony
    label. The issue stays open for human review. The worker does not merge PRs,
-   publish releases, deploy plugins, or start a server.
-5. Review the PR, run remaining Windows smoke and in-game checks, then decide
-   whether to merge. To request rework, add clear owner guidance to the issue
+   publish releases or deploy plugins. It runs actual-server feature scenarios
+   only through the isolated runner and leaves human/client gates explicit.
+5. The integration lead is authorized to merge PRs after independent review,
+   current-main integration, passing CI and required automated Paper checks.
+   Keep unrun in-game/human gates unaccepted in the ledger. To request rework,
+   add clear owner guidance to the issue
    and restore the symphony label. The worker resumes existing work when it can.
 
 The planning documents are the shared memory for subsequent agents. Context
@@ -159,9 +166,10 @@ isolation, and artifact production. A skipped test is a failure. Build and test
 reports remain in the workspace's build/reports directory. A successful build
 does not replace a real Paper smoke test or human gameplay verification.
 
-The server lab and Cursor server tasks are Windows scripts. A Linux worker
-must report them as unrun. After checking out the reviewed branch in your
-Windows development checkout, run the relevant operator checks, for example:
+Linux workers use `scripts/agent-tests/paper_test.py` for actual Paper scenarios;
+see `dev/agent-paper-tests.md`. The human server lab and Cursor tasks use Windows
+scripts. After pulling main into the Windows checkout, run the relevant
+operator checks, for example:
 
 ```powershell
 .\gradlew.bat build --console=plain
@@ -170,8 +178,8 @@ Windows development checkout, run the relevant operator checks, for example:
 
 Use the smoke profile, preserve personal worlds, and follow README.md for
 manual gameplay checks. Do not use server-wide /reload or plugin unloaders.
-Only the operator should choose when to start a server or accept the EULA for
-a fresh environment.
+Workers reuse the existing accepted EULA only for disposable local test servers.
+They never accept new terms or touch human profiles; the operator controls those.
 
 For a first end-to-end check, dispatch one small owner-reviewed documentation
 issue with the symphony label. Confirm the worker made the intended branch,

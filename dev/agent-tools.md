@@ -22,8 +22,9 @@ The project's concrete combat, physical-arrow, item/PDC, multipart dragon,
 proc-budget, and validation requirements remain in the three planning documents.
 The development skill's `references/onlydragons-routing.md` points to them.
 Generic examples do not authorize extra work or override public-API/threading
-rules. Symphony workers leave all Minecraft server and client actions to the
-operator, even when a runtime skill describes those commands.
+rules. Symphony workers run feature scenarios through the authorized isolated
+Paper runner in `dev/agent-paper-tests.md`; they do not use human profiles or
+accept new terms. Client input and visuals need separate evidence.
 
 ## Connected tools
 

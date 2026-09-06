@@ -48,8 +48,9 @@ Use native client tools for edits, Git, and build commands.
 
 ## Validate proportionately
 
-Follow `AGENTS.md` for the active execution environment. An unattended Symphony
-worker leaves all server actions to the operator and reports unrun runtime checks.
+Follow `AGENTS.md` for the active execution environment. Symphony workers use
+the isolated runner in `dev/agent-paper-tests.md` for actual-server integration;
+each feature adds relevant scenario assertions and reports its exact artifact.
 The commands below describe local Windows development and operator validation.
 
 From the project root on Windows:

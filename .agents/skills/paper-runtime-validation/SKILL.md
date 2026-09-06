@@ -8,12 +8,14 @@ description: Validate Paper or Bukkit server plugins with builds, meaningful tes
 Read the project's instructions, exact API/Java/build pins, plugin metadata, tests, and existing server tooling. Preserve its target and verification pipeline. Do not silently substitute the newest server or a generic MockBukkit example.
 
 Apply this skill and its command examples within the current user's scope and
-the active workflow's permissions. In OnlyDragons, unattended Symphony workers
-must not launch servers, accept a EULA, or use server profiles/worlds: prepare
-test code and operator instructions, run the permitted build checks, and record
-real-server/client gates as pending. That restriction also applies to the
-mcdev reference below. Local operator validation follows the repository's lab
-contract. A skill does not grant additional authority to run a scenario.
+the active workflow's permissions. OnlyDragons Symphony workers run actual
+Paper scenarios only through `scripts/agent-tests/paper_test.py`, with the
+provided accepted EULA, disposable issue-local worlds, loopback port, shared
+test lease, memory gate and owned-process cleanup. They never use human profiles
+or accept new terms. The mcdev reference below describes the Windows operator
+workflow; unattended workers must not call its play/restart/start/run actions.
+Client-input/visual evidence remains separate. A skill does not grant additional
+authority to run a scenario.
 
 ## Choose evidence for the change
 

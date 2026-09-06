@@ -8,8 +8,9 @@ description: Review Paper/Bukkit plugin scheduler ownership, asynchronous I/O, s
 Read `AGENTS.md` and the active workflow; keep this review within the current
 user's assigned scope and execution permissions. In OnlyDragons, use public
 Paper/Bukkit APIs without NMS or reflection into server internals. Its unattended
-Symphony workers may review, implement, and build within their issue workspace,
-but leave server/EULA/profile actions and real-server scenarios to the operator.
+Symphony workers test through the permitted isolated Paper runner with the
+shared lease and accepted EULA; human profiles/worlds and new EULA acceptance
+remain outside their scope. Keep client evidence distinct from server checks.
 
 Determine the actual server target first. Classic Bukkit/Paper uses its server thread for ordinary world and player operations. Folia requires the appropriate entity, region, global, or asynchronous scheduler; a global scheduler is not a universal route back to world access. Do not infer Folia support from `folia-supported: true`.
 

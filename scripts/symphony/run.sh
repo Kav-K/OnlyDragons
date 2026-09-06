@@ -12,6 +12,9 @@ export CODEX_HOME="$state_root/codex"
 export JAVA_HOME="$runtime/java"
 export PATH="$runtime/node_modules/.bin:$JAVA_HOME/bin:$PATH"
 export ONLYDRAGONS_TOKEN_FILE="$state_root/github-token"
+export ONLYDRAGONS_EULA_FILE="$ONLYDRAGONS_SOURCE/run/eula.txt"
+export ONLYDRAGONS_TEST_COORDINATION="$state_root/test-coordination"
+mkdir -p "$ONLYDRAGONS_TEST_COORDINATION"
 export GIT_TERMINAL_PROMPT=0
 binary="$runtime/symphony-v0.0.2-linux_x86_64"
 # v0.0.2 precedes the upstream alias-scrubbing fix. Do not pass aliases into it.
