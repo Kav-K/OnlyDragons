@@ -53,3 +53,8 @@ bash ./gradlew -p dev/player-client build installDist --dependency-verification 
 Changing the protocol target requires review of the exact publication, codec,
 dependency locks and hashes together, followed by another real Paper calibration.
 Do not replace the timestamp with `SNAPSHOT`, `latest`, or unverified master.
+
+The [final calibration evidence and extension boundary](../agent-paper-tests.md#protocol-player-evidence)
+record the actual positive, early-exit and timeout runs. Future feature scenarios
+require reviewed admission and their own real Paper assertions; this client is
+currently bounded to the calibration sequence.

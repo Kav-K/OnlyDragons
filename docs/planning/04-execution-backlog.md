@@ -20,7 +20,7 @@ part of the worker's scope.
 | T01a | [#3](https://github.com/Kav-K/OnlyDragons/issues/3) | Complete: PR #23 merged at 1efa7d0 | Base stat resolver and immutable explanations; 30 production tests, 18 Paper assertions, independent review and final-head CI passed. |
 | T02 | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | Complete: PR #24 merged at 7c6d843 | Item definitions, codec/PDC and enchant validation; 54 production tests, 35 Paper assertions, independent review and final-head CI passed. |
 | T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Partial PR #22 integrated at 586a170; full task blocked | Shooterless arrow/dragon findings are partial. Full acceptance awaits player-owned native suppression and semantic head/native-damage evidence after T09b; #9 stays blocked. |
-| T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | T09a, T00; PR #22 owned-listener helper integrated at 586a170 | Locally owned protocol-player calibration, dual reports and client/server failure cleanup. Full T04 acceptance is not a prerequisite. |
+| T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | T09a, T00; PR #22 owned-listener helper integrated at 586a170 | Final 1dd6ffe positive/early-exit/timeout calibration verified with dual reports and client/server cleanup; independent review passed, final CI/merge pending. [Evidence](../../dev/agent-paper-tests.md#protocol-player-evidence). Full T04 acceptance is not a prerequisite. |
 | T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | T00, T01a integrated; active Symphony worker | Combat math, health and contribution; production-service tests remain required. |
 | T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a/T02 integrated; active Symphony worker | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
 | T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | T01a, T02, T03 | Bounded procs and enchant state. |
@@ -48,6 +48,10 @@ merged, T04 can run its remaining player-owned experiments. This component
 ordering avoids a T04/T09b cycle while retaining the full T04 gate for #9.
 T09b protocol packets prove only their recorded Paper events; human visuals,
 authentication, multiplayer and feature-specific dragon behavior remain separate.
+The initial mode admits only `protocol-player-calibration`; the lead delegates
+reviewed admission/fixture extensions to T04/#5 and equipment/#7 one at a time.
+Those tasks must collect their own feature assertions and keep the same bounded
+actor/process ownership. Passing T09b alone does not unblock #9 or accept M0.
 
 ### Completed maintenance
 

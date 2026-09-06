@@ -266,3 +266,61 @@ Reproduce with the environment above and
 This proves contract consumers and immutable capture on Paper using synthetic
 actors. It does not implement or validate the production stat resolver, damage
 application, dragon collision, player input, or any complete gameplay milestone.
+
+## Protocol player evidence
+
+On 2026-09-05, the final T09b batch ran from clean runtime revision
+`1dd6ffe83095cc5fb04388f695f5370690e1cd9a`, after integrating stats, items and the
+owned-listener helper from main `7c6d843`. All three runs used Java `25.0.4.1`,
+Paper `26.2-121-a2a42c5`, and the exact pinned MCProtocolLib publication for
+Minecraft 26.2 / protocol 776. Each invoked production, companion and strict
+client wrapper builds; 54 production tests and 2 client tests passed without
+failures, errors or skips. The Linux runner failure-contract suite passed all
+36 tests, including actual dual-process cleanup and exclusive-lease fixtures.
+
+| Control | Run ID | Observed result |
+| --- | --- | --- |
+| Positive | `682c08a888854f22860b6bf36bbefb88` | Exit 0; all 25 Paper assertions and the complete client report passed |
+| `early-exit` | `49f3733ccc5d489db1407d4d7206cedd` | Exit 1; missing required actions rejected, client explicitly recorded deliberate early exit |
+| `idle --scenario-timeout 15` | `99b8c885ff124d528daed42bbc4772ac` | Exit 1; scenario-report deadline reached, no client actions accepted |
+
+The positive run joined synthetic player `od_682c08a888854` with the expected
+offline UUID `4905584e-469c-3c56-9863-3129e425c5a3`, observed slot 0 to 1, native
+bow use and full draw force `1.0`, then Arrow
+`4589b860-04a6-44f2-a42a-3b297adad7a9` with that real Player as shooter. The arrow
+was valid and moving after two ticks. The client acknowledged two teleports,
+sent select/draw/release/quit in order, and Paper observed quit and player removal.
+
+All three Paper processes exited 0 unforced. The positive client exited 0;
+both negative clients exited 1 and were reaped without forced termination.
+Every scenario recorded zero remaining owned listeners, entities, tasks and
+chunk force-loads. Post-run inspection found ports 37401, 54337 and 56729 closed,
+no process remaining in this checkout's disposable run directories, and the
+shared lease available. The early-exit run exercised a real memory wait before
+admission recovered; no threshold or unrelated process was changed.
+
+All three runs used identical staged bytes:
+
+- Production SHA256: `103efd337f5c6a109d3199581d5f9e19317df471c1a11304bdab2f883b426547`.
+- Companion SHA256: `08ba904ec7ad8a9356ebfab34b63167c2c931ce39016da34e100a4e7d986a8cb`.
+- Client SHA256: `ccab969031782ae9bdd2a1182d83316ac5da1f5278c84c3d3b923406a8af626e`.
+- Dependency-lock SHA256: `90c3d77fde25d047d0edf06cc28f888b32b1c968d7ae98e97b5e27a109dfc0ba`.
+- Verification-metadata SHA256: `d659767aa4310c5d315ccece52e083f6b1ee2062e6e24ef01de0c44bacba6913`.
+
+The reports record hashes for all 77 staged client JARs; the protocol artifact
+itself matches the published SHA256 recorded in `versions.properties` and
+[provenance](player-client/README.md). Independent review checked the final
+reports and rehashed the deployed artifacts. Later shared-context reconciliation
+and this evidence are documentation-only; runtime evidence remains at `1dd6ffe`.
+
+### Extending the actor after calibration
+
+The runner currently admits this mode only for `protocol-player-calibration`.
+T04/#5 and equipment/#7 must receive a reviewed scenario-admission extension and
+add their own actual production/Paper assertions after T09b merges. They can
+reuse the select/draw/release/quit markers with their public-API fixtures.
+The current bow-use packet uses yaw/pitch zero: align a fixture with that shot
+direction or explicitly review a bounded aiming-message extension. Do not treat
+the calibration as dragon damage suppression, equipment behavior, human input,
+visuals, authenticated multiplayer, or milestone acceptance. Each feature owns
+its observations and cleanup evidence under the same lease/memory policy.
