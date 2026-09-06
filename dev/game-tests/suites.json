@@ -302,7 +302,8 @@
         "dragon-combat",
         "dragon-restart-fresh",
         "dragon-restart-legacy",
-        "dragon-restart-animation"
+        "dragon-restart-animation",
+        "dragon-ranking"
       ],
       "affects": [
         "stats",
@@ -500,7 +501,8 @@
         "dragon-combat",
         "dragon-restart-fresh",
         "dragon-restart-legacy",
-        "dragon-restart-animation"
+        "dragon-restart-animation",
+        "dragon-ranking"
       ],
       "affects": []
     },
