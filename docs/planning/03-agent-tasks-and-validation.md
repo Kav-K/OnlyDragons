@@ -166,8 +166,15 @@ All four owned cleanup counters were zero; Paper exited 0 with `forced=false`
 and `clean=true`. The port closed and no Java process for that run remained.
 Raw reports stay ignored under `build/reports/agent-paper/<runId>/`.
 
-Draft PR #30 is In review. The lead's #28 suite/checkpoint must be integrated
-and exercised when available before final acceptance. Windows smoke,
+Draft PR #30 is In review. **Final acceptance is blocked on the lead-owned
+GH-28 suite/checkpoint dependency.** At handoff, a fresh fetch still has main
+`9092fbe`, and no shared suite/checkpoint scripts or merged GH-28 delivery exist.
+This worker cannot complete that new required gate within its owned files.
+The implementation and evidence above are committed and pushed; no useful work
+is unshared. Next action: the lead integrates GH-28 and reapplies GH-8's dispatch
+label; resume this branch, merge current main normally, run the new shared suite
+and checkpoint plus affected build/Paper checks, and update PR #30. Dispatch is
+removed under the blocker workflow, leaving the issue and draft PR open. Windows smoke,
 authenticated input/visual/multiplayer and performance are unrun;
 composition-root/equipment/physical adapter integration remains assigned to its
 owners. No milestone is accepted. Later evidence-only documentation commits do
