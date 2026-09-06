@@ -123,3 +123,18 @@ moves a managed bow out and back and verifies identical item metadata and amount
 Chest/custom-menu transactions need their own declared window and slot contract;
 do not reuse window-0 rules for other menus. Full-client rendering/input feel and
 Microsoft account compatibility remain separate human checks.
+
+
+## Persisted configuration and process restart
+
+Use the catalog's fixed `same-profile-restart-v1` envelope when a feature needs
+two actual Paper boots in the same disposable world. Both phase assertions,
+actor/session message matchers and separately hashed plans are mandatory. See
+[the restart runner contract](../agent-paper-tests.md#same-profile-restart-fixtures).
+`ScenarioContext.restartPhase()` supplies parent/index/nonce and the previous
+immutable report, allowing a consumer to carry native UUIDs/chunk coordinates.
+Keep expected prior values separate from independently loaded production state.
+The framework does not reset production encounters; #39 must establish its own
+disable/start absence/idle/new-spawn behavior. Starter greeting persistence is
+only the generic calibration. The suite replays each phase through the ordinary
+strict validator plus config/artifact/world/process continuity and lease checks.

@@ -9,6 +9,12 @@ MODE = 'same-profile-restart-v1'
 CONFIG = 'plugins/OnlyDragons/config.yml'
 
 
+def evidence_path(root, relative):
+    # Share the suite's lexical, resolved and no-symlink contract for every new leaf.
+    from paper_suite import safe_path
+    return safe_path(root, relative)
+
+
 def validate_descriptor(project, descriptor):
     import paper_test as r
     r.require(descriptor.get('catalogMode') == MODE and descriptor.get('testPlayerMode') == 'protocol-actions-v1',
@@ -42,7 +48,7 @@ def artifact_hashes(r, directory):
     paths = ['server.jar', 'plugins/OnlyDragons.jar', 'plugins/OnlyDragonsGameTests.jar']
     paths += [path.relative_to(directory).as_posix() for path in sorted((directory / 'player-client').glob('*.jar'))]
     paths += [path.relative_to(directory).as_posix() for path in sorted((directory / 'cache').glob('mojang_*.jar'))]
-    return {name: r.sha256(directory / name) for name in paths}
+    return {name: r.sha256(evidence_path(directory, name)) for name in paths}
 
 
 def snapshot(r, source, destination):
@@ -67,7 +73,7 @@ def execute_phases(r, args, project, java_home, pins, descriptor, parent, direct
     for index, phase in enumerate(phases, 1):
         nonce = parent[:10] + uuid.uuid4().hex[10:]
         r.require(nonce not in (parent, previous_nonce), 'Repeated restart nonce')
-        phase_root = root / f'phase-{index}'
+        phase_root = evidence_path(root, f'phase-{index}')
         phase_root.mkdir()
         plan = r.player_actions.load_plan(project, phase)
         plan_file = phase_root / 'player-plan.json'
@@ -133,7 +139,7 @@ def verify_continuity(r, parent, descriptor, root):
     nonces = {parent_id}
     previous_end = parent['startedAtEpochMs']
     process_ids = set()
-    initial = root / 'config-initial.yml'
+    initial = evidence_path(root, 'config-initial.yml')
     r.require(initial.is_file() and r.sha256(initial) == parent.get('initialConfigSha256'), 'Initial config changed')
     for index, phase in enumerate(phases, 1):
         nonce = phase.get('runId', '')
@@ -141,19 +147,20 @@ def verify_continuity(r, parent, descriptor, root):
                   and re.fullmatch('[a-f0-9]{32}', nonce) and nonce[:10] == parent_id[:10]
                   and nonce not in nonces, 'Reordered phase or stale/wrong nonce')
         nonces.add(nonce)
-        r.require(phase['profile'] == parent['profile'] and phase['artifacts'] == parent['artifacts']
-                  and phase['playerBuild'] == parent['playerBuild'], 'Changed restart profile/artifacts')
+        r.require(r.json_values_equal(phase['profile'], parent['profile'])
+                  and r.json_values_equal(phase['artifacts'], parent['artifacts'])
+                  and r.json_values_equal(phase['playerBuild'], parent['playerBuild']), 'Changed restart profile/artifacts')
         r.require(phase.get('artifactsBefore') == parent['stagedArtifacts'] == phase.get('artifactsAfter'),
                   'Changed artifacts between boots')
-        root_phase = root / f'phase-{index}'
-        context = r.strict_json(root_phase / 'context.json')
+        root_phase = evidence_path(root, f'phase-{index}')
+        context = r.strict_json(evidence_path(root_phase, 'context.json'))
         expected_context = {'schemaVersion': 1, 'mode': MODE, 'parentRunId': parent_id, 'index': index,
                             'nonce': nonce, 'previousNonce': phases[0]['runId'] if index == 2 else None,
                             'initialConfigPath': str(initial),
                             'previousReportPath': str(root / 'phase-1/scenario.json') if index == 2 else None}
-        r.require(context == phase.get('context') == expected_context, 'Wrong restart phase metadata')
+        r.require(r.json_values_equal(context, phase.get('context')) and r.json_values_equal(context, expected_context), 'Wrong restart phase metadata')
         for name in ('before', 'after'):
-            r.require(r.sha256(root_phase / f'config-{name}.yml') == phase.get(f'config{name.title()}Sha256'),
+            r.require(r.sha256(evidence_path(root_phase, f'config-{name}.yml')) == phase.get(f'config{name.title()}Sha256'),
                       'Changed phase configuration evidence')
         r.require(type(phase.get('startedAtEpochMs')) is int and previous_end <= phase['startedAtEpochMs'],
                   'Overlapping or reordered boot windows')
@@ -173,7 +180,7 @@ def verify_continuity(r, parent, descriptor, root):
         r.require('status' in phase and parent['pins']['minecraftVersion'] in phase['status'].get('version', {}).get('name', ''),
                   'Failed phase startup')
         previous_end = phase['completedAtEpochMs']
-    worlds = [r.strict_json(root / f'phase-{i}/scenario.json').get('observations', {}).get('restartWorld') for i in (1, 2)]
+    worlds = [r.strict_json(evidence_path(root, f'phase-{i}/scenario.json')).get('observations', {}).get('restartWorld') for i in (1, 2)]
     r.require(all(isinstance(world, dict) and set(world) == {'uuid', 'name'} for world in worlds)
               and worlds[0] == worlds[1] and worlds[0]['name'] == parent['profile']['world']
               and re.fullmatch('[a-f0-9-]{36}', worlds[0]['uuid']), 'World UUID changed across restart')
@@ -189,6 +196,7 @@ def verify_continuity(r, parent, descriptor, root):
 def verify_case(s, project, record, case, descriptor, source, suite_root):
     r = s.runner
     validate_descriptor(project, descriptor)
+    r.require(case['expectation'] == descriptor['phases'][-1]['expectation'], 'Restart case/final phase expectation mismatch')
     parent_id = record.get('runId', '')
     r.require(re.fullmatch('[a-f0-9]{32}', parent_id), 'Invalid parent run ID')
     root = project / 'build/reports/agent-paper' / parent_id
@@ -201,27 +209,29 @@ def verify_case(s, project, record, case, descriptor, source, suite_root):
               'Wrong restart parent identity')
     r.require(type(record.get('exitCode')) is int and record['exitCode'] == (0 if case['expectation'] == 'positive' else 1),
               'Wrong restart exit code')
+    r.require(type(parent.get('schemaVersion')) is int and parent['schemaVersion'] == 1
+              and r.json_values_equal(parent.get('pins'), r.properties(project / 'versions.properties')), 'Wrong parent schema/pins')
     verify_continuity(r, parent, descriptor, root)
     lease = parent.get('lease', {})
     window = [parent['startedAtEpochMs'], lease.get('acquiredAtEpochMs'), parent['phases'][0]['startedAtEpochMs'],
               parent['phases'][1]['completedAtEpochMs'], lease.get('releasedAtEpochMs'), parent['completedAtEpochMs']]
     r.require(all(type(value) is int for value in window) and window == sorted(window), 'Lease did not span both boots and cleanup')
     profile = s.safe_path(project, 'run/agent-tests/' + parent_id)
-    with zipfile.ZipFile(profile / 'plugins/OnlyDragons.jar') as jar:
-        r.require((root / 'config-initial.yml').read_bytes() == jar.read('config.yml'), 'Initial config differs from staged production defaults')
+    with zipfile.ZipFile(evidence_path(profile, 'plugins/OnlyDragons.jar')) as jar:
+        r.require(evidence_path(root, 'config-initial.yml').read_bytes() == jar.read('config.yml'), 'Initial config differs from staged production defaults')
     r.require(artifact_hashes(r, profile) == parent['stagedArtifacts'], 'Restart artifacts changed on disk')
-    r.require(r.sha256(profile / CONFIG) == parent['phases'][1]['configAfterSha256'], 'Final persisted config changed')
+    r.require(r.sha256(evidence_path(profile, CONFIG)) == parent['phases'][1]['configAfterSha256'], 'Final persisted config changed')
     records = record.get('phases')
     r.require(isinstance(records, list) and len(records) == 2, 'Missing/duplicate phase evidence records')
     verified = []
     for index, (phase, item, definition) in enumerate(zip(parent['phases'], records, descriptor['phases']), 1):
-        phase_root = root / f'phase-{index}'
+        phase_root = evidence_path(root, f'phase-{index}')
         r.require(item.get('runId') == phase['runId'], 'Reordered/wrong phase evidence')
-        r.require(r.strict_json(phase_root / 'result.json') == phase, 'Phase report differs from parent')
-        observations = r.strict_json(phase_root / 'scenario.json').get('observations', {})
-        r.require(observations.get('restart') == {'parentRunId': parent_id, 'index': index, 'nonce': phase['runId']}
+        r.require(r.strict_json(evidence_path(phase_root, 'result.json')) == phase, 'Phase report differs from parent')
+        observations = r.strict_json(evidence_path(phase_root, 'scenario.json')).get('observations', {})
+        r.require(r.json_values_equal(observations.get('restart'), {'parentRunId': parent_id, 'index': index, 'nonce': phase['runId']})
                   and observations.get('configOnBootSha256') == phase['configBeforeSha256'], 'Production phase/config observation mismatch')
-        log = (phase_root / 'server.log').read_text(encoding='utf-8', errors='replace')
+        log = evidence_path(phase_root, 'server.log').read_text(encoding='utf-8', errors='replace')
         r.require('OnlyDragons enabled' in log and 'OnlyDragons disabled' in log, 'Production enable/disable evidence missing')
         local = dict(item, testEvidence=record['testEvidence'])
         phase_case = dict(case, expectation=definition['expectation'])

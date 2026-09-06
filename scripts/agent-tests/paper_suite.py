@@ -523,7 +523,7 @@ def verify_case(project, record, case, descriptor, source, suite_root, restart_c
         if action_plan:
             _, plan_hash, plan = action_plan
             staged_plan = (safe_path(project, 'run/agent-tests/' + run_id + '/player-plan.json')
-                           if restart_context is None else report_root / 'player-plan.json')
+                           if restart_context is None else safe_path(project, (report_root / 'player-plan.json').relative_to(project).as_posix()))
             require(runner.sha256(staged_plan) == plan_hash, 'Staged player plan changed')
             require(result.get('playerPlan') == {'sha256': plan_hash, 'planId': plan['planId']}, 'Player plan receipt changed')
             if case['expectation'] == 'cleanup-abort':

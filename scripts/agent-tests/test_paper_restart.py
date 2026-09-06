@@ -156,4 +156,157 @@ class RestartContracts(unittest.TestCase):
         self.assertFalse(any('secret.yml' in p or 'level.dat' in p for p in exported))
 
 
+
+class FullRestartReplayTests(unittest.TestCase):
+    """Exercise the real suite entry point, including nested phase plan containment."""
+    def setUp(self):
+        import io
+        import zipfile
+        import paper_suite as suite
+        from test_paper_suite import ReceiptFixture
+        self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
+        self.f = f = ReceiptFixture(Path(self.temp.name))
+        self.suite = suite
+        self.name = 'same-profile-restart'
+        self.descriptor = runner.strict_json(ROOT / 'dev/game-tests/scenarios.json')[self.name]
+        for phase in self.descriptor['phases']:
+            f.write(phase['playerActionPlan'], (ROOT / phase['playerActionPlan']).read_bytes())
+        pins = runner.properties(ROOT / 'versions.properties')
+        # Tiny synthetic protocol JAR bytes, with an explicitly matching test-only pin.
+        pins['paperSha256'] = f.result['pins']['paperSha256']
+        pins['testPlayerProtocolLibSha256'] = runner.hashlib.sha256(b'protocol').hexdigest()
+        f.write('versions.properties', ''.join(k+'='+v+'\n' for k,v in pins.items()))
+        pinned = runner.player_pins(pins)
+        f.write(f.profile/'player-client'/pinned['jarName'], b'protocol')
+        f.write(f.profile/'player-client/OnlyDragonsPlayerClient.jar', b'client')
+        for path in ['dev/player-client/gradle.lockfile','dev/player-client/gradle/verification-metadata.xml']: f.write(path,'fixture')
+        data = io.BytesIO()
+        with zipfile.ZipFile(data,'w') as jar: jar.writestr('config.yml','initial')
+        f.write(f.profile/'plugins/OnlyDragons.jar',data.getvalue())
+        artifacts = {'productionSha256':runner.sha256(f.profile/'plugins/OnlyDragons.jar'),
+                     'gameTestsSha256':runner.sha256(f.profile/'plugins/OnlyDragonsGameTests.jar')}
+        parent = copy.deepcopy(f.result)
+        parent.update(catalogMode=restart.MODE,scenarioId=self.name, pins=pins, artifacts=artifacts, phases=[],
+                      startedAtEpochMs=f.start, completedAtEpochMs=f.end,
+                      lease={'acquiredAtEpochMs':f.start+1,'releasedAtEpochMs':f.end-1})
+        parent['profile'].update(authentication='offline-disposable-loopback',testPlayerMode='protocol-actions-v1')
+        settings=runner.test_settings({},f.run_id,45678,True,2)
+        f.write(f.profile/'server.properties',''.join(k+'='+v+'\n' for k,v in settings.items()))
+        plan = player_actions.load_plan(f.root,self.descriptor['phases'][0])[2]
+        f.json(f.profile/'whitelist.json',player_actions.identities(f.run_id,plan))
+        parent['playerBuild']={'artifact':pinned['artifact'],'jars':{p.name:runner.sha256(p) for p in (f.profile/'player-client').glob('*.jar')},
+                              'lockSha256':runner.sha256(f.root/'dev/player-client/gradle.lockfile'),
+                              'verificationMetadataSha256':runner.sha256(f.root/'dev/player-client/gradle/verification-metadata.xml'),
+                              'unitTests':f.result['build']['unitTests']}
+        parent['stagedArtifacts']=restart.artifact_hashes(runner,f.profile)
+        f.write(f.reports/'config-initial.yml','initial');f.write(f.profile/restart.CONFIG,'initial')
+        parent['initialConfigSha256']=runner.sha256(f.reports/'config-initial.yml')
+        for index,definition in enumerate(self.descriptor['phases'],1):
+            root=f.reports/f'phase-{index}'; nonce=f.run_id[:10]+str(index)*22
+            first=f.start+index*2000
+            plan_path,plan_hash,plan=player_actions.load_plan(f.root,definition)
+            f.write(root/'player-plan.json',plan_path.read_bytes())
+            context={'schemaVersion':1,'mode':restart.MODE,'parentRunId':f.run_id,'index':index,'nonce':nonce,
+                     'previousNonce':f.run_id[:10]+'1'*22 if index==2 else None,
+                     'initialConfigPath':str(f.reports/'config-initial.yml'),
+                     'previousReportPath':str(f.reports/'phase-1/scenario.json') if index==2 else None}
+            phase={key:copy.deepcopy(parent[key]) for key in ('schemaVersion','scenarioId','revision','worktreeDirty','pins','javaVersion','build','artifacts','playerBuild','bootstrap','profile')}
+            phase.update(runId=nonce,parentRunId=f.run_id,index=index,context=context,startedAtEpochMs=first,completedAtEpochMs=first+1000,
+                         issuedAtEpochMs=first+50,deadlineAtEpochMs=first+60050,passed=True,error=None,
+                         status={'version':{'name':'26.2'}},cleanup={'clean':True,'forced':False,'exitCode':0},
+                         playerCleanup={'clean':True,'forced':False,'exitCode':0,'successfulExit':True},
+                         serverProcess={'pid':index,'startTicks':index,'startedAtEpochMs':first+1},
+                         clientProcess={'pid':index+10,'startTicks':index+10,'startedAtEpochMs':first+51},
+                         playerStopStartedAtEpochMs=first+700,playerStopCompletedAtEpochMs=first+710,
+                         stopStartedAtEpochMs=first+800,stopCompletedAtEpochMs=first+900,
+                         memory=runner.assess_memory(1536,{'MemAvailable':5000},client_memory_mib=256),
+                         artifactsBefore=parent['stagedArtifacts'],artifactsAfter=parent['stagedArtifacts'],
+                         playerPlan={'sha256':plan_hash,'planId':plan['planId']})
+            for side,text in [('before','initial' if index==1 else 'saved'),('after','saved' if index==1 else 'initial')]:
+                f.write(root/f'config-{side}.yml',text);phase['config'+side.title()+'Sha256']=runner.sha256(root/f'config-{side}.yml')
+            scenario=copy.deepcopy(f.scenario)
+            scenario.update(runId=nonce,scenarioId=self.name,mechanicRevision=definition['mechanicRevision'],startedAtEpochMs=first+60,completedAtEpochMs=first+600,
+                            assertions=[{'id':a,'expected':0 if a in suite.CLEANUP else True,'observed':0 if a in suite.CLEANUP else True,'passed':True} for a in definition['requiredAssertions']])
+            actors=[];journal=[]
+            for actor,identity in zip(plan['actors'],player_actions.identities(nonce,plan)):
+                session=actor['sessions'][0]
+                messages=[' '.join(m.get('containsAll',[])) if 'containsAll' in m else m['exact'] for m in definition['requiredActorMessages'] if m['actor']==actor['id']]
+                steps=[dict(copy.deepcopy(step),submittedAtEpochMs=first+200+i*10,packetTypes=player_actions.PACKETS[step['action']]) for i,step in enumerate(session['steps'])]
+                actors.append({'id':actor['id'],'username':identity['name'],'uuid':identity['uuid'],'sessions':[{
+                    'id':session['id'],'startedAtEpochMs':first+100,'completedAtEpochMs':first+500,'loginReceived':True,'playerLoadedSent':True,
+                    'teleportsAcknowledged':1,'steps':steps,'messages':messages,'bindings':[],'inventorySnapshots':[],'inventoryConfirmations':[],
+                    'disconnected':True,'passed':True,'error':''}]})
+                for kind,detail in [('join',{'uuid':identity['uuid'],'sessionOrdinal':1}), *[('request',{'session':session['id'],'step':step['id']}) for step in session['steps']],('quit',{'uuid':identity['uuid']})]:
+                    journal.append({'kind':kind,'actor':actor['id'],'tick':100+len(journal),'detail':detail})
+            player={'schemaVersion':2,'runId':nonce,'planId':plan['planId'],'planSha256':plan_hash,'authentication':'offline-disposable-loopback',
+                    'artifact':pinned['artifact'],'minecraftVersion':'26.2','protocolVersion':pinned['protocolVersion'],
+                    'startedAtEpochMs':first+80,'completedAtEpochMs':first+650,'actors':actors,'passed':True,'error':''}
+            scenario['observations']={'playerFixture':journal,'restart':{'parentRunId':f.run_id,'index':index,'nonce':nonce},
+                                      'restartWorld':{'uuid':'11111111-1111-1111-1111-111111111111','name':parent['profile']['world']},
+                                      'configOnBootSha256':phase['configBeforeSha256']}
+            phase.update(scenario=scenario,player=player)
+            for filename,value in [('context',context),('scenario',scenario),('player',player),('result',phase)]:f.json(root/(filename+'.json'),value)
+            f.write(root/'server.log','OnlyDragons enabled\nOnlyDragons disabled\nStopping server\n')
+            parent['phases'].append(phase)
+        self.parent = parent
+        f.json(f.reports/'result.json',parent)
+        self.record=copy.deepcopy(f.record);self.record.update(caseId=self.name,scenarioId=self.name)
+        restart.capture(suite,f.root,f.reports,self.record)
+        for kind in ['production','player']:
+            path=f.suite_root/self.name/kind/'TEST-Sample.xml'
+            f.write(path,'<testsuite tests="1" failures="0" errors="0" skipped="0"><testcase classname="Sample" name="boundary"/></testsuite>')
+        self.record['testEvidence']=[{'kind':kind,'path':(f.suite_root/self.name/kind/'TEST-Sample.xml').relative_to(f.root).as_posix(),'sha256':runner.sha256(f.suite_root/self.name/kind/'TEST-Sample.xml')} for kind in ['production','player']]
+        self.case={'scenarioId':self.name,'expectation':'positive','testPlayer':'protocol-actions-v1','scenarioTimeout':60}
+
+    def verify(self):
+        with patch.object(self.suite,'process_cleanup'):
+            return self.suite.verify_case(self.f.root,self.record,self.case,self.descriptor,self.f.source,self.f.suite_root)
+
+    def test_full_nested_replay_passes(self): self.assertGreater(self.verify()['assertions'],0)
+
+    def refresh(self):
+        f = self.f
+        for phase in self.parent['phases']:
+            root = f.reports / f"phase-{phase['index']}"
+            for filename, value in [('result', phase), ('player', phase['player']), ('scenario', phase['scenario'])]:
+                f.json(root / (filename + '.json'), value)
+        f.json(f.reports / 'result.json', self.parent)
+        restart.capture(self.suite, f.root, f.reports, self.record)
+
+    def test_corrupt_phase_provenance_and_lifetimes_fail_full_replay(self):
+        original = copy.deepcopy(self.parent)
+        changes = [lambda p: p['phases'].reverse(),
+                   lambda p: p['phases'].pop(),
+                   lambda p: p['phases'][1].update(runId=p['phases'][0]['runId']),
+                   lambda p: p['phases'][0]['cleanup'].update(clean=False),
+                   lambda p: p['phases'][1].pop('status'),
+                   lambda p: p['phases'][1]['player']['actors'][0].update(username='wrong_actor'),
+                   lambda p: p['phases'][1]['player']['actors'][1]['sessions'][0].update(messages=[]),
+                   lambda p: p['phases'][1].update(artifactsBefore={}),
+                   lambda p: p.update(error='arbitrary error')]
+        for change in changes:
+            self.parent = copy.deepcopy(original); change(self.parent); self.refresh()
+            with self.subTest(change=change), self.assertRaises((runner.ValidationError, player_actions.ActionValidationError)):
+                self.verify()
+        self.parent = original; self.refresh(); self.verify()
+
+    def test_same_content_evidence_leaf_symlinks_fail_full_replay(self):
+        self.verify()
+        paths=[self.f.reports/'phase-2/player-plan.json',self.f.reports/'phase-2/context.json',
+               self.f.reports/'config-initial.yml',self.f.reports/'phase-2/config-before.yml',
+               self.f.reports/'phase-1/config-after.yml',self.f.profile/restart.CONFIG]
+        for number,path in enumerate(paths):
+            data=path.read_bytes();external=self.f.root.parent/(self.f.root.name+'-outside-'+str(number));external.write_bytes(data)
+            self.addCleanup(lambda p=external:p.unlink(missing_ok=True))
+            path.unlink()
+            try:
+                try: path.symlink_to(external)
+                except OSError as error:
+                    self.skipTest('Platform cannot create test symlinks: '+str(error))
+                with self.subTest(path=path), self.assertRaisesRegex(runner.ValidationError,'[Ss]ymlink'):
+                    self.verify()
+            finally:
+                path.unlink(missing_ok=True);path.write_bytes(data)
+
+
 if __name__ == '__main__': unittest.main()

@@ -43,7 +43,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T08c — Personal loot simulation | Planned | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | After T02b/T08b: personal placement-dependent previews with hard item locks and explicit sample calibration. Real rewards always disabled; all resolver/no-grant Paper evidence pending. |
 | T09 — Gameplay validation | In progress (T09a/T09b/T09c complete; future gameplay gates pending) | [#2 runner](https://github.com/Kav-K/OnlyDragons/issues/2), [PR #16](https://github.com/Kav-K/OnlyDragons/pull/16), [#20 protocol player](https://github.com/Kav-K/OnlyDragons/issues/20), [PR #27](https://github.com/Kav-K/OnlyDragons/pull/27) | T09b merged at 5b0e030 after independent review and final-head CI. Clean runtime 1dd6ffe passed 25 protocol-player Paper assertions; early-exit and timeout controls failed as intended, with both owned JVMs cleaned up. [Exact evidence/hashes](../../dev/agent-paper-tests.md#protocol-player-evidence). T09c merged in [PR #32](https://github.com/Kav-K/OnlyDragons/pull/32) at 73a8cc8: all 15 shared cases met their declared outcomes, including the 40-second actor soak and five expected-failure controls; [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). Human visuals/authenticated multiplayer and future feature scenarios remain separate gates. |
 | T09d — Reusable headless fixtures | Complete; merged `9def91f75d655caaccd6c7fa01313e4ba3a0ea54` | [#43](https://github.com/Kav-K/OnlyDragons/issues/43), [PR #44](https://github.com/Kav-K/OnlyDragons/pull/44), integration-lead-owned | Reviewed runtime `3047a56` passed all 17 hosted suite outcomes, including two-player action/damage and intended-abort controls, 82 production/28 client tests and current-runtime CI. Independent unchanged-artifact replay and the T09d checkpoint passed; [exact evidence](evidence/t09d-suite.md). Final documentation-head CI passed and PR #44 merged at `9def91f75d655caaccd6c7fa01313e4ba3a0ea54`. Generic calibration does not satisfy production multiplayer firing/accounting or human gates. No duplicate Symphony dispatch. |
-| T09e — Same-profile restart fixtures | In review (implementation and validation underway) | [#49](https://github.com/Kav-K/OnlyDragons/issues/49), `symphony/gh-49` | Lead-assigned bounded maintenance after integrated T09a/T09b/T09c/T09d. Fixed two-boot runner, strict per-phase evidence/replay and generic starter configuration calibration. Focused actual Paper, full-cohort lead review and current CI pending; no managed-dragon or milestone acceptance. |
+| T09e — Same-profile restart fixtures | In review (implementation and validation underway) | [#49](https://github.com/Kav-K/OnlyDragons/issues/49), [draft PR #50](https://github.com/Kav-K/OnlyDragons/pull/50), `symphony/gh-49` | Lead-assigned bounded maintenance after integrated T09a/T09b/T09c/T09d. Fixed two-boot runner, strict per-phase evidence/replay and generic starter configuration calibration. Focused actual Paper, full-cohort lead review and current CI pending; no managed-dragon or milestone acceptance. |
 | T10 — Prefire/performance | Planned | [#12](https://github.com/Kav-K/OnlyDragons/issues/12) | Retains all existing dependencies and additionally requires T08a shared dragon backend; integrated traces, human rehearsal, and measured load/cleanup gates remain pending. |
 | T11 — Eight-eye lifecycle | Planned, later | [#13](https://github.com/Kav-K/OnlyDragons/issues/13) | M3 accepted, then transaction, spawn, cancellation, and recovery gates. |
 | T12 — Variants/progression | Planned, later | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus separately agreed roster, rewards, and acquisition scope. |
@@ -546,9 +546,15 @@ The generic starter configuration calibration exercises actual commands and
 production greeting observations; it is not managed-dragon recovery proof.
 T08a consumes the public phase/previous-observation metadata to verify its own
 active-encounter disable/start behavior. No feature prerequisite or human gate is
-removed. Implementation is In review; actual evidence and PR reference will be
-recorded at handoff. Initial worker doctor/structural checkpoint passed, as did
-the production build and focused Python failure controls; Paper gates remain pending.
+removed. Implementation is In review in [draft PR #50](https://github.com/Kav-K/OnlyDragons/pull/50).
+Main `3c35a85` is integrated normally at `a7a97c0`; all 23 combined cases and
+T04's accepted ledger survive. The initial clean `efc9714` positive/abort runs
+both passed strict raw replay with 35 assertions, 82 production/28 client tests
+and clean owned shutdown, but do not certify the merged/review-fixed inputs.
+The local replay symlink finding is fixed with full entry-point rejection tests;
+253 Python tests and structural/no-weakening checks pass. Final focused Paper
+runs are pending. Per the lead's GH-49 instruction, the final whole-cohort hosted
+suite/replay/checkpoint is lead-dispatched; no duplicate local full suite is needed.
 
 ### T10 — Integrated prefire rehearsal and performance gate
 
