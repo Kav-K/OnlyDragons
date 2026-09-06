@@ -210,7 +210,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Draft PR #46; clean runtime 90b5cf6775dcdf53003f89d1d5fb2cf7940edf58 includes main 4cfb7b9. 109 production tests, companion build, 92 checkpoint/suite tests and runtime-head Windows/Linux CI passed. Focused Paper: 30 positive assertions passed; abort control had 14 passes/one intended exception, restored the catalog and cleaned up. Exact evidence: docs/planning/evidence/t02b-focused-paper.md. Per owner coordination the lead owns the final combined suite and T02b automated acceptance checkpoint; no complete receipt, completed requirements or milestone/live dragon/reward acceptance claimed."
+      "notice": "Draft PR #46; clean runtime 90b5cf6775dcdf53003f89d1d5fb2cf7940edf58 includes main 4cfb7b9. 109 production tests, companion build, 92 checkpoint/suite tests and runtime-head Windows/Linux CI passed. Focused Paper: 30 positive assertions passed; abort control had 14 passes/one intended exception, restored the catalog and cleaned up. Exact evidence: docs/planning/evidence/t02b-focused-paper.md. Per owner coordination the lead owns the final combined suite and T02b automated acceptance checkpoint; no complete receipt, completed requirements or milestone/live dragon/reward acceptance claimed. Final normal merge 99118728e5110dabb51b2e8ec3bf2a972a0e0221 integrates T04/main 705de34 and preserves all 20 selected cases; prior focused evidence retains its original identity. Reconciled artifact acceptance remains with the lead."
     },
     "T08a": {
       "status": "planned",

@@ -51,8 +51,15 @@ plus a standalone Paper inventory sentinel. No players or live dragons were
 spawned, and no loot calculation/grant/currency service exists. The phase contract
 is declarative; it cannot widen T06's separately reviewed admission policy.
 
-The complete branch selection contains **19 cases**: the unchanged 17-case
-baseline plus both catalog cases. **No complete suite receipt or T02b automated
+At the focused runtime revision, the complete selection contained **19 cases**:
+the then-current 17-case baseline plus both catalog cases. Final normal merge
+`99118728e5110dabb51b2e8ec3bf2a972a0e0221` integrates T04/main
+`705de34cfbe497d970067a1ddebaef2a85d75125`, preserving its
+`projectile-player-feasibility` case and both catalog cases. The reconciled
+selection is **20 cases**. Root wrapper and companion builds and the structural
+checkpoint passed after reconciliation; the focused reports above retain
+their original source and artifact identities and do not certify that new
+combined companion. **No complete suite receipt or T02b automated
 acceptance checkpoint is claimed here.** Per the [owner's verification coordination](https://github.com/Kav-K/OnlyDragons/issues/38#issuecomment-5558553088),
 the lead will run the catalog/proc combined integration suite and both task
 checkpoints on the latest accepted base, independently replay evidence and review
