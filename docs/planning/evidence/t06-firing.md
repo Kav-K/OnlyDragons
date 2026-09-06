@@ -189,10 +189,35 @@ The other numeric catalog oracle, `ItemIdentityScenario`, already includes
 shortbow; a search of production tests and companion fixtures found no other
 instance of this omission. No production firing or gameplay policy changes.
 
-Current main `92147a2` is already integrated. Fresh build and clean focused
-equipment Paper evidence are pending for this repair. The lead owns independent
-review and the next full 24-case hosted run, receipt replay and T06 checkpoint;
-the worker will not duplicate that run. Research/design contracts are unchanged.
+Clean repair revision `2317721bb4d003d4759c9f4e1658103c857cdd31` includes current
+main `92147a25c7dfd6f761f502bdbac0d00ffa261ef8`. The JDK 25.0.4.1 wrapper build
+passes 182 production tests with zero failures/errors/skips. The fresh command
+`python3 scripts/agent-tests/paper_test.py --scenario equipment-stats` passes
+run `4bff07222e8243e1b3e53ffc7d448dd3` on Paper `26.2-121-a2a42c5`:
+24 required assertions plus shared `owned_resources_released` (25/25 reported).
+All nine IDs/totals match, including shortbow `[100, 50, 0, 0]`; all previous
+assertions remain. Owned resources return to zero and Paper exits 0 unforced;
+loopback port 44053 is closed. This is a synthetic UUID/command-sender fixture
+using production services and native item serialization, with no client login.
+The accepted EULA, verified bootstrap, shared lease and 2560 MiB memory gate
+were used. No production source changed; its JAR hash matches the prior firing
+candidate. Raw reports/logs are retained in the issue workspace under
+`build/reports/agent-paper/4bff07222e8243e1b3e53ffc7d448dd3/`.
+
+| Repair input/evidence | SHA-256 |
+| --- | --- |
+| Production JAR | `9ff747e8b7a4e8cde7725131cf6b3eb1bbf6b476ea7149168a39aa0d4468dfd2` |
+| Companion JAR | `fd9fc5c790471db751ee62d2728d91ec20d6a6629f3c81f3d66e077308ecf03d` |
+| Raw result JSON | `97bbb08a15067e0a4fd4aa7497f191d4b75fdb1d4249723d0207cda7d27f7938` |
+| Raw scenario JSON | `a5198280e843a04b8a2d5ce2e5a8b4da91bad2f97fdddd5fa119341176e869d4` |
+
+Static plan validation passes and changed-area selection retains all 24 cases;
+these are not a complete receipt or T06 acceptance checkpoint. Prior required
+scenario assertions are a subset of the new catalog. The lead owns independent
+review and the next full 24-case hosted run, receipt replay, current-head CI and
+T06 checkpoint; the worker did not duplicate that run. Later documentation-only
+commits record this evidence without changing the tested inputs. Research/design
+contracts are unchanged.
 
 Windows Play/smoke, mouse/hold feel, rendered presentation and authenticated-client
 compatibility remain separate unrun human observations. T08 owns full multiplayer
