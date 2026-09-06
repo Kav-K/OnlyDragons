@@ -509,6 +509,42 @@ native death keeps diagnostic completion, never retries lethal damage, and remai
 protected until explicit reset. Reset/abort/disable do not mint results or rewards.
 The backend supplies T10's future target projection, not countdown/prefire or M3.
 
+### T08e candidate motion and returning Tracer contract
+
+GH-65 adopts the owner-declared `dragon-orbit/v1` candidate through the public
+AI-enabled HOVER position adapter. A smooth160-tick radial entry reaches horizontal
+radius8 with bob±1 and nominal0.20 blocks/tick. A conservative12-block part/stopping
+envelope reduces radius to4 in the smallest radius16 arena; parent step≤0.25 and
+yaw delta≤3 degrees are checked. Actual parent/eight-part boxes must retain a
+0.5-block arena margin. Unexpected movement, changed AI/phase, rejected/redirected
+teleport or unsafe geometry fails visibly through the existing combat retirement
+path. Native first-tick part initialization precedes route advancement.
+
+`DragonBackend` owns `DragonFlight`, advances it once per server tick through the
+existing combat synchronization, stops before managed lethal, and retains the
+route-center neighbourhood ticket demands through native removal. Reset/disable
+retires the backend and all demands. No new scheduler or damage authority is added.
+`DevelopmentDragonService.motion()` returns an immutable diagnostic view for T08d
+and later consumers. Human `dev dragon spawn [orbit|stationary]` defaults to orbit;
+the legacy no-argument service method explicitly retains stationary calibration.
+Existing deterministic command plans request `spawn stationary`.
+
+`tracer-return/v2` is frozen in `OwnedProjectile` from the trusted named
+`tracer_return_v2` definition (`tracer-return-v2`), with the original group's launch
+tick inherited by Duplex. Its candidate acquisition radii are8/16/24/32/40, retention
+is acquisition+8 for the same eligible target, and maximum turn is18 degrees/tick.
+First three original-group ticks are ballistic without vetoing genuine collisions.
+Closest visible current parts supply aim; obstruction, phase/generation loss and
+arena exit release eligibility. Native speed/drag/gravity and arrow UUID remain
+unchanged. The named development drawn bow supplies Tracer V and Duplex V, damage100,
+zero extra crit/ferocity and T01's total crit damage50. Old nine definitions and
+`tracer-continuity/v1` remain unchanged. There is no editable profile PDC field.
+
+These are in-progress candidate contracts. [Evidence and gates](evidence/t08e-motion-tracer.md)
+separate server geometry, collisions, received motion and human feel. Targetless
+T07 admission/late attachment remains a scoped pre-spawn control; T10 owns future
+managed prepare/attach and countdown/hatch. No M3, attack, type or reward expansion.
+
 ### T08b frozen ranking and presentation
 
 Accepted through PR #62 at `1149169` after the complete 33-case hosted cohort,

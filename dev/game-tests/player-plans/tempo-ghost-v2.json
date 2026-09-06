@@ -13,7 +13,7 @@
               "id": "denied",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn training"
+                "command": "onlydragons dev dragon spawn training stationary"
               }
             },
             {
@@ -27,7 +27,7 @@
               "id": "spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn training"
+                "command": "onlydragons dev dragon spawn training stationary"
               }
             },
             {

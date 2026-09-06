@@ -32,6 +32,10 @@ public final class CalibrationLoadouts {
                     Set.of(WeaponDefinition.FiringMode.DRAWN_BOW, WeaponDefinition.FiringMode.SHORTBOW), levels));
         }
         return new ItemRegistry(REVISION, List.of(
+                new ItemDefinition(new WeaponDefinition("tracer_return_v2", ItemRegistry.SCHEMA_VERSION, "tracer-return-v2",
+                        WeaponDefinition.FiringMode.DRAWN_BOW, 100, List.of(),
+                        List.of(enchant("dragon_tracer", false), enchant("duplex", true))),
+                        "Returning Tracer v2 (Development)", "BOW", Set.of()),
                 bow("ordinary", "Calibration Bow", 0, 0, List.of()),
                 bow("crit", "Critical Calibration Bow", 100, 0, List.of()),
                 bow("ferocity_25", "25 Ferocity Bow", 0, 25, List.of()),

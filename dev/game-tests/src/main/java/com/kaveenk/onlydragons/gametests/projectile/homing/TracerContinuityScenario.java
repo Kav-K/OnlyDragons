@@ -247,6 +247,8 @@ public final class TracerContinuityScenario implements Scenario, Listener {
     }
     private void finish() {
         finished = true; bows.endEncounter(encounter);
+        context.check("v1_trace_profile_preserved", true, bows.trace().stream().anyMatch(t -> t.kind().equals("tracer-acquired"))
+                && bows.trace().stream().filter(t -> t.kind().equals("tracer-acquired")).allMatch(t -> t.detail().contains("tracer-continuity/v1")));
         context.check("native_velocity_matches_applied_steering", true, nativeVelocitySamples > 10 && nativeVelocityMatches);
         context.check("reset_releases_registry_frames_reservations", true, bows.capacityUsed() == 0 && bows.continuity().frameCount() == 0
                 && bows.continuity().tickets().reservedCount() == 0 && bows.continuity().tickets().demandCount() == 0);

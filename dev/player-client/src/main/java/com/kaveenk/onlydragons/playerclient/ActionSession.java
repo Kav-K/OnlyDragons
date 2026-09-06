@@ -36,6 +36,7 @@ final class ActionSession extends SessionAdapter {
     private final List<String> messages = new ArrayList<>();
     private final Map<String, UUID> targets = new LinkedHashMap<>();
     private final List<Map<String, Object>> bindings = new ArrayList<>();
+    private final EntityMotionObservation entityMotion = new EntityMotionObservation();
     private final Map<UUID, Integer> entities = new HashMap<>();
     private final Map<Integer, UUID> entityIds = new HashMap<>();
     private final BossBarObservation bossBars = new BossBarObservation();
@@ -83,6 +84,7 @@ final class ActionSession extends SessionAdapter {
         if (!error.isEmpty() || disconnected || requestedDisconnect) return new Effects(List.of(), null, null);
         inventory.receive(packet);
         if (observeUi && packet instanceof org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundBossEventPacket boss) bossBars.receive(boss);
+        entityMotion.receive(packet);
         var outgoing = new ArrayList<Packet>();
         if (packet instanceof ClientboundLoginPacket joined) {
             check(!joined.isOnlineMode(), "Action fixture requires disposable offline profile");
@@ -238,6 +240,7 @@ final class ActionSession extends SessionAdapter {
         result.put("loginReceived", login); result.put("playerLoadedSent", loaded); result.put("teleportsAcknowledged", teleports);
         result.put("steps", List.copyOf(steps)); result.put("messages", List.copyOf(messages)); result.put("bindings", List.copyOf(bindings));
         if (bossBars.sampled()) { result.put("bossBars",bossBars.report()); result.put("styledMessages",List.copyOf(styledMessages)); }
+        result.put("entityMotion", entityMotion.report());
         result.put("inventorySnapshots", inventory.snapshots());
         result.put("inventoryConfirmations", inventory.confirmations());
         result.put("disconnected", disconnected); result.put("passed", successful()); result.put("error", error);

@@ -12,10 +12,11 @@ import org.bukkit.util.Vector;
 /** Attached to the existing firing lifetime. Owns diagnostics/tickets, never projectile identity or a task. */
 public final class ArrowContinuity implements AutoCloseable {
     public record Frame(long tick, long launchAge, Vector3 position, Vector3 before, Vector3 after,
-                        Optional<TracerRules.Aim> aim, int previousLifetime) {}
+                        Optional<TracerRules.Aim> aim, int previousLifetime, String profileRevision, long groupLaunchAge) {}
     private final ArenaTickets tickets;
     private boolean closed;
     private final Map<UUID, Frame> frames = new HashMap<>();
+    private final Map<UUID, UUID> locks = new HashMap<>();
     public ArrowContinuity(Plugin plugin) { tickets = new ArenaTickets(plugin); }
     public ArenaTickets tickets() { return tickets; }
     public Optional<Frame> frame(UUID arrow) { thread(); return Optional.ofNullable(frames.get(arrow)); }
@@ -34,22 +35,26 @@ public final class ArrowContinuity implements AutoCloseable {
                     || !target.bounds().contains(vector(dragon.getLocation().toVector()))) continue;
             for (var part : dragon.getParts()) {
                 var box = part.getBoundingBox();
+                if (owned.tracerProfile() == com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile.RETURN_V2
+                        && (!target.bounds().contains(vector(box.getMin())) || !target.bounds().contains(vector(box.getMax())))) continue;
                 parts.add(new TracerRules.Part(target.targetId(), part.getUniqueId(),
                         new TracerRules.Box(vector(box.getMin()), vector(box.getMax()))));
             }
         }
-        var aim = TracerRules.acquire(position, level, parts, candidate -> candidate.distance() == 0
+        var aim = owned.tracerProfile().ballistic(tick, owned.groupLaunchTick()) ? Optional.<TracerRules.Aim>empty()
+                : TracerRules.acquire(position, level, parts, candidate -> candidate.distance() == 0
                 || arrow.getWorld().rayTraceBlocks(arrow.getLocation(), bukkit(TracerRules.subtract(candidate.point(), position)),
-                candidate.distance(), FluidCollisionMode.NEVER, false) == null);
-        Vector3 after = aim.map(a -> TracerRules.steer(before, TracerRules.subtract(a.point(), position), TracerRules.TURN_RADIANS)).orElse(before);
+                candidate.distance(), FluidCollisionMode.NEVER, false) == null, owned.tracerProfile(), Optional.ofNullable(locks.get(id)));
+        if (aim.isPresent()) locks.put(id, aim.get().part().targetId()); else locks.remove(id);
+        Vector3 after = aim.map(a -> TracerRules.steer(before, TracerRules.subtract(a.point(), position), owned.tracerProfile().turnRadians())).orElse(before);
         if (!after.equals(before)) arrow.setVelocity(bukkit(after));
         int lifetime = arrow.getLifetimeTicks();
         arrow.setLifetimeTicks(0); // Native age only. Launch age, gravity, drag and UUID are never rewritten.
-        frames.put(id, new Frame(tick, tick - owned.shot().launchTick(), position, before, after, aim, lifetime));
+        frames.put(id, new Frame(tick, tick - owned.shot().launchTick(), position, before, after, aim, lifetime, owned.tracerProfile().revision(), tick - owned.groupLaunchTick()));
     }
-    public void retire(UUID id) { thread(); frames.remove(id); tickets.release(id); }
+    public void retire(UUID id) { thread(); frames.remove(id); locks.remove(id); tickets.release(id); }
     public int frameCount() { thread(); return frames.size(); }
-    @Override public void close() { thread(); frames.clear(); tickets.close(); closed = true; }
+    @Override public void close() { thread(); frames.clear(); locks.clear(); tickets.close(); closed = true; }
     private static Vector3 vector(Vector v) { return new Vector3(v.getX(), v.getY(), v.getZ()); }
     private static Vector bukkit(Vector3 v) { return new Vector(v.x(), v.y(), v.z()); }
     private static void thread() { if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Continuity requires server thread"); }

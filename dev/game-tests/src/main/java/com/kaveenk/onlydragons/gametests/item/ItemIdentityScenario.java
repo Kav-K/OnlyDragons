@@ -42,7 +42,7 @@ public final class ItemIdentityScenario implements Scenario {
         int roundtrips = 0;
         int calibratedSnapshots = 0;
         var expectedFerocity = Map.of("ordinary", 0.0, "crit", 0.0, "ferocity_25", 25.0,
-                "ferocity_100", 100.0, "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0, "shortbow_v1", 0.0);
+                "ferocity_100", 100.0, "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0, "shortbow_v1", 0.0, "tracer_return_v2", 0.0);
         for (String id : registry.definitions().keySet()) {
             ItemInstance instance = registry.create(id);
             var result = codec.decode(bytes(codec.encode(instance)));

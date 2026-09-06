@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "planId": "dragon-restart-1-v1",
+  "planId": "dragon-restart-motion-1-v1",
   "targets": [],
   "actors": [
     {
@@ -20,7 +20,7 @@
               "id": "unconfigured",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn calibration stationary"
+                "command": "onlydragons dev dragon spawn calibration orbit"
               }
             },
             {
@@ -48,7 +48,7 @@
               "id": "spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn calibration stationary"
+                "command": "onlydragons dev dragon spawn calibration orbit"
               }
             },
             {
@@ -62,7 +62,7 @@
               "id": "duplicate",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn calibration stationary"
+                "command": "onlydragons dev dragon spawn calibration orbit"
               }
             },
             {

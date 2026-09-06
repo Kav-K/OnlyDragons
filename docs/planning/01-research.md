@@ -271,6 +271,18 @@ credited 200 with 100 HP removed; the received bar stayed at domain HP 900/1,000
 [Exact artifact/run evidence and remaining suite/restart gates](evidence/t08d-presentation.md).
 This is received protocol/state evidence, not full-client appearance, human feel
 or a researched Hypixel mechanic. Existing combat/phase policy is unchanged.
+### T08e bounded motion experiment (Paper 121)
+
+**Observed, 6 September 2026, iteration evidence:** AI-enabled HOVER ignores
+assigned velocity (zero displacement over ten ticks). Small public position/rotation
+steps update actual multipart geometry: the 500-step non-origin radius16 experiment
+measured parent step ≤0.15924, part step ≤0.33661 and part-corner offset ≤9.43167
+blocks. The production candidate subsequently stayed bounded at arena radii16/24/48,
+with maximum parent step0.20614 and yaw delta2.86481 degrees. These are separate
+server observations, not received-client smoothness, native-positive collision,
+or final acceptance. [Exact iteration identities and remaining gates](evidence/t08e-motion-tracer.md).
+[The pinned public API](https://jd.papermc.io/paper/26.2/org/bukkit/entity/Entity.html)
+supplies the position adapter; no NMS/reflection is used by production or fixtures.
 
 ## Decisions still open
 

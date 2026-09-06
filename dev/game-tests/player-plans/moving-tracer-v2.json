@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "planId": "moving-tracer-v2",
+  "targets": [
+    "moving-dragon"
+  ],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "first",
+          "steps": [
+            {
+              "id": "return-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "return-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "plain-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "plain-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "blocked-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "blocked-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "range-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "range-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "prefire-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "prefire-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "grace-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "grace-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "lethal-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "end",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
