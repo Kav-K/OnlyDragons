@@ -18,7 +18,8 @@ public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.of(
             "lifecycle-calibration", new CalibrationScenario(false),
             "deliberate-failure", new CalibrationScenario(true),
-            "foundation-contracts", new ContractScenario());
+            "foundation-contracts", new ContractScenario(),
+            "item-identity", new com.kaveenk.onlydragons.gametests.item.ItemIdentityScenario());
     private final ExecutorService writer = Executors.newSingleThreadExecutor();
     private ScenarioContext active;
     private String runId;
