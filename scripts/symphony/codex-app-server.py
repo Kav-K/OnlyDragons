@@ -41,7 +41,11 @@ def codex_command(workspace, source):
         ONLYDRAGONS_AGENT_RUNTIME=str(source / '.symphony/runtime'),
     )
     return [
-        'codex', '--config', 'shell_environment_policy.inherit=all',
+        # Concurrent workers share CODEX_HOME. Optional remote-plugin syncing
+        # races over its mutable cache; the reviewed MCP servers and repository
+        # skills are supplied independently. Apply this only to this child.
+        'codex', '--disable', 'remote_plugin',
+        '--config', 'shell_environment_policy.inherit=all',
         '--config', 'mcp_servers=' + toml_value(servers), 'app-server',
     ]
 
