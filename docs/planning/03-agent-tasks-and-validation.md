@@ -7,8 +7,9 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 ## Current delivery status
 
 [Checkpoint 2](07-checkpoint-two.md) registers T08d/T08e/T05b/T03b/T06c/T06b/T02c
-as issues #64–#70 for the user's next gameplay feedback. All are planned, with nine
-new deferred requirements and no completed evidence. T05b also owns still-deferred
+as issues #64–#70 for the user's next gameplay feedback. T08d/T08e/T05b are assigned
+and active in Symphony after PR #71; the other four remain planned. Nine new
+requirements have no completed evidence. T05b also owns still-deferred
 P08/P09. Lead assignment and integrated dependencies control dispatch; existing
 accepted tasks, evidence and milestone states below remain unchanged.
 

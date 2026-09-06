@@ -1,8 +1,8 @@
 # Execution backlog and integration
 
 The next user-requested [checkpoint 2](07-checkpoint-two.md) registers seven
-planned tasks as #64–#70. T08d/T08e and the now-recorded T05b contract can receive
-lead assignment first; the linked dependency table controls later integration.
+tasks as #64–#70. T08d/T08e/T05b are assigned and active in Symphony after PR #71;
+the linked dependency table controls assignment of the remaining four tasks.
 No new requirement or milestone is accepted by this registration.
 
 T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md).
