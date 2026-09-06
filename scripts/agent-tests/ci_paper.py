@@ -7,7 +7,7 @@ import base64
 import binascii
 import hashlib
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import signal
 import subprocess
@@ -40,6 +40,78 @@ def java_version(checkout):
     require(len(matches) == 1 and matches[0].split('.')[0] == major,
             'Exact Linux JDK pin is missing or disagrees with versions.properties')
     return matches[0]
+
+
+def java_archive_pin(checkout):
+    """Read literal archive pins without executing the installer or resolving a version range."""
+    version = java_version(checkout)
+    script = (Path(checkout) / 'scripts/symphony/install-runtime.sh').read_text(encoding='utf-8')
+    values = {}
+    for key in ('JAVA_URL', 'JAVA_SHA256'):
+        matches = re.findall(r'^' + key + r'="([^"\r\n]+)"[ \t]*\r?$', script, re.MULTILINE)
+        require(len(matches) == 1, 'Missing or ambiguous exact JDK archive pin: ' + key)
+        values[key] = matches[0]
+    require(re.fullmatch(r'[a-f0-9]{64}', values['JAVA_SHA256']), 'Malformed JDK archive SHA256')
+    major = version.split('.')[0]
+    pattern = (r'https://github\.com/adoptium/temurin' + major + r'-binaries/releases/download/jdk-'
+               + re.escape(version) + r'%2B([1-9][0-9]*)/OpenJDK' + major
+               + r'U-jdk_x64_linux_hotspot_' + re.escape(version) + r'_\1\.tar\.gz')
+    match = re.fullmatch(pattern, values['JAVA_URL'])
+    require(match is not None, 'JDK URL must pin the matching Temurin Linux x64 version and build')
+    runtime = version + '+' + match.group(1)
+    return {'version': version, 'runtimeVersion': runtime, 'directoryName': 'jdk-' + runtime,
+            'url': values['JAVA_URL'], 'sha256': values['JAVA_SHA256']}
+
+
+def provision_java(checkout, root):
+    """Provision only inside a fresh owned CI root; never reuse ambient JAVA_HOME."""
+    pin = java_archive_pin(checkout)
+    archive_path = Path(root) / 'temurin-linux-x64.tar.gz'
+    destination = Path(root) / 'jdk'
+    require(not destination.exists() and not destination.is_symlink(), 'JDK destination already exists')
+    download_verified(pin['url'], archive_path, pin['sha256'])
+    # Check again at the extraction boundary, including when the downloader is replaced in tests.
+    require(paper_test.sha256(archive_path) == pin['sha256'], 'JDK archive SHA256 mismatch')
+    with tarfile.open(archive_path, 'r:gz') as archive:
+        members = archive.getmembers()
+        require(0 < len(members) <= 20000 and sum(item.size for item in members) <= 1024 ** 3,
+                'JDK archive exceeds extraction bounds')
+        seen = set()
+        for item in members:
+            path = PurePosixPath(item.name)
+            require(not path.is_absolute() and '..' not in path.parts and '\\' not in item.name
+                    and path.parts and path.parts[0] == pin['directoryName'], 'Unexpected JDK archive path')
+            require(path not in seen, 'Duplicate JDK archive entry')
+            seen.add(path)
+            require(item.isfile() or item.isdir() or item.issym(), 'Unsupported JDK archive entry type')
+        for tool in ('java', 'javac'):
+            entries = [item for item in members if item.name == pin['directoryName'] + '/bin/' + tool]
+            require(len(entries) == 1 and entries[0].isfile() and entries[0].mode & 0o111,
+                    'JDK archive tool is missing or not executable: ' + tool)
+        destination.mkdir(mode=0o700)
+        # The upstream archive contains relative legal-license symlinks. The data filter
+        # preserves those while rejecting links outside this new extraction directory.
+        archive.extractall(destination, members=members, filter='data')
+    java_home = destination / pin['directoryName']
+    release = java_home / 'release'
+    require(release.is_file() and not release.is_symlink(), 'JDK release identity is missing')
+    identity = {}
+    for line in release.read_text(encoding='utf-8').splitlines():
+        match = re.fullmatch(r'([A-Z0-9_]+)="([^"\r\n]*)"', line)
+        require(match is not None and match.group(1) not in identity, 'Malformed or duplicate JDK release identity')
+        identity[match.group(1)] = match.group(2)
+    expected = {'JAVA_VERSION': pin['version'], 'SEMANTIC_VERSION': pin['runtimeVersion'],
+                'IMPLEMENTOR': 'Eclipse Adoptium', 'IMPLEMENTOR_VERSION': 'Temurin-' + pin['runtimeVersion'],
+                'OS_NAME': 'Linux', 'OS_ARCH': 'x86_64', 'IMAGE_TYPE': 'JDK'}
+    require(all(identity.get(key) == value for key, value in expected.items())
+            and identity.get('JAVA_RUNTIME_VERSION') in (pin['runtimeVersion'], pin['runtimeVersion'] + '-LTS'),
+            'Extracted JDK identity differs from the exact version/build/vendor/platform pin')
+    for tool in ('java', 'javac'):
+        path = java_home / 'bin' / tool
+        require(path.is_file() and not path.is_symlink() and os.access(path, os.X_OK),
+                'Extracted JDK tool is missing or not executable: ' + tool)
+    return java_home, {**pin, 'releaseSha256': paper_test.sha256(release), 'releaseIdentity': expected,
+                       'javaRuntimeVersion': identity['JAVA_RUNTIME_VERSION']}
 
 
 def materialize_consent(encoded, destination):
@@ -192,11 +264,9 @@ def execute(args):
         source = clone_exact(checkout, project, args.revision)
         manifest['sourceInputSha256'] = source['sourceInputSha256']
         pins = paper_test.properties(project / 'versions.properties')
-        java_home = Path(os.environ.get('JAVA_HOME', '')).resolve()
-        require((java_home / 'bin/java').is_file(), 'CI must supply the pinned JDK through JAVA_HOME')
-        actual_java = paper_test.properties(java_home / 'release').get('JAVA_VERSION', '').strip('"')
-        require(actual_java == java_version(project), 'Hosted JDK does not match the exact existing Linux pin')
-        manifest['javaVersion'] = actual_java
+        java_home, java_identity = provision_java(project, root)
+        manifest['javaVersion'] = java_identity['version']
+        manifest['javaProvisioning'] = java_identity
         paper = download_verified(pins['paperUrl'], root / 'paper.jar', pins['paperSha256'])
         metadata = paper_bootstrap.inspect_launcher(paper, pins['paperSha256'])
         mojang = download_verified(metadata['mojangUrl'], root / metadata['mojangFileName'], metadata['mojangSha256'])

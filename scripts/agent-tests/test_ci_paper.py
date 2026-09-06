@@ -18,6 +18,15 @@ SHA = 'a' * 40
 RUN = 'b' * 32
 SUITE = 'c' * 32
 CONSENT = b'# Already accepted by the operator\r\neula=true\r\n'
+JDK_VERSION = '25.0.4.1'
+JDK_RUNTIME = JDK_VERSION + '+1'
+JDK_DIRECTORY = 'jdk-' + JDK_RUNTIME
+JDK_URL = ('https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.4.1%2B1/'
+           'OpenJDK25U-jdk_x64_linux_hotspot_25.0.4.1_1.tar.gz')
+JDK_RELEASE = {'JAVA_VERSION': JDK_VERSION, 'JAVA_RUNTIME_VERSION': JDK_RUNTIME + '-LTS',
+               'SEMANTIC_VERSION': JDK_RUNTIME, 'IMPLEMENTOR': 'Eclipse Adoptium',
+               'IMPLEMENTOR_VERSION': 'Temurin-' + JDK_RUNTIME, 'OS_NAME': 'Linux',
+               'OS_ARCH': 'x86_64', 'IMAGE_TYPE': 'JDK'}
 
 
 class Response(io.BytesIO):
@@ -59,6 +68,121 @@ class HostedPaperTests(unittest.TestCase):
             script.write_bytes(value)
             with self.assertRaises(RuntimeError):
                 ci.java_version(self.project)
+
+    def jdk_archive(self, identity=None, extra=None, tool_mode=0o755):
+        release = '\n'.join(f'{key}="{value}"' for key, value in (identity or JDK_RELEASE).items()) + '\n'
+        stream = io.BytesIO()
+        with tarfile.open(fileobj=stream, mode='w:gz') as archive:
+            for name, data, mode in [('release', release.encode(), 0o644),
+                                     ('bin/java', b'test-only executable bytes', tool_mode),
+                                     ('bin/javac', b'test-only compiler bytes', tool_mode)]:
+                entry = tarfile.TarInfo(JDK_DIRECTORY + '/' + name)
+                entry.mode, entry.size = mode, len(data)
+                archive.addfile(entry, io.BytesIO(data))
+            if extra is not None:
+                archive.addfile(extra, io.BytesIO(b'') if extra.isfile() else None)
+        return stream.getvalue()
+
+    def pin_jdk(self, data):
+        self.put('versions.properties', b'javaVersion=25\n')
+        return self.put('scripts/symphony/install-runtime.sh',
+                        f'JAVA_VERSION="{JDK_VERSION}"\nJAVA_URL="{JDK_URL}"\n'
+                        f'JAVA_SHA256="{hashlib.sha256(data).hexdigest()}"\n'.encode())
+
+    def test_archive_pin_requires_matching_literal_url_build_and_checksum(self):
+        data = self.jdk_archive()
+        script = self.pin_jdk(data)
+        original = script.read_text()
+        pin = ci.java_archive_pin(self.project)
+        self.assertEqual(pin['runtimeVersion'], '25.0.4.1+1')
+        self.assertEqual(pin['url'], JDK_URL)
+        invalid = [original.replace('%2B1/', '%2B2/'), original.replace('_1.tar.gz', '_2.tar.gz'),
+                   original.replace('x64_linux', 'aarch64_linux'), original.replace('https://', 'http://'),
+                   original.replace('25.0.4.1%2B1/', '${JAVA_VERSION}%2B1/'),
+                   original.replace('JAVA_SHA256="', 'JAVA_SHA256="invalid'),
+                   original + f'JAVA_URL="{JDK_URL}"\n', original.replace('JAVA_SHA256=', '#JAVA_SHA256=')]
+        for content in invalid:
+            with self.subTest(content=content), self.assertRaises(RuntimeError):
+                script.write_text(content)
+                ci.java_archive_pin(self.project)
+
+    def test_provision_extracts_exact_archive_and_records_release_identity(self):
+        data = self.jdk_archive()
+        self.pin_jdk(data)
+        runtime = self.root / 'runtime'
+        runtime.mkdir()
+        with patch.object(ci.urllib.request, 'urlopen', return_value=Response(data, JDK_URL)) as opened, \
+                patch.object(ci.subprocess, 'run') as launched:
+            home, identity = ci.provision_java(self.project, runtime)
+        self.assertEqual(home, runtime / 'jdk' / JDK_DIRECTORY)
+        self.assertEqual((home / 'bin/javac').read_bytes(), b'test-only compiler bytes')
+        self.assertEqual(opened.call_args.args[0].full_url, JDK_URL)
+        self.assertEqual(identity['sha256'], hashlib.sha256(data).hexdigest())
+        self.assertEqual(identity['releaseSha256'], ci.paper_test.sha256(home / 'release'))
+        self.assertEqual(identity['javaRuntimeVersion'], '25.0.4.1+1-LTS')
+        self.assertEqual(identity['releaseIdentity']['OS_ARCH'], 'x86_64')
+        launched.assert_not_called()
+
+    def test_provision_hash_failure_never_extracts_or_uses_ambient_java(self):
+        self.pin_jdk(self.jdk_archive())
+        runtime = self.root / 'runtime'
+        runtime.mkdir()
+        with patch.object(ci.urllib.request, 'urlopen', return_value=Response(b'wrong archive', JDK_URL)), \
+                patch.object(ci.tarfile, 'open') as extracted, \
+                patch.dict(ci.os.environ, {'JAVA_HOME': str(self.project)}):
+            with self.assertRaisesRegex(RuntimeError, 'SHA256 mismatch'):
+                ci.provision_java(self.project, runtime)
+        extracted.assert_not_called()
+        self.assertFalse((runtime / 'jdk').exists())
+
+    def test_provision_rejects_wrong_version_build_vendor_platform_or_jre(self):
+        invalid = {'JAVA_VERSION': '25.0.4', 'JAVA_RUNTIME_VERSION': '25.0.4.1+2-LTS',
+                   'SEMANTIC_VERSION': '25.0.4.1+2', 'IMPLEMENTOR': 'Other vendor',
+                   'IMPLEMENTOR_VERSION': 'Temurin-25.0.4.1+2', 'OS_NAME': 'Windows',
+                   'OS_ARCH': 'aarch64', 'IMAGE_TYPE': 'JRE'}
+        for key, value in invalid.items():
+            data = self.jdk_archive({**JDK_RELEASE, key: value})
+            self.pin_jdk(data)
+            runtime = self.root / key
+            runtime.mkdir()
+            with self.subTest(key=key), patch.object(ci.urllib.request, 'urlopen', return_value=Response(data, JDK_URL)), \
+                    self.assertRaisesRegex(RuntimeError, 'Extracted JDK identity differs'):
+                ci.provision_java(self.project, runtime)
+
+    def test_provision_rejects_paths_links_duplicates_and_nonexecutable_tools(self):
+        extras = [tarfile.TarInfo('../outside'), tarfile.TarInfo('/absolute'),
+                  tarfile.TarInfo('other-root/entry'), tarfile.TarInfo(JDK_DIRECTORY + '/release')]
+        link = tarfile.TarInfo(JDK_DIRECTORY + '/escape')
+        link.type, link.linkname = tarfile.SYMTYPE, '../../outside'
+        extras.append(link)
+        fifo = tarfile.TarInfo(JDK_DIRECTORY + '/fifo')
+        fifo.type = tarfile.FIFOTYPE
+        extras.append(fifo)
+        for index, extra in enumerate(extras):
+            data = self.jdk_archive(extra=extra)
+            self.pin_jdk(data)
+            runtime = self.root / f'unsafe-{index}'
+            runtime.mkdir()
+            with self.subTest(index=index), patch.object(ci.urllib.request, 'urlopen', return_value=Response(data, JDK_URL)), \
+                    self.assertRaises((RuntimeError, tarfile.FilterError)):
+                ci.provision_java(self.project, runtime)
+        data = self.jdk_archive(tool_mode=0o644)
+        self.pin_jdk(data)
+        runtime = self.root / 'not-executable'
+        runtime.mkdir()
+        with patch.object(ci.urllib.request, 'urlopen', return_value=Response(data, JDK_URL)), \
+                self.assertRaisesRegex(RuntimeError, 'not executable'):
+            ci.provision_java(self.project, runtime)
+        self.assertFalse((self.root / 'outside').exists())
+
+    def test_provision_never_overwrites_existing_destination(self):
+        self.pin_jdk(self.jdk_archive())
+        runtime = self.root / 'runtime'
+        self.put('jdk/sentinel', b'preserve', runtime)
+        with patch.object(ci.urllib.request, 'urlopen') as opened, self.assertRaisesRegex(RuntimeError, 'already exists'):
+            ci.provision_java(self.project, runtime)
+        opened.assert_not_called()
+        self.assertEqual((runtime / 'jdk/sentinel').read_bytes(), b'preserve')
 
     def test_consent_preserves_exact_bytes_and_does_not_overwrite(self):
         destination = self.root / 'eula.txt'
@@ -180,7 +304,8 @@ class HostedPaperTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'Symlink report'):
                 ci.evidence_files(self.project)
 
-    def run_mocked(self, suite_exit=0, replay_exit=0, consent=True, existing=False, interrupt=False):
+    def run_mocked(self, suite_exit=0, replay_exit=0, consent=True, existing=False, interrupt=False,
+                   provision_error=None):
         runtime = self.root / 'runtime'
         if existing:
             runtime.mkdir()
@@ -216,7 +341,8 @@ class HostedPaperTests(unittest.TestCase):
             environment['ONLYDRAGONS_PAPER_EULA_BASE64'] = base64.b64encode(CONSENT).decode()
         with patch.object(ci.sys, 'platform', 'linux'), patch.object(ci, 'canonical_root', return_value=runtime), \
                 patch.dict(ci.os.environ, environment, clear=True), patch.object(ci, 'clone_exact', side_effect=clone) as cloned, \
-                patch.object(ci, 'java_version', return_value='25.0.4.1'), \
+                patch.object(ci, 'provision_java', return_value=(java, {'version': JDK_VERSION}),
+                             side_effect=provision_error), \
                 patch.object(ci, 'download_verified', side_effect=download) as downloaded, \
                 patch.object(ci.paper_bootstrap, 'inspect_launcher', return_value={
                     'mojangUrl': 'https://piston-data.mojang.com/file', 'mojangFileName': 'mojang_26.2.jar', 'mojangSha256': 'f' * 64}), \
@@ -252,6 +378,16 @@ class HostedPaperTests(unittest.TestCase):
         self.assertFalse(manifest['passed'])
         self.assertEqual(len(calls), 2)
         self.assertEqual(manifest['replayExitCode'], 1)
+
+    def test_jdk_provision_failure_exports_reason_without_any_paper_download_or_launch(self):
+        status, manifest, calls, clones, downloads = self.run_mocked(
+            provision_error=RuntimeError('JDK archive SHA256 mismatch'))
+        self.assertEqual(status, 1)
+        self.assertFalse(manifest['passed'])
+        self.assertIn('JDK archive SHA256 mismatch', manifest['error'])
+        self.assertEqual((clones, downloads, calls), (1, 0, []))
+        self.assertIsNone(manifest['suiteExitCode'])
+        self.assertIsNone(manifest['replayExitCode'])
 
     def test_cancellation_exports_partial_evidence_as_failure(self):
         status, manifest, calls, _, _ = self.run_mocked(interrupt=True)

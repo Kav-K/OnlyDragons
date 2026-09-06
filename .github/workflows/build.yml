@@ -68,15 +68,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Read the exact existing Linux JDK pin
-        id: paper-java
-        shell: bash
-        run: echo "java=$(python scripts/agent-tests/ci_paper.py java-version --checkout .)" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: ${{ steps.paper-java.outputs.java }}
-      - name: Run and independently replay the complete isolated Paper suite
+      # The helper provisions the exact checksum-pinned JDK archive. setup-java's
+      # SemVer parser does not support the existing four-part 25.0.4.1+1 release.
+      - name: Provision the pinned JDK, run and replay the complete Paper suite
         env:
           ONLYDRAGONS_PAPER_EULA_BASE64: ${{ vars.ONLYDRAGONS_PAPER_EULA_BASE64 }}
         shell: bash
