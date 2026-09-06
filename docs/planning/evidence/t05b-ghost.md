@@ -64,3 +64,21 @@ Focused Paper iteration, current-main integration, complete clean-input suite
 receipt/checkpoint and independent lead review/current CI are pending. Human
 Windows Play/smoke, authenticated-client compatibility, visual readability and
 weapon feel remain separate; no performance or M1–M5 claim is made.
+
+## First physical iteration (not accepted)
+
+Run `d440336e4f084f858310c7134c8ef08d` began on dirty `a4e9210`; its runtime
+content was subsequently committed as `2de7a7e` (main integration `28cd871`).
+Production SHA256 `358ddad05ae79f8d4d71605568191f7110b87c61173d56694ec3a6ca44f7a2ca`,
+companion SHA256 `a2108bd3b54832d46f20f1388e0686bd46585c9641a2efff3ac242acc241009e`.
+All three numeric hit-count/HP/credit trial observations matched the table above,
+and swap, expiry, frozen selection/overkill, three modes and cleanup checks passed.
+The run failed three combined assertions because the newly added native-health
+comparison assumed double precision. Both JVMs exited 0 unforced and all five
+resource counters were zero. This failed run remains iteration evidence.
+
+[Exact pinned Paper source](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java#L122)
+shows public `setHealth(double)` narrows to float. The fixture now keeps exact
+domain accounting checks and separately asserts the exact float-rounded native
+projection, recording both observed and expected values. No production code,
+domain oracle or existing fixture assertion was weakened by this correction.

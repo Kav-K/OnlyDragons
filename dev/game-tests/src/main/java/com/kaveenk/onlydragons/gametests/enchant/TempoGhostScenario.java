@@ -98,11 +98,13 @@ public final class TempoGhostScenario implements Scenario, Listener {
         long before=view().acceptedImpacts();double oldHp=view().target().currentHealth(),oldCredit=credit();
         draw(step,()->players.await(step+" expected procs",120,()->view().acceptedImpacts()>=before+expectedCount&&view().procs().queued()==0,()->{
             var results=view().impacts().stream().skip(before).toList();
-            c.check(step+"_exact_accounting",true,view().acceptedImpacts()==before+expectedCount&&oldHp-view().target().currentHealth()==hp&&credit()-oldCredit==score
-                    &&Math.abs(dragon.getHealth()-200*view().target().currentHealth()/view().target().maxHealth())<1e-9);
+            c.check(step+"_exact_accounting",true,view().acceptedImpacts()==before+expectedCount&&oldHp-view().target().currentHealth()==hp&&credit()-oldCredit==score);
+            // Paper 121 setHealth(double) narrows to float; compare that exact public projection.
+            double nativeExpected=(double)(float)(200*view().target().currentHealth()/view().target().maxHealth());
+            c.check(step+"_native_health_projection",nativeExpected,dragon.getHealth());
             c.check(step+"_physical_event_identity",true,results.stream().filter(r->r.kind()!=DamageResult.Kind.FEROCITY).count()==2
                     &&results.stream().filter(r->r.kind()!=DamageResult.Kind.FEROCITY).allMatch(r->collisions.contains(r.origin().projectileId())&&r.effectiveFerocity()==f&&Bukkit.getEntity(r.origin().projectileId())==null));
-            trials.add(Map.of("trial",step,"hp",oldHp-view().target().currentHealth(),"credit",credit()-oldCredit,"count",results.size(),"results",results.toString()));next.run();
+            trials.add(Map.of("trial",step,"hp",oldHp-view().target().currentHealth(),"credit",credit()-oldCredit,"count",results.size(),"nativeHealth",dragon.getHealth(),"results",results.toString()));next.run();
         }));
     }
     void lethal() {

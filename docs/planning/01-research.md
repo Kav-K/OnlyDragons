@@ -254,6 +254,14 @@ actual UUID disappearance after reset/restart. [Exact results and superseded
 iterations](evidence/t08a-focused-paper.md) preserve the earlier failed validity
 assumptions. Full-suite and human acceptance remain pending in [T08a status](03-agent-tasks-and-validation.md#t08a--managed-real-dragon-backend-and-development-controls).
 
+### T05b native health projection precision (Paper 121)
+
+**Source inspected, 6 September 2026:** the pinned public `setHealth(double)`
+implementation narrows to float before native assignment. T05b's fixture therefore
+compares the exact float-rounded normalized native projection separately from
+full-precision domain HP/credit. This does not change damage or ranking policy.
+[Source and failed iteration](evidence/t05b-ghost.md#first-physical-iteration-not-accepted).
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

@@ -1210,7 +1210,10 @@
         "owned_listeners_removed",
         "owned_entities_removed",
         "owned_tasks_cancelled",
-        "owned_chunk_tickets_removed"
+        "owned_chunk_tickets_removed",
+        "p08_native_health_projection",
+        "buffed_native_health_projection",
+        "expired_native_health_projection"
       ],
       "caseIds": [
         "tempo-ghost"
