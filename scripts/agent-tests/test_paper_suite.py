@@ -376,6 +376,54 @@ class NegativePolicyTests(unittest.TestCase):
         with self.assertRaises(suite.ValidationError):
             suite.verify_player(report, case, self.run_id, self.pins, self.now - 2000, self.now)
 
+    def idle_scenario(self, abort):
+        report = self.scenario('player-idle')
+        report.update(scenarioId='protocol-player-calibration', mechanicRevision='protocol-player-v1')
+        setup = dict.fromkeys(suite.PLAYER_SETUP, True)
+        setup.update(disposable_protocol_mode='protocol-calibration', offline_fixture=False,
+                     player_uuid='a9a0f02c-aa22-4c00-8d88-630f222ca009', player_not_op=False)
+        rows = [{'id': key, 'expected': value, 'observed': value, 'passed': True} for key, value in setup.items()]
+        rows.append({'id': 'real_player_quit', 'expected': True, 'observed': False, 'passed': False})
+        if abort:
+            rows.append({'id': 'scenario_exception', 'expected': 'no exception', 'observed': suite.ABORT, 'passed': False})
+        else:
+            rows.append({'id': 'player_removed_after_quit', 'expected': True, 'observed': True, 'passed': True})
+        rows.extend({'id': key, 'expected': 0, 'observed': 0, 'passed': True} for key in suite.CLEANUP)
+        report['assertions'] = rows
+        return report
+
+    def verify_idle_scenario(self, report):
+        case = {'scenarioId': 'protocol-player-calibration', 'expectation': 'player-idle', 'scenarioTimeout': 15}
+        descriptor = {'mechanicRevision': 'protocol-player-v1',
+                      'requiredAssertions': [*suite.PLAYER_SETUP, *suite.CLEANUP, 'native_projectile_shooter']}
+        return suite.verify_scenario(report, case, descriptor, self.run_id, self.pins, self.now - 2000, self.now)
+
+    def test_idle_accepts_server_abort_after_client_disconnect(self):
+        self.assertEqual(14, self.verify_idle_scenario(self.idle_scenario(abort=True)))
+
+    def test_idle_accepts_quit_completion_before_server_abort(self):
+        self.assertEqual(14, self.verify_idle_scenario(self.idle_scenario(abort=False)))
+
+    def test_idle_rejects_unrelated_failure_in_either_cleanup_order(self):
+        for abort in (False, True):
+            with self.subTest(abort=abort):
+                report = self.idle_scenario(abort)
+                report['assertions'].append({'id': 'other_failure', 'expected': 1, 'observed': 2, 'passed': False})
+                with self.assertRaisesRegex(suite.ValidationError, 'differs from intended negative'):
+                    self.verify_idle_scenario(report)
+
+    def test_idle_without_abort_requires_successful_logout_evidence(self):
+        for removed in (None, False):
+            with self.subTest(removed=removed):
+                report = self.idle_scenario(abort=False)
+                row = next(row for row in report['assertions'] if row['id'] == 'player_removed_after_quit')
+                if removed is None:
+                    report['assertions'].remove(row)
+                else:
+                    row.update(expected=False, observed=False)
+                with self.assertRaises(suite.ValidationError):
+                    self.verify_idle_scenario(report)
+
 
 class ChildOwnershipTests(unittest.TestCase):
     def test_unsupported_platform_rejects_execution_before_opening_log_or_spawning(self):

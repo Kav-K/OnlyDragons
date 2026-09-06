@@ -276,10 +276,16 @@ def verify_scenario(report, case, descriptor, run_id, pins, start, end):
     elif expectation in ('player-early-exit', 'player-idle'):
         required = set(PLAYER_SETUP) | set(CLEANUP)
         allowed = {'real_player_quit': {'expected': True, 'observed': False}}
-        if expectation == 'player-early-exit':
+        if expectation == 'player-early-exit' or 'scenario_exception' not in rows:
+            # Client cleanup can finish the quit callback before Paper disables the
+            # companion. That ordering must prove logout instead of an abort.
             required.add('player_removed_after_quit')
         else:
             allowed['scenario_exception'] = {'expected': 'no exception', 'observed': ABORT}
+        if 'player_removed_after_quit' in rows:
+            removed = rows['player_removed_after_quit']
+            require(removed['expected'] is True and removed['observed'] is True and removed['passed'] is True,
+                    'Negative player logout evidence is missing or failed')
         require(not any(name in rows for name in ('real_selected_slot_event', 'real_bow_use_event',
                     'real_bow_release_event', 'native_projectile_shooter')), 'Negative player unexpectedly performed actions')
     require(required.issubset(rows), 'Required scenario assertions are missing')
