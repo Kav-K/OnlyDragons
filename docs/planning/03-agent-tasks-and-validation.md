@@ -12,6 +12,8 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 [full evidence](evidence/t05b-suite.md). T03b/#67 is active and lead-assigned with
 its prerequisites integrated; Symphony dispatch follows the lead's label.
 T08d/#64 and T08e/#65 are In review pending their combined current-input cohort.
+Their [combined integration evidence](evidence/checkpoint2-ui-flight.md) records
+the focused pass and the first complete-cohort failure; no acceptance is implied.
 T06c/#70, T06b/#68 and T02c/#69 remain planned; T08c/#41 remains planned and
 undispatched. Other requirements, prior evidence and milestone states are unchanged.
 

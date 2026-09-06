@@ -123,6 +123,7 @@
         "server_thread",
         "production_enabled",
         "codec_loaded_from_production",
+        "all_loadout_ids",
         "all_loadouts_roundtrip",
         "calibration_no_crit_bonus",
         "distinct_instance_ids",
