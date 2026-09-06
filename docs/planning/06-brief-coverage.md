@@ -47,8 +47,11 @@ repository. It does not install another game framework or reimplement combat.
 PR #44's reviewed runtime `3047a56` now verifies its three reusable components,
 the full 17-case suite baseline and checkpoint requirements. Independent exported
 artifact replay and current-runtime CI passed; [exact evidence](evidence/t09d-suite.md).
-Final documentation-head CI and actual merge remain pending, so the progress
-ledger retains in-review and downstream dispatch still waits for integration.
+Final documentation-head CI passed at `9c669ad` in
+[run 34025800244](https://github.com/Kav-K/OnlyDragons/actions/runs/34025800244),
+and PR #44 merged at `9def91f75d655caaccd6c7fa01313e4ba3a0ea54`.
+The progress ledger records T09d complete; downstream dispatch still requires
+each task's other prerequisites and the lead's label.
 The three reusable components are:
 
 - `headless-player-primitives`: bounded, versioned action programs and at least
