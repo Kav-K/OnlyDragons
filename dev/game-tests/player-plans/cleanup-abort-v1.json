@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "planId": "cleanup-abort-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {"id": "status", "action": "command", "args": {"command": "onlydragons status"}},
+            {"id": "quit", "action": "disconnect", "args": {}}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {"id": "status", "action": "command", "args": {"command": "onlydragons status"}},
+            {"id": "quit", "action": "disconnect", "args": {}}
+          ]
+        }
+      ]
+    }
+  ]
+}

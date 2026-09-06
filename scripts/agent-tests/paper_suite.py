@@ -145,7 +145,12 @@ def load_catalog(project):
         # Legacy catalog compatibility is restricted to the already reviewed actor.
         if declared is None and scenario_id == 'protocol-player-calibration':
             declared = 'protocol-calibration'
-        require(mode == declared and mode in (None, 'protocol-calibration'), 'Case player mode differs from scenario admission')
+        require(mode == declared and mode in (None, 'protocol-calibration', 'protocol-actions-v1'), 'Case player mode differs from scenario admission')
+        if mode == 'protocol-actions-v1':
+            try:
+                runner.player_actions.load_plan(project, descriptor)
+            except RuntimeError as error:
+                raise ValidationError(str(error)) from error
         control = case.get('playerControl', 'calibrate')
         require(control in ('calibrate', 'early-exit', 'idle') and (mode or control == 'calibrate'), 'Invalid player control')
         require((control == 'early-exit') == (expectation == 'player-early-exit')
@@ -421,6 +426,10 @@ def verify_case(project, record, case, descriptor, source, suite_root):
     if positive:
         require(runner.json_values_equal(result.get('scenario'), scenario), 'Raw scenario differs from accepted runner scenario')
     profile = safe_path(project, 'run/agent-tests/' + run_id)
+    try:
+        runner.paper_bootstrap.validate_bootstrap(profile, result.get('bootstrap'), pins['paperSha256'])
+    except RuntimeError as error:
+        raise ValidationError(str(error)) from error
     settings = runner.properties(profile / 'server.properties')
     actor = bool(case.get('testPlayer'))
     memory = result.get('memory', {})
@@ -445,8 +454,7 @@ def verify_case(project, record, case, descriptor, source, suite_root):
     process_cleanup(profile, port)
     server_log = checked_file(project, record, 'serverLogPath', 'serverLogSha256', report_root / 'server.log').read_text(encoding='utf-8', errors='replace')
     checked_file(project, record, 'buildLogPath', 'buildLogSha256', report_root / 'build.log')
-    require('Stopping server' in server_log and not re.search(
-        r'(?:/ERROR\]|\bSEVERE\]|OD_GAME_TEST_REPORT_ERROR|Error occurred while (?:enabling|disabling)|Could not load|Failed to start the minecraft server)', server_log),
+    require('Stopping server' in server_log and not runner.paper_errors(server_log),
         'Paper error log or missing shutdown evidence')
     artifacts = result.get('artifacts', {})
     for relative, digest in [('server.jar', pins['paperSha256']),
@@ -470,14 +478,17 @@ def verify_case(project, record, case, descriptor, source, suite_root):
     require(runner.json_values_equal(counts, build.get('unitTests')), 'Production JUnit totals differ from actual cases')
     client_identity = None
     if actor:
-        for key, value in {'white-list': 'true', 'enforce-whitelist': 'true', 'max-players': '1',
+        action_plan = runner.player_actions.load_plan(project, descriptor) if case.get('testPlayer') == 'protocol-actions-v1' else None
+        for key, value in {'white-list': 'true', 'enforce-whitelist': 'true',
+                           'max-players': str(len(action_plan[2]['actors'])) if action_plan else '1',
                            'enforce-secure-profile': 'false'}.items():
             require(settings.get(key) == value, 'Wrong synthetic actor admission: ' + key)
         name = 'od_' + run_id[:13]
         raw_uuid = bytearray(hashlib.md5(('OfflinePlayer:' + name).encode()).digest())
         raw_uuid[6] = (raw_uuid[6] & 0x0f) | 0x30
         raw_uuid[8] = (raw_uuid[8] & 0x3f) | 0x80
-        require(runner.strict_json(profile / 'whitelist.json') == [{'name': name, 'uuid': str(uuid.UUID(bytes=bytes(raw_uuid)))}],
+        expected_whitelist = runner.player_actions.identities(run_id, action_plan[2]) if action_plan else [{'name': name, 'uuid': str(uuid.UUID(bytes=bytes(raw_uuid)))}]
+        require(runner.strict_json(profile / 'whitelist.json') == expected_whitelist,
                 'Actor whitelist differs from the unique run identity')
         client = result.get('playerBuild', {})
         pinned = runner.player_pins(pins)
@@ -492,9 +503,23 @@ def verify_case(project, record, case, descriptor, source, suite_root):
         require(runner.json_values_equal(junit_counts(grouped['player']), client.get('unitTests')), 'Player JUnit totals differ')
         player_path = checked_file(project, record, 'playerPath', 'playerSha256', report_root / 'player.json')
         player = runner.strict_json(player_path)
-        verify_player(player, case, run_id, pins, start, end)
+        if action_plan:
+            _, plan_hash, plan = action_plan
+            staged_plan = safe_path(project, 'run/agent-tests/' + run_id + '/player-plan.json')
+            require(runner.sha256(staged_plan) == plan_hash, 'Staged player plan changed')
+            require(result.get('playerPlan') == {'sha256': plan_hash, 'planId': plan['planId']}, 'Player plan receipt changed')
+            if case['expectation'] == 'cleanup-abort':
+                runner.player_actions.validate_abort_report(player, plan, plan_hash, run_id, pins, start, end)
+                runner.player_actions.validate_abort_journal(scenario, player, plan)
+            else:
+                runner.player_actions.validate_report(player, plan, plan_hash, run_id, pins, start, end)
+                runner.player_actions.validate_server_journal(scenario, player, plan)
+            runner.player_actions.validate_messages(player, descriptor)
+        else:
+            verify_player(player, case, run_id, pins, start, end)
         if positive:
-            runner.validate_player_messages(player, descriptor)
+            if not action_plan:
+                runner.validate_player_messages(player, descriptor)
             require(runner.json_values_equal(result.get('player'), player), 'Raw player differs from accepted player report')
         cleanup = result.get('playerCleanup', {})
         require(cleanup.get('clean') is True and cleanup.get('forced') is False
@@ -627,7 +652,7 @@ def execute(args):
                        '--scenario', case['scenarioId'], '--scenario-timeout', str(case.get('scenarioTimeout', 60))]
             if case.get('testPlayer'):
                 command += ['--test-player', case['testPlayer'], '--player-control', case.get('playerControl', 'calibrate')]
-            for option in ('eula_file', 'lease_directory', 'java_home', 'paper_jar', 'memory_mib',
+            for option in ('eula_file', 'lease_directory', 'java_home', 'paper_jar', 'mojang_jar', 'memory_mib',
                            'startup_timeout', 'lease_timeout', 'resource_timeout'):
                 value = getattr(args, option)
                 if value is not None:
@@ -679,7 +704,7 @@ def main():
     parser.add_argument('--changed-since')
     parser.add_argument('--plan', action='store_true', help='Print selection only; never produces acceptance evidence')
     parser.add_argument('--validate', type=Path, help='Independently revalidate a completed receipt')
-    for option in ('eula-file', 'lease-directory', 'java-home', 'paper-jar'):
+    for option in ('eula-file', 'lease-directory', 'java-home', 'paper-jar', 'mojang-jar'):
         parser.add_argument('--' + option, type=Path)
     for option in ('memory-mib', 'startup-timeout', 'lease-timeout', 'resource-timeout'):
         parser.add_argument('--' + option, type=int)

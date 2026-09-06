@@ -145,16 +145,9 @@
     },
     "T05": {
       "status": "in-review",
-      "completedRequirements": [
-        "bounded-procs"
-      ],
-      "evidence": {
-        "bounded-procs": {
-          "url": "https://github.com/Kav-K/OnlyDragons/pull/30",
-          "revision": "5284b66f086d3762bf9e3b269c50f57dd24e88fa"
-        }
-      },
-      "notice": "In review: main 799c01d integrated at e6c2b50. Clean runtime 5284b66 passed 136 production/7 client tests and all 16 cases; full receipt replay and automated T05 acceptance passed against identical current relevant inputs. Fresh recovery Python checks passed 135 tests. Receipt b7fd6bc562374f6f83b15da1f192caac and exact evidence: dev/game-tests/findings/t05-suite.md. Lead review and final-head CI remain external; physical P08/P09 and T08 composition wiring remain later integration."
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "In review: main 4cfb7b9 (PR44/PR45) reconciled additively for bounded local checks. Historical b7fd6bc acceptance held: old console matcher missed ERROR lines. No fresh Paper acceptance claimed. Lead owns combined current suite/raw replay and T05 checkpoint after T04 integration and T02b/T05 reconciliation. See dev/game-tests/findings/t05-suite.md; physical P08/P09 and T08 composition remain later integration."
     },
     "T06": {
       "status": "blocked",
@@ -211,6 +204,65 @@
           "revision": "e72fb2a"
         }
       }
+    },
+    "T02b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T08a": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T08b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T08c": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T09d": {
+      "status": "complete",
+      "completedRequirements": [
+        "headless-player-primitives",
+        "headless-damage-primitives",
+        "offline-paper-bootstrap",
+        "suite-baseline",
+        "checkpoint-unit-checks"
+      ],
+      "evidence": {
+        "headless-player-primitives": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024646724",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        },
+        "headless-damage-primitives": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024646724",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        },
+        "offline-paper-bootstrap": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024646724",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        },
+        "suite-baseline": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024646724",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        },
+        "checkpoint-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34024649057",
+          "revision": "3047a56b0ed0c634034841b776752e71b55ac857"
+        }
+      },
+      "reviewedRevision": "3047a56b0ed0c634034841b776752e71b55ac857",
+      "notice": "Implementation and all five automated requirements verified: full 17-case hosted suite, independent unchanged-artifact replay and task checkpoint, 82 production/28 client tests, 238 Linux runner/checkpoint tests and passing current-runtime CI. Exact evidence: docs/planning/evidence/t09d-suite.md. PR #44 merged at 9def91f75d655caaccd6c7fa01313e4ba3a0ea54; the reviewed runtime evidence remains unchanged. Downstream dispatch still requires each task's remaining prerequisites and owner-applied label. Generic calibration does not complete production multiplayer firing/accounting, T04, P01-P14, human authentication/visual/feel checks or any milestone.",
+      "mergedRevision": "9def91f75d655caaccd6c7fa01313e4ba3a0ea54"
     }
   },
   "milestones": {

@@ -91,6 +91,22 @@ class CheckpointTests(unittest.TestCase):
                 patch.object(checkpoint.subprocess, 'check_output', return_value=b'src/main/java/stats/Changed.java\0'):
             return checkpoint.validate_acceptance(self.project, 'build/receipt.json', 'origin/main', tasks, self.suite)
 
+    def block_dependent_fixture_tasks(self, task_id):
+        # A scenario that uncompletes a prerequisite must also put its downstream
+        # fixture tasks on hold. Keep production progress and gate validation intact.
+        affected = {task_id}
+        tasks = self.read(BACKLOG)['tasks']
+        while True:
+            expanded = affected | {task['id'] for task in tasks
+                                   if affected.intersection(task.get('dependsOn', []))}
+            if expanded == affected:
+                break
+            affected = expanded
+        progress = self.read(PROGRESS)
+        for dependent in affected - {task_id}:
+            progress['tasks'][dependent].update(status='blocked', completedRequirements=[], evidence={})
+        self.write(PROGRESS, progress)
+
     def baseline(self, previous):
         with patch.object(checkpoint.subprocess, 'check_output', return_value=(SHA + '\n').encode()), \
                 patch.object(checkpoint, 'base_document', side_effect=lambda project, revision, path: previous.get(path)):
@@ -358,6 +374,7 @@ class CheckpointTests(unittest.TestCase):
             self.acceptance(['T09b'])
 
     def test_blocked_selected_task_requires_completed_prerequisites(self):
+        self.block_dependent_fixture_tasks('T09b')
         self.change(PROGRESS, lambda value: value['tasks']['T09c'].update(status='blocked'))
         self.change(PROGRESS, lambda value: value['tasks']['T09b'].update(status='blocked'))
         self.assertTrue(self.plan()['summary']['planValid'])
@@ -377,6 +394,7 @@ class CheckpointTests(unittest.TestCase):
         self.assertEqual([], self.suite.calls)
 
     def test_planned_task_with_satisfied_gates_can_verify_automated_components(self):
+        self.block_dependent_fixture_tasks('T09c')
         self.change(PROGRESS, lambda value: value['tasks']['T09c'].update(status='planned'))
         result = self.acceptance(['T09c'])
         self.assertTrue(result['automatedReady'])

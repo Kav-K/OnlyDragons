@@ -352,5 +352,18 @@ finally:
                 process.wait()
 
 
+class PaperLogPolicyTests(unittest.TestCase):
+    def test_console_and_file_error_formats_are_both_rejected(self):
+        for line in ('[01:24:14 ERROR]: Failed to request yggdrasil public key',
+                     '[01:24:14] [Server thread/ERROR]: Event registration failed',
+                     '[01:24:14 SEVERE]: Plugin initialization failed',
+                     'OD_GAME_TEST_REPORT_ERROR Unsupported report value'):
+            with self.subTest(line=line):
+                self.assertEqual(runner.paper_errors('normal startup\n' + line + '\nStopping server'), [line])
+
+    def test_ordinary_console_information_is_not_an_error(self):
+        self.assertEqual(runner.paper_errors('[01:24:14 INFO]: OnlyDragons enabled\n[01:24:14 WARN]: Offline fixture\nStopping server'), [])
+
+
 if __name__ == '__main__':
     unittest.main()

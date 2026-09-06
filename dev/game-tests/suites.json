@@ -70,6 +70,18 @@
       "testPlayer": "protocol-calibration",
       "scenarioTimeout": 120
     },
+    "headless-player-primitives": {
+      "scenarioId": "headless-player-primitives",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
+    },
+    "headless-player-cleanup-abort": {
+      "scenarioId": "headless-player-cleanup-abort",
+      "expectation": "cleanup-abort",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 60
+    },
     "enchants-procs": {
       "scenarioId": "enchants-procs",
       "expectation": "positive"
@@ -87,6 +99,7 @@
       "equipment-stats",
       "equipment-player",
       "protocol-player-soak",
+      "headless-player-primitives",
       "enchants-procs"
     ],
     "harness-controls": [
@@ -94,7 +107,8 @@
       "projectile-cleanup-failure",
       "projectile-cleanup-abort",
       "protocol-player-early-exit",
-      "protocol-player-idle"
+      "protocol-player-idle",
+      "headless-player-cleanup-abort"
     ],
     "all": [
       "lifecycle-calibration",
@@ -112,6 +126,8 @@
       "equipment-stats",
       "equipment-player",
       "protocol-player-soak",
+      "headless-player-primitives",
+      "headless-player-cleanup-abort",
       "enchants-procs"
     ]
   },
@@ -157,6 +173,8 @@
         "equipment-stats",
         "equipment-player",
         "protocol-player-soak",
+        "headless-player-primitives",
+        "headless-player-cleanup-abort",
         "enchants-procs"
       ],
       "affects": [
@@ -245,7 +263,9 @@
         "protocol-player-calibration",
         "protocol-player-early-exit",
         "protocol-player-idle",
-        "protocol-player-soak"
+        "protocol-player-soak",
+        "headless-player-primitives",
+        "headless-player-cleanup-abort"
       ],
       "affects": [
         "equipment"
@@ -297,7 +317,9 @@
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/Json.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/GameTestsPlugin.java",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/CalibrationScenario.java",
-        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/ContractScenario.java"
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/ContractScenario.java",
+        "dev/game-tests/player-plans/*",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/fixtures/*"
       ],
       "cases": [
         "lifecycle-calibration",
@@ -315,6 +337,8 @@
         "equipment-stats",
         "equipment-player",
         "protocol-player-soak",
+        "headless-player-primitives",
+        "headless-player-cleanup-abort",
         "enchants-procs"
       ],
       "affects": []
