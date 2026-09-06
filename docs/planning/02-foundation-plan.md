@@ -177,7 +177,7 @@ enchants and named rolls), resolved catalog data, immutable profile, and externa
 source contents. Only the active main-hand `resolvedWeapon()` is passed once to
 the factory. Offhand identity is inspectable but supplies no weapon modifiers;
 unmanaged or invalid main-hand items use profile defaults, including zero weapon
-damage. Invalid metadata is identified in the explanation.
+damage before external bonuses. Invalid metadata is identified in the explanation.
 
 Unchanged fingerprints reuse the immutable inspection; changed inputs allocate a
 new session-independent revision. Accepted snapshots remain immutable. Inventory
