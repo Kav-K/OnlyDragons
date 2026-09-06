@@ -7,6 +7,10 @@
     "number": 2,
     "url": "https://github.com/Kav-K/OnlyDragons/issues/2"
   },
+  "T09b": {
+    "number": 20,
+    "url": "https://github.com/Kav-K/OnlyDragons/issues/20"
+  },
   "T01a": {
     "number": 3,
     "url": "https://github.com/Kav-K/OnlyDragons/issues/3"
@@ -54,5 +58,13 @@
   "T12": {
     "number": 14,
     "url": "https://github.com/Kav-K/OnlyDragons/issues/14"
+  },
+  "MAINT-17": {
+    "number": 17,
+    "url": "https://github.com/Kav-K/OnlyDragons/issues/17"
+  },
+  "MAINT-18": {
+    "number": 18,
+    "url": "https://github.com/Kav-K/OnlyDragons/issues/18"
   }
 }

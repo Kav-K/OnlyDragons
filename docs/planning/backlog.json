@@ -16,6 +16,12 @@
       "coordination": "Own harness lifecycle/report schema/runner; feature agents own scenario classes in separate packages. Coordinate root Gradle integration with lead. Human worlds/profiles are never used."
     },
     {
+      "id": "T09b", "title": "Add an isolated protocol player for real Paper integration tests", "dependsOn": ["T09a", "T00"],
+      "scope": "Add a standalone pinned MCProtocolLib client under dev/player-client, a separate player calibration scenario and bounded runner integration. Only the explicitly named mode may create one synthetic offline player in a new disposable loopback profile; ordinary tests and human profiles retain authentication. No credentials, remote hosts, NMS/reflection, manufactured Bukkit callbacks or production packaging of client dependencies.",
+      "acceptance": "Actual protocol login produces the expected Paper join/UUID, selected-slot, bow-use/release, projectile-shooter and quit events. Require fresh client and Paper reports, exact source/client/dependency/production/companion artifact hashes, successful client exit and clean owned-process cleanup. Positive calibration passes; early-exit and timeout controls fail without a false green. Both JVMs fit the resource gate and retain the shared lease through cleanup. Protocol evidence does not establish human visuals/authentication/multiplayer or player-owned dragon suppression.",
+      "coordination": "Locally delegated issue #20; do not apply the symphony label or start another worker. Runtime requires the reusable owned-listener cleanup helper from partial PR #22, not full T04 acceptance. Preserve the integrated MAINT-17 typed validator. After T09b merges, T04 can resume player-owned experiments; its unresolved gates still block T06/#9. T01b service/command work proceeds independently after T01a/T02 integrate."
+    },
+    {
       "id": "T01a", "title": "Implement the base stats resolver and immutable explained snapshots", "dependsOn": ["T00", "T09a"],
       "scope": "Implement domain.stats resolution, validated versioned defaults and source-keyed modifier collections. Follow base/flat/additive-percent/ordered-multiplier/cap order. Preserve raw crit chance above 100; derive bounded ordinary probability separately. Replace a source's whole contribution on refresh. No equipment adapter or combat engine ownership.",
       "acceptance": "Deterministic order/source replacement, cap boundaries, fractional values, non-finite/overflow rejection and immutable old snapshots pass domain tests. A real Paper scenario invokes the production resolver and verifies matching values and explanations on this branch's built artifact.",
@@ -31,7 +37,7 @@
       "id": "T04", "title": "Measure real arrow and multipart dragon collision behavior", "dependsOn": ["T00", "T09a"],
       "scope": "Implement isolated real entity scenarios and a concise findings note. Observe event ordering/cancellation, part-to-parent mapping, native suppression, head/body hits, flying/perched behavior, simultaneous impacts, pre-spawn identity and lifetime controls. Use public Paper APIs only.",
       "acceptance": "Evidence identifies a viable single impact authority and native-damage boundary on the exact Paper pin. Real arrows and real dragons are required; retain missed/unsupported cases as findings. No teleported arrows, mock dragons or inferred passes. Revise unsupported design before dependent adapters start.",
-      "coordination": "Own dev/game-tests projectile feasibility scenario package and findings note. Coordinate harness extension points with T09a; do not implement the final combat adapter prematurely."
+      "coordination": "Own dev/game-tests projectile feasibility scenario package and findings note. PR #22 is partial: its reusable owned-listener helper can integrate before full acceptance and enable T09b. Resume player-owned native dragon suppression and semantic head/native-damage experiments after T09b merges. Do not treat shooterless results or partial-PR merge as full T04 acceptance, release T06/#9, or accept M0. Do not implement the final combat adapter prematurely."
     },
     {
       "id": "T03", "title": "Implement combat math, caps, health and contribution accounting", "dependsOn": ["T00", "T01a"],
@@ -43,7 +49,7 @@
       "id": "T01b", "title": "Connect equipment provenance and playable stats inspection", "dependsOn": ["T01a", "T02"],
       "scope": "Equipment fingerprint/cache and source refresh, player session cleanup, temporary overrides, and /onlydragons stats explain. Add permission-gated calibration loadout grants through the validated item path. Own paper.item.equipment and agreed application/command files; integrate shared registration through lead.",
       "acceptance": "Equip/unequip/offhand refresh cannot stack stats; changed item data invalidates cache; accepted snapshots remain unchanged; quit clears session state. Real Paper tests cover production codec/service/command integration and invalid console/permission paths where possible. Document a short Cursor Play + in-game procedure and leave actual authenticated-client evidence explicit.",
-      "coordination": "This is the first human-playable stats slice. Do not claim projectile shot-time integration until T06 connects it. Preserve/update existing status/reload behavior and smoke assertions."
+      "coordination": "This is the first human-playable stats slice. Await integrated T01a/T02; independent service/command work is not blocked by T04 or T09b. Adopt the optional T09b actor when integrated and report actual protocol evidence separately. Do not claim projectile shot-time integration until T06 connects it. Preserve/update existing status/reload behavior and smoke assertions."
     },
     {
       "id": "T05", "title": "Implement bounded ferocity and enchant effect state", "dependsOn": ["T01a", "T02", "T03"],
@@ -55,7 +61,7 @@
       "id": "T06", "title": "Implement owned bow, shortbow and Duplex projectiles", "dependsOn": ["T01b", "T02", "T04"],
       "scope": "Native drawn-bow capture, shortbow trigger/cooldown, one-time ammo/capacity reservation, immutable shot inputs, real Arrow registry and distinct Duplex child. Own firing/lifecycle subpackages of domain.projectile and paper.projectile.",
       "acceptance": "Real Paper UUID traces show physical primary/child identity and ownership, no duplicate emission/consumption on cancellation or offhand events, exact one Duplex child, and cleanup after failures. Shot-time equipment verification uses T01b. Authenticated mouse/hold input remains a separate client gate.",
-      "coordination": "Use T04's measured impact/event decisions. Do not implement Tracer steering in this issue; publish registry contracts for T07."
+      "coordination": "Use T04's accepted impact/event decisions. Keep issue #9 undispatched while T04 player-owned native suppression and semantic head/native-damage evidence remain unresolved; partial PR #22 or T09b calibration alone does not satisfy T04. Do not implement Tracer steering in this issue; publish registry contracts for T07."
     },
     {
       "id": "T07", "title": "Implement Dragon Tracer and continuous pre-spawn arrows", "dependsOn": ["T04", "T06"],
@@ -86,6 +92,18 @@
       "scope": "Later planning task to split bounded variant/abilities/content and durable progression work. Preserve configurable registries and idempotent result consumption; do not infer an entire SkyBlock economy.",
       "acceptance": "Written bounded implementation tasks and balance/acquisition decisions before coding; later seeded selection, deterministic abilities and durable one-time rewards must pass their own runtime/recovery checks.",
       "coordination": "Do not dispatch until the manual gate is satisfied. Foundation-default authorization does not choose the entire later economy."
+    },
+    {
+      "id": "MAINT-17", "title": "Reject boolean/number mismatches in Paper scenario reports", "dependsOn": ["T09a"],
+      "scope": "Use recursive typed JSON equality in the independent report validator so booleans cannot equal numbers, including nested arrays/objects, while retaining integer/float numeric equivalence. Own only the Python validator, meaningful regression tests and maintenance evidence.",
+      "acceptance": "Scalar and nested forged-pass controls fail; valid numerical and structural comparisons pass. Preserve freshness, identifiers, provenance and cleanup gates. Revalidate unchanged stored T09/T00 reports within their original time windows without calling replay a new Paper run.",
+      "coordination": "Complete: issue #17 and PR #19 are closed; reviewed/validated fix merged at 6f0ccfb. No Symphony dispatch or duplicate implementation; no gameplay milestone advanced."
+    },
+    {
+      "id": "MAINT-18", "title": "Harden Symphony worker startup and coordination", "dependsOn": [],
+      "scope": "Disable only supported optional remote-plugin synchronization on subsequent Symphony app-server launches. Preserve required repository skills, reviewed MCP configuration, host github_api, model/auth settings, sandbox and active sessions. Require issue/API refresh before expensive verification and clean committed final runtime evidence.",
+      "acceptance": "Generated worker command uses the supported remote_plugin=false setting; bridge protocol/sandbox regressions pass. An isolated no-model app-server discovers required skills and MCP tools and exits cleanly. Personal/global configuration and unrelated sessions are unchanged.",
+      "coordination": "Complete: issue #18 and PR #21 are closed; reviewed/validated maintenance merged at e72fb2a. No Symphony dispatch or duplicate implementation; no gameplay milestone advanced."
     }
   ]
 }
