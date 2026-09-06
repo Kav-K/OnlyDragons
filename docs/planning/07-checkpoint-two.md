@@ -43,7 +43,8 @@ T08c remains undispatched pending lead sequencing; this is not loot implementati
   with full 100% credit. After an accepted eligible captured FT source, including
   approved FT children, add `10 × level` percentage points up to +200%, refresh
   expiry by 60 ticks, and adopt that source's level even when lower. Expire before
-  the boundary hit: the first FT impact after expiry is unbuffed and 100% HP.
+  the boundary hit: a newly admitted physical FT impact after expiry is unbuffed
+  and uses 100% proc HP; previously queued children keep their captured policy.
   Children retain their immutable pre-hit HP policy and never recurse. Store active
   buff/proc-policy provenance separately from `fatalTempoSourceLevel`, whose existing
   meaning is refresh eligibility. Later held gear must not rewrite either identity.
