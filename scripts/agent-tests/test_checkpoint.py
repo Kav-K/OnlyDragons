@@ -354,6 +354,9 @@ class CheckpointTests(unittest.TestCase):
             self.assertEqual('automated', plan['requirements'][requirement]['kind'])
 
     def test_bounded_player_evidence_allows_machine_readiness_but_keeps_policy_external(self):
+        self.prepare_partial_t04()
+        for requirement in ('P02', 'P04'):
+            self.defer_fixture_requirement(requirement)
         fixture = self.implement_player_observation_fixture()
         result = self.acceptance(['T04'])
         self.assertTrue(result['automatedReady'])
@@ -368,7 +371,24 @@ class CheckpointTests(unittest.TestCase):
             self.acceptance(['T04'])
 
     def test_feasibility_completion_cannot_release_deferred_adapter_requirements(self):
-        self.implement_player_observation_fixture()
+        self.prepare_partial_t04()
+        fixture = self.implement_player_observation_fixture()
+        self.record_bounded_t04_completion()
+        # Start with synthetic implemented components and valid component evidence
+        # to prove the deferred fixture also survives future adapter implementation.
+        # This existing fixture is only a checkpoint seam, not production P02/P04 proof.
+        for requirement in ('P02', 'P04'):
+            self.defer_fixture_requirement(requirement)
+            self.change(PLAN, lambda value: value['requirements'][requirement].update(
+                availability='implemented', fixtures=[fixture]))
+        self.change(PROGRESS, lambda value: value['tasks']['T06'].update(
+            status='partial', completedRequirements=['P02', 'P04'], evidence={
+                ref: {'url': 'https://github.com/Kav-K/OnlyDragons/pull/31', 'revision': SHA}
+                for ref in ('P02', 'P04')}))
+        self.assertTrue(self.plan()['summary']['planValid'])
+        self.prepare_partial_t04()
+        for requirement in ('P02', 'P04'):
+            self.defer_fixture_requirement(requirement)
         self.record_bounded_t04_completion()
         self.assertTrue(self.plan()['summary']['planValid'])
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'deferred automated requirements: P02, P04'):
