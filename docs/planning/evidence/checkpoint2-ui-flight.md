@@ -97,6 +97,15 @@ are already integrated. One final source will therefore prove T03b, T08d and
 T08e together. This consolidates their final runtime gate without removing any
 required case, independent review, or acceptance checkpoint.
 
+The correction retains exact phase count/order, all metadata fields and JSON
+scalar types, and requires a nonempty, unique assertion superset in each phase.
+All 55 checkpoint unit tests passed, including additions to every restart
+descriptor, removals hidden by additions in either phase, and 15 metadata/order/
+count/type mutations. The integration preserves Overload's captured primary
+decision alongside Tracer's captured profile/original launch tick. Its equipment
+oracle covers nine legacy definitions, their nine explicit v3 copies, the
+legacy-only returning Tracer and the two new expanded presets: 21 exact IDs.
+
 ## Remaining gates
 
 The corrected complete cohort, independent raw/source review and strict replay,

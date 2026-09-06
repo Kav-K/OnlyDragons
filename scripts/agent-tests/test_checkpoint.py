@@ -219,6 +219,64 @@ class CheckpointTests(unittest.TestCase):
             with self.assertRaisesRegex(checkpoint.CheckpointError, 'restart phases changed'):
                 self.baseline(previous)
 
+    def test_restart_phase_assertion_additions_preserve_each_existing_binding(self):
+        previous = {SCENARIOS: self.read(SCENARIOS)}
+        for scenario_id, scenario in previous[SCENARIOS].items():
+            if 'phases' not in scenario:
+                continue
+            with self.subTest(scenario=scenario_id):
+                self.write(SCENARIOS, previous[SCENARIOS])
+                def add_assertions(value):
+                    for phase in value[scenario_id]['phases']:
+                        phase['requiredAssertions'].append('new_phase_assertion_' + str(phase['index']))
+                self.change(SCENARIOS, add_assertions)
+                self.assertEqual(SHA, self.baseline(previous))
+
+    def test_restart_phase_assertion_removal_is_not_hidden_by_additions(self):
+        previous = {SCENARIOS: self.read(SCENARIOS)}
+        for position in (0, 1):
+            with self.subTest(position=position):
+                self.write(SCENARIOS, previous[SCENARIOS])
+                def replace_assertion(value):
+                    phase = value['same-profile-restart']['phases'][position]
+                    phase['requiredAssertions'].pop()
+                    phase['requiredAssertions'].append('replacement_assertion')
+                self.change(SCENARIOS, replace_assertion)
+                with self.assertRaisesRegex(checkpoint.CheckpointError, 'restart phases changed'):
+                    self.baseline(previous)
+
+    def test_restart_phase_metadata_and_sequence_remain_exact(self):
+        previous = {SCENARIOS: self.read(SCENARIOS)}
+        mutations = {
+            'reorder': lambda scenario: scenario['phases'].reverse(),
+            'remove_phase': lambda scenario: scenario['phases'].pop(),
+            'add_phase': lambda scenario: scenario['phases'].append(deepcopy(scenario['phases'][-1])),
+            'remove_phases_field': lambda scenario: scenario.pop('phases'),
+            'index': lambda scenario: scenario['phases'][0].update(index=2),
+            'index_boolean': lambda scenario: scenario['phases'][0].update(index=True),
+            'index_float': lambda scenario: scenario['phases'][0].update(index=1.0),
+            'revision': lambda scenario: scenario['phases'][0].update(mechanicRevision='changed-v2'),
+            'plan': lambda scenario: scenario['phases'][0].update(playerActionPlan='dev/game-tests/player-plans/cleanup-abort-v1.json'),
+            'messages': lambda scenario: scenario['phases'][0]['requiredActorMessages'].pop(),
+            'expectation': lambda scenario: scenario['phases'][0].update(expectation='cleanup-abort'),
+            'added_metadata': lambda scenario: scenario['phases'][0].update(extra=True),
+            'removed_metadata': lambda scenario: scenario['phases'][0].pop('expectation'),
+            'catalog_mode': lambda scenario: scenario.update(catalogMode='different-restart-v1'),
+            'removed_catalog_mode': lambda scenario: scenario.pop('catalogMode'),
+        }
+        for name, mutation in mutations.items():
+            with self.subTest(mutation=name):
+                self.write(SCENARIOS, previous[SCENARIOS])
+                def change_metadata(value):
+                    scenario = value['same-profile-restart']
+                    # Stronger assertion coverage must never hide a changed binding.
+                    for phase in scenario['phases']:
+                        phase['requiredAssertions'].append('additional_coverage')
+                    mutation(scenario)
+                self.change(SCENARIOS, change_metadata)
+                with self.assertRaisesRegex(checkpoint.CheckpointError, 'restart phases changed'):
+                    self.baseline(previous)
+
     def test_issue_mapping_drift_rejected(self):
         self.change(MAPPING, lambda value: value.pop('T04'))
         self.reject_plan('issue mapping drift')

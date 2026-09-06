@@ -121,9 +121,11 @@ production / six companion / 28 client tests; expanded-bow 49, equipment 25,
 catalog 30 assertions and the exact 15-row catalog-abort control, with clean owned
 JVM/resource cleanup. Real releases/collisions, fixture-controlled profiles/paused
 swap arrows and injected positive native damage remain explicitly distinguished.
-Static plan and changed-area selection pass. PR76 main integration and any affected
-focused rerun remain pending. The lead owns the final current-input hosted
-cohort/replay/T03b acceptance checkpoint per its issue instruction; no duplicate
+Static plan and changed-area selection pass. The lead combined this history with
+PR76's presentation/flight branch, preserving both immutable Overload capture and
+the projectile's captured Tracer profile. Equipment coverage now requires all 21
+explicit IDs, including legacy-only returning Tracer. The lead owns one final
+40-case hosted cohort/replay and T03b/T08d/T08e checkpoints; no duplicate
 local cohort or automated/milestone acceptance is claimed. Independent review/CI,
 Windows smoke, authenticated-client visuals/feel and performance remain separate.
 Next dependency: T06c consumes descriptors and the existing firing authority.
