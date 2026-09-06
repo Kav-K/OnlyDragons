@@ -165,7 +165,7 @@ class FullRestartReplayTests(unittest.TestCase):
         import paper_suite as suite
         from test_paper_suite import ReceiptFixture
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
-        self.f = f = ReceiptFixture(Path(self.temp.name))
+        self.f = f = ReceiptFixture(Path(self.temp.name).resolve())
         self.suite = suite
         self.name = 'same-profile-restart'
         self.descriptor = runner.strict_json(ROOT / 'dev/game-tests/scenarios.json')[self.name]
