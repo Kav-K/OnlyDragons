@@ -261,7 +261,9 @@ one Adventure bar UUID to two protocol actors, preserved its identity through
 HP updates/reconnect and world return, retained zero HP through native animation,
 and removed it on actual retirement/reset/close. A labelled score-only fixture
 credited 200 with 100 HP removed; the received bar stayed at domain HP 900/1,000.
-[Exact artifact/run evidence and remaining suite/restart gates](evidence/t08d-presentation.md).
+The same checks passed again at clean `ae795386` with strict between-snapshot
+packet replay; fresh and death-animation two-boot UI checks also passed.
+[Exact artifact/run evidence and remaining combined integration gates](evidence/t08d-presentation.md).
 This is received protocol/state evidence, not full-client appearance, human feel
 or a researched Hypixel mechanic. Existing combat/phase policy is unchanged.
 

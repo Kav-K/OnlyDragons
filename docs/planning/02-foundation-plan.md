@@ -570,9 +570,12 @@ production accounting, then samples actual received bar identity/title/percent/
 flags and message components for two actors. A named fixture-only score-only
 catalog uses the same deployed combat and UI adapters to distinguish 100 HP from
 200 credit. It is not a production balance selection. Existing restart fixtures
-add received empty/new/reset UI checks to their real two-boot evidence. The [focused run](evidence/t08d-presentation.md) passed; complete-suite/restart
-verification remains pending, with human appearance/authentication and milestone
-acceptance separate.
+add received empty/new/reset UI checks to their real two-boot evidence.
+[Final focused presentation and both restart variants](evidence/t08d-presentation.md)
+passed. Per lead coordination, combined #64/#65 integration after #66, the full
+cohort and both task checkpoints remain lead-owned and pending. Received ordinary
+chat evidence excludes overlay action-bar delivery; human appearance/authentication
+and milestone acceptance remain separate.
 
 ### Managed health
 

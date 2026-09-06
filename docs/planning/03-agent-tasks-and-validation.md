@@ -565,8 +565,12 @@ the read-only health UI, shared formatter, focused two-actor packet fixture and
 additive restart UI checks under `dragon-bossbar` / `combat-presentation`.
 [Focused clean-source evidence and failed iteration](evidence/t08d-presentation.md)
 record 235 production/six companion/30 client/273 Python tests and 18 Paper
-assertion rows plus 28 received-bar samples at `03e8af7`. Full changed-area suite,
-two-boot UI checks, strict replay and final task checkpoint remain pending.
+assertion rows plus 28 received-bar samples, including fresh final candidate
+`ae795386` with the newest validator. Fresh and death-animation two-boot UI runs
+also pass. Per [lead coordination](https://github.com/Kav-K/OnlyDragons/issues/64#issuecomment-5562281339),
+the lead will combine #64/#65 after #66 integration and owns the pending complete
+cohort/replay and both task checkpoints; the worker must not duplicate that suite.
+The evidence archive records exact inputs and additive integration notes.
 Human appearance/readability, authenticated-client compatibility, independent
 review/current CI and milestone acceptance remain separate. T02c/T06b consume
 the formatter boundary in document 02 after integration.

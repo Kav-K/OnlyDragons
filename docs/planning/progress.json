@@ -416,7 +416,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Draft PR #74: clean focused 03e8af7 passed 18 Paper assertions/28 received-bar samples, 235 production/6 companion/30 client and 273 Python tests. Main 7a38040 integrated. Full changed-area suite, restart UI and task checkpoint pending; no completed requirement or milestone accepted. Evidence: docs/planning/evidence/t08d-presentation.md."
+      "notice": "Draft PR #74: clean final focused ae795386 passed 18 Paper assertions/28 received-bar samples with newest validator; fresh and death-animation two-boot UI runs pass. Tests: 235 production/6 companion/30 client/273 Python; static plan valid. Main 7a38040 integrated. Per lead comment 5562281339, combined #64/#65 cohort and task checkpoints after #66 are lead-owned and pending; no requirement/milestone accepted. Evidence: docs/planning/evidence/t08d-presentation.md."
     },
     "T08e": {
       "status": "active",
