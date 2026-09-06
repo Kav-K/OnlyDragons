@@ -35,7 +35,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T04 — Paper feasibility | Complete | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #31](https://github.com/Kav-K/OnlyDragons/pull/31) | Merged at `705de34` after clean `96ef4b3` passed all 18 hosted suite outcomes, independent raw replay/review and current CI; 82 production/28 client tests and all 52 required player-projectile assertions plus shared cleanup were verified. The external part/phase/terminal-impact policy was accepted separately; [exact evidence and review](evidence/t04-suite.md). P02/P04 are separately accepted under T06 through PR #52. Bounded M0 was subsequently accepted with the PR48 cohort; see [combined evidence](evidence/catalog-procs-suite.md). |
 | T05 — Enchants/procs | Complete | [#8](https://github.com/Kav-K/OnlyDragons/issues/8), [PR #48](https://github.com/Kav-K/OnlyDragons/pull/48) | Merged at `3c35a85` after the full current-input suite, independent review/replay, task checkpoint and CI; 38 required proc assertions plus shared cleanup passed. [combined acceptance evidence](evidence/catalog-procs-suite.md). Physical P08/P09 and T08 composition remain later integration; old held worker runs retain their original disposition. |
 | T06 — Firing/Duplex | Complete | [#9](https://github.com/Kav-K/OnlyDragons/issues/9), [PR #52](https://github.com/Kav-K/OnlyDragons/pull/52) | Merged at `25891c0` after tested `f4178ba` passed all 24 hosted outcomes, independent raw replay/review, actual-main T06 checkpoint and current CI. Owned firing passed 115 assertion rows; repaired equipment passed 25; relevant builds report 182 production/28 client tests with no failures/errors/skips. [Final evidence, failed iteration and boundaries](evidence/t06-suite.md); [single-consumer API](evidence/t06-firing.md#consumer-contract). T08 accounting and human observations remain unaccepted. |
-| T07 — Tracer/continuity | In progress | Symphony / [#10 dispatch](https://github.com/Kav-K/OnlyDragons/issues/10#issuecomment-5559839786) | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence remain pending. |
+| T07 — Tracer/continuity | In review | [Draft PR #56](https://github.com/Kav-K/OnlyDragons/pull/56) / #10 | Pure steering and service-owned continuity implemented on `symphony/gh-10`; [clean focused evidence](evidence/t07-tracer.md): 192 tests, 57 Tracer/115 firing assertions and expected-abort cleanup. Lead full cohort, independent shared-lifecycle review and P07/P10 acceptance remain pending. |
 | T08 — Practice tools | In review; focused Paper checks pass | [#11](https://github.com/Kav-K/OnlyDragons/issues/11), [draft PR #57](https://github.com/Kav-K/OnlyDragons/pull/57) | Lead complete cohort/replay/T08 checkpoint/current CI and human Windows Play/visuals remain pending; [evidence](evidence/t08-focused.md). |
 | T08a — Managed dragon controls | Planned | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | After T08/T02b/T09e: real test-dragon backend and spawn/status/reset/result inspection through the existing shared lifecycle and T06 claims. All feature Paper/command evidence pending. |
 | T08b — Frozen damage ranking | Planned | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | After T08a: post-kill credited damage including ghost damage and overkill, unique placements under the lead-reviewed commit/ordinal tie rule. Deterministic and real multi-identity presentation gates pending. |
@@ -47,7 +47,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T11 — Eight-eye lifecycle | Planned, later | [#13](https://github.com/Kav-K/OnlyDragons/issues/13) | M3 accepted, then transaction, spawn, cancellation, and recovery gates. |
 | T12 — Variants/progression | Planned, later | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus separately agreed roster, rewards, and acquisition scope. |
 
-Bounded M0 contracts/feasibility is explicitly accepted; M1–M5 remain unaccepted. T02b/T05/T06 are integrated; T08 accounting and T07 tracing are in progress under lead dispatch. P02/P04 are accepted under T06; the remaining P-series gates, including P01/P08/P09/P13, stay pending. Shared fixtures do not accept future gameplay behavior. A task's
+Bounded M0 contracts/feasibility is explicitly accepted; M1–M5 remain unaccepted. T02b/T05/T06 are integrated; T08 accounting is in progress; T07 tracing is in review under lead dispatch. P02/P04 are accepted under T06; the remaining P-series gates, including P01/P08/P09/P13, stay pending. Shared fixtures do not accept future gameplay behavior. A task's
 full acceptance criteria below remain authoritative; this table is a summary.
 
 Use **Planned**, **In progress**, **In review**, **Blocked**, or **Complete** for
@@ -107,6 +107,13 @@ This instruction does not authorize implementing unassigned work packages.
    the merged context; unmerged proposals stay identified as pending.
 
 ### Context change record
+
+T07 / GH-10 adopts explicitly versioned six-degree/current-part/UUID-tie/obstruction
+calibration and a bounded shared ticket broker within its dispatched scope.
+The bow service remains the only registry/tick/retirement owner; T08's receiver
+and accounting ownership remain separate. [Contract, rationale and actual
+validation state](evidence/t07-tracer.md). No milestone or requirement is accepted.
+
 
 PR #52 merged at `25891c0` on 6 September 2026: T06 completed after the
 24-case `f4178ba` cohort, independent raw replay/review, actual-main T06 and
@@ -473,7 +480,10 @@ Python harness tests and the static 26-case selection/plan checks pass.
 The lead owns the complete final hosted baseline, independent replay/T08 checkpoint,
 CI and merge per dispatch. No requirement/milestone acceptance is inferred from
 focused results. Windows Build/Play, authentication, visuals and performance remain
-unrun. T07 PR #56 needs its fixture receiver migrated during lead composition;
+unrun. The bounded peer integration normally merges reviewed T07 PR #56 at `576e394`
+and migrates its tracer fixture to `combat().observeSettled(...)`, preserving all
+57 tracer assertions, the exact abort control, 115 firing assertions and both T08
+cases. Focused verification of these combined inputs is pending;
 #39/#40 consume the published backend and frozen provenance contracts.
 
 ### T08a — Managed real-dragon backend and development controls

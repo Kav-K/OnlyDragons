@@ -597,6 +597,20 @@ Maintain one registry of managed airborne arrows and the active encounter's targ
 
 Start with current part positions rather than a complicated prediction algorithm. Keep the turn-rate parameter common across levels so the advertised level distinction remains radius. Unit-test vector math and zero-length cases, then tune moving-dragon accuracy with actual flight traces.
 
+### T07 scoped calibration (GH-10, pending review)
+
+`tracer-continuity/v1` implements inclusive surface radii 2/4/6/8/10,
+current nearest part-box aim, UUID ties, obstruction rays and a common six-degree
+turn limit with unchanged speed/native gravity/drag. Only admitted real dragons
+in T06's allowed phases qualify; there is no cone or invisible proxy.
+The existing bow service owns tick/retirement integration and immutable admission
+views. A shared reference-counted ticket broker reserves bounded potential arena
+footprints before admission and loads only current demanded neighbourhoods;
+capacity rejection changes no admitted arena/session state. [Exact consumer,
+lifecycle, ticket calibration and pending evidence](evidence/t07-tracer.md).
+These are adopted OnlyDragons sandbox rules, not researched upstream steering
+facts or P07/P10 acceptance. The single T06 registry/receiver remains authoritative.
+
 ### Continuity and lifecycle
 
 The requested permanence means **no arbitrary airborne age expiry during a valid encounter**. Track our own launch age independently from Paper's despawn counter. The pinned API exposes arrow lifetime control; use it narrowly for managed in-flight arrows when needed, and verify that world despawn settings do not override the guarantee. Disk persistence alone does not prevent despawn. Save item data normally, but clear encounter-owned projectile eligibility on restart; stale saved projectiles must not become valid hits in a new encounter.

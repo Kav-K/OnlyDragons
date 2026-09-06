@@ -959,6 +959,89 @@
         "practice-lifecycle"
       ],
       "scope": "Two actual actors, retained real projectile across reconnect, queued proc death/quit/exit, replacement generations, proc-lethal and pending competing physical claims; server flight hold and death are explicit fixture setup."
+    },
+    "tracer-continuity": {
+      "assertions": [
+        "server_thread_and_single_task",
+        "arena_reservation_does_not_load_all_chunks",
+        "native_prefire_same_registry_uuid",
+        "no_target_ballistic_velocity",
+        "native_gravity_and_motion",
+        "actual_prefire_acquired_later_dragon",
+        "actual_prefire_physical_hit",
+        "prefire_no_replacement",
+        "age_counter_reset_on_same_entity",
+        "target_loss_had_real_lock",
+        "unregistered_target_ballistic",
+        "same_arrow_reacquires",
+        "wall_prevents_acquisition",
+        "actual_block_collision_retires",
+        "grounded_arrow_does_not_rearm",
+        "quit_retains_captured_arrow_and_mechanics",
+        "physical_chunk_boundary_same_uuid",
+        "continuity_without_target_no_speed_boost",
+        "unexpected_removal_recorded_no_replacement",
+        "other_ticket_demand_survives_arrow_retirement",
+        "last_demand_releases_tickets",
+        "reset_releases_registry_frames_reservations",
+        "disable_releases_task_tickets",
+        "level_1_native_acquisition",
+        "level_1_radius_speed_turn",
+        "level_1_captured_enchant",
+        "level_2_native_acquisition",
+        "level_2_radius_speed_turn",
+        "level_2_captured_enchant",
+        "level_3_native_acquisition",
+        "level_3_radius_speed_turn",
+        "level_3_captured_enchant",
+        "level_4_native_acquisition",
+        "level_4_radius_speed_turn",
+        "level_4_captured_enchant",
+        "level_5_native_acquisition",
+        "level_5_radius_speed_turn",
+        "level_5_captured_enchant",
+        "owned_resources_released",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "owned_listeners_removed",
+        "native_velocity_matches_applied_steering",
+        "distant_destination_has_no_ticking_influence",
+        "destination_promoted_by_broker",
+        "native_destination_ticket_released",
+        "level_1_native_turn_toward_part",
+        "level_2_native_turn_toward_part",
+        "level_3_native_turn_toward_part",
+        "level_4_native_turn_toward_part",
+        "level_5_native_turn_toward_part",
+        "level_1_real_target_moved",
+        "level_2_real_target_moved",
+        "level_3_real_target_moved",
+        "level_4_real_target_moved",
+        "level_5_real_target_moved"
+      ],
+      "caseIds": [
+        "tracer-continuity"
+      ],
+      "scope": "T07 production native-arrow Tracer/continuity, controlled real-dragon positions, obstacles, age boundary and cleanup; no ritual or human visuals."
+    },
+    "tracer-cleanup-abort": {
+      "assertions": [
+        "abort_has_live_shared_ticket_demand",
+        "abort_other_consumer_keeps_native_ticket",
+        "abort_releases_tickets_and_reservation",
+        "abort_releases_owned_task",
+        "owned_resources_released",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "owned_listeners_removed",
+        "abort_preserves_preexisting_native_ticket"
+      ],
+      "caseIds": [
+        "tracer-cleanup-abort"
+      ],
+      "scope": "Deliberate abort with live production shared ticket demand and service cleanup."
     }
   },
   "requirements": {
@@ -1149,9 +1232,11 @@
     },
     "P07": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "All Dragon Tracer levels and moving targets respect acquisition/steering boundaries.",
-      "fixtures": []
+      "fixtures": [
+        "tracer-continuity"
+      ]
     },
     "P08": {
       "kind": "automated",
@@ -1167,9 +1252,12 @@
     },
     "P10": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Accepted production projectile ageing/chunk-boundary lifecycle with bounded ticket ownership.",
-      "fixtures": []
+      "fixtures": [
+        "tracer-continuity",
+        "tracer-cleanup-abort"
+      ]
     },
     "P11": {
       "kind": "automated",
