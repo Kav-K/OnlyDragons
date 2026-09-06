@@ -62,9 +62,11 @@ public class OnlyDragonsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (combat != null) combat.close();
-        if (bows != null) bows.close();
-        if (equipmentListener != null) equipmentListener.close();
+        try { if (combat != null) combat.close(); }
+        finally {
+            try { if (bows != null) bows.close(); }
+            finally { if (equipmentListener != null) equipmentListener.close(); }
+        }
         getLogger().info("OnlyDragons disabled");
     }
 }

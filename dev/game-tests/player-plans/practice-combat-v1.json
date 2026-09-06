@@ -148,6 +148,18 @@
               "args": {}
             },
             {
+              "id": "lethal-volley-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-volley-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
               "id": "reset-reduced",
               "action": "command",
               "args": {
@@ -254,6 +266,18 @@
             },
             {
               "id": "volley-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "lethal-volley-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-volley-release",
               "action": "releaseUse",
               "args": {}
             },

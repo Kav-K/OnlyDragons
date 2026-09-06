@@ -59,6 +59,11 @@ public final class CombatEncounter {
     public TargetState target() { checkThread(); return target; }
     public Optional<EncounterResult> completion() { checkThread(); return Optional.ofNullable(completion); }
     public List<DamageResult> impacts() { checkThread(); return List.copyOf(accepted.values()); }
+    /** Bounded diagnostic projection; authoritative idempotency/accounting remains intact. */
+    public List<DamageResult> recentImpacts(int limit) {
+        checkThread(); if (limit < 0) throw new IllegalArgumentException("Negative impact limit");
+        return accepted.values().stream().skip(Math.max(0, accepted.size() - limit)).toList();
+    }
     public Map<UUID, EncounterResult.Contribution> contributions() { checkThread(); return Map.copyOf(contributions); }
     public void end() { checkThread(); ended = true; }
     public long acceptedOrdinal() { checkThread(); return acceptedOrdinal; }

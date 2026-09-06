@@ -119,8 +119,25 @@ public final class PracticeCombatScenario implements Scenario, Listener {
                 c.check("simultaneous_two_owner_physical_commits",true,hits.size()==2&&hits.stream().map(SettledHit::collisionTick).distinct().count()==1&&hits.stream().map(h->h.projectile().shot().ownerId()).distinct().count()==2);
                 totals("reduced_two_owner",250,200,200,4);
                 c.check("reduced_hp_credit_separate",true,view().contributions().values().stream().allMatch(t->t.actualHealthDamage()==125&&t.contributionDamage()==200));
-                command("alpha","reset-reduced",()->command("alpha","score",()->{capture();scoreOnly();}));
+                lethalVolley();
             }));
+        }));
+    }
+    void lethalVolley() {
+        for(String actor:List.of("alpha","beta")){kit(actor,"crit");players.request(actor,"lethal-volley-use");}
+        players.await("both lethal bows",60,()->players.player("alpha").isHandRaised()&&players.player("beta").isHandRaised(),()->c.later(22,()->{
+            int before=settlements.size();players.request("alpha","lethal-volley-release");players.request("beta","lethal-volley-release");
+            settled(before+2,()->{
+                var v=view();var r=v.completion().orElseThrow();var hits=settlements.subList(before,settlements.size());
+                c.check("same_tick_lethal_two_owner_order",true,hits.size()==2&&hits.stream().map(SettledHit::collisionTick).distinct().count()==1
+                        &&r.completedOrdinal()==6&&v.impacts().get(4).amounts().actualHealthDamage()==150&&v.impacts().get(5).amounts().actualHealthDamage()==100);
+                c.check("lethal_overkill_and_ghost_totals",true,r.participants().size()==2&&r.participants().values().stream().allMatch(t->t.contributionDamage()==350)
+                        &&r.participants().values().stream().mapToDouble(EncounterResult.Contribution::actualHealthDamage).sum()==500);
+                c.check("frozen_participant_commit_stamps",true,r.participants().values().stream().map(t->t.lastCreditIncrease().orElseThrow().ordinal()).sorted().toList().equals(List.of(5L,6L))
+                        &&r.participants().values().stream().allMatch(t->t.lastCreditIncrease().orElseThrow().tick()==r.completedTick()));
+                c.check("one_completion_per_generation",true,combat.completions().size()==2&&combat.completions().stream().map(EncounterResult::encounterId).distinct().count()==2);
+                command("alpha","reset-reduced",()->command("alpha","score",()->{capture();scoreOnly();}));
+            });
         }));
     }
     void scoreOnly() {
@@ -174,5 +191,5 @@ public final class PracticeCombatScenario implements Scenario, Listener {
     @EventHandler(priority=EventPriority.MONITOR) public void bow(EntityShootBowEvent e){if(e.getEntity() instanceof Player p){releases.merge(p.getUniqueId(),1,Integer::sum);if(swap)p.getInventory().setItemInMainHand(c.production().equipment().createLoadout("crit"));}}
     @EventHandler(priority=EventPriority.MONITOR) public void launch(ProjectileLaunchEvent e){if(e.getEntity() instanceof Arrow arrow&&arrow.getShooter() instanceof Player p){nativeOwners.put(arrow.getUniqueId(),p.getUniqueId());if(nativeDamage)arrow.setDamage(2);}}
     @EventHandler(priority=EventPriority.HIGH) public void hit(ProjectileHitEvent e){if(e.getEntity() instanceof Arrow a&&nativeOwners.containsKey(a.getUniqueId())){collisions.put(a.getUniqueId(),Bukkit.getCurrentTick());if(veto)e.setCancelled(true);}}
-    @EventHandler(priority=EventPriority.MONITOR) public void death(EntityDeathEvent e){if(target!=null&&e.getEntity().getUniqueId().equals(target.getUniqueId())){deaths++;completionAtDeath=combat.view(encounter).orElseThrow().completion().isPresent()&&combat.view(encounter).orElseThrow().procs().queued()==0;}}
+    @EventHandler(priority=EventPriority.MONITOR) public void death(EntityDeathEvent e){if(encounter!=null&&target!=null&&e.getEntity().getUniqueId().equals(target.getUniqueId())){deaths++;completionAtDeath=combat.view(encounter).orElseThrow().completion().isPresent()&&combat.view(encounter).orElseThrow().procs().queued()==0;}}
 }

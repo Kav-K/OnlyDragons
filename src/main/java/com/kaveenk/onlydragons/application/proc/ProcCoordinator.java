@@ -168,6 +168,11 @@ public final class ProcCoordinator implements AutoCloseable {
         checkThread();
         return new Metrics(queue.size(), sessions.size(), tempo.size(), capacityRejected, inactiveRejected, cleared);
     }
+    /** Adapter provenance need only remain while one of these bounded parents has queued children. */
+    public Set<UUID> pendingParents() {
+        checkThread(); var parents = new HashSet<UUID>();
+        queue.forEach(p -> parents.add(p.command().parentImpactId())); return Set.copyOf(parents);
+    }
 
     public static UUID childId(UUID parent, int index) {
         Objects.requireNonNull(parent);

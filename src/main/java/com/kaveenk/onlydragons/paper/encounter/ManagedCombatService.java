@@ -34,9 +34,9 @@ public final class ManagedCombatService implements AutoCloseable {
     }
     public record View(UUID encounterId, UUID ownerId, UUID entityId, State state, TargetState target,
                        Map<UUID, EncounterResult.Contribution> contributions, List<DamageResult> impacts,
-                       Optional<EncounterResult> completion, ProcCoordinator.Metrics procs) {}
+                       Optional<EncounterResult> completion, ProcCoordinator.Metrics procs, long acceptedImpacts, long omittedImpacts, int retainedParents) {}
     private static final class Fight {
-        final UUID id, owner;
+        final UUID id, owner, entityId;
         final TargetBackend backend;
         final BoundingBox bounds;
         final CombatEncounter combat;
@@ -46,11 +46,11 @@ public final class ManagedCombatService implements AutoCloseable {
         final Map<UUID, Long> collisions = new HashMap<>();
         State state = State.ACTIVE;
         Fight(UUID id, UUID owner, TargetBackend backend, BoundingBox bounds, CombatEncounter combat, ProcCoordinator procs) {
-            this.id = id; this.owner = owner; this.backend = backend; this.bounds = bounds.clone(); this.combat = combat; this.procs = procs;
+            this.id = id; this.owner = owner; this.entityId = backend.entity().getUniqueId(); this.backend = backend; this.bounds = bounds.clone(); this.combat = combat; this.procs = procs;
         }
         boolean contains(Player p) { return p.getWorld().equals(backend.entity().getWorld()) && bounds.contains(p.getLocation().toVector()); }
-        View view() { return new View(id, owner, backend.entity().getUniqueId(), state, combat.target(), combat.contributions(),
-                combat.impacts(), combat.completion(), procs.metrics()); }
+        View view() { return new View(id, owner, entityId, state, combat.target(), combat.contributions(),
+                combat.recentImpacts(64), combat.completion(), procs.metrics(), combat.acceptedOrdinal(), Math.max(0, combat.acceptedOrdinal() - 64), shots.size()); }
     }
     private final JavaPlugin plugin;
     private final OwnedBowService bows;
@@ -62,7 +62,8 @@ public final class ManagedCombatService implements AutoCloseable {
     private final Consumer<SettledHit> receiver = this::receive;
     private final EnchantEffects effects = EnchantEffects.calibration();
     private BukkitTask task;
-    private boolean closed;
+    private boolean closed, notifying;
+    private final ArrayDeque<String> diagnostics = new ArrayDeque<>();
     public ManagedCombatService(JavaPlugin plugin, OwnedBowService bows) { this.plugin = plugin; this.bows = bows; }
     public void start() {
         check(); if (task != null) throw new IllegalStateException("Already started");
@@ -72,7 +73,7 @@ public final class ManagedCombatService implements AutoCloseable {
     public Observation observeSettled(Consumer<SettledHit> observer) {
         check(); Objects.requireNonNull(observer);
         if (observers.size() >= 8) throw new IllegalStateException("Observer capacity reached");
-        observers.add(observer); return () -> { thread(); observers.remove(observer); };
+        observers.add(observer); return () -> { mutation(); observers.remove(observer); };
     }
     public UUID open(UUID owner, TargetBackend backend, BoundingBox bounds, double hp, double defense,
                      String variant, CombatProfile profile, Optional<DragonCatalog.Selection> selection,
@@ -104,13 +105,13 @@ public final class ManagedCombatService implements AutoCloseable {
     public List<EncounterResult> completions() { thread(); return List.copyOf(completions.values()); }
     public int activeCount() { thread(); return fights.size(); }
     public int taskCount() { thread(); return task == null ? 0 : 1; }
-    public boolean ownsEntity(UUID entity) { thread(); return fights.values().stream().anyMatch(f -> f.backend.entity().getUniqueId().equals(entity)); }
+    public boolean ownsEntity(UUID entity) { thread(); return fights.values().stream().anyMatch(f -> f.entityId.equals(entity)); }
     public void reset(UUID owner) {
         check(); for (Fight f : List.copyOf(fights.values())) if (f.owner.equals(owner)) terminate(f);
     }
     /** Listener order cannot lose the old token: retain and compare exact activated sessions. */
     public void playerEnded(UUID owner) {
-        thread(); last.remove(owner);
+        mutation(); last.remove(owner);
         for (Fight f : List.copyOf(fights.values())) {
             ProcCoordinator.Session old = f.sessions.remove(owner);
             if (old != null) f.procs.clearSession(old);
@@ -118,8 +119,8 @@ public final class ManagedCombatService implements AutoCloseable {
         }
     }
     public void entityEnded(UUID entity) {
-        thread(); for (Fight f : List.copyOf(fights.values()))
-            if (f.backend.entity().getUniqueId().equals(entity) && f.state == State.ACTIVE) terminate(f);
+        mutation(); for (Fight f : List.copyOf(fights.values()))
+            if (f.entityId.equals(entity) && f.state == State.ACTIVE) terminate(f);
     }
     private void reconcile(Fight f) {
         if (f.state != State.ACTIVE) return;
@@ -129,12 +130,21 @@ public final class ManagedCombatService implements AutoCloseable {
                 f.procs.clearSession(old); f.sessions.remove(old.ownerId(), old);
             }
         }
+        prune(f);
         for (Player p : Bukkit.getOnlinePlayers()) if (!p.isDead() && f.contains(p)) {
             bows.currentSession(p.getUniqueId()).ifPresent(token -> {
                 var session = new ProcCoordinator.Session(p.getUniqueId(), token);
                 if (!session.equals(f.sessions.get(p.getUniqueId())) && f.procs.activate(session)) f.sessions.put(p.getUniqueId(), session);
             });
         }
+    }
+    private void prune(Fight f) {
+        var needed = f.procs.pendingParents(); f.shots.keySet().retainAll(needed); f.collisions.keySet().retainAll(needed);
+    }
+    public List<String> diagnostics() { thread(); return List.copyOf(diagnostics); }
+    private void diagnostic(String message) {
+        diagnostics.addLast(message); while (diagnostics.size() > 32) diagnostics.removeFirst();
+        plugin.getLogger().warning(message);
     }
     private void receive(SettledHit hit) {
         if (closed) return;
@@ -148,14 +158,20 @@ public final class ManagedCombatService implements AutoCloseable {
                 var impact = new PhysicalImpact(hit.impact().key(), hit.impact().ownerId(), now, hit.impact().position(), hit.impact().targetPart());
                 var result = f.procs.physical(shot, impact, effects.modifiers(shot, impact.position(), f.backend.airborne()),
                         new ProcCoordinator.Session(shot.ownerId(), hit.projectile().sessionToken()), rejection(hit));
-                if (result.damage().accepted()) {
+                if (!result.children().isEmpty()) {
                     f.shots.put(result.damage().impactId(), shot); f.collisions.put(result.damage().impactId(), hit.collisionTick());
                 }
                 explain(f, result.damage(), shot, hit.collisionTick(), result.admission());
-                synchronize(f);
+                prune(f); synchronize(f);
             } catch (RuntimeException failure) { failed(f, failure); }
         }
-        for (var observer : List.copyOf(observers)) observer.accept(hit);
+        notifying = true;
+        try {
+            for (var observer : List.copyOf(observers)) {
+                try { observer.accept(hit); }
+                catch (RuntimeException failure) { diagnostic("Settled-hit observer failed: " + failure); }
+            }
+        } finally { notifying = false; }
     }
     private Optional<DamageResult.RejectionReason> rejection(SettledHit hit) {
         return hit.rejection().map(reason -> switch (reason) {
@@ -177,6 +193,7 @@ public final class ManagedCombatService implements AutoCloseable {
                 var drain = f.procs.tickOutcomes(now);
                 for (var result : drain.results()) explain(f, result, f.shots.get(result.parentImpactId().orElse(result.impactId())),
                         f.collisions.getOrDefault(result.parentImpactId().orElse(result.impactId()), result.tick()), ProcCoordinator.Admission.NO_CHILDREN);
+                prune(f);
                 // Both parent and drain already mutated the domain. Never apply their damage again.
                 synchronize(f);
                 if (!drain.failures().isEmpty()) {
@@ -224,11 +241,18 @@ public final class ManagedCombatService implements AutoCloseable {
     private void terminate(Fight f) {
         if (!fights.containsKey(f.id)) return;
         if (f.state == State.ACTIVE) f.state = State.TERMINATED;
-        f.procs.close(); f.sessions.clear(); bows.endEncounter(f.id); f.backend.close(); release(f);
+        // Every resource is attempted even when an extension backend fails.
+        try { f.procs.close(); } catch (RuntimeException failure) { diagnostic("Proc cleanup failed: " + failure); }
+        f.sessions.clear(); f.shots.clear(); f.collisions.clear();
+        try { bows.endEncounter(f.id); } catch (RuntimeException failure) { diagnostic("Bow cleanup failed: " + failure); }
+        try { f.backend.close(); } catch (RuntimeException failure) { diagnostic("Backend cleanup failed: " + failure); }
+        finally { release(f); }
     }
     private void release(Fight f) {
-        putBounded(history, f.id, f.view(), 32); fights.remove(f.id);
         f.shots.clear(); f.collisions.clear();
+        try { putBounded(history, f.id, f.view(), 32); }
+        catch (RuntimeException failure) { diagnostic("History projection failed: " + failure); }
+        finally { fights.remove(f.id); }
     }
     private static <K,V> void putBounded(LinkedHashMap<K,V> map, K key, V value, int capacity) {
         map.remove(key); map.put(key, value); while (map.size() > capacity) map.remove(map.keySet().iterator().next());
@@ -237,11 +261,17 @@ public final class ManagedCombatService implements AutoCloseable {
         Player p = Bukkit.getPlayer(owner); if (p != null && p.isOnline()) p.sendMessage(Component.text(message));
     }
     public void close() {
-        thread(); if (closed) return;
+        mutation(); if (closed) return;
         closed = true; if (task != null) task.cancel(); task = null;
-        for (Fight f : List.copyOf(fights.values())) terminate(f);
-        bows.clearReceiver(receiver); observers.clear(); history.clear(); last.clear(); completions.clear();
+        try {
+            for (Fight f : List.copyOf(fights.values())) {
+                try { terminate(f); } catch (RuntimeException failure) { diagnostic("Fight cleanup failed: " + failure); }
+            }
+        } finally {
+            bows.clearReceiver(receiver); observers.clear(); history.clear(); last.clear(); completions.clear(); fights.clear();
+        }
     }
     private static void thread() { if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Managed combat requires server thread"); }
-    private void check() { thread(); if (closed) throw new IllegalStateException("Managed combat closed"); }
+    private void mutation() { thread(); if (notifying) throw new IllegalStateException("Settled-hit observers are read-only"); }
+    private void check() { mutation(); if (closed) throw new IllegalStateException("Managed combat closed"); }
 }

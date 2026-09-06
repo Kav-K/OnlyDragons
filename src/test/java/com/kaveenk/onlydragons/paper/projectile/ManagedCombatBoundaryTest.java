@@ -104,4 +104,46 @@ class ManagedCombatBoundaryTest {
         plugin.combat().close(); plugin.combat().close();
         assertFalse(cow.isValid()); assertEquals(0,bows.capacityUsed()); assertEquals(0,plugin.combat().taskCount()); assertEquals(0,plugin.combat().activeCount());
     }
+    @Test void throwingAndMutatingObserversCannotInterruptTwoSettledClaims() {
+        open(1000,1);
+        plugin.combat().observeSettled(hit -> { throw new IllegalArgumentException("observer fixture"); });
+        plugin.combat().observeSettled(hit -> plugin.combat().reset(a.getUniqueId()));
+        int[] observed={0}; plugin.combat().observeSettled(hit -> observed[0]++);
+        impact(shoot(a,"ordinary")); impact(shoot(b,"ordinary")); server.getScheduler().performOneTick();
+        assertEquals(2,observed[0]); assertEquals(2,plugin.combat().view(id).orElseThrow().acceptedImpacts());
+        assertEquals(800,plugin.combat().view(id).orElseThrow().target().currentHealth());
+        assertEquals(0,bows.capacityUsed()); assertEquals(4,plugin.combat().diagnostics().size());
+        assertTrue(plugin.combat().owned(a.getUniqueId()).isPresent());
+    }
+    @Test void retainedViewsAreBoundedAndProcProvenanceIsReleasedAfterDrain() {
+        open(1_000_000,0);
+        for(int i=0;i<70;i++){ impact(shoot(a,"ordinary")); server.getScheduler().performOneTick(); }
+        var live=plugin.combat().view(id).orElseThrow();
+        assertEquals(70,live.acceptedImpacts()); assertEquals(64,live.impacts().size()); assertEquals(6,live.omittedImpacts());
+        assertEquals(7000,live.contributions().get(a.getUniqueId()).contributionDamage()); assertEquals(0,live.retainedParents());
+        impact(shoot(a,"ferocity_100"));server.getScheduler().performOneTick();
+        assertEquals(1,plugin.combat().view(id).orElseThrow().retainedParents());
+        server.getScheduler().performTicks(2);assertEquals(0,plugin.combat().view(id).orElseThrow().retainedParents());
+        plugin.combat().reset(a.getUniqueId());var frozen=plugin.combat().view(id).orElseThrow();
+        assertEquals(64,frozen.impacts().size());assertEquals(72,frozen.acceptedImpacts());assertEquals(8,frozen.omittedImpacts());
+    }
+    @Test void failingBackendCleanupStillClosesOtherFightsAndDetachesReceiver() {
+        open(1000,1);
+        var w=b.getWorld();b.teleport(new Location(w,2500,100,0));
+        Cow broken=w.spawn(b.getLocation(),Cow.class);
+        var backend=new TargetBackend(){
+            public LivingEntity entity(){return broken;}public boolean airborne(){return false;}
+            public void synchronize(TargetState t){}public void defeated(EncounterResult r){}
+            public boolean released(){return !broken.isValid();}
+            public void close(){broken.remove();throw new IllegalStateException("cleanup fixture");}
+        };
+        plugin.combat().open(b.getUniqueId(),backend,new BoundingBox(2400,0,-100,2600,200,100),1000,0,"dummy",CombatProfile.calibration(),Optional.empty(),()->0);
+        plugin.combat().close();
+        assertFalse(cow.isValid());assertFalse(broken.isValid());assertEquals(0,plugin.combat().activeCount());
+        assertEquals(0,plugin.combat().taskCount());assertEquals(0,bows.capacityUsed());
+        assertDoesNotThrow(()->bows.receiver(hit->{}));
+        assertTrue(plugin.combat().diagnostics().stream().anyMatch(d->d.contains("cleanup fixture")));
+        plugin.onDisable();assertEquals(0,bows.taskCount());assertEquals(0,plugin.equipment().sessionCount());
+    }
+
 }

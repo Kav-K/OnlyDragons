@@ -1190,7 +1190,11 @@
       "owned_tasks_cancelled",
       "owned_chunk_tickets_removed",
       "owned_listeners_removed",
-      "owned_resources_released"
+      "owned_resources_released",
+      "same_tick_lethal_two_owner_order",
+      "lethal_overkill_and_ghost_totals",
+      "frozen_participant_commit_stamps",
+      "one_completion_per_generation"
     ],
     "requiredActorMessages": [
       {
