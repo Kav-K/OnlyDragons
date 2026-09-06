@@ -31,7 +31,7 @@ def validate(scenario, player):
             require(str(uuid.UUID(identity)) == identity, 'Invalid received bar UUID')
             action = event['action']
             if action == 'ADD':
-                require(identity not in active and len(active)<8, 'Duplicate bar add')
+                require(identity not in active and not active, 'Duplicate bar add')
             else:
                 require(identity in active, 'Unknown bar update/remove')
             if action == 'REMOVE':
@@ -83,6 +83,22 @@ def validate(scenario, player):
         else:
             require(bar['id'] not in identities.values(),'Bar reused across generations')
             identities[generation]=bar['id']
+    # Reject transient extra bars or incorrect HP/title updates between sampled states.
+    for key,session in sessions.items():
+        allowed={}
+        for check in expected:
+            if (check['actor'],check['session'])==key and check['generation']:
+                identity=identities[check['generation']]
+                allowed.setdefault(identity,[]).append(check)
+                if restart and scenario['scenarioId']=='dragon-restart-animation' and scenario['observations']['restart']['index']==1:
+                    allowed[identity].append(dict(percent=0,title='Test Dragon (Calibration)  |  0 / 1,000 HP  (0%)'))
+        for event in session['bossBars']['events']:
+            require(event['id'] in allowed,'Unrequested transient boss bar')
+            if 'state' in event:
+                state=event['state']
+                # Name and health travel in separate packets; intermediate combinations are valid.
+                require(any(abs(state['percent']-c['percent'])<1e-6 for c in allowed[event['id']]),'Unobserved HP between UI samples')
+                require(any(state['title']==c['title'] for c in allowed[event['id']]),'Unobserved title between UI samples')
     # The strings themselves remain independently required by the scenario catalog.
     for key,session in sessions.items():
         styled=session.get('styledMessages')

@@ -41,7 +41,7 @@ class BossBarReplayTests(unittest.TestCase):
         self.assertEqual({'id':'s1'},_ui_session_fields({'id':'s1'},{'planId':'primitives-v1'}))
     def test_complete_packet_history_and_lifecycle(self):ui.validate(*self.fixture())
     def test_missing_oracle_duplicate_identity_stale_samples_and_wrong_hp_fail(self):
-        for mutation in ('missing','duplicate','hp','snapshot','color','style','identity'):
+        for mutation in ('missing','duplicate','hp','snapshot','color','style','identity','transient'):
             with self.subTest(mutation=mutation):
                 scenario,player=self.fixture();session=player['actors'][0]['sessions'][0]
                 if mutation=='missing':scenario['observations']['bossBarChecks'].pop()
@@ -50,5 +50,7 @@ class BossBarReplayTests(unittest.TestCase):
                 elif mutation=='snapshot':session['bossBars']['samples'][0]['bars']=[]
                 elif mutation=='color':session['bossBars']['events'][0]['state']['music']=True
                 elif mutation=='style':session['styledMessages'][0]['json']='{"text":"Your stats"}'
+                elif mutation=='transient':
+                    event=copy.deepcopy(session['bossBars']['events'][0]);identity=str(uuid.uuid4());event['id']=identity;event['state']['id']=identity;session['bossBars']['events'].append(event)
                 else:scenario['observations']['bossBarChecks'][0]['generation']='wrong'
                 with self.assertRaises((ActionValidationError,ValueError)):ui.validate(scenario,player)
