@@ -1,6 +1,6 @@
 # T08e motion and Tracer — GH-65
 
-In progress; no final acceptance or milestone claim. Branch `symphony/gh-65`
+In review in [PR #75](https://github.com/Kav-K/OnlyDragons/pull/75); no final acceptance or milestone claim. Branch `symphony/gh-65`
 includes main `7a380408e02fe59d1820163bd7cfa68169e85e4b`. Production/profile ownership
 is described in document02; owner comments5561944060/5561951211 declare calibration.
 
@@ -55,10 +55,66 @@ allows stopping/rotation margin. Safety remains checked against actual geometry.
   both mandatory full-suite areas and retaining restart-specific assertions in
   the mandatory first-phase declaration. No phase assertion was removed.
 
-## Outstanding gates
+## Clean focused candidate
 
-Moving native-positive and owned collision/suppression; returning real volleys and
-honest no-enchant/blocked/range controls; original pre-spawn UUID acquisition;
-terminal/death/disable ownership; received motion; current-main clean runtime build,
-complete suite receipt/replay and task checkpoint. Human full-client smoothness,
-aiming/feel and authenticated compatibility remain separate and unrun.
+Runtime revision `eab1c015b4ccbbd459e72721afa79782405a6512`, worktree clean in every
+result, integrated main `7a38040`. Commands use `paper_test.py` with the registered
+player mode and explicit scenario bound (180s for moving/Tracers/restart,150s flight).
+Production SHA256 `25de23ef2d8945d15fb445a60accb99c05302e515695393b2a63725ad5ad3bad`;
+companion `677dbf3d9ce86447fd6b4194e9dea114e320c89417caefd4eaa4b61d5cbf5e60`;
+client `e746d90284ab1f5b5dbe43beed034621916706239d0907d2416e1c2e74e0f971`.
+Each wrapper build:238 production/6 companion tests; player builds31 tests, all
+zero failures/errors/skips. Python274 and checkpoint plan pass.
+[Windows/Linux CI](https://github.com/Kav-K/OnlyDragons/actions/runs/34060942946) passes;
+its Paper integration job is skipped and supplies no full-cohort evidence.
+
+| Run | Focused result |
+| --- | --- |
+| `74f697f2ea2c4d6f9d65e0e7a04a7cf8` | moving-Tracer25/25 assertions plus required bound-UUID motion receipt |
+| `7a2ef51089dc41c1a913632663bf1468` | flight18/18 including cancellation, redirected yaw and lost AI |
+| `5bdc2712366e4328828516f3a7694858` | moving restart then registered as fresh:18/13 phase assertions |
+| `382d243682de47a7bbb698dc8372df45` | preserved-v1 Tracer58/58 including captured trace revision |
+| `217783b824924f0a819c6a3c54c62a76` | intended abort only: exit1 with `scenario_exception`; all ticket/task cleanup controls pass |
+
+Every owned server/client exited0 unforced with clean cleanup, including both
+restart boots and the expected-negative server. Raw files are under
+`build/reports/agent-paper/<runId>` in GH-65; no worlds/logs are committed.
+
+Native player use/release packets produced the returning primary/Duplex collisions:
+exact880 domainHP,176 nativeHP and120 contribution. Independent public Paper velocity
+observations matched applied steering toward current native parts. A native-positive
+control used a public-API spawned arrow, distinct from protocol release: actual
+native damage2 lowered its moving unregistered dragon to198HP. Owned native-damage
+sentinels observed positive initial damage, cancelled/zero final damage, alongside
+production accounting. These are separate event and service assertions.
+
+The grace collision occurred at original launch age1 and900HP. Managed lethal froze
+1000 HP/credit, stopped controller steps, retained parent tickets through native death
+and then released all parent/projectile reservations with no loot/XP. Native death
+animation remains native behavior; stopped route state does not suppress animation.
+Received bound-dragon motion measured87 updates, path50.98423472, maximum received
+step0.60461149. This aggregates server ticks and is not rendered-client smoothness.
+Clean flight radii16/24/48 reproduced the preceding measured routes across4 chunks.
+
+## Integration handoff and remaining gates
+
+The lead requested an explicit `dragon-restart-moving` variant after reviewing
+the shared restart class. The previous fresh catalog pointed to the moving plans;
+its passing result above remains historical. The descendant restores the original
+stationary fresh catalog and adds a separate motion constructor flag/registration.
+The moving first boot now also exercises the human default `spawn` command.
+Focused verification of both final variants is pending.
+
+[Owner comment5562281395](https://github.com/Kav-K/OnlyDragons/issues/65#issuecomment-5562281395)
+assigns the combined #64/#65/current-main cohort after #66 to the lead. The worker
+must not duplicate that full suite. Complete suite receipt/replay, both task
+checkpoints, combined-main/current-CI and independent integration review remain
+pending there. Human full-client smoothness, aiming/return visibility, Windows
+Play smoke and authenticated compatibility remain separate and unrun.
+
+API ownership: `DragonBackend` owns route/phase/footprint-ticket lifetime; immutable
+`DevelopmentDragonService.motion()` is diagnostic only. `OwnedProjectile` captures
+trusted profile/original launch origin; T07 owns all projectile ticking/retirement.
+`EntityMotionObservation` + `entity_motion.py` add only optional session motion and
+required bound-UUID matchers. Preserve #64's separate UI fields/helpers when merging.
+No countdown/prepare API is added: T10 still owns managed admission/hatch continuity.

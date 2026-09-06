@@ -540,7 +540,7 @@ unchanged. The named development drawn bow supplies Tracer V and Duplex V, damag
 zero extra crit/ferocity and T01's total crit damage50. Old nine definitions and
 `tracer-continuity/v1` remain unchanged. There is no editable profile PDC field.
 
-These are in-progress candidate contracts. [Evidence and gates](evidence/t08e-motion-tracer.md)
+These are review candidates in [PR #75](https://github.com/Kav-K/OnlyDragons/pull/75), with clean focused Paper evidence. [Evidence and gates](evidence/t08e-motion-tracer.md)
 separate server geometry, collisions, received motion and human feel. Targetless
 T07 admission/late attachment remains a scoped pre-spawn control; T10 owns future
 managed prepare/attach and countdown/hatch. No M3, attack, type or reward expansion.

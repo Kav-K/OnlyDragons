@@ -22,6 +22,7 @@ public final class GameTestsPlugin extends JavaPlugin {
             Map.entry("dragon-restart-animation", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false, true)),
             Map.entry("dragon-ranking", new com.kaveenk.onlydragons.gametests.encounter.DragonRankingScenario()),
             Map.entry("dragon-combat", new com.kaveenk.onlydragons.gametests.encounter.DragonCombatScenario()),
+            Map.entry("dragon-restart-moving", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false, false, true)),
             Map.entry("dragon-restart-fresh", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false)),
             Map.entry("dragon-restart-legacy", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(true)),
             Map.entry("practice-lifecycle", new com.kaveenk.onlydragons.gametests.combat.PracticeLifecycleScenario()),

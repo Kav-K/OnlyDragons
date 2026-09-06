@@ -48,7 +48,7 @@
               "id": "spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn orbit"
+                "command": "onlydragons dev dragon spawn"
               }
             },
             {

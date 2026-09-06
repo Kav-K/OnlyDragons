@@ -558,17 +558,22 @@ planned and undispatched until that checkpoint and lead assignment.
 
 ### T08e — Bounded flight and returning Tracer (GH-65)
 
-**In progress** on `symphony/gh-65`, integrated main `7a38040`. The candidate backend
-route/immutable motion view and separate trusted returning profile are implemented;
-old calibration definitions and stationary fixture mode are retained. Initial
-production build passed236 tests; later route build and actual non-origin
-radii16/24/48 geometry/reset/cancellation checks passed as dirty iteration evidence.
-[Exact artifacts, measured values, failed iterations and remaining gates](evidence/t08e-motion-tracer.md).
-Both acceptance requirements remain pending: native-positive/owned moving collision,
-returning/pre-spawn controls, received entity motion, lifecycle and complete clean
-source-bound suite/checkpoint still need final proof. Human smoothness/feel and
-authenticated-client compatibility remain separate. T08d consumes only read-only
-views; T06b/T10 consume this backend/profile after lead integration.
+**In review:** [PR #75](https://github.com/Kav-K/OnlyDragons/pull/75), based on main
+`7a38040`. Runtime candidate `eab1c01` passed clean pinned-Paper moving Tracer25,
+bounded flight18 and preserved-v1 Tracer58 assertions, moving restart18/13 phase
+assertions, and the intended abort cleanup control. Builds passed238 production,
+6 companion and31 client tests; Python274 and Windows/Linux CI passed.
+[Exact artifacts, failed iterations and focused evidence](evidence/t08e-motion-tracer.md).
+The follow-up fixture split gives moving restart its own registration/flag and
+preserves the original stationary fresh case; its focused verification is pending.
+
+Per the [lead's integration assignment](https://github.com/Kav-K/OnlyDragons/issues/65#issuecomment-5562281395),
+the lead combines #64/#65 histories after #66 and owns the complete combined-main
+cohort, strict receipt replay, both task checkpoints and final CI/independent review.
+No duplicate full cohort or milestone acceptance is claimed by this worker.
+Human full-client smoothness, aiming/return visibility and authenticated clients
+remain unrun. T08d consumes immutable views; T06b/T10 consume this backend/profile
+only after lead integration. The trusted new preset preserves the old nine/v1.
 
 ### T08c — Personal placement-based loot simulation
 
