@@ -101,6 +101,25 @@ This instruction does not authorize implementing unassigned work packages.
 
 ### Context change record
 
+T04 reconciliation blocker (2026-09-05, PR #31): fetched main `8f5069c`,
+but the ordinary merge from `80fc9e0` failed because the worker sandbox mounts
+`.agents` read-only: Git could not unlink
+`.agents/skills/paper-runtime-validation/SKILL.md`. No merge was committed.
+Removed only byte-verified unchanged main files left untracked by the failed
+merge; existing committed implementation and earlier evidence are preserved.
+The newly materialized main `doctor.py` ran inside this sandbox before cleanup:
+JSON `state=ready`, exit 0, 16 readable fixture/context files, JDK 25.0.4.1,
+existing EULA readable, shared lease writable/available, memory requirement
+2816 MiB versus guest available 7040 MiB and effective host 4892 MiB.
+This checks access only in the partial checkout, not integrated source or runtime
+acceptance. No new build, suite, checkpoint acceptance or latest-head CI pass
+is claimed. The lead must provision a workspace where an ordinary main merge
+can update tracked skills, then redispatch #5 to reconcile catalog-driven actor
+admission, additive suite/acceptance coverage and #8 shared edits, run the clean
+committed suite and T04 checkpoint, and review PR #31. T04 remains In review;
+#9 stays blocked and M0 unaccepted. Natural-End-cycle/all-phase automation and
+production adapter acceptance remain pending, alongside separate human gates.
+
 Keep one concise row per meaningful decision or delivery update. The tables and
 design sections above are the current summary; this record explains changes.
 
