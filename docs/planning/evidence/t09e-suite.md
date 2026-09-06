@@ -50,7 +50,7 @@ Windows checkpoint/selection checks passed 51/14 tests.
 Independent raw review verified artifact/report/JUnit identities, exact negative
 causes, actor provenance and cleanup. All owned Paper processes exited 0 and all
 owned processes were reaped without forced termination; observed ports were
-closed. No corrected `ERROR`/`SEVERE` matches remained in the server logs.
+closed. No `ERROR`/`SEVERE` entries were found in the server logs.
 This is retained run/replay evidence, not a new server run during documentation.
 
 | Case | Declared outcome | Assertion rows |
