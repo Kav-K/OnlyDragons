@@ -474,6 +474,11 @@ The rehearsal is complete only when UUID traces demonstrate that pre-spawn arrow
 
 ## 11. Later encounter and progression boundaries
 
+The [6 September encounter expansion proposal](05-encounter-expansion.md) scopes
+development spawn controls, result presentation, type/loot definitions and eye
+placement. It records unresolved product choices separately; its proposed work
+packages do not choose a roster/economy or waive the M3 ritual prerequisite.
+
 Model the later altar as `IDLE → CHARGING → HATCHING → ACTIVE → DEFEATED → RESETTING`, plus an explicit failure/abort path. Eight distinct slots hold eye-placement records with player UUID and transaction ID. Validate tagged eyes, inventory quantity, arena state, and offhand duplication on the server thread. The eighth accepted placement transitions state exactly once.
 
 Reserve/consume eyes through a transaction ledger, with an idempotent refund rule for a failed summon. Define removal permissions and refunds before charge; once locked, a second click cannot remove or duplicate an eye. When progression is implemented, journal eye consumption and reward grants durably before calling them complete.
