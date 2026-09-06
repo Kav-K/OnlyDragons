@@ -82,11 +82,22 @@ public final class TempoGhostScenario implements Scenario, Listener {
                                 &&settled.getLast().projectile().shot().stats().effective(StatKey.FEROCITY)==200
                                 &&settled.getLast().projectile().shot().enchantments().stream().anyMatch(e->e.id().equals("fatal_tempo")&&e.level()==5)
                                 &&view().impacts().subList(6,9).stream().allMatch(r->r.amounts().actualHealthDamage()==100&&r.effectiveFerocity()==200));
+                        long lastFtTick=view().impacts().subList(6,9).stream().mapToLong(DamageResult::tick).max().orElseThrow();
                         trial("buffed",12,420,720,500,()->{
                             c.check("duplex_global_tempo_without_refresh",true,view().target().currentHealth()==98920&&credit()==1380);
-                            c.later(65,()->{
-                                c.check("duplex_children_did_not_keep_tempo_alive",0,view().procs().tempoStates());
-                                trial("expired",6,360,360,200,this::lethal);
+                            long originalExpiry=lastFtTick+60;
+                            long duplexTick=view().impacts().getLast().tick();
+                            long now=Integer.toUnsignedLong(Bukkit.getCurrentTick());
+                            c.check("original_ft_expiry_window",true,duplexTick>lastFtTick&&now<originalExpiry-1);
+                            c.observe("expiryTicks",Map.of("lastEligibleFt",lastFtTick,"lastIneligibleDuplex",duplexTick,"originalExpiry",originalExpiry));
+                            if(now>=originalExpiry-1)throw new IllegalStateException("Missed original FT expiry observation window");
+                            c.later(originalExpiry-1-now,()->{
+                                c.check("tempo_present_before_original_expiry",1,view().procs().tempoStates());
+                                c.later(1,()->{
+                                    c.check("original_ft_expiry_tick",originalExpiry,Integer.toUnsignedLong(Bukkit.getCurrentTick()));
+                                    c.check("duplex_children_did_not_keep_tempo_alive",0,view().procs().tempoStates());
+                                    trial("expired",6,360,360,200,this::lethal);
+                                });
                             });
                         });
                     });

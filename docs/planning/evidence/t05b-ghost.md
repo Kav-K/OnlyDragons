@@ -82,3 +82,17 @@ shows public `setHealth(double)` narrows to float. The fixture now keeps exact
 domain accounting checks and separately asserts the exact float-rounded native
 projection, recording both observed and expected values. No production code,
 domain oracle or existing fixture assertion was weakened by this correction.
+
+## Clean focused projection check
+
+`62400730575c4f9689c15f4d6395be9b` on clean `4c31774` passed all 28 assertions
+and required received messages, with both JVMs exiting 0 unforced and all resource
+counters zero. Domain trial totals matched the table. Native health matched exact
+float projections. This verifies the precision correction, but the lead correctly
+identified that a 65-tick post-Duplex wait could miss an illicit refresh.
+
+The final fixture now records the last accepted eligible FT tick and checks live
+state at its +59 boundary and expired state exactly at +60, before the later
+Duplex/child tick +60. It retains the independent post-expiry physical counts and
+totals. The complete final-input suite must verify this strengthened oracle;
+the earlier focused pass alone does not accept P09.

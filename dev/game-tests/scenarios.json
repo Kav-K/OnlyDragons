@@ -2151,7 +2151,10 @@
       "owned_chunk_tickets_removed",
       "p08_native_health_projection",
       "buffed_native_health_projection",
-      "expired_native_health_projection"
+      "expired_native_health_projection",
+      "original_ft_expiry_window",
+      "tempo_present_before_original_expiry",
+      "original_ft_expiry_tick"
     ],
     "testPlayerMode": "protocol-actions-v1",
     "playerActionPlan": "dev/game-tests/player-plans/tempo-ghost-v2.json",

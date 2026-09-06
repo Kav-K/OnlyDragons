@@ -178,6 +178,7 @@
   },
   "suites": {
     "regression": [
+      "tempo-ghost",
       "lifecycle-calibration",
       "foundation-contracts",
       "stats-resolution",
@@ -201,8 +202,7 @@
       "dragon-restart-fresh",
       "dragon-restart-legacy",
       "dragon-restart-animation",
-      "dragon-ranking",
-      "tempo-ghost"
+      "dragon-ranking"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -216,6 +216,7 @@
       "tracer-cleanup-abort"
     ],
     "all": [
+      "tempo-ghost",
       "lifecycle-calibration",
       "foundation-contracts",
       "stats-resolution",
@@ -248,8 +249,7 @@
       "dragon-restart-fresh",
       "dragon-restart-legacy",
       "dragon-restart-animation",
-      "dragon-ranking",
-      "tempo-ghost"
+      "dragon-ranking"
     ]
   },
   "areas": {
