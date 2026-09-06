@@ -134,6 +134,9 @@ def validate_plan(project, snapshot=None, now_ms=None):
         require(cases <= set(suites['cases']), 'Unknown fixture suite case: ' + key)
         require(all(isinstance(suites['cases'][case], dict) and suites['cases'][case].get('scenarioId') == key
                     for case in cases), 'Fixture/suite scenario binding drift: ' + key)
+        positives = {case for case, definition in suites['cases'].items()
+                     if definition.get('scenarioId') == key and definition.get('expectation') == 'positive'}
+        require(positives <= cases, 'Positive fixture coverage cannot be replaced by negative controls: ' + key)
         require(isinstance(fixture.get('scope'), str) and fixture['scope'], 'Fixture scope is missing: ' + key)
     referenced_fixtures = set()
     for key, requirement in requirements.items():
@@ -323,7 +326,7 @@ def validate_acceptance(project, receipt_path, base, task_ids=(), suite_module=N
     receipt = suite.validate_suite_receipt(project, receipt_path)
     require(receipt['source']['sourceInputSha256'] == current['sourceInputSha256'], 'Stale suite source input hash')
     revision = validate_no_weakening(project, base, validated)
-    changed = subprocess.check_output(['git', 'diff', '--name-only', '-z', revision, 'HEAD', '--'], cwd=project).decode().split('\0')
+    changed = subprocess.check_output(['git', 'diff', '--no-renames', '--name-only', '-z', revision, 'HEAD', '--'], cwd=project).decode().split('\0')
     changed = [path for path in changed if path]
     required_cases = set(suite.required_cases(project, changed))
     selected_tasks = names(list(task_ids), 'requested tasks')

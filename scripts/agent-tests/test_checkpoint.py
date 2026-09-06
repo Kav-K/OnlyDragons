@@ -5,6 +5,7 @@ import io
 import json
 from pathlib import Path
 import tempfile
+import subprocess
 import unittest
 from unittest.mock import patch
 
@@ -160,6 +161,11 @@ class CheckpointTests(unittest.TestCase):
         self.change(PLAN, lambda value: value['fixtures']['stats-resolution'].update(caseIds=['item-identity']))
         self.reject_plan('Fixture/suite scenario binding drift')
 
+    def test_negative_controls_cannot_replace_positive_case_for_same_scenario(self):
+        self.change(SUITES, lambda value: value['cases']['protocol-player-calibration'].update(expectation='positive'))
+        self.change(PLAN, lambda value: value['fixtures']['protocol-player-calibration'].update(caseIds=['protocol-player-idle']))
+        self.reject_plan('Positive fixture coverage cannot be replaced')
+
     def test_receipt_replayed_and_changed_paths_derived_locally(self):
         result = self.acceptance()
         self.assertTrue(result['automatedReady'])
@@ -174,6 +180,28 @@ class CheckpointTests(unittest.TestCase):
         self.suite.receipt['source']['sourceInputSha256'] = 'd' * 64
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'Stale suite source'):
             self.acceptance()
+
+    def test_renamed_file_selects_both_removed_and_added_areas(self):
+        def git(*arguments):
+            return subprocess.check_output(['git', *arguments], cwd=self.project, stderr=subprocess.DEVNULL)
+        git('init', '-q')
+        git('config', 'user.name', 'Checkpoint test')
+        git('config', 'user.email', 'checkpoint@example.invalid')
+        git('config', 'core.autocrlf', 'false')
+        original = self.project / 'src/old-area/Feature.java'
+        original.parent.mkdir(parents=True)
+        original.write_text('class Feature {}\n')
+        git('add', '.')
+        git('commit', '-qm', 'Initial inputs')
+        base = git('rev-parse', 'HEAD').decode().strip()
+        destination = self.project / 'src/new-area/Feature.java'
+        destination.parent.mkdir(parents=True)
+        original.rename(destination)
+        git('add', '.')
+        git('commit', '-qm', 'Move feature across areas')
+        with patch.object(checkpoint, 'validate_no_weakening', return_value=base):
+            result = checkpoint.validate_acceptance(self.project, 'build/receipt.json', base, suite_module=self.suite)
+        self.assertEqual({'src/old-area/Feature.java', 'src/new-area/Feature.java'}, set(result['changedPaths']))
 
     def test_receipt_omitting_changed_area_case_rejected(self):
         self.suite.receipt['cases'] = [{'caseId': 'item-identity'}]
