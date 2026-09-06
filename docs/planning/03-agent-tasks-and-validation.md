@@ -525,7 +525,10 @@ subscription on every production spawn. Pure tests cover precision, all input
 permutations, signed zeros, actual rejected/replayed/rounded/late commits,
 proc/overkill HP separation, >10 formatting and generation/delivery failures.
 The two-actor fixture covers real owned-arrow ties/overkill, reconnect, a later
-proc-only lethal, stale/replayed delivery and cancelled/admin/reset exclusions.
+proc-only lethal, generation isolation and cancelled/admin/reset exclusions.
+Direct replay/reentry tests stay in the presenter package; consumers cannot reset
+the live presenter deduplication. The late protocol step proves a post-death bow
+release leaves the board unchanged; it does not claim a witnessed late collision.
 Focused clean-source Paper evidence is pending; the lead's dispatch assigns the
 complete hosted cohort, independent replay/review and current CI to the lead.
 No prior fixture/gate is removed and T08c remains the next dependent task.

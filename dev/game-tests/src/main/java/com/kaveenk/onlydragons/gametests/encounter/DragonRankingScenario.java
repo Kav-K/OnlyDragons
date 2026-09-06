@@ -55,31 +55,28 @@ public final class DragonRankingScenario implements Scenario, Listener {
         });
     }
     void firstComplete(){
-        players.await("ordinary frozen board",80,()->dragons.leaderboard().ranking().isPresent(),()->{
-            firstRanking=dragons.leaderboard().ranking().orElseThrow();var result=view().completion().orElseThrow();
+        players.await("ordinary frozen board",80,()->dragons.ranking().isPresent(),()->{
+            firstRanking=dragons.ranking().orElseThrow();var result=view().completion().orElseThrow();
             c.check("same_frozen_result_and_selection",true,firstRanking.result()==result&&result.selection().orElseThrow().equals(dragons.selection().orElseThrow()));
             var rows=firstRanking.placements();
             c.check("tied_credit_unique_acceptance_order",true,rows.size()==2&&rows.get(0).playerId().equals(players.identity("alpha"))&&rows.get(0).place()==1&&rows.get(1).playerId().equals(players.identity("beta"))&&rows.get(1).place()==2&&rows.stream().allMatch(r->r.contribution().contributionDamage()==600));
             c.check("lethal_overkill_hp_separate",true,rows.get(0).contribution().actualHealthDamage()==600&&rows.get(1).contribution().actualHealthDamage()==400&&result.completedOrdinal()==2&&view().target().currentHealth()==0);
-            c.check("real_native_owned_arrow_death",true,deaths==1&&dragon.getHealth()==0&&completions.size()==1&&physicalOwners.values().containsAll(List.of(players.identity("alpha"),players.identity("beta")))&&probe.events().stream().anyMatch(e->e.cancelled()&&e.settledDamage()==0));
-            dragons.leaderboard().accept(completions.getFirst());dragons.leaderboard().accept(completions.getFirst());
-            c.check("replayed_delivery_same_projection",true,dragons.leaderboard().ranking().orElseThrow()==firstRanking&&dragons.subscriberCount()==0);
+            c.check("real_native_owned_arrow_death",true,deaths==1&&dragon.getHealth()==0&&completions.size()==1&&physicalOwners.values().containsAll(List.of(players.identity("alpha"),players.identity("beta")))&&probe.events().stream().anyMatch(e->e.cancelled()&&e.initialDamage()>0&&e.settledDamage()==0&&e.target().equals(dragon.getUniqueId())&&settled.stream().anyMatch(hit->hit.rejection().isEmpty()&&hit.projectile().shot().projectileId().equals(e.directDamager())&&hit.projectile().shot().ownerId().equals(e.player()))));
+            c.check("completion_releases_subscription_and_retains_projection",true,dragons.ranking().orElseThrow()==firstRanking&&dragons.subscriberCount()==0);
             players.setupItem("alpha",0,c.production().equipment().createLoadout("crit"));
             draw("beta","late","ordinary",900,()->{
-                c.check("late_arrow_and_equipment_cannot_reorder",true,dragons.leaderboard().ranking().orElseThrow()==firstRanking&&view().completion().orElseThrow()==result&&view().acceptedImpacts()==2);
+                c.check("post_death_release_and_equipment_cannot_reorder",true,dragons.ranking().orElseThrow()==firstRanking&&view().completion().orElseThrow()==result&&view().acceptedImpacts()==2);
                 c.later(8,()->{dragons.reset(generation);secondFight();});
             },false);
         });
     }
     void secondFight(){
         spawn(()->{
-            dragons.leaderboard().accept(completions.getFirst());
-            c.check("stale_completion_cannot_enter_next_fight",true,dragons.leaderboard().ranking().isEmpty());
+            c.check("next_fight_starts_without_old_board",true,dragons.ranking().isEmpty());
             draw("beta","second","ordinary",0,()->draw("alpha","proc","ferocity_100",500,()->
-                players.await("proc lethal board",100,()->dragons.leaderboard().ranking().isPresent(),()->{
-                    var ranked=dragons.leaderboard().ranking().orElseThrow();var a=ranked.placement(players.identity("alpha")).orElseThrow();var b=ranked.placement(players.identity("beta")).orElseThrow();
+                players.await("proc lethal board",100,()->dragons.ranking().isPresent(),()->{
+                    var ranked=dragons.ranking().orElseThrow();var a=ranked.placement(players.identity("alpha")).orElseThrow();var b=ranked.placement(players.identity("beta")).orElseThrow();
                     c.check("proc_only_lethal_delivers_new_generation",true,completions.size()==2&&ranked.result()==view().completion().orElseThrow()&&a.place()==1&&a.contribution().contributionDamage()==1200&&a.contribution().actualHealthDamage()==900&&b.place()==2&&b.contribution().contributionDamage()==100&&b.contribution().actualHealthDamage()==100&&ranked.result().completedOrdinal()==3&&deaths==2);
-                    dragons.leaderboard().accept(completions.getLast());
                     c.check("prior_frozen_board_unchanged",true,firstRanking.placements().getFirst().contribution().contributionDamage()==600&&firstRanking.placements().getLast().contribution().actualHealthDamage()==400);
                     c.later(8,()->{dragons.reset(generation);diagnosticFight();});
                 })));
@@ -89,14 +86,14 @@ public final class DragonRankingScenario implements Scenario, Listener {
         spawn(()->{
             cancelDeath=true;draw("alpha","cancelled","ordinary",900,()->{
                 cancelDeath=false;
-                c.check("cancelled_native_death_has_no_board",true,view().completion().isPresent()&&dragon.getHealth()>0&&dragons.leaderboard().ranking().isEmpty()&&completions.size()==2&&dragons.subscriberCount()==0);
+                c.check("cancelled_native_death_has_no_board",true,view().completion().isPresent()&&dragon.getHealth()>0&&dragons.ranking().isEmpty()&&completions.size()==2&&dragons.subscriberCount()==0);
                 dragon.setHealth(0); // Administrative follow-up is diagnostic, never an ordinary defeat.
                 c.later(3,()->{
-                    c.check("admin_followup_cannot_announce",true,dragons.leaderboard().ranking().isEmpty()&&completions.size()==2);
+                    c.check("admin_followup_cannot_announce",true,dragons.ranking().isEmpty()&&completions.size()==2);
                     dragons.reset(generation);spawn(()->{
                         dragons.reset(generation);
-                        c.check("abort_reset_has_no_board",true,view().completion().isEmpty()&&dragons.leaderboard().ranking().isEmpty()&&completions.size()==2);
-                        c.check("ranking_resources_released",true,dragons.subscriberCount()==0&&c.production().combat().activeCount()==0&&c.production().bows().continuity().tickets().reservedCount()==0&&dragons.leaderboard().deliveryFailures()==0);
+                        c.check("abort_reset_has_no_board",true,view().completion().isEmpty()&&dragons.ranking().isEmpty()&&completions.size()==2);
+                        c.check("ranking_resources_released",true,dragons.subscriberCount()==0&&c.production().combat().activeCount()==0&&c.production().bows().continuity().tickets().reservedCount()==0&&dragons.leaderboardDeliveryFailures()==0);
                         for(String actor:List.of("alpha","beta"))c.check("no_rewards_"+actor,true,players.player(actor).getTotalExperience()==0&&players.player(actor).getInventory().all(Material.DIAMOND).isEmpty());
                         c.observe("rankingResults",completions.stream().map(event->Map.of("completion",event.result().completionId().toString(),"generation",event.generation().toString(),"participants",event.result().participants().toString())).toList());
                         c.observe("physicalOwners",physicalOwners.toString());c.observe("playerActions",players.journal());
@@ -115,6 +112,8 @@ public final class DragonRankingScenario implements Scenario, Listener {
     }
     void draw(String actor,String step,String loadout,double bonus,Runnable next){draw(actor,step,loadout,bonus,next,true);}
     void draw(String actor,String step,String loadout,double bonus,Runnable next,boolean expectSettled){
+        String other=actor.equals("alpha")?"beta":"alpha";
+        players.setupPosition(other,new Location(players.player(other).getWorld(),20,100,20));
         var p=players.player(actor);var aim=dragon.getParts().stream().max(Comparator.comparingDouble(part->part.getBoundingBox().getVolume())).orElseThrow().getBoundingBox().getCenter();var origin=aim.clone().add(new Vector(0,0,-12));
         players.setupPosition(actor,new Location(p.getWorld(),origin.getX(),origin.getY()-p.getEyeHeight(),origin.getZ(),0,0));p.setVelocity(new Vector());
         players.setupItem(actor,0,c.production().equipment().createLoadout(loadout));players.setupItem(actor,9,new ItemStack(Material.ARROW,64));c.production().equipment().bonus(p,StatKey.WEAPON_DAMAGE,bonus);

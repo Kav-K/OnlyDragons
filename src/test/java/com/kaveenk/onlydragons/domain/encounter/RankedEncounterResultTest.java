@@ -18,9 +18,10 @@ class RankedEncounterResultTest {
     DamageResult hit(CombatEncounter c,ShotContext s,long tick,DamageModifiers modifiers){return fixture.hit(c,s,tick,modifiers);}
     @Test void exactTiesUseLastIncreaseTickThenAcceptedOrdinalNotUuidOrFirstHit() {
         var c=encounter(400);
-        hit(c,a,50,1); hit(c,b,100,2); hit(c,a,50,3);
+        hit(c,a,0,0); hit(c,a,50,1); hit(c,b,100,2); hit(c,a,50,3);
         UUID other=UUID.randomUUID();hit(c,other,200,4);
         var ranked=new RankedEncounterResult(c.completion().orElseThrow());
+        assertEquals(new EncounterResult.CommitStamp(0,1),ranked.placement(a).orElseThrow().contribution().firstParticipation().orElseThrow());
         assertEquals(List.of(other,b,a),ranked.placements().stream().map(RankedEncounterResult.Placement::playerId).toList());
         var same=encounter(200);hit(same,b,100,5);hit(same,a,100,5);
         assertEquals(b,new RankedEncounterResult(same.completion().orElseThrow()).placements().getFirst().playerId());

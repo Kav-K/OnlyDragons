@@ -518,7 +518,8 @@ Names and two-decimal display never enter ordering; no imported-data fallback ex
 Every successful `DevelopmentDragonService.spawn()` starts and subscribes its
 `DragonLeaderboardPresenter` through the existing read-only completion API.
 Only the matching generation's confirmed ANIMATING completion is admitted.
-The completion ID is checked before delivery; a different second completion for
+Presenter mutation remains package-private to its service; consumers receive only
+immutable ranking/failure diagnostics. The completion ID is checked before delivery; a different second completion for
 that generation rejects. Recipient failures are isolated and never retry the
 public announcement. Reset/retirement/disable invalidate delivery and release the
 existing subscriptions; at most one frozen board is retained until the next spawn.

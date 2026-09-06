@@ -25,6 +25,8 @@ class DragonLeaderboardPresenterTest {
         assertEquals(Set.of(a,b),received.keySet());assertSame(event.result(),p.ranking().orElseThrow().result());
         assertTrue(received.get(a).getLast().contains("#1 - 200.00"));assertTrue(received.get(b).getLast().contains("#2 - 100.00"));
         assertEquals(0,p.deliveryFailures());assertTrue(received.get(a).get(1).contains("before"));
+        assertThrows(IllegalArgumentException.class,()->p.accept(completion(generation,"ANIMATING")));
+        assertEquals(2,received.size());
     }
     @Test void diagnosticRetiredAndStaleGenerationsNeverAnnounce(){
         var received=new ArrayList<UUID>();var p=new DragonLeaderboardPresenter(UUID::toString,(id,lines)->received.add(id));

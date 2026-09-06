@@ -8,14 +8,14 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 
 /** Server-thread, generation-scoped presentation. Retains at most one frozen board. */
-public final class DragonLeaderboardPresenter {
+final class DragonLeaderboardPresenter {
     private final Function<UUID, String> names;
     private final BiConsumer<UUID, List<String>> send;
     private UUID generation;
     private RankedEncounterResult ranking;
     private int deliveryFailures;
 
-    public DragonLeaderboardPresenter() {
+    DragonLeaderboardPresenter() {
         this(id -> {
             var player = Bukkit.getPlayer(id);
             return player == null ? id.toString() : player.getName();
@@ -26,19 +26,19 @@ public final class DragonLeaderboardPresenter {
     }
 
     /** Injectable presentation boundary for behavior tests; never supplies score or identity. */
-    public DragonLeaderboardPresenter(Function<UUID, String> names, BiConsumer<UUID, List<String>> send) {
+    DragonLeaderboardPresenter(Function<UUID, String> names, BiConsumer<UUID, List<String>> send) {
         this.names = Objects.requireNonNull(names); this.send = Objects.requireNonNull(send);
     }
 
-    public void begin(UUID generation) {
+    void begin(UUID generation) {
         thread(); this.generation = Objects.requireNonNull(generation); ranking = null;
     }
 
-    public void retire(UUID generation) {
+    void retire(UUID generation) {
         thread(); if (Objects.equals(this.generation, generation)) this.generation = null;
     }
 
-    public void accept(DevelopmentDragonService.Completion completion) {
+    void accept(DevelopmentDragonService.Completion completion) {
         thread();
         if (generation == null || !generation.equals(completion.generation())
                 || !generation.equals(completion.result().encounterId())
@@ -57,8 +57,8 @@ public final class DragonLeaderboardPresenter {
         }
     }
 
-    public Optional<RankedEncounterResult> ranking() { thread(); return Optional.ofNullable(ranking); }
-    public int deliveryFailures() { thread(); return deliveryFailures; }
+    Optional<RankedEncounterResult> ranking() { thread(); return Optional.ofNullable(ranking); }
+    int deliveryFailures() { thread(); return deliveryFailures; }
     private static void thread() {
         if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Leaderboard requires server thread");
     }

@@ -50,7 +50,7 @@ public final class DevelopmentDragonService implements AutoCloseable {
     public DevelopmentDragonService(ManagedCombatService combat, DragonDefinitionRegistry definitions, ArenaConfiguration arena, com.kaveenk.onlydragons.paper.projectile.homing.ArenaTickets tickets) {
         this(combat, definitions, arena, tickets, new DragonLeaderboardPresenter());
     }
-    public DevelopmentDragonService(ManagedCombatService combat, DragonDefinitionRegistry definitions, ArenaConfiguration arena, com.kaveenk.onlydragons.paper.projectile.homing.ArenaTickets tickets, DragonLeaderboardPresenter leaderboard) {
+    DevelopmentDragonService(ManagedCombatService combat, DragonDefinitionRegistry definitions, ArenaConfiguration arena, com.kaveenk.onlydragons.paper.projectile.homing.ArenaTickets tickets, DragonLeaderboardPresenter leaderboard) {
         this.combat = combat; this.definitions = definitions; this.arena = arena; this.tickets = tickets;
         this.leaderboard = Objects.requireNonNull(leaderboard);
     }
@@ -108,7 +108,8 @@ public final class DevelopmentDragonService implements AutoCloseable {
                 + " HP removed=" + hp + " credit=" + credit + " | rewards disabled";
     }
     public void close() { combat.requireMutationAllowed(); if (closed) return; if (active()) combat.reset(owner); retirePresentation(); closed = true; }
-    public DragonLeaderboardPresenter leaderboard() { thread(); return leaderboard; }
+    public Optional<com.kaveenk.onlydragons.domain.encounter.RankedEncounterResult> ranking() { thread(); return leaderboard.ranking(); }
+    public int leaderboardDeliveryFailures() { thread(); return leaderboard.deliveryFailures(); }
     private void retirePresentation() {
         subscribers.clear();
         if (generation != null) leaderboard.retire(generation);
