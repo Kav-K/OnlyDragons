@@ -96,7 +96,13 @@ Cursor also exposes `Symphony: check`, `Symphony: start`, `Symphony: stop`, and
 
 The pinned Codex CLI uses the `granular` approval-policy schema. A small local
 app-server adapter grants each worker write access to that checkout's `.git`
-directory so it can commit under workspace-write restrictions. It also grants
+and `.agents` directories so it can commit and merge shared skill updates under
+workspace-write restrictions. Both must be real local directories; the adapter
+rejects a missing/file/symlink `.agents` at launch and rechecks the same checkout
+anchor on every transformed turn. It grants `.agents` itself because the pinned
+Codex 0.153.4 sandbox leaves a read-only ancestor when only `.agents/skills` is
+added. The checkout's `.codex` and operator/home skill directories are not added.
+It also grants
 the exact shared `.symphony/test-coordination` directory for the Paper-test
 lease. The source tree and other issue clones are not added as writable roots.
 Gradle's cache stays inside each issue
@@ -109,6 +115,36 @@ Run its protocol, path-boundary, and subprocess cleanup tests in WSL:
 ```bash
 python3 -m unittest discover -s scripts/symphony/tests -v
 ```
+
+The 11 bridge tests cover policy/input preservation, exact skill/Git/lease roots,
+missing/file/symlink/replaced-workspace rejection, idempotence, trusted operator
+MCP configuration, and child cleanup. Linux CI runs these tests. They do not
+establish installed Codex sandbox behavior.
+
+Run the separate, explicit sandbox smoke with the installed pinned CLI:
+
+```bash
+python3 -B scripts/symphony/verify-skill-sandbox.py \
+  --codex /absolute/path/to/pinned/codex \
+  --scratch-root /absolute/path/to/scratch
+```
+
+Choose a scratch root outside `/tmp` and `$TMPDIR`, since ordinary temporary
+write permission would invalidate the sibling negative control. The smoke uses
+disposable local Git repositories and an isolated Codex home, with no model
+calls or supplied credentials and with MCP disabled. It first proves the skill is
+read-only with the old `.git`-only grant, then exercises the adapter's actual
+roots: the skill becomes writable while `.codex` and a sibling remain EROFS.
+An ordinary two-parent merge imports an upstream skill change and preserves an
+unrelated worker commit. A nested-only `.agents/skills` grant must reproduce the
+known read-only-ancestor failure. All owned processes and scratch files are cleaned up.
+
+The direct Linux/WSL smoke passed on Codex 0.153.4 during this maintenance
+verification; the app server exited 0 and scratch cleanup succeeded. Current
+head review, CI and lead integration remain pending. CI without this installed
+CLI does not run the smoke and must not count it as a sandbox pass. These are
+adapter checks; prior Paper receipts retain their original exact input identity
+and do not validate the changed adapter.
 
 ## Dispatch an issue
 

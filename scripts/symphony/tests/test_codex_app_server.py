@@ -27,6 +27,7 @@ class BridgeTests(unittest.TestCase):
         )
         self.workspace = self.source / '.symphony/workspaces/issue'
         (self.workspace / '.git').mkdir(parents=True)
+        (self.workspace / '.agents').mkdir()
         self.coordination = self.source / '.symphony/test-coordination'
         self.coordination.mkdir()
         self.turn = {
@@ -38,10 +39,10 @@ class BridgeTests(unittest.TestCase):
             },
         }
 
-    def test_only_git_root_is_added_without_changing_input(self):
+    def test_only_git_and_agents_roots_are_added_without_changing_input(self):
         changed = bridge.transform_message(self.turn, self.workspace)
         expected = json.loads(json.dumps(self.turn))
-        expected['params']['sandboxPolicy']['writableRoots'] = [str(self.workspace / '.git')]
+        expected['params']['sandboxPolicy']['writableRoots'] = [str(self.workspace / '.git'), str(self.workspace / '.agents')]
         self.assertEqual(expected, changed)
         self.assertNotIn('writableRoots', self.turn['params']['sandboxPolicy'])
         self.assertIs(bridge.transform_message(changed, self.workspace), changed)
@@ -61,7 +62,7 @@ class BridgeTests(unittest.TestCase):
     def test_shared_lease_is_narrow_and_rejects_symlink_redirection(self):
         self.assertEqual(self.coordination, bridge.validate_coordination(self.source))
         changed = bridge.transform_message(self.turn, self.workspace, self.coordination)
-        self.assertEqual([str(self.workspace / '.git'), str(self.coordination)], changed['params']['sandboxPolicy']['writableRoots'])
+        self.assertEqual([str(self.workspace / '.git'), str(self.workspace / '.agents'), str(self.coordination)], changed['params']['sandboxPolicy']['writableRoots'])
         self.coordination.rmdir()
         self.coordination.symlink_to(self.source, target_is_directory=True)
         with self.assertRaises(ValueError):
@@ -78,6 +79,71 @@ class BridgeTests(unittest.TestCase):
             bridge.validate_workspace(self.workspace, self.source)
         with self.assertRaises(ValueError):
             bridge.transform_message(self.turn, self.workspace)
+
+    def test_missing_or_file_agents_is_rejected_on_launch_and_each_turn(self):
+        # A previously valid/idempotent policy must not skip path revalidation.
+        granted = bridge.transform_message(self.turn, self.workspace, self.coordination)
+        agents = self.workspace / '.agents'
+        agents.rmdir()
+        for replacement in ('missing', 'file'):
+            with self.subTest(replacement=replacement):
+                if replacement == 'file':
+                    agents.write_text('not a directory')
+                with self.assertRaises(ValueError):
+                    bridge.validate_workspace(self.workspace, self.source)
+                with self.assertRaises(ValueError):
+                    bridge.transform_message(granted, self.workspace, self.coordination)
+
+    def test_agents_symlink_cannot_redirect_to_source_sibling_or_local_target(self):
+        agents = self.workspace / '.agents'
+        granted = bridge.transform_message(self.turn, self.workspace)
+        agents.rmdir()
+        for target in (self.source, self.workspace.parent / 'other-issue',
+                       self.workspace / 'different-directory', self.workspace / 'missing'):
+            with self.subTest(target=target):
+                if target.name != 'missing':
+                    target.mkdir(exist_ok=True)
+                agents.symlink_to(target, target_is_directory=True)
+                try:
+                    with self.assertRaises(ValueError):
+                        bridge.validate_workspace(self.workspace, self.source)
+                    with self.assertRaises(ValueError):
+                        bridge.transform_message(granted, self.workspace)
+                finally:
+                    agents.unlink()
+
+    def test_replaced_workspace_cannot_redirect_later_turn_grant(self):
+        granted = bridge.transform_message(self.turn, self.workspace)
+        sibling = self.workspace.parent / 'different-issue'
+        self.workspace.rename(sibling)
+        self.workspace.symlink_to(sibling, target_is_directory=True)
+        with self.assertRaises(ValueError):
+            bridge.transform_message(granted, self.workspace)
+
+    def test_scoped_agents_root_preserves_existing_policy_and_is_idempotent(self):
+        turn = json.loads(json.dumps(self.turn))
+        policy = turn['params']['sandboxPolicy']
+        original_roots = [str(self.workspace / 'build'), str(self.workspace / '.git')]
+        policy.update(writableRoots=original_roots, excludeTmpdirEnvVar=True,
+                      excludeSlashTmp=True, networkAccess=False)
+        changed = bridge.transform_message(turn, self.workspace, self.coordination)
+        expected = json.loads(json.dumps(turn))
+        expected['params']['sandboxPolicy']['writableRoots'] += [str(self.workspace / '.agents'), str(self.coordination)]
+        self.assertEqual(changed, expected)
+        self.assertEqual(turn['params']['sandboxPolicy']['writableRoots'], original_roots)
+        self.assertIs(bridge.transform_message(changed, self.workspace, self.coordination), changed)
+        added = set(changed['params']['sandboxPolicy']['writableRoots']) - set(original_roots)
+        self.assertEqual(added, {str(self.workspace / '.agents'), str(self.coordination)})
+        self.assertNotIn(str(self.workspace / '.codex'), added)
+        self.assertNotIn(str(self.source / '.agents'), added)
+        self.assertNotIn(str(self.workspace.parent), added)
+
+    def test_non_workspace_write_policy_is_preserved_even_without_agents(self):
+        (self.workspace / '.agents').rmdir()
+        for policy in ({'type': 'readOnly'}, {'type': 'dangerFullAccess'}, None):
+            changed = json.loads(json.dumps(self.turn))
+            changed['params']['sandboxPolicy'] = policy
+            self.assertIs(bridge.transform_message(changed, self.workspace), changed)
 
     def test_mcp_command_uses_operator_config_and_anchors_issue_checkout(self):
         import tomllib
