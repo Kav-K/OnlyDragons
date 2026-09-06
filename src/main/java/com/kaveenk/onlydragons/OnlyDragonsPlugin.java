@@ -7,6 +7,8 @@ import com.kaveenk.onlydragons.paper.item.equipment.EquipmentStatsService;
 import com.kaveenk.onlydragons.paper.item.equipment.EquipmentListener;
 import com.kaveenk.onlydragons.domain.item.CalibrationLoadouts;
 import com.kaveenk.onlydragons.domain.stats.StatProfile;
+import com.kaveenk.onlydragons.domain.encounter.definition.DragonCatalogLoader;
+import com.kaveenk.onlydragons.domain.encounter.definition.DragonDefinitionRegistry;
 import java.util.Objects;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,6 +16,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class OnlyDragonsPlugin extends JavaPlugin {
     private GreetingService greetings;
     private EquipmentStatsService equipment;
+    private DragonDefinitionRegistry dragonDefinitions;
+    public DragonDefinitionRegistry dragonDefinitions() { return dragonDefinitions; }
     private EquipmentListener equipmentListener;
     public EquipmentStatsService equipment() { return equipment; }
 
@@ -21,8 +25,10 @@ public class OnlyDragonsPlugin extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         reloadSettings();
+        var items = CalibrationLoadouts.registry();
+        dragonDefinitions = new DragonDefinitionRegistry(DragonCatalogLoader.calibration(items));
         equipment = new EquipmentStatsService(
-                CalibrationLoadouts.registry(),
+                items,
                 StatProfile.calibration());
         equipmentListener = new EquipmentListener(this, equipment);
         getServer().getPluginManager().registerEvents(equipmentListener, this);

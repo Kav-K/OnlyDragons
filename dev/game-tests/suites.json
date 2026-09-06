@@ -90,6 +90,14 @@
     "enchants-procs": {
       "scenarioId": "enchants-procs",
       "expectation": "positive"
+    },
+    "dragon-definitions": {
+      "scenarioId": "dragon-definitions",
+      "expectation": "positive"
+    },
+    "dragon-definitions-abort": {
+      "scenarioId": "dragon-definitions-abort",
+      "expectation": "cleanup-abort"
     }
   },
   "suites": {
@@ -106,7 +114,8 @@
       "protocol-player-soak",
       "projectile-player-feasibility",
       "headless-player-primitives",
-      "enchants-procs"
+      "enchants-procs",
+      "dragon-definitions"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -114,7 +123,8 @@
       "projectile-cleanup-abort",
       "protocol-player-early-exit",
       "protocol-player-idle",
-      "headless-player-cleanup-abort"
+      "headless-player-cleanup-abort",
+      "dragon-definitions-abort"
     ],
     "all": [
       "lifecycle-calibration",
@@ -135,7 +145,9 @@
       "projectile-player-feasibility",
       "headless-player-primitives",
       "headless-player-cleanup-abort",
-      "enchants-procs"
+      "enchants-procs",
+      "dragon-definitions",
+      "dragon-definitions-abort"
     ]
   },
   "areas": {
@@ -183,7 +195,9 @@
         "projectile-player-feasibility",
         "headless-player-primitives",
         "headless-player-cleanup-abort",
-        "enchants-procs"
+        "enchants-procs",
+        "dragon-definitions",
+        "dragon-definitions-abort"
       ],
       "affects": [
         "stats",
@@ -228,7 +242,8 @@
       "affects": [
         "combat",
         "equipment",
-        "enchants-procs"
+        "enchants-procs",
+        "dragon-definitions"
       ]
     },
     "combat": {
@@ -244,7 +259,8 @@
         "combat-accounting"
       ],
       "affects": [
-        "enchants-procs"
+        "enchants-procs",
+        "dragon-definitions"
       ]
     },
     "projectiles": {
@@ -293,7 +309,9 @@
         "src/test/java/com/kaveenk/onlydragons/service/GreetingServiceTest.java"
       ],
       "cases": [
-        "lifecycle-calibration"
+        "lifecycle-calibration",
+        "dragon-definitions",
+        "dragon-definitions-abort"
       ],
       "affects": [
         "shared-contracts",
@@ -350,7 +368,9 @@
         "projectile-player-feasibility",
         "headless-player-primitives",
         "headless-player-cleanup-abort",
-        "enchants-procs"
+        "enchants-procs",
+        "dragon-definitions",
+        "dragon-definitions-abort"
       ],
       "affects": []
     },
@@ -384,6 +404,19 @@
         "item-identity",
         "combat-accounting",
         "enchants-procs"
+      ],
+      "affects": []
+    },
+    "dragon-definitions": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/domain/encounter/definition/*",
+        "src/main/resources/encounters/*",
+        "src/test/java/com/kaveenk/onlydragons/domain/encounter/definition/*",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/definition/*"
+      ],
+      "cases": [
+        "dragon-definitions",
+        "dragon-definitions-abort"
       ],
       "affects": []
     }

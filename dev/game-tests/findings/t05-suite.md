@@ -7,13 +7,15 @@ production composition wiring belongs to lead-coordinated T08/#11.
 
 ## Lead integration, runtime acceptance pending
 
-The lead branch combines main `705de34cfbe497d970067a1ddebaef2a85d75125`
-with the handed-back PR #30 head `bc9eaba396a4f6a82e7df9c51d4cdbd707d7c143`.
-The catalog preserves all 18 main cases plus `enchants-procs` (19 total),
-including T04 player-owned observations, T09d actions and every declared control.
-Proc implementation is unchanged. The later accepted-T04 ledger merge and
-combined runtime verification remain pending; the checks below describe their
-original worker inputs, not this new integration.
+The lead branch combines main `705de34cfbe497d970067a1ddebaef2a85d75125`,
+handed-back PR #30 head `bc9eaba396a4f6a82e7df9c51d4cdbd707d7c143`, the corrected
+T04 completion ledger `91911d7a5f946118cab4c125d7e299a9d53a3084`, and PR #46 head
+`2613ba46b94dc390d2ea6a637c070908234beac4`. The catalog preserves all 18 main
+cases, `enchants-procs` and both dragon-definition cases (21 total), including
+T04 player-owned observations, T09d actions and every declared control.
+Proc implementation is unchanged. T04 is complete; T02b/T05 remain In review
+until the lead verifies the fresh combined suite and both task checkpoints.
+The checks below retain their original worker inputs.
 
 ## Worker source reconciliation
 

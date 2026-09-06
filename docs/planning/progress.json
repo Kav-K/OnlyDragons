@@ -159,7 +159,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "In review: main 4cfb7b9 (PR44/PR45) reconciled additively for bounded local checks. Historical b7fd6bc acceptance held: old console matcher missed ERROR lines. No fresh Paper acceptance claimed. Lead owns combined current suite/raw replay and T05 checkpoint after T04 integration and T02b/T05 reconciliation. See dev/game-tests/findings/t05-suite.md; physical P08/P09 and T08 composition remain later integration."
+      "notice": "In review: the lead candidate combines main 705de34, handed-back proc head bc9eaba, corrected T04 completion ledger 91911d7 and catalog head 2613ba4, preserving all 21 cases. Historical b7fd6bc acceptance remains held because the old console matcher missed ERROR lines. The fresh combined suite, independent raw replay and T05 checkpoint remain pending. Prior worker evidence retains its original inputs; see dev/game-tests/findings/t05-suite.md. Physical P08/P09 and T08 composition remain later integration."
     },
     "T06": {
       "status": "planned",
@@ -219,10 +219,10 @@
       }
     },
     "T02b": {
-      "status": "planned",
+      "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+      "notice": "Draft PR #46; clean runtime 90b5cf6775dcdf53003f89d1d5fb2cf7940edf58 includes main 4cfb7b9. 109 production tests, companion build, 92 checkpoint/suite tests and runtime-head Windows/Linux CI passed. Focused Paper: 30 positive assertions passed; abort control had 14 passes/one intended exception, restored the catalog and cleaned up. Exact evidence: docs/planning/evidence/t02b-focused-paper.md. Per owner coordination the lead owns the final combined suite and T02b automated acceptance checkpoint; no complete receipt, completed requirements or milestone/live dragon/reward acceptance claimed. Final normal merge 99118728e5110dabb51b2e8ec3bf2a972a0e0221 integrates T04/main 705de34 and preserves all 20 selected cases; prior focused evidence retains its original identity. Reconciled artifact acceptance remains with the lead. The lead candidate additionally retains the proc case and corrected T04 completion ledger (21 cases total); fresh combined runtime acceptance remains pending."
     },
     "T08a": {
       "status": "planned",

@@ -16,6 +16,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.ofEntries(
+            Map.entry("dragon-definitions-abort", new com.kaveenk.onlydragons.gametests.definition.DragonDefinitionScenario(true)),
+            Map.entry("dragon-definitions", new com.kaveenk.onlydragons.gametests.definition.DragonDefinitionScenario()),
             Map.entry("headless-player-primitives", new com.kaveenk.onlydragons.gametests.fixtures.PlayerPrimitivesScenario()),
             Map.entry("headless-player-cleanup-abort", new com.kaveenk.onlydragons.gametests.fixtures.PlayerCleanupAbortScenario()),
             Map.entry("equipment-player", new com.kaveenk.onlydragons.gametests.equipment.EquipmentPlayerScenario()),
