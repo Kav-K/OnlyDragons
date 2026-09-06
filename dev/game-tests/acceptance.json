@@ -602,6 +602,113 @@
         "same-profile-restart-abort"
       ],
       "scope": "Generic two-boot starter config and connected command calibration; not managed dragon recovery."
+    },
+    "enchants-procs": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "coordinator_loaded_from_production",
+        "controlled_counts",
+        "zero_base_tempo",
+        "snipe_displacement",
+        "parent_preincrement",
+        "five_stable_ids",
+        "captured_basis_and_crit",
+        "duplicate_cannot_enqueue",
+        "capacity_rejection",
+        "actual_tick_progress",
+        "nothing_early",
+        "first_due_tick",
+        "eligible_child_builds_tempo",
+        "five_children_no_recursion",
+        "child_damage_inheritance",
+        "tempo_cap",
+        "accounting_totals",
+        "two_bow_swap",
+        "duplex_child_scaled",
+        "tempo_before_expiry",
+        "tempo_at_expiry",
+        "duplex_did_not_refresh",
+        "quit_clears_queue_and_buff",
+        "late_quit_preserves_reconnect",
+        "old_session_cannot_buff",
+        "ended_target_rejects_child",
+        "rejected_child_no_credit",
+        "shutdown_clears_state",
+        "late_callback_rejected",
+        "trusted_snapshot_vicious_once",
+        "codec_to_effects_to_combat",
+        "item_edit_cannot_rewrite_child",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "enchants-procs"
+      ],
+      "scope": "Production proc coordinator on actual Paper scheduler ticks with synthetic settled impacts/session tokens, plus real item serialization through stats/effects/combat. No physical firing, Duplex emission or player-listener P08/P09 acceptance."
+    },
+    "dragon-definitions": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "loader_from_production",
+        "one_shipped_type",
+        "shipped_calibration",
+        "explicit_profiles",
+        "resolved_item_provenance",
+        "all_required_fields_rejected_atomically",
+        "duplicate_ids_and_properties",
+        "unknown_stale_references",
+        "nonfinite_out_of_range_rejected",
+        "inclusive_numeric_boundaries",
+        "unsupported_schemas",
+        "incompatible_profiles_rejected",
+        "reward_fields_fail_closed",
+        "distinct_type_table_isolation",
+        "whole_candidate_rollback_after_adoption",
+        "retained_definition_table_revisions",
+        "immutable_selection",
+        "io_failure_rollback",
+        "bundled_catalog_restored",
+        "no_inventory_mutation",
+        "no_entities_items_or_xp_spawned",
+        "no_production_tasks_or_listeners",
+        "same_labels_distinct_resolved_content",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-definitions"
+      ],
+      "scope": "Production dragon loader/registry/bootstrap with synthetic candidates on Paper; immutable revision retention and inert bindings. No live dragon, player, reward policy or grant acceptance."
+    },
+    "dragon-definitions-abort": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "loader_from_production",
+        "one_shipped_type",
+        "shipped_calibration",
+        "explicit_profiles",
+        "resolved_item_provenance",
+        "catalog_changed_before_abort",
+        "scenario_exception",
+        "bundled_catalog_restored",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-definitions-abort"
+      ],
+      "scope": "Intended abort after deployed production catalog mutation; owned cleanup restores original catalog and verifies full resolved values before releasing resources."
     }
   },
   "requirements": {
@@ -711,7 +818,8 @@
         "equipment-stats",
         "equipment-player",
         "protocol-player-soak",
-        "projectile-player-feasibility"
+        "projectile-player-feasibility",
+        "enchants-procs"
       ]
     },
     "equipment-service": {
@@ -732,9 +840,11 @@
     },
     "bounded-procs": {
       "kind": "automated",
-      "availability": "deferred",
-      "description": "Production ferocity queue, nonrecursive children, expiry and lifecycle integration.",
-      "fixtures": []
+      "availability": "implemented",
+      "description": "Bounded production ferocity queue, inherited damage/crit, observable admission rejection, Tempo expiry/captured swap eligibility, item-to-effects regression and scheduler/session/target cleanup. Physical firing integration remains P08/P09.",
+      "fixtures": [
+        "enchants-procs"
+      ]
     },
     "firing-input": {
       "kind": "automated",
@@ -882,15 +992,21 @@
     },
     "dragon-definition-catalog": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "One production test-dragon/versioned definition registry: atomic validation, stable retained revisions and explicit type isolation on real Paper. Additional type fixtures are calibration-only.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-definitions",
+        "dragon-definitions-abort"
+      ]
     },
     "sample-loot-table-bindings": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Inert versioned sample table/item references validate without reward calculation, grant enabling or inventory mutation; no real product drop values approved.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-definitions",
+        "dragon-definitions-abort"
+      ]
     },
     "managed-dragon-development": {
       "kind": "automated",

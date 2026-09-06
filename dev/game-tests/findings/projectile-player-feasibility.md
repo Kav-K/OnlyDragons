@@ -1,12 +1,19 @@
 # T04 player-owned dragon collision findings
 
 Target: Minecraft **26.2**, Paper **121** (`a2a42c5`), Temurin **25.0.4.1**.
-The continuation is in review in [draft PR #31](https://github.com/Kav-K/OnlyDragons/pull/31); **#9 stays blocked and M0 unaccepted**
-until the full T04 evidence and impact policy are reviewed. This adds to, and
+[PR #31](https://github.com/Kav-K/OnlyDragons/pull/31) is accepted and merged at
+`705de34cfbe497d970067a1ddebaef2a85d75125`. [Final hosted evidence and separate
+policy acceptance](../../../docs/planning/evidence/t04-suite.md) verify clean
+`96ef4b3`, all 18 suite outcomes and the reviewed contract. **T06 is eligible for
+the lead's label; M0 remains unaccepted.** This adds to, and
 preserves, the [shooterless/pre-spawn/lifetime findings](projectile-feasibility.md).
 No production combat adapter is introduced.
 
 ## PR44 reconciliation handoff
+
+The following records the pre-validation handoff. Its pending status was resolved
+by the [final accepted hosted result](../../../docs/planning/evidence/t04-suite.md);
+local checks and older observations retain their original input identities.
 
 Ordinary merge `6936c6f20b3b9e436389256e1e8c522619191839` integrates
 main `9def91f75d655caaccd6c7fa01313e4ba3a0ea54` into the existing PR #31.
@@ -35,12 +42,11 @@ again after PR #45 integration, preserving T09d complete and T04 partial. Main's
 fixture definitions and suite memberships were compared and all preserved.
 
 Per the [latest owner instruction](https://github.com/Kav-K/OnlyDragons/issues/5),
-the lead will dispatch the complete hosted Paper suite and independently replay
-its exported evidence on the handed-back clean head. No local full Paper run is
-claimed for this reconciliation. The reviewed `77c94a2` / `bf523a75` observations
-below are preserved historical evidence, not current-input acceptance. T04
-remains In review, T06 blocked and M0 unaccepted pending hosted evidence,
-current CI and lead review. Natural End-cycle/all-phase automation, production
+the lead was to dispatch the complete hosted suite and replay its exported
+evidence; this is now complete at `96ef4b3`. No local full Paper run is claimed
+for that reconciliation. The reviewed `77c94a2` / `bf523a75` observations below
+remain historical evidence. The later hosted result, current CI and separate
+lead policy review establish T04 completion; T06 is eligible and M0 unaccepted. Natural End-cycle/all-phase automation, production
 adapter enforcement, Windows live smoke, authenticated-client/multiplayer,
 human input/visual/feel and performance gates remain pending.
 
