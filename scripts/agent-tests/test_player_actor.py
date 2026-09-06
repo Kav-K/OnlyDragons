@@ -41,15 +41,28 @@ class PlayerActorContractTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(runner.ValidationError):
                 runner.player_pins(dict(self.pins, **mutation))
 
-    def test_only_explicit_named_scenario_can_enable_player_mode(self):
-        self.assertFalse(runner.player_mode(None, 'foundation-contracts', 'calibrate'))
-        self.assertTrue(runner.player_mode('protocol-calibration', 'protocol-player-calibration', 'calibrate'))
-        for args in ((None, 'protocol-player-calibration', 'calibrate'),
-                     ('protocol-calibration', 'foundation-contracts', 'calibrate'),
-                     (None, 'foundation-contracts', 'early-exit'),
-                     ('unrestricted', 'protocol-player-calibration', 'calibrate')):
+    def test_only_explicit_catalog_declared_scenarios_can_enable_player_mode(self):
+        catalog = {'plain': {}, 'calibration': {'testPlayerMode': 'protocol-calibration'},
+                   'equipment': {'testPlayerMode': 'protocol-calibration'}}
+        self.assertFalse(runner.player_mode(None, 'plain', 'calibrate', catalog))
+        for scenario in ('calibration', 'equipment'):
+            self.assertTrue(runner.player_mode('protocol-calibration', scenario, 'calibrate', catalog))
+            with self.assertRaises(runner.ValidationError):
+                runner.player_mode(None, scenario, 'calibrate', catalog)
+        for args in (('protocol-calibration', 'plain', 'calibrate'),
+                     (None, 'plain', 'early-exit'),
+                     ('unrestricted', 'calibration', 'calibrate'),
+                     (None, 'missing', 'calibrate')):
             with self.subTest(args=args), self.assertRaises(runner.ValidationError):
-                runner.player_mode(*args)
+                runner.player_mode(*args, catalog)
+        for malformed in (None, False, '', 'unknown', [], {}):
+            with self.subTest(declaration=malformed), self.assertRaises(runner.ValidationError):
+                runner.player_mode(None, 'bad', 'calibrate', {'bad': {'testPlayerMode': malformed}})
+        with self.assertRaises(runner.ValidationError):
+            runner.player_mode(None, 'bad', 'calibrate', {'bad': []})
+        actual = runner.strict_json(Path(__file__).resolve().parents[2] / 'dev/game-tests/scenarios.json')
+        for scenario in ('protocol-player-calibration', 'equipment-player'):
+            self.assertTrue(runner.player_mode('protocol-calibration', scenario, 'calibrate', actual))
 
     def test_default_authenticated_settings_and_input_are_preserved(self):
         source = {'online-mode': 'true', 'server-ip': '0.0.0.0', 'level-name': 'human-world'}

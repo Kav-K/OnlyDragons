@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.ofEntries(
+            Map.entry("equipment-player", new com.kaveenk.onlydragons.gametests.equipment.EquipmentPlayerScenario()),
             Map.entry("equipment-stats", new com.kaveenk.onlydragons.gametests.equipment.EquipmentStatsScenario()),
             Map.entry("lifecycle-calibration", new CalibrationScenario(false)),
             Map.entry("deliberate-failure", new CalibrationScenario(true)),

@@ -355,11 +355,16 @@ def player_pins(pins):
             'minecraftVersion': pins['minecraftVersion']}
 
 
-def player_mode(mode, scenario, control):
+def player_mode(mode, scenario, control, catalog):
     require(mode in (None, 'protocol-calibration'), 'Unknown isolated player mode')
     require(control in ('calibrate', 'early-exit', 'idle'), 'Unknown player failure control')
-    require((mode is not None) == (scenario == 'protocol-player-calibration'),
-            'Protocol player mode requires exactly the protocol-player-calibration scenario')
+    require(isinstance(catalog, dict) and scenario in catalog and isinstance(catalog[scenario], dict),
+            'Unknown or malformed scenario descriptor')
+    descriptor = catalog[scenario]
+    require('testPlayerMode' not in descriptor or descriptor['testPlayerMode'] == 'protocol-calibration',
+            'Unknown or malformed catalog player mode')
+    require(mode == descriptor.get('testPlayerMode'),
+            'Explicit player mode must match the selected scenario catalog declaration')
     require(mode is not None or control == 'calibrate', 'Player failure controls require protocol player mode')
     return mode is not None
 
@@ -489,7 +494,8 @@ def execute(args):
     server = None
     client = None
     try:
-        with_player = player_mode(args.test_player, args.scenario, args.player_control)
+        plans = strict_json(project / 'dev/game-tests/scenarios.json')
+        with_player = player_mode(args.test_player, args.scenario, args.player_control, plans)
         accepted_eula(args.eula_file)
         require(args.lease_directory is not None, 'Supply the operator-provisioned shared lease directory')
         require(args.java_home is not None, 'Supply JDK via --java-home or JAVA_HOME')
@@ -497,8 +503,6 @@ def execute(args):
         pins = properties(project / 'versions.properties')
         release = properties(java_home / 'release')
         require(re.match(r'"?' + re.escape(pins['javaVersion']) + r'(?:\.|\")', release.get('JAVA_VERSION', '')), 'JDK major does not match versions.properties')
-        plans = strict_json(project / 'dev/game-tests/scenarios.json')
-        require(args.scenario in plans, 'Unknown scenario; register it in dev/game-tests/scenarios.json')
         scenario = plans[args.scenario]
         outcome.update({'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project, text=True).strip(),
                         'worktreeDirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=project, text=True).strip()),
