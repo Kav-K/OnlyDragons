@@ -103,7 +103,22 @@ the shared restart class. The previous fresh catalog pointed to the moving plans
 its passing result above remains historical. The descendant restores the original
 stationary fresh catalog and adds a separate motion constructor flag/registration.
 The moving first boot now also exercises the human default `spawn` command.
-Focused verification of both final variants is pending.
+Both final variants pass at clean code candidate
+`778b425e77fdba1d883c0976290d3ca31e2f8b0d`:
+
+- `0221c074485e475186e8687803558574`, `dragon-restart-moving`:18/13 phase
+  assertions, including default spawn and motion before shutdown. Memory admission
+  waited normally before both boots; both were eventually admitted and completed.
+- `07e04373f37b42ee825488b628f9065e`, restored stationary `dragon-restart-fresh`:
+  17/13 phase assertions, retaining the original stationary fresh coverage.
+
+Every phase had server/client exit0, unforced, clean cleanup. Production/client
+SHA256 remain the preceding values; final companion SHA256 is
+`671e7c59d5a0890d8055f09182ccca999c2d0653f8890bb3c0bca6ecd7d04a48`.
+Python274/checkpoint plan and [candidate Windows/Linux CI](https://github.com/Kav-K/OnlyDragons/actions/runs/34061616735)
+pass. The plan explicitly reports automatedReady=false/acceptanceApproved=false;
+it is not an accepted task checkpoint. Final fetch still resolved main `7a38040`;
+merging it was a no-op. Later documentation-only commit(s) do not alter these inputs.
 
 [Owner comment5562281395](https://github.com/Kav-K/OnlyDragons/issues/65#issuecomment-5562281395)
 assigns the combined #64/#65/current-main cohort after #66 to the lead. The worker

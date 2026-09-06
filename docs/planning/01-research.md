@@ -263,7 +263,12 @@ measured parent step ≤0.15924, part step ≤0.33661 and part-corner offset ≤
 blocks. The production candidate subsequently stayed bounded at arena radii16/24/48,
 with maximum parent step0.20614 and yaw delta2.86481 degrees. These are separate
 server observations, not received-client smoothness, native-positive collision,
-or final acceptance. [Exact iteration identities and remaining gates](evidence/t08e-motion-tracer.md).
+or final acceptance. Clean candidate `eab1c01` then independently established
+native-positive damage, owned suppression/accounting and returning collisions
+against the moving parts. Received bound-dragon packets measured50.9842 blocks
+across87 updates (maximum received step0.604612, aggregating server ticks).
+These packet observations still do not establish rendered-client smoothness.
+[Exact iteration identities and remaining gates](evidence/t08e-motion-tracer.md).
 [The pinned public API](https://jd.papermc.io/paper/26.2/org/bukkit/entity/Entity.html)
 supplies the position adapter; no NMS/reflection is used by production or fixtures.
 
