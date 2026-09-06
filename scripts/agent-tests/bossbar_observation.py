@@ -9,7 +9,7 @@ def validate(scenario, player):
     expected = scenario.get('observations', {}).get('bossBarChecks')
     restart=scenario.get("scenarioId", "").startswith("dragon-restart-")
     require(isinstance(expected, list) and (2 if restart else 10) <= len(expected) <= 64, 'Missing bounded boss bar checks')
-    markers=('full','veto','damaged','reconnected','outside','returned','animation','retired','new-generation','reset','ghost-full','ghost-credit','ghost-stable','closed')
+    markers=('full','veto','damaged','reconnected','outside','returned','animation','retired','new-generation','reset','ghost-full','ghost-credit','ghost-stable','closed','standard-full','standard-reset','training-full','training-reset')
     required={(actor, 's1' if actor=='alpha' or marker in markers[:3] else 's2', marker) for actor in ('alpha','beta') for marker in markers}
     if restart:
         index=scenario['observations']['restart']['index']

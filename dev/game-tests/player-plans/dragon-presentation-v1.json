@@ -34,7 +34,7 @@
               "id": "spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration stationary"
               }
             },
             {
@@ -72,7 +72,7 @@
               "id": "again",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn"
+                "command": "onlydragons dev dragon spawn calibration stationary"
               }
             },
             {
@@ -93,6 +93,34 @@
               "id": "ghost-release",
               "action": "releaseUse",
               "args": {}
+            },
+            {
+              "id": "standard-spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "standard-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "training-spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn training"
+              }
+            },
+            {
+              "id": "training-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
             },
             {
               "id": "quit",

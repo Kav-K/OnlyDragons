@@ -110,7 +110,7 @@ public final class DragonPresentationScenario implements Scenario, Listener {
         ghostDragons=new DevelopmentDragonService(c.production().combat(),registry,new ArenaConfiguration(fixtureConfig,registry),c.production().bows().continuity().tickets());
         ghostDragons.setup(new DevelopmentArena(arenaWorld.getKey().toString(),0,100,0,32,"test_dragon"));
         dragons=ghostDragons;ghostUi=new DragonHealthPresenter(c.production(),dragons,c.production().combat());ghostUi.start();
-        generation=dragons.spawn();capture();
+        generation=dragons.spawn(DevelopmentDragonService.SpawnMode.CALIBRATION,DragonFlight.Mode.STATIONARY);capture();
         players.await("ghost bar attached",100,()->ghostUi.viewerCount()==2,()->{
             sampleBoth("ghost-full",1000,"ghost");
             draw("alpha","ghost","ferocity_100",0,()->{
@@ -120,8 +120,40 @@ public final class DragonPresentationScenario implements Scenario, Listener {
                     sampleBoth("ghost-stable",900,"ghost");
                     ghostUi.close();c.later(2,()->{
                         sampleBoth("closed",0,"");c.check("ui_close_releases_viewers",true,ghostUi.viewerCount()==0&&ghostUi.generation().isEmpty());
-                        ghostDragons.close();finish();
+                        ghostDragons.close();humanModes();
                     });
+                });
+            });
+        });
+    }
+    private void humanModes(){
+        dragons=c.production().dragons();
+        mode("standard",1000,"Test Dragon","v2","Test Dragon  |  1,000 / 1,000 HP  (100%)",()->
+            mode("training",100000,"Test Dragon (Training)","training-v2","Test Dragon (Training)  |  100,000 / 100,000 HP  (100%)",this::finish));
+    }
+    private void mode(String name,double maximum,String displayName,String revision,String title,Runnable next){
+        command("alpha",name+"-spawn",()->{
+            capture();
+            players.await(name+" orbit and UI ready",100,()->dragons.motion().orElseThrow().state().equals("MOVING")
+                    &&dragons.motion().orElseThrow().steps()>=3&&c.production().dragonHealth().viewerCount()==2,()->{
+                var selected=dragons.selection().orElseThrow();
+                c.check(name+"_mode_selection",true,selected.identity().id().equals("test_dragon")
+                        &&selected.identity().revision().equals(revision)&&selected.displayName().equals(displayName)
+                        &&selected.combatProfile().mechanic().equals(new MechanicRevision("dragon-tempo","v2"))
+                        &&selected.maxHealth()==maximum&&view().target().maxHealth()==maximum&&view().target().currentHealth()==maximum
+                        &&view().contributions().isEmpty());
+                var start=dragon.getLocation();long steps=dragons.motion().orElseThrow().steps();UUID nativeId=dragon.getUniqueId();
+                c.later(5,()->{
+                    c.check(name+"_mode_orbit",true,dragon.isValid()&&dragons.motion().orElseThrow().state().equals("MOVING")
+                            &&dragons.motion().orElseThrow().steps()>steps&&dragon.getLocation().distance(start)>.001);
+                    for(String actor:List.of("alpha","beta"))sampleExpected(actor,name+"-full",name,title,1.0);
+                    command("alpha",name+"-reset",()->awaitUi(0,()->{
+                        sampleBoth(name+"-reset",0,"");
+                        c.check(name+"_mode_reset_ui",true,c.production().dragonHealth().generation().isEmpty()
+                                &&Bukkit.getEntity(nativeId)==null&&!c.production().combat().ownsEntity(nativeId)
+                                &&view().completion().isEmpty());
+                        next.run();
+                    }));
                 });
             });
         });
@@ -135,7 +167,10 @@ public final class DragonPresentationScenario implements Scenario, Listener {
     private void sampleBoth(String marker,double hp,String identity){sample("alpha",marker,hp,identity);sample("beta",marker,hp,identity);}
     private void sample(String actor,String marker,double hp,String identity){
         String title=identity.isEmpty()?"":"Test Dragon (Calibration)  |  "+(hp==1000?"1,000":Integer.toString((int)hp))+" / 1,000 HP  ("+(int)(hp/10)+"%)";
-        checks.add(Map.of("actor",actor,"session",actor.equals("beta")&&players.joins("beta")==2?"s2":"s1","marker",marker,"generation",identity,"title",title,"percent",hp/1000));
+        sampleExpected(actor,marker,identity,title,hp/1000);
+    }
+    private void sampleExpected(String actor,String marker,String identity,String title,double percent){
+        checks.add(Map.of("actor",actor,"session",actor.equals("beta")&&players.joins("beta")==2?"s2":"s1","marker",marker,"generation",identity,"title",title,"percent",percent));
         players.player(actor).sendMessage(Component.text("OD_UI_CHECK:"+c.harness().runId()+":"+marker));
     }
     private void awaitUi(int count,Runnable next){players.await("UI viewer reconciliation",100,()->c.production().dragonHealth().viewerCount()==count,()->c.later(3,next::run));}
