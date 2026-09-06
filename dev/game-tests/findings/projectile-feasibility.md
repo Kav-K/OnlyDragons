@@ -3,7 +3,8 @@
 Target: Minecraft 26.2, Paper **121** (`a2a42c5`), Temurin JDK 25.0.4.1.
 **Acceptance: partial / [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) in review.**
 Native player-owned dragon damage suppression remains unaccepted; do not unblock
-T06/#9 or accept M0 from these results.
+T06/#9 or accept M0 from these results. The lead plans to resume GH-5 after
+[player actor #20](https://github.com/Kav-K/OnlyDragons/issues/20) is integrated.
 
 Scope: companion-only experiments with real API-spawned arrows, cows and dragons.
 No arrow is teleported, recreated, or given a manufactured collision event. Gravity
