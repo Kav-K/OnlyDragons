@@ -27,7 +27,7 @@ handoff in PR #23, with lead review/merge still pending. See [execution order](0
 | T00 — Contracts | Complete | [#1](https://github.com/Kav-K/OnlyDragons/issues/1), [PR #15](https://github.com/Kav-K/OnlyDragons/pull/15) | Merged at be920d0 after independent review, final-head Windows/Linux CI, 21 production tests and 29 real-Paper contract assertions; see [evidence](../../dev/agent-paper-tests.md#foundation-contract-evidence). Feature engines remain separate tasks. |
 | T01 — Stats | In review (T01a; T01b pending) | [#3 resolver](https://github.com/Kav-K/OnlyDragons/issues/3), [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23), [#7 equipment/play](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a: 30 production tests and 18 real-Paper assertions passed; see [evidence](#t01a-resolver-validation). Lead review/CI and merge pending. T01b equipment/play remains pending and waits for stats and item integration. |
 | T02 — Items | Planned (ready) | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | PDC/schema/identity and one-ultimate validation cases. |
-| T03 — Combat/ledger | Planned | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | Numeric fixtures, one impact authority, health/score/death invariants. |
+| T03 — Combat/ledger | In progress | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | Domain services and additive combat-accounting scenario implemented; build and exact-artifact Paper verification pending. Physical adapter/native suppression and human checks remain separate. |
 | T04 — Paper feasibility | Planned (ready) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Isolated real dragon/projectile scenarios and durable findings; client observations remain separate. |
 | T05 — Enchants/procs | Planned | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Bounded ferocity, tempo expiry/swap, and modifier fixtures. |
 | T06 — Firing/Duplex | Planned | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence. |
@@ -105,6 +105,7 @@ design sections above are the current summary; this record explains changes.
 
 | Date | Task / reference | Change and rationale | Evidence / remaining work |
 | --- | --- | --- | --- |
+| 2026-09-05 | T03 / #6 | Adopted immutable versioned combat policy and a single-thread encounter authority while preserving T00 DTOs. Physical/proc identity and inherited mitigated basis prevent duplicate or recursive credit. | Numeric/lifecycle and production-service Paper scenarios added; verification pending. Native suppression and human gates remain unaccepted. |
 | 2026-09-05 | Shared-context setup; user request | Made the three planning documents required project context and added an agent maintenance/handoff protocol. | Starter-only source inventory reconciled; all gameplay tasks remain planned. Shared reading routes are in AGENTS.md, Cursor rules, and WORKFLOW.md. |
 | 2026-09-05 | Shared agent tooling; user request | Bundled three Minecraft skills with references/provenance; configured Context7 and project-scoped Serena for Cursor, Codex, and isolated Symphony workers. | All three skill validators passed; Windows/Linux MCP initialize/tool-list and Java-symbol checks passed. A fresh Linux issue clone discovered all three skills, connected Context7 (2 tools) and Serena (8), queried Paper docs and production lifecycle symbols. Direct Codex from a nested directory also connected. Five bridge tests and scaffold skill-preservation checks passed. No gameplay milestone advanced; see dev/agent-tools.md. |
 | 2026-09-05 | User-confirmed execution policy | Authorized feature agents to test against isolated real Minecraft, parallel coding, and lead merges of reviewed/tested PRs into main. Reuse existing local EULA acceptance; preserve human worlds and serialize JVM tests. | Existing managed dev server stopped cleanly with user permission. Fourteen issues created; T00/T09a agents started in separate clones. Bridge tests include the narrow shared lease directory (6 pass); client/milestone gates remain distinct. |
@@ -112,6 +113,24 @@ design sections above are the current summary; this record explains changes.
 | 2026-09-05 | T01a / #3 / [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23) | Adopted named calibration defaults/ranges/caps and deterministic arithmetic policy within task scope; stable T00 records preserved. See document 02 section 3. | Clean 36a7e23: 30 production tests (9 new resolver tests), zero failures/errors/skips; 18 production-resolver Paper assertions and clean unforced shutdown. See [evidence](#t01a-resolver-validation). T01b equipment integration and human play remain separate. |
 | 2026-09-05 | T00 / #1 / PR #15 | Established shared immutable domain contracts without introducing resolver/combat engines or choosing unresolved balance rules. | Clean 53f7e20: 21 production tests, no failures/errors/skips; real Paper passed 29 assertions with clean unforced shutdown. Independent review and final e3a9e68 Windows/Linux CI passed; merged at be920d0. [Versions, hashes, and scope](../../dev/agent-paper-tests.md#foundation-contract-evidence). |
 | 2026-09-05 | Report validation / [#17](https://github.com/Kav-K/OnlyDragons/issues/17), In review | Reject boolean/number equivalence recursively in assertion evidence, even with forged pass flags; preserve integer/float numeric equivalence and JSON structure/order checks. | Implementation 4aa62f4: Ubuntu 24.04 / Python 3.12.3, `python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py' -v` passed all 27 tests without skips. Revalidated unchanged stored T09 positive (13 assertions), negative (only `deliberate_failure` rejected), and T00 (29 assertions) reports within their original run windows. No new Paper JVM or gameplay gate; independent review/CI pending. |
+
+### T03 combat validation
+
+GH-6 owns additive combat services, `CombatEncounter`, and its unit/Paper scenarios.
+T00 and T01a are integrated (owner dispatch confirms PR #23 merge `1efa7d0`);
+older T01a review wording above is historical and awaits lead reconciliation.
+Existing T00 DTOs, production listener/command registration, pins and other
+feature ownership are unchanged. See document 02 section 6 for the service API.
+The branch implements no-Strength offense, explicit crit, historical cap,
+separate health/contribution, idempotent accepted impacts, validated inherited
+children, one completion, and terminal generation rejection. The 0.25 and 0
+ferocity HP fractions are test calibration, not researched Hypixel values.
+
+Validation pending: wrapper build and real-Paper `combat-accounting` against a
+clean runtime revision. Physical arrow/native suppression, Windows smoke,
+authenticated-client/input/visual/multiplayer and performance gates are unrun.
+Next dependency: T05 consumes the frozen pre-cap basis for bounded scheduling;
+T08 and the final T04-informed adapter wire player-facing combat later.
 
 ### T01a resolver validation
 
