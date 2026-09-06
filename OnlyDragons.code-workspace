@@ -1,0 +1,49 @@
+{
+    "folders":  [
+                    {
+                        "name":  "OnlyDragons",
+                        "path":  "."
+                    }
+                ],
+    "settings":  {
+                     "java.import.gradle.wrapper.enabled":  true,
+                     "java.configuration.updateBuildConfiguration":  "automatic",
+                     "java.compile.nullAnalysis.mode":  "automatic",
+                     "java.debug.settings.hotCodeReplace":  "auto",
+                     "java.test.config":  {
+                                              "name":  "Default",
+                                              "workingDirectory":  "${workspaceFolder}"
+                                          },
+                     "editor.formatOnSave":  true,
+                     "[java]":  {
+                                    "editor.defaultFormatter":  "redhat.java"
+                                },
+                     "files.exclude":  {
+                                           "**/.gradle":  true,
+                                           "**/bin":  true
+                                       },
+                     "files.watcherExclude":  {
+                                                  "**/run/**":  true,
+                                                  "**/build/**":  true,
+                                                  "**/.gradle/**":  true
+                                              },
+                     "search.exclude":  {
+                                            "**/.gradle":  true,
+                                            "**/build":  true,
+                                            "**/run":  true
+                                        },
+                     "java.jdt.ls.java.home":  "C:\\Users\\Kaveen\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-25.0.4.1+1",
+                     "java.import.gradle.java.home":  "C:\\Users\\Kaveen\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-25.0.4.1+1",
+                     "java.configuration.runtimes":  [
+                                                         {
+                                                             "path":  "C:\\Users\\Kaveen\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-25.0.4.1+1",
+                                                             "default":  true,
+                                                             "name":  "JavaSE-25"
+                                                         }
+                                                     ],
+                     "terminal.integrated.env.windows":  {
+                                                             "JAVA_HOME":  "C:\\Users\\Kaveen\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-25.0.4.1+1",
+                                                             "Path":  "C:\\Users\\Kaveen\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-25.0.4.1+1\\bin;${env:Path}"
+                                                         }
+                 }
+}

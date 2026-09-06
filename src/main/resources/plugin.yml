@@ -1,0 +1,18 @@
+name: OnlyDragons
+version: '${version}'
+main: com.kaveenk.onlydragons.OnlyDragonsPlugin
+api-version: '${apiVersion}'
+description: Main workspace for Minecraft Java plugin development.
+commands:
+  onlydragons:
+    description: Check the plugin and reload its configuration.
+    usage: /onlydragons [status|reload]
+    aliases: [mcdev]
+    permission: onlydragons.use
+permissions:
+  onlydragons.use:
+    description: Use the OnlyDragons status command.
+    default: true
+  onlydragons.admin:
+    description: Reload OnlyDragons configuration.
+    default: op

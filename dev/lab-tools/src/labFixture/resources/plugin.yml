@@ -1,0 +1,7 @@
+name: CompatibilityProbe
+version: '1.0'
+main: com.kaveenk.onlydragons.lab.CompatibilityProbe
+api-version: '1.13'
+commands:
+  compatibilityprobe:
+    description: Confirm that the compatibility fixture handles commands.

@@ -1,0 +1,12 @@
+name: OnlyDragonsHarness
+version: '1.0'
+main: com.kaveenk.onlydragons.lab.LabHarness
+api-version: '1.13'
+description: Local development test companion. Do not deploy to production.
+commands:
+  labcheck:
+    description: Verify that a named plugin is enabled.
+    permission: onlydragons.harness
+permissions:
+  onlydragons.harness:
+    default: op

@@ -1,0 +1,35 @@
+name: Build and test
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the pinned JDK version
+        id: versions
+        shell: bash
+        run: echo "java=$(sed -n 's/^javaVersion=//p' versions.properties | tr -d '\r')" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ steps.versions.outputs.java }}
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build, test, and generate coverage
+        shell: bash
+        run: bash ./gradlew build --console=plain
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: OnlyDragons-${{ matrix.os }}
+          path: |
+            build/libs/*.jar
+            build/reports/tests/
+            build/reports/jacoco/

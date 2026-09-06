@@ -1,0 +1,5 @@
+{
+  "checks": [
+    {"command": "compatibilityprobe", "expect": "COMPATIBILITY_PROBE_OK"}
+  ]
+}

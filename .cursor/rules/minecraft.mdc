@@ -1,0 +1,16 @@
+---
+description: Shared Minecraft agent contract and task-specific workflow
+alwaysApply: true
+---
+
+Read and follow the repository's `AGENTS.md`. Use `dev/agent-workflow.md` for the
+shared Codex/Cursor development loop, commands, and validation evidence.
+
+- Read `versions.properties` and use the checked-in Gradle wrapper and `mcdev.cmd`.
+- Select installed skills by task: `minecraft-plugin-development` for plugin work,
+  `paper-runtime-validation` for server verification, and `paper-threading-review`
+  for threading/lifecycle changes. Read only relevant skills.
+- Use Context7 when available for unfamiliar/version-sensitive API documentation;
+  verify that answers match the pinned API. Fall back to official docs/signatures.
+- A successful build or MockBukkit test does not prove real Paper or player behavior.
+  Follow the contract's proportionate checks and report what was actually verified.

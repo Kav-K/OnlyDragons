@@ -1,0 +1,6 @@
+{
+  "checks": [
+    {"command": "onlydragons status", "expect": "OnlyDragons ready \\| version"},
+    {"command": "onlydragons reload", "expect": "OnlyDragons configuration reloaded\\."}
+  ]
+}
