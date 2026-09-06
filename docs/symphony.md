@@ -32,6 +32,19 @@ For the initial repository upload, also enable **Workflows: Read and write**:
 the project includes `.github/workflows/build.yml`. Keep that permission only
 if workers should be able to propose changes to CI workflow files.
 
+For **lead-hosted Paper validation**, the repository-scoped saved credential
+also needs **Actions: Read and write** to dispatch the existing manual workflow.
+This is distinct from Workflows permission for proposing workflow-file changes.
+The [official workflow-dispatch endpoint](https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event)
+requires repository Actions write permission.
+
+**Variables: Read and write** is needed only for initial repository-variable
+creation or a deliberate later change, rather than each dispatch. The existing
+`ONLYDRAGONS_PAPER_EULA_BASE64` setup is already complete; see the
+[official repository-variable endpoint](https://docs.github.com/en/rest/actions/variables#create-a-repository-variable).
+Existing saved credentials already work. No new credential, routine variable
+rewrite or broader unattended-worker access is required. Keep tokens out of chat.
+
 Create the token through [GitHub's token settings](https://github.com/settings/personal-access-tokens)
 and enter it using `Symphony.cmd set-token`. The hidden prompt saves it to the
 ignored local `.symphony/github-token` file with a restricted Windows ACL. The

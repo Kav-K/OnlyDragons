@@ -359,7 +359,7 @@ physical hits can omit it. [Player-owned evidence](../../dev/game-tests/findings
 records the positive controls and limits. These scoped decisions revise the
 unsupported semantic/phase assumptions; production end-to-end claim, veto,
 retirement and phase-rejection tests remain assigned to later adapter tasks.
-T04 is accepted and merged at `705de34`; [final evidence and separate policy review](evidence/t04-suite.md) record the decision. T06 is eligible for lead dispatch; M0 remains unaccepted.
+T04 is accepted and merged at `705de34`; [final evidence and separate policy review](evidence/t04-suite.md) record the decision. T06/#9 is lead-dispatched after PR #48. Bounded M0 contracts/feasibility is explicitly accepted through the [combined cohort and separate policy review](evidence/catalog-procs-suite.md); M1–M5 remain unaccepted.
 No production adapter is introduced by the feasibility scenario.
 
 A proposed simple damage model is:
@@ -472,6 +472,8 @@ Clear temporary state on death, quit, arena exit, and encounter reset. Scheduled
 
 ### T05 adopted coordinator boundary (GH-8)
 
+Integrated through PR #48 at `3c35a85` after current-input acceptance; [combined evidence](evidence/catalog-procs-suite.md). The bounded contract below does not implement the later live firing/encounter or reward adapters.
+
 `application.proc.ProcCoordinator(encounter, Limits, RandomSource)` owns exactly
 one `CombatEncounter`, one bounded due queue and one bounded player-session map
 on their creating server thread. `physical(ShotContext, PhysicalImpact,
@@ -582,6 +584,8 @@ An immutable `EncounterResult` includes the selected variant, contribution and a
 
 ### T02b test-dragon catalog contract (GH-38)
 
+Integrated through PR #48 at `3c35a85` after current-input acceptance; [combined evidence](evidence/catalog-procs-suite.md). The bounded contract below does not implement the later live firing/encounter or reward adapters.
+
 Adopted within scope and reviewed by the lead: exactly one `test_dragon`, schema
 1/revision v1, named Test Dragon (Calibration), with **1,000 HP / zero defense**.
 The lead selected 1,000 HP so the existing 100-damage ordinary bow can support a
@@ -670,7 +674,7 @@ define the fixed evidence envelope.
 
 | Milestone | Playable outcome | Exit gate |
 | --- | --- | --- |
-| M0: contracts and feasibility | Written rules plus a small real-Paper collision experiment | Multipart hits, native suppression, simultaneous arrows, and despawn control have an evidenced implementation path. |
+| M0: contracts and feasibility — accepted | Written rules plus a small real-Paper collision experiment | Multipart hits, native suppression, simultaneous arrows, and despawn control have an evidenced implementation path; [explicit PR48-cohort acceptance](evidence/catalog-procs-suite.md). Production enforcement remains later work. |
 | M1: stats and combat | Inspectable stats, tagged test bow, dummy, crits, ferocity, separate ledgers | Deterministic math tests and real-target hit reports agree; vanilla damage is not added twice. |
 | M2: enchant and arrow sandbox | Tracer, Duplex, Fatal Tempo, Snipe, shortbow; Power/Vicious and Overload hooks | Physical projectile identity, input cadence, swap/expiry, and proc bounds pass. |
 | M3: prefire rehearsal | Repeatable countdown and real dragon hatch | A human and automated trace prove pre-spawn arrows can hit, with valid misses remaining misses. |
