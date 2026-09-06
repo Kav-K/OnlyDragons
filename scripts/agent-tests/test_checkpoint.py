@@ -105,7 +105,52 @@ class CheckpointTests(unittest.TestCase):
         progress = self.read(PROGRESS)
         for dependent in affected - {task_id}:
             progress['tasks'][dependent].update(status='blocked', completedRequirements=[], evidence={})
+        # An accepted milestone cannot survive temporarily uncompleting one of
+        # its fixture tasks. Hold only that milestone and its downstream gates;
+        # unrelated accepted milestones must remain intact.
+        milestones = self.read(PLAN)['milestones']
+        held = set()
+        while True:
+            expanded = held | {key for key, milestone in milestones.items()
+                               if affected.intersection(milestone['tasks'])
+                               or held.intersection(milestone['dependsOn'])}
+            if expanded == held:
+                break
+            held = expanded
+        for key in held:
+            progress['milestones'][key].update(status='not-accepted', evidence={})
         self.write(PROGRESS, progress)
+
+    def prepare_completed_combat_fixture(self):
+        # These bindings/references only model future ledger transitions at the
+        # checkpoint seam. They are never evidence that a real fixture implements
+        # the future firing, accounting, managed-dragon or ranking behavior.
+        plan, progress = self.read(PLAN), self.read(PROGRESS)
+        def implement(refs):
+            for ref in refs:
+                requirement = plan['requirements'][ref]
+                if requirement['availability'] == 'deferred':
+                    self.assertEqual('automated', requirement['kind'])
+                    requirement.update(availability='implemented', fixtures=['foundation-contracts'])
+            return {ref: {'url': 'https://example.invalid/synthetic-checkpoint', 'revision': SHA}
+                    for ref in refs}
+        for task_id in ('T09e', 'T06', 'T08', 'T08a', 'T08b'):
+            refs = plan['tasks'][task_id]
+            progress['tasks'][task_id] = {
+                'status': 'complete', 'mergedRevision': SHA,
+                'completedRequirements': list(refs), 'evidence': implement(refs),
+            }
+        for milestone in ('M0', 'M1'):
+            progress['milestones'][milestone].update(
+                status='accepted', evidence=implement(plan['milestones'][milestone]['requirements']))
+        self.write(PLAN, plan)
+        self.write(PROGRESS, progress)
+        self.assertTrue(self.plan()['summary']['planValid'])
+
+    def prepare_unfinished_t06(self):
+        self.block_dependent_fixture_tasks('T06')
+        self.change(PROGRESS, lambda value: value['tasks']['T06'].update(
+            status='active', completedRequirements=[], evidence={}))
 
     def prepare_partial_t04(self):
         # Model the unfinished prerequisite explicitly; the real ledger may already
@@ -157,6 +202,16 @@ class CheckpointTests(unittest.TestCase):
         self.change(BACKLOG, lambda value: next(task for task in value['tasks'] if task['id'] == 'T00')['dependsOn'].append('T01a'))
         self.reject_plan('dependency cycle')
 
+    def test_restart_phase_bindings_cannot_be_removed_or_weakened(self):
+        previous = {SCENARIOS: self.read(SCENARIOS)}
+        for mutation in (lambda phase: phase['requiredAssertions'].pop(),
+                         lambda phase: phase['requiredActorMessages'].pop(),
+                         lambda phase: phase.update(playerActionPlan='dev/game-tests/player-plans/cleanup-abort-v1.json')):
+            self.write(SCENARIOS, previous[SCENARIOS])
+            self.change(SCENARIOS, lambda value: mutation(value['same-profile-restart']['phases'][1]))
+            with self.assertRaisesRegex(checkpoint.CheckpointError, 'restart phases changed'):
+                self.baseline(previous)
+
     def test_issue_mapping_drift_rejected(self):
         self.change(MAPPING, lambda value: value.pop('T04'))
         self.reject_plan('issue mapping drift')
@@ -167,6 +222,10 @@ class CheckpointTests(unittest.TestCase):
         self.reject_plan('complete with missing requirements')
 
     def test_deferred_component_cannot_be_declared_complete(self):
+        self.prepare_completed_combat_fixture()
+        self.prepare_unfinished_t06()
+        self.defer_fixture_requirement('P02')
+        self.assertTrue(self.plan()['summary']['planValid'])
         self.change(PROGRESS, lambda value: value['tasks']['T06']['completedRequirements'].append('P02'))
         self.reject_plan('Deferred component declared complete')
 
@@ -411,11 +470,15 @@ class CheckpointTests(unittest.TestCase):
         self.assertTrue(self.plan()['summary']['planValid'])
 
     def test_gate_relocation_still_requires_a_reviewed_new_comparison_base(self):
+        self.prepare_completed_combat_fixture()
         previous = self.read(PLAN)
         previous['tasks']['T04'] = ['projectile-observations', 'listener-cleanup', 'P02', 'P04']
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'Acceptance requirement mapping weakened: tasks/T04'):
             self.baseline({PLAN: previous})
         # Once the reviewed relocation lands, neither downstream owner can drop it.
+        # Clear synthetic completion before dropping an assigned requirement so
+        # the no-weakening check, rather than ledger consistency, is exercised.
+        self.prepare_unfinished_t06()
         current = self.read(PLAN)
         for group, owner in (('tasks', 'T06'), ('milestones', 'M1')):
             with self.subTest(group=group, owner=owner):
@@ -434,10 +497,13 @@ class CheckpointTests(unittest.TestCase):
             self.acceptance(['T09b'])
 
     def test_blocked_selected_task_requires_completed_prerequisites(self):
+        self.prepare_completed_combat_fixture()
         self.block_dependent_fixture_tasks('T09b')
         self.change(PROGRESS, lambda value: value['tasks']['T09c'].update(status='blocked'))
         self.change(PROGRESS, lambda value: value['tasks']['T09b'].update(status='blocked'))
         self.assertTrue(self.plan()['summary']['planValid'])
+        self.assertEqual('accepted', self.read(PROGRESS)['milestones']['M0']['status'])
+        self.assertEqual('not-accepted', self.read(PROGRESS)['milestones']['M1']['status'])
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'Unsatisfied task prerequisites for T09c: T09b'):
             self.acceptance(['T09c'])
         self.assertEqual([], self.suite.calls)
@@ -454,6 +520,7 @@ class CheckpointTests(unittest.TestCase):
         self.assertEqual([], self.suite.calls)
 
     def test_planned_task_with_satisfied_gates_can_verify_automated_components(self):
+        self.prepare_completed_combat_fixture()
         self.block_dependent_fixture_tasks('T09c')
         self.change(PROGRESS, lambda value: value['tasks']['T09c'].update(status='planned'))
         result = self.acceptance(['T09c'])
@@ -596,7 +663,18 @@ class CheckpointTests(unittest.TestCase):
             checkpoint.validate_plan(self.project, snapshot, now_ms=1_000_000)
 
     def test_dispatch_and_stale_snapshot_rejected(self):
+        # This scenario deliberately dispatches a planned task. The living ledger
+        # may already have T06 active/complete and accepted downstream milestones.
+        self.block_dependent_fixture_tasks('T06')
+        progress = self.read(PROGRESS)
+        progress['tasks']['T06'] = {
+            'status': 'planned', 'completedRequirements': [], 'evidence': {},
+        }
+        for milestone in progress['milestones'].values():
+            milestone.update(status='not-accepted', evidence={})
+        self.write(PROGRESS, progress)
         snapshot = self.snapshot()
+        self.assertTrue(checkpoint.validate_plan(self.project, snapshot, now_ms=1_000_000)['summary']['planValid'])
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'Stale/future'):
             checkpoint.validate_plan(self.project, snapshot, now_ms=2_000_000)
         number = self.read(MAPPING)['T06']['number']

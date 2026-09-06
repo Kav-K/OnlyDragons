@@ -298,6 +298,26 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, ['scripts/agent-tests/paper_suite.py'])))
         self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, ['dev/game-tests/acceptance.json'])))
 
+    def test_restart_phase_alone_requires_every_catalog_case(self):
+        catalog, _ = suite.load_catalog(self.root)
+        path = 'dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/RestartPhase.java'
+        self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, [path])))
+
+    def test_every_tracked_companion_java_file_has_scenario_coverage(self):
+        source = Path(__file__).resolve().parents[2]
+        tracked = suite.git(source, 'ls-files', '-z', '--', 'dev/game-tests/src').decode('utf-8').split('\0')
+        java_files = sorted(path for path in tracked if path.endswith('.java'))
+        self.assertTrue(java_files, 'Companion Java coverage audit must not silently check zero files')
+        for path in java_files:
+            with self.subTest(path=path):
+                self.assertTrue(suite.required_cases(self.root, [path]),
+                                'Tracked companion Java must select actual cases: ' + path)
+
+    def test_unknown_companion_java_remains_rejected(self):
+        path = 'dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/UnmappedCompanion.java'
+        with self.assertRaisesRegex(suite.ValidationError, 'no scenario coverage'):
+            suite.required_cases(self.root, [path])
+
     def test_shared_player_client_code_and_build_settings_require_full_baseline(self):
         catalog, _ = suite.load_catalog(self.root)
         for path in ('dev/player-client/src/main/java/com/kaveenk/onlydragons/playerclient/ProtocolPlayer.java',

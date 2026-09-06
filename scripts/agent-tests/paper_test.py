@@ -158,7 +158,7 @@ def accepted_eula(path):
 
 
 @contextmanager
-def server_lease(directory, timeout):
+def server_lease(directory, timeout, evidence=None):
     import fcntl
     require(directory.is_dir(), 'The operator must provision the shared lease directory')
     descriptor = os.open(directory / 'paper-tests.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
@@ -169,6 +169,8 @@ def server_lease(directory, timeout):
             try:
                 fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 acquired = True
+                if evidence is not None:
+                    evidence.update(directory=str(directory), acquiredAtEpochMs=int(time.time() * 1000))
                 break
             except BlockingIOError:
                 if time.monotonic() >= deadline:
@@ -178,6 +180,8 @@ def server_lease(directory, timeout):
     finally:
         if acquired:
             fcntl.flock(descriptor, fcntl.LOCK_UN)
+            if evidence is not None:
+                evidence['releasedAtEpochMs'] = int(time.time() * 1000)
         os.close(descriptor)
 
 
@@ -546,6 +550,108 @@ def stage_artifact(source, destination, expected_sha256):
     require(sha256(destination) == expected_sha256, 'Artifact changed after build validation: ' + destination.name)
 
 
+def epoch_ms():
+    return int(time.time() * 1000)
+
+
+def process_identity(owned):
+    # Kernel start ticks disambiguate recycled PIDs without searching for other JVMs.
+    stat = Path(f'/proc/{owned.process.pid}/stat').read_text().rsplit(')', 1)[1].split()
+    return {'pid': owned.process.pid, 'startTicks': int(stat[19]), 'startedAtEpochMs': epoch_ms()}
+
+
+def boot(args, project, java_home, pins, scenario_id, scenario, action_plan,
+         run_id, directory, report_root, outcome, plan_file=None, phase_context=None):
+    server = client = None
+    plugins = directory / 'plugins'
+    client_dir = directory / 'player-client'
+    port = outcome['profile']['port']
+    with_player = bool(args.test_player)
+    plan_file = plan_file or directory / 'player-plan.json'
+    command = [str(java_home / 'bin/java'), f'-Xmx{args.memory_mib}m', '-Xms256m', '-XX:ActiveProcessorCount=2',
+               '-Dfile.encoding=UTF-8', '-Dterminal.jline=false', '-Dterminal.ansi=false',
+               f'-Donlydragons.test.runId={run_id}', f'-Donlydragons.test.playerMode={args.test_player or ""}',
+               '-jar', 'server.jar', '--nogui']
+    if action_plan:
+        command[1:1] = ['-Donlydragons.test.playerPlan=' + str(plan_file),
+                        '-Donlydragons.test.playerPlanSha256=' + action_plan[1]]
+    if phase_context is not None:
+        command[1:1] = ['-Donlydragons.test.phaseContext=' + str(phase_context)]
+    try:
+        print(f'Starting isolated Paper at 127.0.0.1:{port}', flush=True)
+        blocked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGINT, signal.SIGTERM})
+        try:
+            server = OwnedServer(command, directory, report_root / 'server.log')
+            outcome['serverProcess'] = process_identity(server)
+        finally:
+            signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
+        server.wait_text(r'Done \([0-9.,]+s\)!', args.startup_timeout)
+        status = query_status(port)
+        require(pins['minecraftVersion'] in status['version']['name'], 'Status protocol returned the wrong Minecraft version')
+        outcome['status'] = status
+        issued_ms = int(time.time() * 1000)
+        outcome['issuedAtEpochMs'] = issued_ms
+        outcome['deadlineAtEpochMs'] = issued_ms + args.scenario_timeout * 1000
+        server.send(f'odgametest {run_id} {scenario_id}')
+        expected = dict(scenario, runId=run_id, scenarioId=scenario_id,
+                        minecraftVersion=pins['minecraftVersion'], paperBuild=pins['paperBuild'])
+        scenario_path = plugins / 'OnlyDragonsGameTests/report.json'
+        if with_player:
+            server.wait_text('OD_PLAYER_READY ' + run_id, min(args.scenario_timeout, 10))
+            client_command = [str(java_home / 'bin/java'), '-Xmx256m', '-Xms32m', '-XX:ActiveProcessorCount=2',
+                              '-Dfile.encoding=UTF-8', '-cp', str(client_dir / '*'),
+                              'com.kaveenk.onlydragons.playerclient.ProtocolPlayer', run_id, str(port),
+                              str(report_root / 'player.json'), str(args.scenario_timeout), args.player_control]
+            if action_plan:
+                client_command[client_command.index('com.kaveenk.onlydragons.playerclient.ProtocolPlayer')] = 'com.kaveenk.onlydragons.playerclient.ActionPlayer'
+                client_command += [str(plan_file), action_plan[1]]
+            blocked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGINT, signal.SIGTERM})
+            try:
+                client = OwnedPlayer(client_command, directory, report_root / 'player.log')
+                outcome['clientProcess'] = process_identity(client)
+            finally:
+                signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
+        outcome['scenario'] = wait_for_report(scenario_path, expected, issued_ms, args.scenario_timeout,
+                                              server.process, client.process if client else None)
+        if client:
+            require(client.process.wait(timeout=5) == 0, 'Protocol player exited unsuccessfully')
+            if action_plan:
+                report = strict_json(report_root / 'player.json')
+                player_actions.validate_report(report, action_plan[2], action_plan[1], run_id, pins,
+                                               issued_ms, int(time.time() * 1000))
+                player_actions.validate_messages(report, scenario)
+                player_actions.validate_server_journal(outcome['scenario'], report, action_plan[2])
+                outcome['player'] = report
+            else:
+                outcome['player'] = validate_player_report(report_root / 'player.json', run_id, issued_ms, args.scenario_timeout, pins, scenario)
+    finally:
+        if server is not None:
+            # Ignore a repeated termination while saving this runner's own disposable world.
+            previous = {item: signal.signal(item, signal.SIG_IGN) for item in (signal.SIGTERM, signal.SIGINT)}
+            try:
+                try:
+                    if client is not None:
+                        outcome['playerStopStartedAtEpochMs'] = epoch_ms()
+                        outcome['playerCleanup'] = client.stop()
+                        outcome['playerStopCompletedAtEpochMs'] = epoch_ms()
+                finally:
+                    outcome['stopStartedAtEpochMs'] = epoch_ms()
+                    outcome['cleanup'] = server.stop()
+                    outcome['stopCompletedAtEpochMs'] = epoch_ms()
+            finally:
+                for item, handler in previous.items():
+                    signal.signal(item, handler)
+        raw_report = plugins / 'OnlyDragonsGameTests/report.json'
+        if raw_report.is_file():
+            shutil.copyfile(raw_report, report_root / 'scenario.json')
+    require(outcome['cleanup'] and outcome['cleanup']['clean'], 'Paper did not stop cleanly')
+    if with_player:
+        require(outcome.get('playerCleanup', {}).get('clean'), 'Protocol player did not stop cleanly')
+    errors = paper_errors(server.text())
+    require(not errors, 'Paper logged errors: ' + '\n'.join(errors[:10]))
+    outcome['passed'] = True
+
+
 def execute(args):
     require(sys.platform == 'linux', 'Use this runner on Linux/WSL; Windows human play keeps using mcdev.cmd')
     project = args.project.resolve()
@@ -568,7 +674,11 @@ def execute(args):
         release = properties(java_home / 'release')
         require(re.match(r'"?' + re.escape(pins['javaVersion']) + r'(?:\.|\")', release.get('JAVA_VERSION', '')), 'JDK major does not match versions.properties')
         scenario = plans[args.scenario]
-        action_plan = player_actions.load_plan(project, scenario) if args.test_player == 'protocol-actions-v1' else None
+        restart = scenario.get('catalogMode') == 'same-profile-restart-v1'
+        if restart:
+            import paper_restart
+            paper_restart.validate_descriptor(project, scenario)
+        action_plan = player_actions.load_plan(project, scenario['phases'][0] if restart else scenario) if args.test_player == 'protocol-actions-v1' else None
         outcome.update({'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project, text=True).strip(),
                         'worktreeDirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=project, text=True).strip()),
                         'pins': pins, 'javaVersion': release['JAVA_VERSION'].strip('"')})
@@ -582,7 +692,10 @@ def execute(args):
         paper = fetch_paper(project, pins, args.paper_jar)
         bootstrap_metadata = paper_bootstrap.inspect_launcher(paper, pins['paperSha256'])
         mojang = paper_bootstrap.resolve_mojang(project, paper, bootstrap_metadata, supplied=args.mojang_jar)
-        with server_lease(args.lease_directory.resolve(), args.lease_timeout):
+        lease_evidence = {} if restart else None
+        if restart:
+            outcome['lease'] = lease_evidence
+        with server_lease(args.lease_directory.resolve(), args.lease_timeout, lease_evidence):
             outcome['memory'] = wait_for_memory(args.memory_mib, args.resource_timeout, 256 if with_player else 0)
             directory = project / 'run/agent-tests' / run_id
             directory.mkdir(parents=True, exist_ok=False)
@@ -615,78 +728,14 @@ def execute(args):
             outcome['profile'] = {'directory': str(directory), 'port': port, 'world': settings['level-name'],
                                   'authentication': 'offline-disposable-loopback' if with_player else 'authenticated',
                                   'testPlayerMode': args.test_player}
-            command = [str(java_home / 'bin/java'), f'-Xmx{args.memory_mib}m', '-Xms256m', '-XX:ActiveProcessorCount=2',
-                       '-Dfile.encoding=UTF-8', '-Dterminal.jline=false', '-Dterminal.ansi=false',
-                       f'-Donlydragons.test.runId={run_id}', f'-Donlydragons.test.playerMode={args.test_player or ""}',
-                       '-jar', 'server.jar', '--nogui']
-            if action_plan:
-                command[1:1] = ['-Donlydragons.test.playerPlan=' + str(directory / 'player-plan.json'),
-                                '-Donlydragons.test.playerPlanSha256=' + action_plan[1]]
-            try:
-                print(f'Starting isolated Paper at 127.0.0.1:{port}', flush=True)
-                blocked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGINT, signal.SIGTERM})
-                try:
-                    server = OwnedServer(command, directory, report_root / 'server.log')
-                finally:
-                    signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
-                server.wait_text(r'Done \([0-9.,]+s\)!', args.startup_timeout)
-                status = query_status(port)
-                require(pins['minecraftVersion'] in status['version']['name'], 'Status protocol returned the wrong Minecraft version')
-                outcome['status'] = status
-                issued_ms = int(time.time() * 1000)
-                server.send(f'odgametest {run_id} {args.scenario}')
-                expected = dict(scenario, runId=run_id, scenarioId=args.scenario,
-                                minecraftVersion=pins['minecraftVersion'], paperBuild=pins['paperBuild'])
-                scenario_path = plugins / 'OnlyDragonsGameTests/report.json'
-                if with_player:
-                    server.wait_text('OD_PLAYER_READY ' + run_id, min(args.scenario_timeout, 10))
-                    client_command = [str(java_home / 'bin/java'), '-Xmx256m', '-Xms32m', '-XX:ActiveProcessorCount=2',
-                                      '-Dfile.encoding=UTF-8', '-cp', str(client_dir / '*'),
-                                      'com.kaveenk.onlydragons.playerclient.ProtocolPlayer', run_id, str(port),
-                                      str(report_root / 'player.json'), str(args.scenario_timeout), args.player_control]
-                    if action_plan:
-                        client_command[client_command.index('com.kaveenk.onlydragons.playerclient.ProtocolPlayer')] = 'com.kaveenk.onlydragons.playerclient.ActionPlayer'
-                        client_command += [str(directory / 'player-plan.json'), action_plan[1]]
-                    blocked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGINT, signal.SIGTERM})
-                    try:
-                        client = OwnedPlayer(client_command, directory, report_root / 'player.log')
-                    finally:
-                        signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
-                outcome['scenario'] = wait_for_report(scenario_path, expected, issued_ms, args.scenario_timeout,
-                                                      server.process, client.process if client else None)
-                if client:
-                    require(client.process.wait(timeout=5) == 0, 'Protocol player exited unsuccessfully')
-                    if action_plan:
-                        report = strict_json(report_root / 'player.json')
-                        player_actions.validate_report(report, action_plan[2], action_plan[1], run_id, pins,
-                                                       issued_ms, int(time.time() * 1000))
-                        player_actions.validate_messages(report, scenario)
-                        player_actions.validate_server_journal(outcome['scenario'], report, action_plan[2])
-                        outcome['player'] = report
-                    else:
-                        outcome['player'] = validate_player_report(report_root / 'player.json', run_id, issued_ms, args.scenario_timeout, pins, plans[args.scenario])
-            finally:
-                if server is not None:
-                    # Ignore a repeated termination while saving this runner's own disposable world.
-                    previous = {item: signal.signal(item, signal.SIG_IGN) for item in (signal.SIGTERM, signal.SIGINT)}
-                    try:
-                        try:
-                            if client is not None:
-                                outcome['playerCleanup'] = client.stop()
-                        finally:
-                            outcome['cleanup'] = server.stop()
-                    finally:
-                        for item, handler in previous.items():
-                            signal.signal(item, handler)
-                raw_report = plugins / 'OnlyDragonsGameTests/report.json'
-                if raw_report.is_file():
-                    shutil.copyfile(raw_report, report_root / 'scenario.json')
-            require(outcome['cleanup'] and outcome['cleanup']['clean'], 'Paper did not stop cleanly')
-            if with_player:
-                require(outcome.get('playerCleanup', {}).get('clean'), 'Protocol player did not stop cleanly')
-            errors = paper_errors(server.text())
-            require(not errors, 'Paper logged errors: ' + '\n'.join(errors[:10]))
-            outcome['passed'] = True
+            if restart:
+                import paper_restart
+                paper_restart.execute_phases(sys.modules[__name__], args, project, java_home, pins,
+                                             scenario, run_id, directory, report_root, outcome)
+            else:
+                boot(args, project, java_home, pins, args.scenario, scenario, action_plan,
+                     run_id, directory, report_root, outcome)
+
     except (Exception, KeyboardInterrupt) as error:
         outcome['error'] = str(error) or type(error).__name__
         outcome['busy'] = isinstance(error, ResourceBusy)

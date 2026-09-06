@@ -335,3 +335,39 @@ direction or explicitly review a bounded aiming-message extension. Do not treat
 the calibration as dragon damage suppression, equipment behavior, human input,
 visuals, authenticated multiplayer, or milestone acceptance. Each feature owns
 its observations and cleanup evidence under the same lease/memory policy.
+
+## Same-profile restart fixtures
+
+T09e adds the explicitly catalog-declared `same-profile-restart-v1` mode. Run
+`--scenario same-profile-restart --test-player protocol-actions-v1` for the
+positive case or `same-profile-restart-abort` for the intended second-phase abort.
+Both use the existing `paper_test.py` entry point and resource/EULA policy.
+
+Build/stage happens once. Exactly two boots share one disposable directory,
+world UUID/name, port, roster, whitelist and binary cohort under one lease.
+Each phase has a fresh combined-memory decision and nonce, independently pinned
+plan and ordinary strict scenario/client report. The ten-character parent prefix
+preserves actor names; random suffixes prevent stale protocol/report reuse. The
+first shutdown must succeed before the second boot starts; there are no retries,
+world resets or inter-boot configuration regeneration.
+
+The parent result contains ordered `phases`. `phase-1/` and `phase-2/` contain
+result/scenario/player JSON, server/player logs, context and plan bytes plus
+`config-before.yml` and `config-after.yml`; `config-initial.yml` is staged from
+the production JAR once. Replay verifies file hashes, public production config
+observations, actual world UUID, phase invocation/process windows, ordinary
+assertions/messages/journals, exact intended abort and both JVM cleanups. The
+export allowlist adds only the declared restart profile's final
+`plugins/OnlyDragons/config.yml`; no world or credential is exported.
+
+The fixture edits greeting configuration as explicit server setup, invokes actual
+allowed/denied reload and status commands from two protocol actors, and observes
+the production greeting independently on boot two. It restores initial bytes and
+fixture-owned permissions/blocks/entities/tasks/chunks on completion or abort.
+This is generic calibration, not managed-encounter persistence acceptance.
+
+Future consumers use `ScenarioContext.restartPhase()` and its `previousReport()`
+to carry immutable expected native identities/chunk coordinates between boots.
+The context does not reset production state. T08a/#39 must leave its production
+encounter active before shutdown, then load those chunks and assert old native
+UUID absence, production idle and successful new spawn/reset itself.

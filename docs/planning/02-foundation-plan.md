@@ -359,7 +359,7 @@ physical hits can omit it. [Player-owned evidence](../../dev/game-tests/findings
 records the positive controls and limits. These scoped decisions revise the
 unsupported semantic/phase assumptions; production end-to-end claim, veto,
 retirement and phase-rejection tests remain assigned to later adapter tasks.
-T04 is accepted and merged at `705de34`; [final evidence and separate policy review](evidence/t04-suite.md) record the decision. T06 is eligible for lead dispatch; M0 remains unaccepted.
+T04 is accepted and merged at `705de34`; [final evidence and separate policy review](evidence/t04-suite.md) record the decision. T06/#9 is lead-dispatched after PR #48. Bounded M0 contracts/feasibility is explicitly accepted through the [combined cohort and separate policy review](evidence/catalog-procs-suite.md); M1–M5 remain unaccepted.
 No production adapter is introduced by the feasibility scenario.
 
 A proposed simple damage model is:
@@ -471,6 +471,8 @@ For tempo, store a player-scoped percentage bonus and expiry tick. The proposed 
 Clear temporary state on death, quit, arena exit, and encounter reset. Scheduled children retain damage snapshots but must recheck encounter/target validity. A quitter's already flying physical arrows may finish in the same encounter and credit their UUID, but they do not recreate a live player buff; future rewards can be delivered to that UUID later.
 
 ### T05 adopted coordinator boundary (GH-8)
+
+Integrated through PR #48 at `3c35a85` after current-input acceptance; [combined evidence](evidence/catalog-procs-suite.md). The bounded contract below does not implement the later live firing/encounter or reward adapters.
 
 `application.proc.ProcCoordinator(encounter, Limits, RandomSource)` owns exactly
 one `CombatEncounter`, one bounded due queue and one bounded player-session map
@@ -591,6 +593,8 @@ An immutable `EncounterResult` includes the selected variant, contribution and a
 
 ### T02b test-dragon catalog contract (GH-38)
 
+Integrated through PR #48 at `3c35a85` after current-input acceptance; [combined evidence](evidence/catalog-procs-suite.md). The bounded contract below does not implement the later live firing/encounter or reward adapters.
+
 Adopted within scope and reviewed by the lead: exactly one `test_dragon`, schema
 1/revision v1, named Test Dragon (Calibration), with **1,000 HP / zero defense**.
 The lead selected 1,000 HP so the existing 100-damage ordinary bow can support a
@@ -655,11 +659,31 @@ behavior before T08 connects combat/procs; full HP/ghost-score attribution stays
 required at T08 and M3. This keeps the service consumer out of its producer's
 completion prerequisites. M3 still requires the requested human visual prefire rehearsal.
 
+### T09e fixed restart validation contract (GH-49)
+
+Adopted within lead-assigned validation maintenance: `same-profile-restart-v1`
+executes exactly two catalog-bound boots in one disposable profile/world/port,
+with one staged binary cohort and shared lease. Each boot receives fresh memory
+admission, nonce, separately hashed action plan, process windows and ordinary
+scenario/client evidence. Nonces retain the parent's ten-character actor prefix;
+the declared actor order and whitelist remain unchanged. Saved configuration
+bytes pass unchanged from the first clean shutdown to the second startup.
+
+`ScenarioContext.restartPhase()` exposes parent/index/nonce and the preceding
+immutable scenario report for later consumers. Its observations may retain native
+UUID/chunk coordinates; it never resets production state. T08a/#39 must leave its
+production encounter active before shutdown, load its old chunks after restart,
+and prove the native UUID absent plus production idle and new spawn/reset. T09e's
+starter greeting/configuration and connected reload/status calibration does not
+satisfy that future feature gate. Human profiles and single-boot contracts remain
+unchanged; [runner details](../../dev/agent-paper-tests.md#same-profile-restart-fixtures)
+define the fixed evidence envelope.
+
 ## 13. Milestones and completion gates
 
 | Milestone | Playable outcome | Exit gate |
 | --- | --- | --- |
-| M0: contracts and feasibility | Written rules plus a small real-Paper collision experiment | Multipart hits, native suppression, simultaneous arrows, and despawn control have an evidenced implementation path. |
+| M0: contracts and feasibility — accepted | Written rules plus a small real-Paper collision experiment | Multipart hits, native suppression, simultaneous arrows, and despawn control have an evidenced implementation path; [explicit PR48-cohort acceptance](evidence/catalog-procs-suite.md). Production enforcement remains later work. |
 | M1: stats and combat | Inspectable stats, tagged test bow, dummy, crits, ferocity, separate ledgers | Deterministic math tests and real-target hit reports agree; vanilla damage is not added twice. |
 | M2: enchant and arrow sandbox | Tracer, Duplex, Fatal Tempo, Snipe, shortbow; Power/Vicious and Overload hooks | Physical projectile identity, input cadence, swap/expiry, and proc bounds pass. |
 | M3: prefire rehearsal | Repeatable countdown and real dragon hatch | A human and automated trace prove pre-spawn arrows can hit, with valid misses remaining misses. |

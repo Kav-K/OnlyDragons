@@ -187,6 +187,18 @@ def evidence_files(project):
                 path = profile / relative
                 if path.exists() or path.is_symlink():
                     include(path)
+            result_path = project / 'build/reports/agent-paper' / profile.name / 'result.json'
+            restart_result = None
+            if result_path.is_file():
+                try:
+                    restart_result = paper_test.strict_json(result_path)
+                except paper_test.ValidationError:
+                    pass  # Preserve malformed failure evidence, without admitting additional profile files.
+            if isinstance(restart_result, dict) and restart_result.get('catalogMode') == 'same-profile-restart-v1':
+                # Only the named restart mode's final production greeting config; never the plugin directory.
+                config = profile / 'plugins/OnlyDragons/config.yml'
+                if config.exists() or config.is_symlink():
+                    include(config)
             for directory, pattern in (('cache', 'mojang_*.jar'), ('player-client', '*.jar')):
                 root = profile / directory
                 if root.exists():

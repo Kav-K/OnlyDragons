@@ -4,6 +4,19 @@
   "defaultBranch": "main",
   "tasks": [
     {
+      "id": "T09e",
+      "title": "Reusable same-profile Paper restart fixtures",
+      "dependsOn": [
+        "T09a",
+        "T09b",
+        "T09c",
+        "T09d"
+      ],
+      "scope": "Lead-assigned bounded validation maintenance: fixed two-boot runner, strict replay, generic calibration and additive catalogs.",
+      "acceptance": "Clean sequential processes under one lease, unchanged artifacts/config continuity, positive and intended abort Paper cases, failure/provenance tests. Generic calibration never certifies managed encounter recovery.",
+      "coordination": "GH-49 owns authorized shared runner/companion/catalog touchpoints; preserve PR48 additive integration."
+    },
+    {
       "id": "T09c", "title": "Shared regression suites and evidence-based delivery checkpoints", "dependsOn": ["T09a", "T09b", "T00"],
       "scope": "Common regression and failure-control suites, changed-area coverage, strict evidence aggregation, connected-player integration fixtures and an automated checkpoint against task dependencies and milestone requirements. All issue checkouts receive the same fixture contract.",
       "acceptance": "Registered scenarios cannot disappear from coverage silently. Unknown gameplay changes, stale or incomplete receipts, unexpected failure, skipped tests and resource-busy results cannot pass. Actual Paper positive and intended negative controls retain exact clean input/artifact evidence and owned cleanup. Checkpoints distinguish automated evidence from independent review, CI, subjective feel/visual/authentication and unresolved design decisions; partial components do not release full milestone dependencies.",
@@ -94,7 +107,7 @@
       "coordination": "Integration-lead-owned bootstrap/descriptor/command registration. Revalidate latest main and existing status smoke checks before merge."
     },
     {
-      "id": "T08a", "title": "Add the managed test-dragon backend and development controls", "dependsOn": ["T08", "T02b"],
+      "id": "T08a", "title": "Add the managed test-dragon backend and development controls", "dependsOn": ["T08", "T02b", "T09e"],
       "scope": "Consume T08 shared target/combat/proc lifecycle and T02b definition to add one real test-dragon backend plus permission-gated spawn/status/reset/result-inspection controls. Own the agreed paper.encounter/application encounter backend and command adapters; bootstrap stays lead-owned. Reuse T06 physical claims, part mapping, phase guards and native suppression; no competing listener or combat engine.",
       "acceptance": "Actual owned arrows and real Paper dragon prove supported-phase admission, native suppression, one lethal completion, no post-death credit, and separate managed/native death observations. Repeated spawn/reset, initialization failure, disable/removal and two same-tick lethal candidates release all owned state and cannot produce duplicate results. A connected actor proves command permissions, invalid/stale IDs and captured output; unmanaged targets and other encounters remain unaffected. Development controls never enable real rewards.",
       "coordination": "Issue #39. Await integrated T08 and T02b. Publish one lifecycle/target-registration boundary for T10 countdown/hatch and T08b result presentation; direct spawn is not M3 acceptance. Preserve existing commands and the Windows Cursor build/play path. Register additive feature assertions and collect clean actual-Paper evidence; no alteration of human worlds."
