@@ -77,7 +77,7 @@ their older raw evidence remains tied to its original revision.
 | Two protected-skill blocked retries | 6.3 combined worker-minutes; 2.16M cumulative input, 1.99M cached, 6,199 output tokens | A real integration defect, fixed by PR #34. Repeated-input counters are neither unique context nor dollar cost. |
 | Verified 15-case suite | 1,119.90 seconds / 18.67 minutes | Exact baseline receipt `0fb6adae1173467f87731ae50367f785`. |
 | Gradle work within that suite | 35 invocations reporting 410 seconds | 36.6% of suite elapsed time; a larger opportunity than MCP startup. |
-| Between case wrappers/receipt work | 186.14 seconds | Measured residual, not all attributed to a specific cause. |
+| Between case wrappers/receipt work | 186.12 seconds | Measured residual, not all attributed to a specific cause. |
 | Four earlier incomplete suite batches | 1,546.22 seconds / 25.77 minutes | Includes idle-control mismatch and host-memory probe failure; intended negative controls are not counted as engineering failures. |
 | Recent Serena LSP initialization | 22.082 and 24.417 seconds | Largely overlapped initial reads; no demonstrated symbol benefit in this sample. |
 | Recent per-worker tool memory | JDTLS about 291–293 MiB RSS; Serena about 102 MiB | The configured 1 GiB Java heap is a ceiling, not observed resident use. |
@@ -118,9 +118,10 @@ operator's Cursor Build command also passed at its stated main revision. Those
 results do not establish unrun Windows Play, visual feel or authenticated
 multiplayer behavior.
 
-Every handoff still requires a clean current-main integration, validated receipt
-for current source inputs, appropriate changed-area tests, independent review and
-current-head CI. `checkpoint.py` rejects missing/deferred requirements and stale
+Every handoff still requires a clean current-main integration, appropriate scoped
+tests, independent review and current-head CI. When the changed-area policy selects
+Paper, require a validated receipt for current source inputs. `checkpoint.py`
+rejects missing/deferred requirements and stale
 receipts; its static plan is not acceptance. The new regressions retain pending
 player evidence and policy review, and prove that completing feasibility cannot
 silently waive the later production adapter's P02/P04 requirements.
