@@ -239,6 +239,19 @@ These are OnlyDragons calibration fixtures, not Hypixel measurements, native
 physical-hit proof or authenticated-client evidence. Gravity/Overload formulas
 and ferocity health coefficients remain unresolved; no upstream claim changed.
 
+### T08a native dragon initialization and terminal ownership (Paper 121)
+
+**Observed in dirty GH-39 iterations, 6 September 2026:** disabling AI in the
+spawn consumer left native multipart geometry near the origin while the parent
+was at the configured y=100; the first owned-arrow claim timed out with complete
+cleanup (`c6520c55fe894404956ff589c11261cd`). Native HOVER with AI enabled updated
+the real parts and passed 36 combat assertions in iteration
+`d93caa45689d49ff9d121e9d2c093ab3`, including same-tick/lethal claims, native
+animation/removal and an unmanaged native XP positive control. This selects
+native HOVER for development initialization; it is not custom flight AI or a
+Hypixel movement claim. New subscription/failure cases and final clean-input
+acceptance remain pending in [T08a status](03-agent-tasks-and-validation.md#t08a--managed-real-dragon-backend-and-development-controls).
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

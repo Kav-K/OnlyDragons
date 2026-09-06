@@ -1461,5 +1461,547 @@
       "owned_listeners_removed",
       "abort_preserves_preexisting_native_ticket"
     ]
+  },
+  "dragon-restart-fresh": {
+    "catalogMode": "same-profile-restart-v1",
+    "testPlayerMode": "protocol-actions-v1",
+    "mechanicRevision": "dragon-restart-v1",
+    "requiredAssertions": [
+      "production_idle_on_boot",
+      "legacy_settings_preserved",
+      "loaded_arena_before_setup",
+      "production_real_dragon_active",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ],
+    "phases": [
+      {
+        "index": 1,
+        "expectation": "positive",
+        "mechanicRevision": "dragon-restart-v1",
+        "requiredAssertions": [
+          "production_idle_on_boot",
+          "legacy_settings_preserved",
+          "loaded_arena_before_setup",
+          "production_real_dragon_active",
+          "owned_resources_released",
+          "owned_listeners_removed",
+          "owned_entities_removed",
+          "owned_tasks_cancelled",
+          "owned_chunk_tickets_removed",
+          "denial_no_config_or_memory_change",
+          "unconfigured_spawn_rejected",
+          "production_setup_saved",
+          "invalid_keeps_previous",
+          "duplicate_preserves_generation",
+          "active_at_first_shutdown",
+          "failed_read_keeps_loaded_arena",
+          "failed_read_fixture_restores_saved_bytes"
+        ],
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-1-v1.json",
+        "requiredActorMessages": [
+          {
+            "id": "message-0",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon spawned."
+            ]
+          },
+          {
+            "id": "message-1",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "rewards disabled"
+            ]
+          },
+          {
+            "id": "message-2",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "You do not have permission to use dragon controls."
+            ]
+          },
+          {
+            "id": "message-3",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon arena saved."
+            ]
+          },
+          {
+            "id": "message-4",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon request rejected:"
+            ]
+          },
+          {
+            "id": "save-fails",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon arena save failed; previous arena retained:"
+            ]
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "expectation": "positive",
+        "mechanicRevision": "dragon-restart-v1",
+        "requiredAssertions": [
+          "production_idle_on_boot",
+          "legacy_settings_preserved",
+          "loaded_arena_before_setup",
+          "production_real_dragon_active",
+          "owned_resources_released",
+          "owned_listeners_removed",
+          "owned_entities_removed",
+          "owned_tasks_cancelled",
+          "owned_chunk_tickets_removed",
+          "old_native_absent_after_chunk_load",
+          "selected_definition_readback",
+          "restart_new_spawn_reset_cleanup",
+          "repeat_reset_no_result"
+        ],
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
+        "requiredActorMessages": [
+          {
+            "id": "message-0",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon spawned."
+            ]
+          },
+          {
+            "id": "message-1",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "rewards disabled"
+            ]
+          },
+          {
+            "id": "message-2",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon reset."
+            ]
+          },
+          {
+            "id": "message-3",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "already retired"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "dragon-restart-legacy": {
+    "catalogMode": "same-profile-restart-v1",
+    "testPlayerMode": "protocol-actions-v1",
+    "mechanicRevision": "dragon-restart-v1",
+    "requiredAssertions": [
+      "production_idle_on_boot",
+      "legacy_settings_preserved",
+      "loaded_arena_before_setup",
+      "production_real_dragon_active",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "legacy_extra_preserved"
+    ],
+    "phases": [
+      {
+        "index": 1,
+        "expectation": "positive",
+        "mechanicRevision": "dragon-restart-v1",
+        "requiredAssertions": [
+          "production_idle_on_boot",
+          "legacy_settings_preserved",
+          "loaded_arena_before_setup",
+          "production_real_dragon_active",
+          "owned_resources_released",
+          "owned_listeners_removed",
+          "owned_entities_removed",
+          "owned_tasks_cancelled",
+          "owned_chunk_tickets_removed",
+          "legacy_extra_preserved",
+          "denial_no_config_or_memory_change",
+          "unconfigured_spawn_rejected",
+          "production_setup_saved",
+          "invalid_keeps_previous",
+          "duplicate_preserves_generation",
+          "active_at_first_shutdown",
+          "failed_read_keeps_loaded_arena",
+          "failed_read_fixture_restores_saved_bytes"
+        ],
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-1-v1.json",
+        "requiredActorMessages": [
+          {
+            "id": "message-0",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon spawned."
+            ]
+          },
+          {
+            "id": "message-1",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "rewards disabled"
+            ]
+          },
+          {
+            "id": "message-2",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "You do not have permission to use dragon controls."
+            ]
+          },
+          {
+            "id": "message-3",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon arena saved."
+            ]
+          },
+          {
+            "id": "message-4",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon request rejected:"
+            ]
+          },
+          {
+            "id": "save-fails",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon arena save failed; previous arena retained:"
+            ]
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "expectation": "positive",
+        "mechanicRevision": "dragon-restart-v1",
+        "requiredAssertions": [
+          "production_idle_on_boot",
+          "legacy_settings_preserved",
+          "loaded_arena_before_setup",
+          "production_real_dragon_active",
+          "owned_resources_released",
+          "owned_listeners_removed",
+          "owned_entities_removed",
+          "owned_tasks_cancelled",
+          "owned_chunk_tickets_removed",
+          "legacy_extra_preserved",
+          "old_native_absent_after_chunk_load",
+          "selected_definition_readback",
+          "restart_new_spawn_reset_cleanup",
+          "repeat_reset_no_result"
+        ],
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
+        "requiredActorMessages": [
+          {
+            "id": "message-0",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon spawned."
+            ]
+          },
+          {
+            "id": "message-1",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "rewards disabled"
+            ]
+          },
+          {
+            "id": "message-2",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon reset."
+            ]
+          },
+          {
+            "id": "message-3",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "already retired"
+            ]
+          }
+        ]
+      }
+    ],
+    "initialConfig": {
+      "path": "dev/game-tests/config-seeds/dragon-legacy.yml",
+      "sha256": "6da32cf961e4350dd8727af7502072b8ebc7b5a5ed02e230baa200004a4c2288"
+    }
+  },
+  "dragon-combat": {
+    "mechanicRevision": "dragon-combat-v1",
+    "requiredAssertions": [
+      "real_dragon_initialized",
+      "selection_retained",
+      "cancelled_hit_zero_credit",
+      "owned_arrow_exact_damage",
+      "physical_owner_and_retirement",
+      "native_suppression_observed",
+      "one_lethal_frozen_result",
+      "native_death_separate_from_domain",
+      "terminal_work_closed",
+      "native_animation_advances",
+      "one_native_death_removal",
+      "delayed_rewards_suppressed",
+      "frozen_after_late_ticks",
+      "death_releases_owned_tickets",
+      "native_xp_observer_positive_control",
+      "stale_reset_rejected",
+      "reset_no_ordinary_result",
+      "repeat_reset_no_extra_completion",
+      "proc_lethal_native_boundary",
+      "animation_reset_keeps_frozen_no_rewards",
+      "cancelled_death_is_diagnostic",
+      "cancelled_death_not_retried",
+      "cancelled_death_cleanup",
+      "native_death_rewards_cleared",
+      "failed_spawn_cleanup_0",
+      "failed_spawn_cleanup_1",
+      "failed_spawn_cleanup_2",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "three_real_arrows_held_before_lethal",
+      "same_tick_lethal_order",
+      "late_arrow_retired_without_claim",
+      "revived_terminal_native_guard",
+      "native_completion_subscription",
+      "proc_lethal_subscription",
+      "cancelled_death_no_notification",
+      "settled_close_rejected_without_poisoning",
+      "later_native_death_cannot_publish_cancelled_result",
+      "unrelated_entity_preserved",
+      "subscriptions_return_to_baseline",
+      "native_mob_drops_enabled",
+      "connected_stale_and_active_setup_reject",
+      "stale_subscription_handle_preserves_new_generation",
+      "repeated_handle_preserves_equal_registration",
+      "nonordinary_removal_before_delivery_disqualifies",
+      "retirement_callback_cleanup"
+    ],
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/dragon-combat-v1.json",
+    "requiredActorMessages": [
+      {
+        "id": "message-0",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Dragon arena saved."
+        ]
+      },
+      {
+        "id": "message-1",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Dragon spawned."
+        ]
+      },
+      {
+        "id": "message-3",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Frozen dragon result="
+        ]
+      },
+      {
+        "id": "message-4",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Dragon reset."
+        ]
+      }
+    ]
+  },
+  "dragon-restart-animation": {
+    "catalogMode": "same-profile-restart-v1",
+    "testPlayerMode": "protocol-actions-v1",
+    "mechanicRevision": "dragon-restart-v1",
+    "requiredAssertions": [
+      "production_idle_on_boot",
+      "legacy_settings_preserved",
+      "loaded_arena_before_setup",
+      "production_real_dragon_active",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ],
+    "phases": [
+      {
+        "index": 1,
+        "expectation": "positive",
+        "mechanicRevision": "dragon-restart-v1",
+        "requiredAssertions": [
+          "production_idle_on_boot",
+          "legacy_settings_preserved",
+          "loaded_arena_before_setup",
+          "production_real_dragon_active",
+          "owned_resources_released",
+          "owned_listeners_removed",
+          "owned_entities_removed",
+          "owned_tasks_cancelled",
+          "owned_chunk_tickets_removed",
+          "denial_no_config_or_memory_change",
+          "unconfigured_spawn_rejected",
+          "production_setup_saved",
+          "invalid_keeps_previous",
+          "duplicate_preserves_generation",
+          "active_at_first_shutdown",
+          "failed_read_keeps_loaded_arena",
+          "failed_read_fixture_restores_saved_bytes",
+          "animation_owned_at_shutdown"
+        ],
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-animation-v1.json",
+        "requiredActorMessages": [
+          {
+            "id": "message-0",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon spawned."
+            ]
+          },
+          {
+            "id": "message-1",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "rewards disabled"
+            ]
+          },
+          {
+            "id": "message-2",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "You do not have permission to use dragon controls."
+            ]
+          },
+          {
+            "id": "message-3",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon arena saved."
+            ]
+          },
+          {
+            "id": "message-4",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon request rejected:"
+            ]
+          },
+          {
+            "id": "save-fails",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon arena save failed; previous arena retained:"
+            ]
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "expectation": "positive",
+        "mechanicRevision": "dragon-restart-v1",
+        "requiredAssertions": [
+          "production_idle_on_boot",
+          "legacy_settings_preserved",
+          "loaded_arena_before_setup",
+          "production_real_dragon_active",
+          "owned_resources_released",
+          "owned_listeners_removed",
+          "owned_entities_removed",
+          "owned_tasks_cancelled",
+          "owned_chunk_tickets_removed",
+          "old_native_absent_after_chunk_load",
+          "selected_definition_readback",
+          "restart_new_spawn_reset_cleanup",
+          "repeat_reset_no_result"
+        ],
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
+        "requiredActorMessages": [
+          {
+            "id": "message-0",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon spawned."
+            ]
+          },
+          {
+            "id": "message-1",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "rewards disabled"
+            ]
+          },
+          {
+            "id": "message-2",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon reset."
+            ]
+          },
+          {
+            "id": "message-3",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "already retired"
+            ]
+          }
+        ]
+      }
+    ]
   }
 }

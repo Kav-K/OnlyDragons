@@ -1,2 +1,4 @@
 welcome-enabled: true
 welcome-message: 'Welcome, {player}! Your development plugin is running.'
+
+# Development arena is intentionally absent until /onlydragons dev dragon setup succeeds.

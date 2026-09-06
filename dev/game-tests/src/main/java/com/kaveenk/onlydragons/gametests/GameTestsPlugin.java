@@ -16,6 +16,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.ofEntries(
+            Map.entry("dragon-restart-animation", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false, true)),
+            Map.entry("dragon-combat", new com.kaveenk.onlydragons.gametests.encounter.DragonCombatScenario()),
+            Map.entry("dragon-restart-fresh", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false)),
+            Map.entry("dragon-restart-legacy", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(true)),
             Map.entry("practice-lifecycle", new com.kaveenk.onlydragons.gametests.combat.PracticeLifecycleScenario()),
             Map.entry("practice-combat", new com.kaveenk.onlydragons.gametests.combat.PracticeCombatScenario()),
             Map.entry("tracer-cleanup-abort", new com.kaveenk.onlydragons.gametests.projectile.homing.TracerCleanupScenario()),

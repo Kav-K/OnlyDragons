@@ -60,6 +60,24 @@ class RestartContracts(unittest.TestCase):
     def verify(self):
         restart.verify_continuity(runner, self.parent, self.descriptor, self.root)
 
+    def test_initial_seed_default_valid_and_rejections(self):
+        import subprocess
+        self.assertIsNone(restart.initial_seed(self.root, {}))
+        subprocess.run(['git', 'init', '-q', str(self.root)], check=True)
+        relative = 'dev/game-tests/config-seeds/legacy.yml'
+        path = self.root / relative
+        path.parent.mkdir(parents=True)
+        path.write_text('legacy: retained\n', encoding='utf-8')
+        subprocess.run(['git', 'add', relative], cwd=self.root, check=True)
+        seed = {'path': relative, 'sha256': runner.sha256(path)}
+        self.assertEqual(path.read_bytes(), restart.initial_seed(self.root, {'initialConfig': seed}))
+        for bad in [dict(seed, path='../legacy.yml'), dict(seed, sha256='0' * 64), dict(seed, extra=True)]:
+            with self.assertRaises(runner.ValidationError): restart.initial_seed(self.root, {'initialConfig': bad})
+        for data in [b'changed', b'\xff', b'a' * 65537]:
+            path.write_bytes(data)
+            candidate = dict(seed, sha256=runner.sha256(path)) if data != b'changed' else seed
+            with self.assertRaises(runner.ValidationError): restart.initial_seed(self.root, {'initialConfig': candidate})
+
     def test_two_sequential_boots_preserve_config_and_world(self):
         self.verify()
         restart.validate_descriptor(ROOT, self.descriptor)

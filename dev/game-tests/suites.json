@@ -138,6 +138,30 @@
     "tracer-cleanup-abort": {
       "scenarioId": "tracer-cleanup-abort",
       "expectation": "cleanup-abort"
+    },
+    "dragon-combat": {
+      "scenarioId": "dragon-combat",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
+    },
+    "dragon-restart-fresh": {
+      "scenarioId": "dragon-restart-fresh",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
+    },
+    "dragon-restart-legacy": {
+      "scenarioId": "dragon-restart-legacy",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
+    },
+    "dragon-restart-animation": {
+      "scenarioId": "dragon-restart-animation",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 120
     }
   },
   "suites": {
@@ -160,7 +184,11 @@
       "owned-firing",
       "practice-combat",
       "practice-lifecycle",
-      "tracer-continuity"
+      "tracer-continuity",
+      "dragon-combat",
+      "dragon-restart-fresh",
+      "dragon-restart-legacy",
+      "dragon-restart-animation"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -201,7 +229,22 @@
       "practice-combat",
       "practice-lifecycle",
       "tracer-continuity",
-      "tracer-cleanup-abort"
+      "tracer-cleanup-abort",
+      "dragon-combat",
+      "dragon-restart-fresh",
+      "dragon-restart-legacy",
+      "dragon-restart-animation"
+    ],
+    "t08a-worker": [
+      "dragon-combat",
+      "dragon-restart-fresh",
+      "dragon-restart-legacy",
+      "dragon-restart-animation",
+      "practice-combat",
+      "practice-lifecycle",
+      "owned-firing",
+      "same-profile-restart",
+      "same-profile-restart-abort"
     ]
   },
   "areas": {
@@ -258,7 +301,11 @@
         "practice-combat",
         "practice-lifecycle",
         "tracer-continuity",
-        "tracer-cleanup-abort"
+        "tracer-cleanup-abort",
+        "dragon-combat",
+        "dragon-restart-fresh",
+        "dragon-restart-legacy",
+        "dragon-restart-animation"
       ],
       "affects": [
         "stats",
@@ -452,7 +499,11 @@
         "practice-combat",
         "practice-lifecycle",
         "tracer-continuity",
-        "tracer-cleanup-abort"
+        "tracer-cleanup-abort",
+        "dragon-combat",
+        "dragon-restart-fresh",
+        "dragon-restart-legacy",
+        "dragon-restart-animation"
       ],
       "affects": []
     },
@@ -529,6 +580,23 @@
       "cases": [
         "tracer-continuity",
         "tracer-cleanup-abort"
+      ],
+      "affects": []
+    },
+    "managed-dragon": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/paper/encounter/*",
+        "src/main/java/com/kaveenk/onlydragons/command/DragonCommand.java",
+        "src/test/java/com/kaveenk/onlydragons/paper/encounter/**",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/encounter/**",
+        "dev/game-tests/player-plans/dragon-*.json",
+        "dev/game-tests/config-seeds/*"
+      ],
+      "cases": [
+        "dragon-combat",
+        "dragon-restart-fresh",
+        "dragon-restart-legacy",
+        "dragon-restart-animation"
       ],
       "affects": []
     }

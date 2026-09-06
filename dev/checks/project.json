@@ -31,6 +31,10 @@
     {
       "command": "onlydragons dev reset",
       "expect": "This command requires a player\\."
+    },
+    {
+      "command": "onlydragons dev dragon status",
+      "expect": "Arena .*dragon IDLE.*rewards disabled"
     }
   ]
 }

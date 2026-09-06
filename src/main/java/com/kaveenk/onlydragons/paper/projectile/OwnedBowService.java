@@ -82,6 +82,7 @@ public final class OwnedBowService implements AutoCloseable {
     private final Map<UUID, Hold> holds = new HashMap<>();
     private final ArrayDeque<Trace> traces = new ArrayDeque<>();
     private Consumer<SettledHit> receiver;
+    private java.util.function.Predicate<UUID> retainedProtection;
     private PlayerDeathEvent refundDeath;
     private BukkitTask task;
     private boolean closed;
@@ -118,6 +119,14 @@ public final class OwnedBowService implements AutoCloseable {
     public void receiver(Consumer<SettledHit> receiver) {
         check(); if (this.receiver != null) throw new IllegalStateException("Receiver already registered");
         this.receiver = Objects.requireNonNull(receiver);
+    }
+    /** Bootstrap-owned native protection survives closed physical admission until backend removal. */
+    public void retainedProtection(java.util.function.Predicate<UUID> protection) {
+        check(); if (retainedProtection != null) throw new IllegalStateException("Native protection already registered");
+        retainedProtection = Objects.requireNonNull(protection);
+    }
+    public void clearRetainedProtection(java.util.function.Predicate<UUID> protection) {
+        thread(); if (retainedProtection == protection) retainedProtection = null;
     }
     public void clearReceiver(Consumer<SettledHit> receiver) { thread(); if (this.receiver == receiver) this.receiver = null; }
     public Optional<UUID> currentSession(UUID owner) { thread(); return Optional.ofNullable(sessions.get(owner)); }
@@ -251,7 +260,7 @@ public final class OwnedBowService implements AutoCloseable {
     void protectTarget(EntityDamageEvent event) {
         check(); Entity entity = event.getEntity();
         UUID id = entity instanceof EnderDragonPart part ? part.getParent().getUniqueId() : entity.getUniqueId();
-        if (targets.containsKey(id)) { event.setDamage(0); event.setCancelled(true); }
+        if (targets.containsKey(id) || (retainedProtection != null && retainedProtection.test(id))) { event.setDamage(0); event.setCancelled(true); }
     }
     private void tick() {
         if (closed) return;
@@ -473,6 +482,6 @@ public final class OwnedBowService implements AutoCloseable {
         for (UUID id : List.copyOf(entities.keySet())) retire(id, Retirement.DISABLE);
         continuity.close();
         closed = true; if (task != null) task.cancel(); task = null;
-        registry.clear(); candidates.clear(); inputs.clear(); holds.clear(); sessions.clear(); sessionArenas.clear(); cooldowns.clear(); targets.clear(); arenas.clear(); receiver = null;
+        registry.clear(); candidates.clear(); inputs.clear(); holds.clear(); sessions.clear(); sessionArenas.clear(); cooldowns.clear(); targets.clear(); arenas.clear(); receiver = null; retainedProtection = null;
     }
 }

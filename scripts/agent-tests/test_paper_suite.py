@@ -372,6 +372,9 @@ class SelectionTests(unittest.TestCase):
         for name in ('suites.json', 'scenarios.json'):
             shutil.copyfile(source / 'dev/game-tests' / name, self.root / 'dev/game-tests' / name)
         shutil.copytree(source / 'dev/game-tests/player-plans', self.root / 'dev/game-tests/player-plans')
+        shutil.copytree(source / 'dev/game-tests/config-seeds', self.root / 'dev/game-tests/config-seeds')
+        subprocess.run(['git', 'init', '-q', str(self.root)], check=True)
+        subprocess.run(['git', 'add', 'dev/game-tests/config-seeds'], cwd=self.root, check=True)
 
     def test_stats_changes_require_transitive_item_and_combat(self):
         selected = suite.required_cases(self.root, ['src/main/java/com/kaveenk/onlydragons/domain/stats/StatResolver.java'])

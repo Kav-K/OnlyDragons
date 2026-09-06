@@ -15,10 +15,36 @@ def evidence_path(root, relative):
     return safe_path(root, relative)
 
 
+def initial_seed(project, descriptor):
+    import paper_test as r
+    seed = descriptor.get('initialConfig')
+    if seed is None:
+        return None
+    r.require(isinstance(seed, dict) and set(seed) == {'path', 'sha256'}, 'Invalid initial config seed')
+    name = seed['path']
+    r.require(isinstance(name, str) and re.fullmatch(r'dev/game-tests/config-seeds/[a-z0-9-]+\.yml', name),
+              'Initial config seed must be a bounded tracked fixture')
+    path = evidence_path(project, name)
+    import subprocess
+    r.require(subprocess.run(['git', 'ls-files', '--error-unmatch', '--', name], cwd=project,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0,
+              'Initial config seed is not tracked')
+    r.require(path.is_file() and path.stat().st_size <= 65536 and r.sha256(path) == seed['sha256'],
+              'Missing, oversized or hash-mismatched initial config seed')
+    data = path.read_bytes()
+    try:
+        data.decode('utf-8')
+    except UnicodeDecodeError as failure:
+        raise r.ValidationError('Initial config seed must be UTF-8') from failure
+    r.require(__import__('hashlib').sha256(data).hexdigest() == seed['sha256'], 'Initial config seed changed during read')
+    return data
+
+
 def validate_descriptor(project, descriptor):
     import paper_test as r
     r.require(descriptor.get('catalogMode') == MODE and descriptor.get('testPlayerMode') == 'protocol-actions-v1',
               'Restart requires the explicitly declared catalog/player mode')
+    initial_seed(project, descriptor)
     phases = descriptor.get('phases')
     r.require(isinstance(phases, list) and len(phases) == 2, 'Restart requires exactly two ordered phases')
     roster = None
@@ -65,7 +91,8 @@ def execute_phases(r, args, project, java_home, pins, descriptor, parent, direct
     config = directory / CONFIG
     config.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(directory / 'plugins/OnlyDragons.jar') as jar:
-        config.write_bytes(jar.read('config.yml'))
+        seed = initial_seed(project, descriptor)
+        config.write_bytes(jar.read('config.yml') if seed is None else seed)
     outcome['initialConfigSha256'] = snapshot(r, config, root / 'config-initial.yml')
     artifacts = artifact_hashes(r, directory)
     outcome['stagedArtifacts'] = artifacts
@@ -220,7 +247,8 @@ def verify_case(s, project, record, case, descriptor, source, suite_root):
     r.require(all(type(value) is int for value in window) and window == sorted(window), 'Lease did not span both boots and cleanup')
     profile = s.safe_path(project, 'run/agent-tests/' + parent_id)
     with zipfile.ZipFile(evidence_path(profile, 'plugins/OnlyDragons.jar')) as jar:
-        r.require(evidence_path(root, 'config-initial.yml').read_bytes() == jar.read('config.yml'), 'Initial config differs from staged production defaults')
+        seed = initial_seed(project, descriptor)
+        r.require(evidence_path(root, 'config-initial.yml').read_bytes() == (jar.read('config.yml') if seed is None else seed), 'Initial config differs from declared source')
     r.require(artifact_hashes(r, profile) == parent['stagedArtifacts'], 'Restart artifacts changed on disk')
     r.require(r.sha256(evidence_path(profile, CONFIG)) == parent['phases'][1]['configAfterSha256'], 'Final persisted config changed')
     records = record.get('phases')

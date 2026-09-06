@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "planId": "dragon-restart-animation-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "denied",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon setup minecraft:overworld 0 100 0 24 test_dragon"
+              }
+            },
+            {
+              "id": "unconfigured",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "setup",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon setup minecraft:overworld 0 100 0 24 test_dragon"
+              }
+            },
+            {
+              "id": "save-fails",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon setup minecraft:overworld 0 100 0 32 test_dragon"
+              }
+            },
+            {
+              "id": "invalid",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon setup minecraft:overworld NaN 100 0 24 test_dragon"
+              }
+            },
+            {
+              "id": "spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "status",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon status"
+              }
+            },
+            {
+              "id": "duplicate",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -19,6 +19,10 @@ public final class ManagedCombatListener implements Listener {
             service.entityEnded(event.getEntity().getUniqueId());
         }
     }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void deathObserved(EntityDeathEvent event) { service.nativeDeathObserved(event.getEntity().getUniqueId(), event.isCancelled()); }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void removed(EntityRemoveEvent event) { service.nativeRemoved(event.getEntity().getUniqueId(), event.getCause()); }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void heal(EntityRegainHealthEvent event) {
         if (service.ownsEntity(event.getEntity().getUniqueId())) event.setCancelled(true);

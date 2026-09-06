@@ -18,6 +18,8 @@ public class OnlyDragonsPlugin extends JavaPlugin {
     public com.kaveenk.onlydragons.paper.encounter.ManagedCombatService combat() { return combat; }
     private com.kaveenk.onlydragons.paper.projectile.OwnedBowService bows;
     public com.kaveenk.onlydragons.paper.projectile.OwnedBowService bows() { return bows; }
+    private com.kaveenk.onlydragons.paper.encounter.DevelopmentDragonService dragons;
+    public com.kaveenk.onlydragons.paper.encounter.DevelopmentDragonService dragons() { return dragons; }
     private GreetingService greetings;
     private EquipmentStatsService equipment;
     private DragonDefinitionRegistry dragonDefinitions;
@@ -40,6 +42,8 @@ public class OnlyDragonsPlugin extends JavaPlugin {
         combat = new com.kaveenk.onlydragons.paper.encounter.ManagedCombatService(this, bows);
         getServer().getPluginManager().registerEvents(new com.kaveenk.onlydragons.paper.encounter.ManagedCombatListener(combat), this);
         combat.start();
+        dragons = new com.kaveenk.onlydragons.paper.encounter.DevelopmentDragonService(combat, dragonDefinitions,
+                new com.kaveenk.onlydragons.paper.encounter.ArenaConfiguration(getDataFolder().toPath().resolve("config.yml"), dragonDefinitions), bows.continuity().tickets());
         equipmentListener = new EquipmentListener(this, equipment);
         getServer().getPluginManager().registerEvents(equipmentListener, this);
         getServer().getOnlinePlayers().forEach(equipmentListener::queue);
@@ -62,7 +66,10 @@ public class OnlyDragonsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        try { if (combat != null) combat.close(); }
+        try {
+            try { if (dragons != null) dragons.close(); }
+            finally { if (combat != null) combat.close(); }
+        }
         finally {
             try { if (bows != null) bows.close(); }
             finally { if (equipmentListener != null) equipmentListener.close(); }

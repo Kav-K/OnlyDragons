@@ -11,5 +11,8 @@ public interface TargetBackend extends AutoCloseable {
     void synchronize(TargetState state);
     void defeated(EncounterResult result);
     boolean released();
+    default boolean announcesImmediately() { return true; }
+    default void deathObserved(boolean cancelled) {}
+    default void removed(org.bukkit.event.entity.EntityRemoveEvent.Cause cause) {}
     @Override void close();
 }
