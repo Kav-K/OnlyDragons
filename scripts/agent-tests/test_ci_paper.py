@@ -222,7 +222,7 @@ class HostedPaperTests(unittest.TestCase):
     def test_clone_is_exact_clean_source_and_does_not_copy_origin_credentials(self):
         self.put('input.txt', b'committed bytes\n')
         def git(*args):
-            return subprocess.check_output(['git', '-C', str(self.project), *args], stderr=subprocess.STDOUT)
+            return subprocess.check_output(['git', '-c', 'maintenance.auto=false', '-C', str(self.project), *args], stderr=subprocess.STDOUT)
         git('init', '-q')
         git('config', 'user.name', 'Fixture')
         git('config', 'user.email', 'fixture@example.invalid')
