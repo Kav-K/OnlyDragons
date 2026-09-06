@@ -38,7 +38,7 @@ M3, real-content and economy gates remain in force; no task is dispatched here.
 
 **Owner:** encounter adapter owner, coordinated with the #9 projectile owner and integration lead. Own the bounded encounter service and `paper.encounter` adapter. #9 owns projectile identity, part-to-parent mapping, settled physical claims, native-suppression/phase guards and retirement; this component consumes that boundary and invokes the established combat/proc services. The shared backlog and T06/T08 ownership text now make this split explicit.
 
-**Dependencies:** accepted T04, T03, T05, T06 and required T01b shot-time integration. This is a proposed bounded extension/split of #11/T08, not completion of #12 prefire or M3. Direct managed-dragon practice need not depend on the later eight-eye ritual.
+**Dependencies:** accepted T04, T03, T05, T06 and required T01b shot-time integration. Definition-backed integration consumes D4's published dragon-definition contract; later loot-policy and delivery work are not prerequisites. This is a proposed bounded extension/split of #11/T08, not completion of #12 prefire or M3. Direct managed-dragon practice need not depend on the later eight-eye ritual.
 
 **Deliverable:** one explicit encounter generation for the initial test dragon, with owned native identity and authoritative domain health, using the reviewed measured phase policy. Register and expose a target only after successful initialization. On managed lethal damage, freeze one result and drive the native death/presentation sequence once. Distinguish defeat from reset, removal, startup failure and shutdown; abort paths must not masquerade as a rewarded defeat. Use stable completion identity for consumers. Preserve existing ordinary/unowned entities and unrelated arenas. Select the permitted arenas, simultaneous encounter limit and configured target behavior only after the lead records the user's scope.
 
@@ -134,7 +134,7 @@ Retain the existing dependency chain through T04/T05/T06/T07/T08. Reuse D1 from 
 
 1. Continue #5/#8 acceptance independently; reconcile pending decisions before their dependent proposed work packages are dispatched.
 2. Clarify #9/#11 physical-boundary ownership; integrate #9 after its prerequisites.
-3. Implement D1, then consume it from D2 and D3. Pure command/projection tests and D4 schema design can proceed in parallel only against agreed contracts and nonoverlapping ownership.
+3. Publish D4's bounded dragon-definition contract before D1's definition-backed integration, then consume D1 from D2 and D3. Later loot-policy/delivery work does not block that lifecycle. Pure command/projection tests and remaining schema design can proceed in parallel only against agreed contracts and nonoverlapping ownership.
 4. Complete existing #12/T10 with the shared lifecycle and preserve M3's external gates.
 5. Dispatch #13 only after M3 acceptance; dispatch the approved #14 subcomponents only after their existing design/economy gate.
 
