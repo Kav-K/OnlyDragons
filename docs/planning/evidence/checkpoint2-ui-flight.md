@@ -66,6 +66,37 @@ The original failed report is retained; the unexecuted cases remain unverified.
 - ZIP SHA256: `9cd4288f993bd189198f7756c5d3162c2491140dc5f9237002ff47b21b98ce97`.
 - Evidence archive SHA256: `9b19c3211dfa391491cde65b51ea2371bd4945a8fe4403504ee45e24c16d6fc4`.
 
+## Completed gameplay cohort; checkpoint rejection retained
+
+[Hosted run 34063119912](https://github.com/Kav-K/OnlyDragons/actions/runs/34063119912)
+passed all 39 cases at clean `5c3b2e508edf0135a71813a1b2c35063bdec7a5b`,
+compared with main `2babaee1d4f710fb5f4d248e62533315e4a1607a`. Both platform
+builds passed. Suite `9ec6cd74e45545fd9d3154b0f4105bb9` contains 30 positive
+cases and nine intended controls across 45 Paper boots: 1,237 passing assertion
+rows and ten intended failing control rows. All 45 servers exited 0, clean and
+unforced, with no overlapping server lifetimes. Production/companion/client
+tests were 262/6/33 with zero failures, errors or skips. Raw source, report, JAR,
+JUnit and log audit found no inconsistency. Strict suite replay passed.
+
+- Artifact: `9998616848`, `OnlyDragons-Paper-34063119912-1.zip`.
+- ZIP SHA256: `1dadacdd97320ef1e95425ca9ffd7dd9bd4d3a0130586e36f77aaab8d2aadd85`.
+
+The subsequent automated task checkpoint failed with
+`Previously bound restart phases changed: dragon-restart-fresh`; this run does
+not establish task acceptance. Independent comparison found only additive UI
+assertions in the existing fresh, legacy and animation phases. Phase count,
+order, identity, expectation, revision, action-plan path, required messages and
+catalog mode are unchanged; every old assertion remains. The checker incorrectly
+compares the complete phase objects, rejecting assertion additions as rebinding.
+The narrow correction must keep all other metadata exact and reject assertion
+removal. The failed checkpoint and original evidence remain preserved.
+
+The correction changes validation inputs. A fresh combined cohort will also
+include the independently reviewed T03b history from PR79, whose prerequisites
+are already integrated. One final source will therefore prove T03b, T08d and
+T08e together. This consolidates their final runtime gate without removing any
+required case, independent review, or acceptance checkpoint.
+
 ## Remaining gates
 
 The corrected complete cohort, independent raw/source review and strict replay,
