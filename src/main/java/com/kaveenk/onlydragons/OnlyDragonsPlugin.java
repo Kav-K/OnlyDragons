@@ -14,6 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 // MockBukkit subclasses the entry point while loading it in tests.
 public class OnlyDragonsPlugin extends JavaPlugin {
+    private com.kaveenk.onlydragons.paper.projectile.OwnedBowService bows;
+    public com.kaveenk.onlydragons.paper.projectile.OwnedBowService bows() { return bows; }
     private GreetingService greetings;
     private EquipmentStatsService equipment;
     private DragonDefinitionRegistry dragonDefinitions;
@@ -30,6 +32,9 @@ public class OnlyDragonsPlugin extends JavaPlugin {
         equipment = new EquipmentStatsService(
                 items,
                 StatProfile.calibration());
+        bows = new com.kaveenk.onlydragons.paper.projectile.OwnedBowService(this, equipment, 2000, Math::random);
+        getServer().getPluginManager().registerEvents(new com.kaveenk.onlydragons.paper.projectile.OwnedBowListener(bows), this);
+        bows.start();
         equipmentListener = new EquipmentListener(this, equipment);
         getServer().getPluginManager().registerEvents(equipmentListener, this);
         getServer().getOnlinePlayers().forEach(equipmentListener::queue);
@@ -52,6 +57,7 @@ public class OnlyDragonsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (bows != null) bows.close();
         if (equipmentListener != null) equipmentListener.close();
         getLogger().info("OnlyDragons disabled");
     }

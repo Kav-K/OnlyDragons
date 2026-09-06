@@ -171,10 +171,10 @@
       "notice": "PR #48 merged at 3c35a85bfa5d6bf6788af7c26d59891cfb852175 after the complete 21-case hosted suite, independent raw replay/review, task checkpoints and current CI. Exact evidence: docs/planning/evidence/catalog-procs-suite.md. Bounded captured-snapshot proc coordinator and scheduler/session cleanup; physical P08/P09 and T08 composition remain later integration. Historical worker evidence retains its recorded inputs; earlier pending or held acceptance is not relabeled as passing."
     },
     "T06": {
-      "status": "active",
+      "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Lead applied the Symphony dispatch label to issue #9 after PR #48 merged at 3c35a85. Existing T01b/T02/T04 prerequisites are integrated. Production firing/claims, P02/P04 and feature-specific two-player evidence remain unfinished; no requirement is marked complete by dispatch."
+      "notice": "Draft PR #52, In review. Clean 49fa9ae passes 115 feature Paper assertions and 182 production/28 client tests. Combined 92d4a37 includes main 92147a2 and reviewed Git-test cleanup; 257 Python tests and current CI pass. Hosted34035343529 failed its Paper job; the lead owns retained-artifact diagnosis, remediation and full receipt/T06 checkpoint after worker handoff. No T06 acceptance; see evidence/t06-firing.md."
     },
     "T07": {
       "status": "blocked",

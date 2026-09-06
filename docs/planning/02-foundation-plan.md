@@ -538,6 +538,15 @@ Support a native drawn bow first. Capture its real arrow and force through the b
 
 For Duplex, emit one physical secondary per eligible primary arrow with separate UUID and a recorded parent. Proposed default is a one-tick emission offset and the captured launch transform. This preserves provenance even if the player swaps before the child appears. Child damage scales with enchant level; ammo cost is per accepted trigger, with no extra charge for the Duplex child. Verify spawn obstruction and cleanup if the owner exits during emission.
 
+### T06 implementation contract (in progress)
+
+The [bounded firing API and calibration note](evidence/t06-firing.md) records
+the additive owned registry, independent encounter admission/target registration,
+launch-session UUID, and single settled-hit consumer. T00 DTOs stay unchanged;
+accounting receives settlement time separately from collision time. Native ammo
+already debited by Paper is distinct from shortbow-owned reservation. The
+reviewed part/phase policy above remains unchanged; feature acceptance is pending.
+
 ### Homing update
 
 Maintain one registry of managed airborne arrows and the active encounter's target parts. Each server tick:

@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 1,
+  "planId": "owned-firing-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "first",
+          "steps": [
+            {
+              "id": "capture-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "capture-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reconnect",
+              "action": "reconnect",
+              "args": {
+                "delayMillis": 250
+              }
+            }
+          ]
+        },
+        {
+          "id": "second",
+          "steps": [
+            {
+              "id": "cancel-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "cancel-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "death-isolation-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "death-isolation-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "dragon-0-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "dragon-0-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "dragon-1-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "dragon-1-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "dragon-2-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "dragon-2-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "dragon-3-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "dragon-3-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "dragon-4-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "dragon-4-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "dragon-5-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "dragon-5-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "volley-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "volley-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "native-veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "native-veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "end",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "first",
+          "steps": [
+            {
+              "id": "hold",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "click",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "mixed",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "mixed-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "empty",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "launch-veto",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "offhand",
+              "action": "useItem",
+              "args": {
+                "hand": "off"
+              }
+            },
+            {
+              "id": "offhand-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "input-veto",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "permission-denied",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "recovery",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "transfer-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "transfer-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "immediate-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "immediate-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reconnect",
+              "action": "reconnect",
+              "args": {
+                "delayMillis": 250
+              }
+            }
+          ]
+        },
+        {
+          "id": "second",
+          "steps": [
+            {
+              "id": "respawn-after-exit",
+              "action": "respawn",
+              "args": {}
+            },
+            {
+              "id": "volley-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "volley-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "end",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

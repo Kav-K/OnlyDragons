@@ -110,6 +110,12 @@
     "dragon-definitions-abort": {
       "scenarioId": "dragon-definitions-abort",
       "expectation": "cleanup-abort"
+    },
+    "owned-firing": {
+      "scenarioId": "owned-firing",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
     }
   },
   "suites": {
@@ -128,7 +134,8 @@
       "headless-player-primitives",
       "same-profile-restart",
       "enchants-procs",
-      "dragon-definitions"
+      "dragon-definitions",
+      "owned-firing"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -163,7 +170,8 @@
       "same-profile-restart-abort",
       "enchants-procs",
       "dragon-definitions",
-      "dragon-definitions-abort"
+      "dragon-definitions-abort",
+      "owned-firing"
     ]
   },
   "areas": {
@@ -215,7 +223,8 @@
         "same-profile-restart-abort",
         "enchants-procs",
         "dragon-definitions",
-        "dragon-definitions-abort"
+        "dragon-definitions-abort",
+        "owned-firing"
       ],
       "affects": [
         "stats",
@@ -285,7 +294,9 @@
       "paths": [
         "src/main/java/com/kaveenk/onlydragons/domain/projectile/*",
         "src/test/java/com/kaveenk/onlydragons/domain/projectile/*",
-        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/projectile/*"
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/projectile/*",
+        "src/main/java/com/kaveenk/onlydragons/paper/projectile/*",
+        "src/test/java/com/kaveenk/onlydragons/paper/projectile/*"
       ],
       "cases": [
         "foundation-contracts",
@@ -293,7 +304,8 @@
         "projectile-feasibility",
         "projectile-cleanup-failure",
         "projectile-cleanup-abort",
-        "projectile-player-feasibility"
+        "projectile-player-feasibility",
+        "owned-firing"
       ],
       "affects": []
     },
@@ -329,7 +341,8 @@
       "cases": [
         "lifecycle-calibration",
         "dragon-definitions",
-        "dragon-definitions-abort"
+        "dragon-definitions-abort",
+        "owned-firing"
       ],
       "affects": [
         "shared-contracts",
@@ -391,7 +404,8 @@
         "same-profile-restart-abort",
         "enchants-procs",
         "dragon-definitions",
-        "dragon-definitions-abort"
+        "dragon-definitions-abort",
+        "owned-firing"
       ],
       "affects": []
     },
