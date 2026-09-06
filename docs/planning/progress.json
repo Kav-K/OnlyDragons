@@ -231,9 +231,39 @@
       "notice": "PR #56 merged at 2c0be58 after the complete 26-case 576e394 cohort, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions and its cleanup control met the exact expected abort; retained firing passed 115. See evidence/t07-suite.md. Exactly P07/P10 are accepted; T08 accounting, T10 rehearsal and M1–M5 remain separate."
     },
     "T08": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {}
+      "status": "complete",
+      "completedRequirements": [
+        "P01",
+        "P13",
+        "headless-player-primitives",
+        "headless-damage-primitives",
+        "automated-multiplayer-attribution"
+      ],
+      "evidence": {
+        "P01": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34043800507",
+          "revision": "24ddf86eaa2fa870e90ae2d1face3ebd3f79a494"
+        },
+        "P13": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34043800507",
+          "revision": "24ddf86eaa2fa870e90ae2d1face3ebd3f79a494"
+        },
+        "headless-player-primitives": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34043800507",
+          "revision": "24ddf86eaa2fa870e90ae2d1face3ebd3f79a494"
+        },
+        "headless-damage-primitives": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34043800507",
+          "revision": "24ddf86eaa2fa870e90ae2d1face3ebd3f79a494"
+        },
+        "automated-multiplayer-attribution": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34043800507",
+          "revision": "24ddf86eaa2fa870e90ae2d1face3ebd3f79a494"
+        }
+      },
+      "reviewedRevision": "24ddf86eaa2fa870e90ae2d1face3ebd3f79a494",
+      "mergedRevision": "3505d6cc58cd2cf9b09c2d21ac38ec6eca3f4c45",
+      "notice": "PR #57 merged at 3505d6c after the complete 28-case 24ddf86 cohort, independent raw replay/review, unchanged-input c0e6b2e replay, original/latest-main checkpoints and current CI. Exactly five T08 requirements complete; see evidence/t08-suite.md. Human/client observations, managed-dragon controls and M1–M5 remain separate."
     },
     "T10": {
       "status": "blocked",
@@ -297,10 +327,10 @@
       "notice": "PR #48 merged at 3c35a85bfa5d6bf6788af7c26d59891cfb852175 after the complete 21-case hosted suite, independent raw replay/review, task checkpoints and current CI. Exact evidence: docs/planning/evidence/catalog-procs-suite.md. One shipped test-dragon definition and inert table/item bindings; no live spawn, reward calculation or delivery. Historical worker evidence retains its recorded inputs; earlier pending or held acceptance is not relabeled as passing."
     },
     "T08a": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+      "notice": "Lead-assigned after T08 acceptance through PR #57 at 3505d6c; awaiting the Symphony dispatch label on issue #39. Reuse mature fixtures and add only necessary managed-dragon feature cases; preserve all validation gates. No worker execution, implementation or accepted feature evidence is claimed yet."
     },
     "T08b": {
       "status": "planned",

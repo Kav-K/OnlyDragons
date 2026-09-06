@@ -360,7 +360,7 @@ records the positive controls and limits. These scoped decisions revise the
 unsupported semantic/phase assumptions; production end-to-end claim, veto,
 retirement and phase-rejection tests are separately accepted under T06 in
 PR #52 at `25891c0`; [T06 evidence](evidence/t06-suite.md).
-T04 is accepted and merged at `705de34`; [final evidence and separate policy review](evidence/t04-suite.md) record the decision. Bounded M0 contracts/feasibility retains its acceptance through the [combined cohort and separate policy review](evidence/catalog-procs-suite.md); T08 accounting and M1–M5 remain unaccepted.
+T04 is accepted and merged at `705de34`; [final evidence and separate policy review](evidence/t04-suite.md) record the decision. Bounded M0 contracts/feasibility retains its acceptance through the [combined cohort and separate policy review](evidence/catalog-procs-suite.md); T08 accounting is separately accepted through [PR #57 evidence](evidence/t08-suite.md); M1–M5 remain unaccepted.
 No production adapter is introduced by the feasibility scenario.
 
 A proposed simple damage model is:
@@ -428,7 +428,12 @@ Eyes/rewards, healing, native entity mirroring and the full encounter lifecycle
 remain later work. Rejected calls return traceable results but are not retained
 in the accepted ledger. Bounded diagnostic retention remains an adapter concern.
 
-### T08 integration contract (implementation branch, acceptance pending)
+### T08 integration contract
+
+Accepted through PR #57 at `3505d6c` after the complete 28-case cohort,
+independent raw replay/review, actual-main task checkpoints and current CI.
+[Exact five requirements, evidence and limits](evidence/t08-suite.md). T08a/#39
+is lead-assigned and awaiting dispatch to extend this shared backend; M1–M5 remain unaccepted.
 
 `ManagedCombatService` owns the plugin-lifetime settled-hit receiver. Each target
 has one `CombatEncounter`, bounded `ProcCoordinator`, exact activated session
