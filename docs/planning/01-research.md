@@ -294,7 +294,7 @@ supplies the position adapter; no NMS/reflection is used by production or fixtur
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.
-2. The user selected the T05b level-based OnlyDragons playtest policy: no active Tempo 100% proc HP, active I–V 90/80/70/60/50%, with full credit. These coefficients are not researched Hypixel constants; qualitative balance remains a human check. [Implementation contract](02-foundation-plan.md#t05b-level-based-ghost-policy-gh-66-in-progress).
+2. The user selected the T05b level-based OnlyDragons playtest policy: no active Tempo 100% proc HP, active I–V 90/80/70/60/50%, with full credit. These coefficients are not researched Hypixel constants; qualitative balance remains a human check. [Implementation contract](02-foundation-plan.md#t05b-level-based-ghost-policy-gh-66).
 3. Which five variants, if five remains the desired launch scope? This does not block the stats foundation.
 4. Confirm encounter-long arrow continuity versus literal persistence through shutdown and world reload.
 5. Choose current versus historical naming/balance where Hypixel has changed. The recommended default is current documented descriptions, with explicit exceptions for the desired dragon experience.

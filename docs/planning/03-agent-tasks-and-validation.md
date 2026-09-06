@@ -6,12 +6,14 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
-[Checkpoint 2](07-checkpoint-two.md) registers T08d/T08e/T05b/T03b/T06c/T06b/T02c
-as issues #64–#70 for the user's next gameplay feedback. T08d/T08e/T05b are assigned
-and active in Symphony after PR #71; the other four remain planned. Nine new
-requirements have no completed evidence. T05b also owns still-deferred
-P08/P09. Lead assignment and integrated dependencies control dispatch; existing
-accepted tasks, evidence and milestone states below remain unchanged.
+[Checkpoint 2](07-checkpoint-two.md): T05b/#66 is complete through merged
+[PR #73](https://github.com/Kav-K/OnlyDragons/pull/73) at `29f0cf3`, accepting exactly
+`fatal-tempo-ghost-scaling`, P08 and P09 after the verified 34-case hosted cohort;
+[full evidence](evidence/t05b-suite.md). T03b/#67 is active and lead-assigned with
+its prerequisites integrated; Symphony dispatch follows the lead's label.
+T08d/#64 and T08e/#65 are In review pending their combined current-input cohort.
+T06c/#70, T06b/#68 and T02c/#69 remain planned; T08c/#41 remains planned and
+undispatched. Other requirements, prior evidence and milestone states are unchanged.
 
 Baseline reconciled **6 September 2026** after PR #62 merged at
 `114916905c68f5574b2ee437b8db5bd2a187e390`: T08b's frozen ranking and received
@@ -52,7 +54,8 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T02b — Test dragon definitions | Complete | [#38](https://github.com/Kav-K/OnlyDragons/issues/38), [PR #48](https://github.com/Kav-K/OnlyDragons/pull/48) | Merged at `3c35a85`: 30 positive catalog assertions and the 15-row deliberate-abort control passed their exact contracts in the reviewed 21-case cohort. [combined acceptance evidence](evidence/catalog-procs-suite.md). One test type and inert table references; no spawn or real rewards. |
 | T03 — Combat/ledger | Complete | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Merged at 9092fbe after independent review and final-head Windows/Linux CI. Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Physical adapter/native suppression and human checks are separate. |
 | T04 — Paper feasibility | Complete | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #31](https://github.com/Kav-K/OnlyDragons/pull/31) | Merged at `705de34` after clean `96ef4b3` passed all 18 hosted suite outcomes, independent raw replay/review and current CI; 82 production/28 client tests and all 52 required player-projectile assertions plus shared cleanup were verified. The external part/phase/terminal-impact policy was accepted separately; [exact evidence and review](evidence/t04-suite.md). P02/P04 are separately accepted under T06 through PR #52. Bounded M0 was subsequently accepted with the PR48 cohort; see [combined evidence](evidence/catalog-procs-suite.md). |
-| T05 — Enchants/procs | Complete | [#8](https://github.com/Kav-K/OnlyDragons/issues/8), [PR #48](https://github.com/Kav-K/OnlyDragons/pull/48) | Merged at `3c35a85` after the full current-input suite, independent review/replay, task checkpoint and CI; 38 required proc assertions plus shared cleanup passed. [combined acceptance evidence](evidence/catalog-procs-suite.md). Physical P08/P09 remain later integration; T08 composition is now separately accepted. Old held worker runs retain their original disposition. |
+| T05 — Enchants/procs | Complete | [#8](https://github.com/Kav-K/OnlyDragons/issues/8), [PR #48](https://github.com/Kav-K/OnlyDragons/pull/48) | Merged at `3c35a85` after the full current-input suite, independent review/replay, task checkpoint and CI; 38 required proc assertions plus shared cleanup passed. [combined acceptance evidence](evidence/catalog-procs-suite.md). Physical P08/P09 are now separately accepted under [T05b](evidence/t05b-suite.md); T08 composition is separately accepted. Old held worker runs retain their original disposition. |
+| T05b — Global Tempo ghost scaling | Complete | [#66](https://github.com/Kav-K/OnlyDragons/issues/66), [PR #73](https://github.com/Kav-K/OnlyDragons/pull/73) | Merged at `29f0cf3`; the complete 34-case hosted cohort, independent raw/source review, strict replay, task checkpoint and current CI passed. Exactly `fatal-tempo-ghost-scaling`, P08 and P09 accepted; [evidence](evidence/t05b-suite.md). T03b is assigned next; human balance/appearance and M1–M5 remain separate. |
 | T06 — Firing/Duplex | Complete | [#9](https://github.com/Kav-K/OnlyDragons/issues/9), [PR #52](https://github.com/Kav-K/OnlyDragons/pull/52) | Merged at `25891c0` after tested `f4178ba` passed all 24 hosted outcomes, independent raw replay/review, actual-main T06 checkpoint and current CI. Owned firing passed 115 assertion rows; repaired equipment passed 25; relevant builds report 182 production/28 client tests with no failures/errors/skips. [Final evidence, failed iteration and boundaries](evidence/t06-suite.md); [single-consumer API](evidence/t06-firing.md#consumer-contract). T08 accounting is now separately accepted; human observations remain unrun. |
 | T07 — Tracer/continuity | Complete | [#10](https://github.com/Kav-K/OnlyDragons/issues/10), [PR #56](https://github.com/Kav-K/OnlyDragons/pull/56) | Merged at `2c0be58` after clean `576e394` passed all 26 hosted outcomes, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions; its abort control passed 10 checks with the exact expected exception; retained firing passed 115. [Final evidence](evidence/t07-suite.md); [consumer/broker contract and focused history](evidence/t07-tracer.md). Exactly P07/P10 are accepted; T08 integration and later milestones remain separate. |
 | T08 — Practice tools | Complete | [#11](https://github.com/Kav-K/OnlyDragons/issues/11), [PR #57](https://github.com/Kav-K/OnlyDragons/pull/57) | Merged at `3505d6c` after the complete 28-case `24ddf86` cohort, independent raw replay/review, original/latest-main checkpoints and current-head CI. Practice passed 85 assertions plus 17 messages; lifecycle passed 25. Exactly P01/P13 and the three named player/damage/attribution requirements are accepted; [final evidence](evidence/t08-suite.md). Human Windows Play/authentication/visual checks remain unrun. |
@@ -66,7 +69,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T11 — Eight-eye lifecycle | Planned, later | [#13](https://github.com/Kav-K/OnlyDragons/issues/13) | M3 accepted, then transaction, spawn, cancellation, and recovery gates. |
 | T12 — Variants/progression | Planned, later | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus separately agreed roster, rewards, and acquisition scope. |
 
-Bounded M0 contracts/feasibility is explicitly accepted; M1–M5 remain unaccepted. T02b/T05/T06/T07/T08 are integrated. P02/P04 are accepted under T06, P07/P10 under T07 and P01/P13 under T08; P03/P05/P06/P08/P09/P11/P12/P14 stay pending. Shared fixtures do not accept future gameplay behavior. A task's
+Bounded M0 contracts/feasibility is explicitly accepted; M1–M5 remain unaccepted. T02b/T05/T06/T07/T08 are integrated. P02/P04 are accepted under T06, P07/P10 under T07, P01/P13 under T08 and P08/P09 under T05b; P03/P05/P06/P11/P12/P14 stay pending. Shared fixtures do not accept future gameplay behavior. A task's
 full acceptance criteria below remain authoritative; this table is a summary.
 
 Use **Planned**, **In progress**, **In review**, **Blocked**, or **Complete** for
@@ -84,22 +87,25 @@ status edit in an unmerged branch does not reserve the task globally.
 
 ### T05b — Global Tempo ghost scaling (GH-66)
 
-In review in [PR #73](https://github.com/Kav-K/OnlyDragons/pull/73) on
-`symphony/gh-66`. T05/T08a/T08b are integrated and the lead
-applied dispatch. The scoped [v2 contract](02-foundation-plan.md#t05b-level-based-ghost-policy-gh-66-in-progress)
-adds parent-bound immutable HP provenance and explicit standard/training/calibration
-spawn selections. The additive `tempo-ghost` native-player scenario covers physical
-P08/P09 and training accounting/result/reset; preserved legacy dragon fixture setup
-now explicitly selects calibration. Existing assertions remain intact.
+**Complete through [PR #73](https://github.com/Kav-K/OnlyDragons/pull/73), merged
+at `29f0cf3969e7d256b2f678a54f846d836ca6db9f`.** Exactly
+`fatal-tempo-ghost-scaling`, P08 and P09 are accepted. The scoped
+[v2 contract](02-foundation-plan.md#t05b-level-based-ghost-policy-gh-66) preserves
+parent-bound HP provenance and explicit standard/training/calibration selections.
 
-Clean `b63948c` includes main `7a38040`: 251 production / 6 companion / 28 client
-tests and the 31-assertion physical Paper fixture passed, including original FT
-expiry at tick 229 and full training overkill credit. [Exact evidence and preserved
-iterations](evidence/t05b-ghost.md). Startup/integration static checkpoints pass.
-The lead-coordinated full 34-case hosted receipt/checkpoint and independent
-acceptance remain pending; no completed requirement or milestone is claimed.
-Human appearance/feel and authenticated compatibility remain separate. Next
-consumer is T03b/#67 after lead acceptance and merge.
+Clean runtime `b63948c`, including actual base `7a38040`, passed all 34 hosted
+outcomes (25 positive, nine intended controls), 251 production / six companion /
+28 client tests, independent raw/source review, strict original and documentation-
+head replay, the T05b checkpoint and current CI. The 31-assertion `tempo-ghost`
+case proves actual Duplex/Ferocity counts, captured FT bow-swap policy, original
+expiry and frozen training overkill credit; [exact acceptance evidence](evidence/t05b-suite.md).
+[Focused runs and failed iterations](evidence/t05b-ghost.md) retain their original
+identities and dispositions; their earlier pending statements describe that history.
+
+T03b/#67 is active and lead-assigned with T05b/T06 integrated; the lead applies
+its Symphony label after this context is reconciled. T08d/T08e remain In review
+pending their combined cohort, and T06c/T06b/T02c remain planned. Human appearance,
+authenticated compatibility, balance/feel and M1–M5 remain unaccepted.
 
 ## Shared context update protocol
 
@@ -220,7 +226,7 @@ remain authoritative.
 
 ### T05 enchant and proc validation
 
-**Accepted through PR #48 at `3c35a85`.** The combined `e38334e` cohort passed all 21 declared outcomes, including 38 required proc assertions plus shared cleanup; 163 production and 28 client tests had zero failures/errors/skips. Independent replay/review, supported task checkpoints and current CI passed. [Combined evidence and hashes](evidence/catalog-procs-suite.md). T08 composition and physical P08/P09 remain pending.
+**Accepted through PR #48 at `3c35a85`.** The combined `e38334e` cohort passed all 21 declared outcomes, including 38 required proc assertions plus shared cleanup; 163 production and 28 client tests had zero failures/errors/skips. Independent replay/review, supported task checkpoints and current CI passed. [Combined evidence and hashes](evidence/catalog-procs-suite.md). T08 composition and physical P08/P09 were later integration at that acceptance; they are now separately accepted under T08 and [T05b](evidence/t05b-suite.md).
 
 #### Historical worker validation before PR48
 
@@ -494,7 +500,7 @@ and independent current-input review/checkpoint/CI establish exactly
 `firing-input`, P02, P04, `headless-player-primitives`,
 `headless-damage-primitives` and `automated-multiplayer-firing`. T08 consumes
 the [settled-hit contract](evidence/t06-firing.md#consumer-contract) to connect
-combat/procs once; P01/P08/P09/P13 and full multiplayer accounting stay pending.
+combat/procs once; P01/P13 and multiplayer attribution were subsequently accepted under T08, with P08/P09 separately accepted under [T05b](evidence/t05b-suite.md).
 
 ### T07 — Dragon Tracer and encounter-long arrow continuity
 

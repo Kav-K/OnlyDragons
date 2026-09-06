@@ -129,6 +129,26 @@ those observations separate from exact packet, service, event and numeric eviden
 
 ## Build and memory ownership
 
+Run only one Gradle-owning command at a time in each checkout. A standalone
+wrapper build and `paper_test.py` both write that checkout's build outputs, even
+when they use different Gradle user homes. Await the command's actual exit before
+starting the next build or runner; a yielded tool session is still running.
+
+Freeze source while its build and scenario run. Once a feature is stable, commit
+the candidate before its focused verification so the staged JAR and receipt can
+be attributed to one clean revision. A later source fix does not change an
+already-staged fixture. Preserve failed iterations with their original identity.
+
+For a focused multi-phase scenario, pass its catalog-appropriate bounded
+`--scenario-timeout` explicitly. The focused runner defaults to 60 seconds;
+native death animation and reconnect phases may require the longer timeout
+already declared for that suite case. A timeout remains an incomplete run,
+not permission to omit lifecycle assertions. These practices address the
+observed [overlapping builds](https://github.com/Kav-K/OnlyDragons/issues/65#issuecomment-5562095085),
+[staged earlier fixture](https://github.com/Kav-K/OnlyDragons/issues/65#issuecomment-5562246426)
+and [focused timeout](https://github.com/Kav-K/OnlyDragons/issues/65#issuecomment-5562261921)
+without changing the validation gates.
+
 All three Gradle projects use bounded workers and disable persistent build
 daemons, so idle builders do not retain a heap per issue checkout. The runner
 checks memory again after builds and admits Paper only with fresh successful

@@ -416,25 +416,44 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Draft PR #74: clean final focused ae795386 passed 18 Paper assertions/28 received-bar samples with newest validator; fresh and death-animation two-boot UI runs pass. Tests: 235 production/6 companion/30 client/273 Python; static plan valid. Main 7a38040 integrated. Per lead comment 5562281339, combined #64/#65 cohort and task checkpoints after #66 are lead-owned and pending; no requirement/milestone accepted. Evidence: docs/planning/evidence/t08d-presentation.md."
+      "notice": "Combined PR #76 preserves the focused histories of #74/#75 and includes accepted Tempo. Clean integrated runtime 92a6f08 passed dragon-presentation with standard/training orbit and received UI checks. Full combined cohort, independent replay/review, both task checkpoints and current CI remain pending; no completed requirements or milestone acceptance. See the original feature evidence archives; human appearance/feel remain separate."
     },
     "T08e": {
-      "status": "active",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
-    },
-    "T05b": {
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "PR #73: clean b63948c includes main 7a38040; production251/companion6/client28 and focused physical tempo-ghost31 assertions passed with clean owned-process cleanup. Exact evidence: docs/planning/evidence/t05b-ghost.md. Lead-coordinated full34-case hosted receipt/checkpoint and independent acceptance remain pending; no completed requirement or milestone. Rewards disabled; human/client observations remain separate."
+      "notice": "Combined PR #76 preserves the focused histories of #74/#75 and includes accepted Tempo. Clean integrated runtime 92a6f08 passed dragon-presentation with standard/training orbit and received UI checks. Full combined cohort, independent replay/review, both task checkpoints and current CI remain pending; no completed requirements or milestone acceptance. See the original feature evidence archives; human appearance/feel remain separate."
+    },
+    "T05b": {
+      "status": "complete",
+      "completedRequirements": [
+        "fatal-tempo-ghost-scaling",
+        "P08",
+        "P09"
+      ],
+      "evidence": {
+        "fatal-tempo-ghost-scaling": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34060105930",
+          "revision": "b63948cc4d372c3511fe1afb736980227c161f5f"
+        },
+        "P08": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34060105930",
+          "revision": "b63948cc4d372c3511fe1afb736980227c161f5f"
+        },
+        "P09": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34060105930",
+          "revision": "b63948cc4d372c3511fe1afb736980227c161f5f"
+        }
+      },
+      "notice": "PR #73 merged at 29f0cf3969e7d256b2f678a54f846d836ca6db9f after the complete 34-case hosted cohort, independent raw/source review, strict original and documentation-head replay, task checkpoint and current CI. Exactly fatal-tempo-ghost-scaling, P08 and P09 complete; evidence: docs/planning/evidence/t05b-suite.md. Focused/failed iterations retain their original identities. T03b is assigned next; rewards remain disabled and human observations/M1-M5 remain unaccepted.",
+      "reviewedRevision": "06bd35ea88adda03726aa447e22d57d5c66ab12b",
+      "mergedRevision": "29f0cf3969e7d256b2f678a54f846d836ca6db9f"
     },
     "T03b": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+      "notice": "Lead-assigned T03b/#67 with T05b and T06 integrated; Symphony dispatch follows the lead label after accepted-context reconciliation. Own expanded-bow-enchantments under the recorded v2 contract; no implementation or completed evidence claimed. T06c/T06b/T02c remain downstream; rewards and milestone gates are unchanged."
     },
     "T06b": {
       "status": "planned",
