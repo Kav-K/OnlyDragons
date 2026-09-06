@@ -19,9 +19,9 @@ part of the worker's scope.
 | T09a | [#2](https://github.com/Kav-K/OnlyDragons/issues/2) | Complete: PR #16 merged at 140f11c | Isolated runner; positive and deliberate-failure controls, independent review, and CI passed. |
 | T01a | [#3](https://github.com/Kav-K/OnlyDragons/issues/3) | Complete: PR #23 merged at 1efa7d0 | Base stat resolver and immutable explanations; 30 production tests, 18 Paper assertions, independent review and final-head CI passed. |
 | T02 | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | Complete: PR #24 merged at 7c6d843 | Item definitions, codec/PDC and enchant validation; 54 production tests, 35 Paper assertions, independent review and final-head CI passed. |
-| T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Partial PR #22 integrated at 586a170; full task blocked | Shooterless arrow/dragon findings are partial. Full acceptance awaits player-owned native suppression and semantic head/native-damage evidence after T09b; #9 stays blocked. |
-| T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | T09a, T00; PR #22 owned-listener helper integrated at 586a170 | Locally owned protocol-player calibration, dual reports and client/server failure cleanup. Full T04 acceptance is not a prerequisite. |
-| T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | T00, T01a integrated; active Symphony worker | Combat math, health and contribution; production-service tests remain required. |
+| T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Resumed after T09b merged at 5b0e030; partial PR #22 integrated at 586a170 | Shooterless arrow/dragon findings are partial. Full acceptance still requires player-owned native suppression and semantic head/native-damage evidence; #9 stays blocked. |
+| T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | Complete: PR #27 merged at 5b0e030 | Final 1dd6ffe positive/early-exit/timeout calibration verified with dual reports and client/server cleanup; independent review and final-head CI passed. [Evidence](../../dev/agent-paper-tests.md#protocol-player-evidence). This does not accept the feature-specific T04 gates. |
+| T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | In review: PR #26; lead final integration after T09b | Combat math, health and contribution; clean merged-artifact combat-accounting verification and final CI precede merge. |
 | T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a/T02 integrated; active Symphony worker | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
 | T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | T01a, T02, T03 | Bounded procs and enchant state. |
 | T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b, T02, fully accepted T04; blocked | Bow/shortbow/Duplex capture and owned projectiles. Merging partial PR #22 or passing T09b alone does not release this gate. |
@@ -32,9 +32,9 @@ part of the worker's scope.
 | T12 | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus agreed roster/reward/acquisition scope | Later bounded content/progression planning. |
 
 Symphony has three coding slots. Label only tasks whose prerequisites are
-integrated into main and whose manual gates are satisfied. #6 and #7 are active after their prerequisites merged. #20 is owned by a local delegated agent and must not be
-labeled for a duplicate worker. #5 remains a partial delivery awaiting further
-actor evidence, and #9 must remain undispatched. Issue/PR state owns live claims;
+integrated into main and whose manual gates are satisfied. #6 is in lead review,
+#7 remains active, and #20 is merged. The lead resumed #5 for its remaining
+player-owned experiments; #9 must remain undispatched. Issue/PR state owns live claims;
 the lead reconciles this summary after each serial merge.
 All server scenarios share one lease and obey the memory gate, regardless of
 how many agents are coding. A ready branch is not a satisfied dependency.
@@ -43,11 +43,15 @@ how many agents are coding. A ready branch is not a satisfied dependency.
 
 T09b depends on T09a/T00 and the reusable owned-listener cleanup helper in
 partial PR #22. Integrating that helper does not require accepting all T04
-dragon findings. After T09b passes its own positive/negative calibration and is
-merged, T04 can run its remaining player-owned experiments. This component
+dragon findings. T09b passed its positive/negative calibration and merged in
+PR #27 at 5b0e030, so T04 can run its remaining player-owned experiments. This component
 ordering avoids a T04/T09b cycle while retaining the full T04 gate for #9.
 T09b protocol packets prove only their recorded Paper events; human visuals,
 authentication, multiplayer and feature-specific dragon behavior remain separate.
+The initial mode admits only `protocol-player-calibration`; the lead delegates
+reviewed admission/fixture extensions to T04/#5 and equipment/#7 one at a time.
+Those tasks must collect their own feature assertions and keep the same bounded
+actor/process ownership. Passing T09b alone does not unblock #9 or accept M0.
 
 ### Completed maintenance
 

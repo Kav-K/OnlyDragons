@@ -88,8 +88,13 @@ inspect a running server or to validate a documentation edit.
 
 The console smoke test does not log in a player. For chat, inventories, visuals,
 movement, timing, and multiplayer interactions, use targeted in-game testing and
-record what remains unverified. If a bot-based test becomes available, confirm its
-protocol and server-version support before using it as evidence.
+record what remains unverified. The isolated runner's explicit
+`--test-player protocol-calibration` mode uses the locked 26.2/protocol 776
+client in `dev/player-client` to test real Paper input events. Only that fresh
+loopback disposable profile uses offline synthetic identity; default tests and
+human profiles remain authenticated. See `dev/agent-paper-tests.md` for the
+bounded scenario and failure controls. This does not establish human visuals
+or authenticated multiplayer behavior.
 
 For debugging, the existing `mcdev.cmd restart -DebugServer` command starts the
 loopback debugger, and the workspace includes an attach configuration. Use a normal
