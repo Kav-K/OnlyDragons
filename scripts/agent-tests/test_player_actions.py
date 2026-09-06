@@ -358,7 +358,7 @@ class ActionContractTests(unittest.TestCase):
         relative = 'dev/game-tests/player-plans/primitives-v1.json'
         path = self.project / relative; path.parent.mkdir(parents=True); path.write_bytes(self.raw)
         actual, sha, plan = actions.load_plan(self.project, {'playerActionPlan': relative})
-        self.assertEqual((actual, sha, plan), (path, self.sha, self.plan))
+        self.assertEqual((actual, sha, plan), (path.resolve(), self.sha, self.plan))
         for value in ('../outside.json', '/tmp/plan.json', 'dev/game-tests/player-plans/../secret.json',
                       r'dev\game-tests\player-plans\plan.json', 'dev/game-tests/scenarios.json', None):
             with self.subTest(value=value), self.assertRaises(actions.ActionValidationError):
