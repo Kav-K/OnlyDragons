@@ -80,11 +80,27 @@ class CombatProvenanceTest {
         c.end(); assertFalse(hit(c,b,100,13).accepted()); assertTrue(c.completion().isEmpty());
     }
     @Test void completionRetainsFullSelectedDefinitionAndRejectsMismatchedIdentity() {
-        var selection=com.kaveenk.onlydragons.domain.encounter.definition.DragonCatalogLoader.calibration(CalibrationLoadouts.registry()).select("test_dragon");
+        var selection=com.kaveenk.onlydragons.domain.encounter.definition.DragonCatalogLoader.calibration(CalibrationLoadouts.registry()).bundled().select("test_dragon");
         var c=new CombatEncounter(new TargetState(generation,target,1000,1000,0),"test_dragon",profile,Optional.of(selection));
         hit(c,a,1000,10);var result=c.completion().orElseThrow();
         assertSame(selection,result.selection().orElseThrow());assertEquals(1,result.completedOrdinal());
         assertThrows(IllegalArgumentException.class,()->new CombatEncounter(new TargetState(generation,target,999,999,0),"test_dragon",profile,Optional.of(selection)));
+    }
+
+    @Test void publicResultsRejectPartialAndOutOfWindowProvenanceButPreserveLegacyValues() {
+        var stamp=Optional.of(new EncounterResult.CommitStamp(10,2));
+        var empty=Optional.<EncounterResult.CommitStamp>empty();
+        assertThrows(IllegalArgumentException.class,()->new EncounterResult.Contribution(1,1,0,true,stamp,empty));
+        assertThrows(IllegalArgumentException.class,()->new EncounterResult.Contribution(1,1,0,false,stamp,stamp));
+        assertThrows(IllegalArgumentException.class,()->new EncounterResult.Contribution(0,0,0,false,stamp,empty));
+        assertThrows(IllegalArgumentException.class,()->new EncounterResult.Contribution(1,1,0,true,empty,stamp));
+        var valid=new EncounterResult.Contribution(1,1,0,true,stamp,stamp);
+        assertDoesNotThrow(()->new EncounterResult(UUID.randomUUID(),generation,"dummy",profile.mechanic(),10,Map.of(a,valid),2,Optional.empty()));
+        for (long[] boundary : List.of(new long[]{9,2},new long[]{10,1},new long[]{10,0}))
+            assertThrows(IllegalArgumentException.class,()->new EncounterResult(UUID.randomUUID(),generation,"dummy",profile.mechanic(),boundary[0],Map.of(a,valid),boundary[1],Optional.empty()));
+        assertDoesNotThrow(()->new EncounterResult.Contribution(0,0,0,true,stamp,empty));
+        assertDoesNotThrow(()->new EncounterResult(UUID.randomUUID(),generation,"dummy",profile.mechanic(),0,
+                Map.of(a,new EncounterResult.Contribution(1,1,0,true))));
     }
 
 }

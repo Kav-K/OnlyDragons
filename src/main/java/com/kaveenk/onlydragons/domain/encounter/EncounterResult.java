@@ -33,6 +33,9 @@ public record EncounterResult(UUID completionId, UUID encounterId, String varian
             DomainChecks.nonNegative(contributionDamage, "contributionDamage");
             if (eyesPlaced < 0) throw new IllegalArgumentException("eyesPlaced must be nonnegative");
             Objects.requireNonNull(firstParticipation); Objects.requireNonNull(lastCreditIncrease);
+            if (firstParticipation.isPresent() && (!participated
+                    || (contributionDamage > 0 && lastCreditIncrease.isEmpty())))
+                throw new IllegalArgumentException("Incomplete participation provenance");
             if (lastCreditIncrease.isPresent() && (firstParticipation.isEmpty() || contributionDamage == 0
                     || lastCreditIncrease.get().ordinal() < firstParticipation.get().ordinal()
                     || lastCreditIncrease.get().tick() < firstParticipation.get().tick()))
@@ -60,6 +63,13 @@ public record EncounterResult(UUID completionId, UUID encounterId, String varian
         var copy = new TreeMap<UUID, Contribution>();
         Objects.requireNonNull(participants, "participants").forEach((id, contribution) ->
                 copy.put(Objects.requireNonNull(id, "participant id"), Objects.requireNonNull(contribution, "contribution")));
+        for (var contribution : copy.values()) {
+            for (var stamp : java.util.stream.Stream.concat(contribution.firstParticipation().stream(),
+                    contribution.lastCreditIncrease().stream()).toList()) {
+                if (stamp.tick() > completedTick || stamp.ordinal() > completedOrdinal)
+                    throw new IllegalArgumentException("Participant provenance exceeds completion");
+            }
+        }
         participants = Collections.unmodifiableMap(copy);
     }
 }
