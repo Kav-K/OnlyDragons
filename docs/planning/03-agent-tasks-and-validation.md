@@ -84,17 +84,22 @@ status edit in an unmerged branch does not reserve the task globally.
 
 ### T05b — Global Tempo ghost scaling (GH-66)
 
-In progress on `symphony/gh-66`. T05/T08a/T08b are integrated and the lead
+In review in [PR #73](https://github.com/Kav-K/OnlyDragons/pull/73) on
+`symphony/gh-66`. T05/T08a/T08b are integrated and the lead
 applied dispatch. The scoped [v2 contract](02-foundation-plan.md#t05b-level-based-ghost-policy-gh-66-in-progress)
 adds parent-bound immutable HP provenance and explicit standard/training/calibration
 spawn selections. The additive `tempo-ghost` native-player scenario covers physical
 P08/P09 and training accounting/result/reset; preserved legacy dragon fixture setup
 now explicitly selects calibration. Existing assertions remain intact.
 
-Startup doctor and static checkpoint passed. Build, focused actual Paper and the
-complete source-bound suite are still pending; no completed requirement or
-milestone is claimed. Human appearance/feel and authenticated compatibility remain
-separate. Next consumer is T03b/#67 after lead acceptance and merge.
+Clean `b63948c` includes main `7a38040`: 251 production / 6 companion / 28 client
+tests and the 31-assertion physical Paper fixture passed, including original FT
+expiry at tick 229 and full training overkill credit. [Exact evidence and preserved
+iterations](evidence/t05b-ghost.md). Startup/integration static checkpoints pass.
+The lead-coordinated full 34-case hosted receipt/checkpoint and independent
+acceptance remain pending; no completed requirement or milestone is claimed.
+Human appearance/feel and authenticated compatibility remain separate. Next
+consumer is T03b/#67 after lead acceptance and merge.
 
 ## Shared context update protocol
 

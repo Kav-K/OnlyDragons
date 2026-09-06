@@ -1,7 +1,8 @@
 # T05b / GH-66: Tempo ghost policy
 
-Implementation and verification are in progress on `symphony/gh-66`.
-No Paper acceptance or milestone completion is claimed by this provisional note.
+In review in [PR #73](https://github.com/Kav-K/OnlyDragons/pull/73).
+The final focused Paper fixture passes; complete hosted suite/checkpoint and
+independent acceptance remain pending. No milestone completion is claimed.
 
 ## Contract and ownership
 
@@ -60,8 +61,9 @@ calibration; their original numeric assertions are preserved.
 
 ## Outstanding evidence
 
-Focused Paper iteration, current-main integration, complete clean-input suite
-receipt/checkpoint and independent lead review/current CI are pending. Human
+The complete clean-input hosted suite receipt/checkpoint and independent lead
+review/current CI are pending. Main `7a38040` is integrated, and the final focused
+Paper evidence is below. Human
 Windows Play/smoke, authenticated-client compatibility, visual readability and
 weapon feel remain separate; no performance or M1–M5 claim is made.
 
@@ -96,3 +98,39 @@ state at its +59 boundary and expired state exactly at +60, before the later
 Duplex/child tick +60. It retains the independent post-expiry physical counts and
 totals. The complete final-input suite must verify this strengthened oracle;
 the earlier focused pass alone does not accept P09.
+
+## Final focused candidate
+
+Clean runtime `b63948cc4d372c3511fe1afb736980227c161f5f` includes main
+`7a380408e02fe59d1820163bd7cfa68169e85e4b`. Actual pinned Paper run
+`f70bb76252a74280a2b1d292426caa40` passed **31 assertions** and both required
+received-message checks. Its wrapper invocation reports production **251**,
+companion **6**, client **28** tests with zero failures/errors/skips.
+
+The exact HP/credit/count observations match all four trial oracles and the
+100,000-HP / 101,740-credit frozen result. The last accepted eligible FT hit was
+tick **169**, later ineligible Duplex/child tick **207**, and original expiry
+**229**. State was live at 228 and absent exactly at 229; an erroneous refresh
+to 267 would fail. Native projection observations were exactly
+199.27999877929688, 197.83999633789062 and 197.1199951171875.
+Both owned JVMs exited **0**, unforced, and all five resource counters were zero.
+
+| Artifact/report | SHA256 |
+| --- | --- |
+| Production JAR | `358ddad05ae79f8d4d71605568191f7110b87c61173d56694ec3a6ca44f7a2ca` |
+| Companion JAR | `c7d6677cfc01c4dd5223b5082203184f9f03e595f3992a5d16ee0169bd93085c` |
+| Player client JAR | `16e2dbd6b7fa987cb91193d6d41d57741e1baac97aa02df5e041ffc94cdc501f` |
+| result.json | `fec37eaff80ebe21c79be334b8f21f0e57b08b8669ab43e30fcc4745d30caf91` |
+| scenario.json | `cc25732dc1f1e0b881d3c608a5ac6495ca3756463b97e2358a711c85f69824da` |
+
+Reproduce the focused case with:
+
+```bash
+python3 scripts/agent-tests/paper_test.py --scenario tempo-ghost \
+  --test-player protocol-actions-v1 --scenario-timeout 180
+```
+
+The lead offered to dispatch the complete **34-case** hosted cohort for this
+candidate, preserving the local lease for GH-64/GH-65. [Exact candidate handoff](https://github.com/Kav-K/OnlyDragons/issues/66#issuecomment-5562182114).
+Static plan/current-main integration checkpoints pass; a complete receipt and
+T05b automated acceptance checkpoint remain required before final acceptance.
