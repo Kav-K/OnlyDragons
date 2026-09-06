@@ -40,6 +40,21 @@ The current raw files live under
 `build/reports/agent-paper/857114829e3343f8b54e8e46c402a0b8/` in the retained issue
 workspace. They are ignored runtime evidence, not committed artifacts.
 
+## Focused restart and validator follow-up
+
+Fresh two-boot run `96c136712fca4a9988e328124c17158e` passed at clean
+`28cfe99`, with empty UI on each boot, one received full-health bar after each
+spawn, and received removal after second-boot reset. Both phase receipts and
+the presentation receipt replay successfully with the stricter `b7a0aff`
+validator, which rejects transient additional bars between samples. This replay
+is supplementary; the complete suite still must run on final integrated inputs.
+All 273 Python tests pass at `b7a0aff`.
+
+Received styled-message observations cover ordinary chat. The protocol client
+currently ignores overlay SystemChat, so these receipts do not establish live
+action-bar delivery or full-client rendering. The production formatter and
+compact live action-bar call are included in the successful build.
+
 ## Preserved failed iteration
 
 Dirty iteration `2c83c0ef3d5844b689ad040eb40d3b53` passed the observed UI/domain
@@ -52,7 +67,7 @@ under runner cleanup, both unforced. Missing later assertions were not removed.
 
 ## Remaining gates
 
-Fresh real two-boot UI checks, the complete 34-case changed-area suite receipt,
+Death-animation two-boot UI checks, the complete changed-area suite receipt,
 strict replay and final T08d automated checkpoint are pending. Independent review,
 current CI, Windows smoke/Play and human visual/readability/authenticated-client
 observations remain separate. A connected presenter-close packet test is not a
