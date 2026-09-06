@@ -14,21 +14,23 @@ The present accepted baseline provides contracts, arithmetic, item/equipment
 behavior, process cleanup and protocol-player fixtures. It does not establish
 a complete managed dragon fight. PR #31's player-owned observations and scoped
 policy are accepted at `705de34`; [exact evidence](evidence/t04-suite.md) retains
-their boundaries. PR #30's coordinator still requires its own current-input
-acceptance; neither result substitutes for the later production adapter.
-T02b/T08a/T08b/T08c register the test dragon, controls, ranking and loot simulation.
-Their empty/deferred requirements do not count as implemented features.
+their boundaries. PR #48 integrated the bounded proc coordinator and T02b catalog
+at `3c35a85` after the full 21-case cohort, independent replay/review and CI;
+[combined evidence](evidence/catalog-procs-suite.md). Bounded M0 is explicitly
+accepted. Lead-dispatched T06 and planned T08a/T08b/T08c still require production
+firing, controls, ranking and loot-simulation evidence; M1–M5 remain unaccepted.
 
 ## Brief to delivery and evidence
 
 | Intended behavior | Owning tasks | Automated acceptance and actual coverage | Remaining gate |
 | --- | --- | --- | --- |
 | Explainable stats, one ultimate per bow, immutable source/shot values | T00, T01a/T01b, T02; T06 integrates shot capture | Accepted `contract-consumers`, `stats-resolver`, `item-codec`, `equipment-service` and `equipment-player`; native shot capture must still preserve those values | Equipment service evidence does not establish firing-time snapshots |
-| No-Strength offense, crits, caps, separate HP and ghost/contribution damage | T03; T05, T06 and T08 integrate actual hits | `combat-services` is accepted; `bounded-procs`, `firing-input`, P01/P08/P09/P13 require feature integration. Keep fast independent numeric boundary tests and compare real-Paper production outputs | Final ferocity HP balance and unchosen optional enchant formulas remain explicit calibration/design choices |
+| No-Strength offense, crits, caps, separate HP and ghost/contribution damage | T03; T05, T06 and T08 integrate actual hits | `combat-services` and `bounded-procs` are accepted; `firing-input`, P01/P08/P09/P13 require feature integration. Keep fast independent numeric boundary tests and compare real-Paper production outputs | Final ferocity HP balance and unchosen optional enchant formulas remain explicit calibration/design choices |
 | One physical hit authority, native damage suppression and measured dragon parts/phases | T04, T06, T08, T08a | T04 shooterless/player-owned observations and scoped policy accepted in PR #31; P02/P04 remain production requirements, with expected event absence/valid misses retained | Actual production enforcement remains pending; no semantic-head or all-phase claim |
 | Native drawn bows, shortbow cadence, ammo, offhand deduplication and Duplex identity | T06 with T09d primitives; T08 connects combat/procs | `firing-input`, P08/P09/P13 and T06 `automated-multiplayer-firing`; actual parameterized packets and observed Paper effects. Full accounting attribution remains required at T08/M3 | Fixed select/draw/release/quit calibration cannot prove all inputs; subjective feel remains human |
 | Tracer radius/steering, real pre-spawn UUID continuity and bounded capacity | T07, T10 | P03/P05/P06/P07/P10/P11/P12/P14: real flight, obstruction/miss controls, simultaneous hits, revisions and load/cleanup | Measured player/arrow envelope; preserve M3's human visual prefire rehearsal |
-| One extensible test-dragon definition and inert table bindings | T02b / #38 | `dragon-definition-catalog`, `sample-loot-table-bindings`: whole-candidate validation, retained revisions and real production-loader checks | One initial test dragon only; test definitions do not approve later content or production drop numbers |
+| One extensible test-dragon definition and inert table bindings | T02b / #38 | Accepted `dragon-definition-catalog`, `sample-loot-table-bindings` through PR #48: whole-candidate validation, retained selections and real production-loader/abort checks | One initial test dragon only; test definitions do not approve later content or production drop numbers |
+| Reusable persisted configuration and same-world restart validation | T09e / #49 after integrated T09a/T09b/T09c/T09d | `same-profile-restart`: fixed two-boot runner, independent phase plans/reports, saved bytes and positive/abort generic calibration | In review in PR #50; [focused Paper/replay passed](evidence/t09e-focused-paper.md), lead whole-cohort acceptance pending; T08a managed-dragon recovery remains separate |
 | Managed real dragon plus spawn/status/reset/result inspection | T08a / #39 after shared T08/T06 path | `managed-dragon-development`: native and domain death observations, permissions/output, failed spawn, repeated reset and one completion | No engine clone; no real grants; direct spawning does not accept prefire or the altar |
 | Post-kill damage ranking including ghost damage and overkill | T08b / #40 | `frozen-damage-ranking`: unique placements, strict-increase commit provenance, same-tick ordinal ties, no late credit and actual distinct-player attribution/messages | Cosmetic presentation and authenticated full-client compatibility remain separate |
 | Personal placement-based rolls, improved chances and hard item locks | T08c / #41 | `personal-loot-preview`: seeded sample policies, hard exclusion, per-player/type isolation, visible simulation and no inventory/XP/currency/grant side effects | Real rewards always disabled; sample probabilities and items are not production balance |
@@ -174,6 +176,6 @@ Retain every existing M4/M5 gate; a written decomposition is not implementation.
 
 The confirmed first playable expansion is one test dragon with development
 controls, frozen damage ranking and disabled-grant personal loot simulation.
-M0–M3 still require the full physical combat/prefire path; M4 adds the gated ritual
+M0 contracts/feasibility is accepted. M1–M3 still require the full physical combat/prefire path; M4 adds the gated ritual
 and coherent initial encounter; M5 remains the separately scoped real progression
 delivery. Neither #38–41 nor a comprehensive harness alone completes the game.

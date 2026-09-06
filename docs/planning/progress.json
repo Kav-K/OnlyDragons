@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repository": "Kav-K/OnlyDragons",
   "baselineRevision": "73a8cc8637d8044a1687dff67eab50cab057b5c1",
-  "notice": "Historical integrated state and durable references only. Fresh machine evidence, independent review and current CI are checked separately. No milestone is accepted.",
+  "notice": "Historical integrated state and durable references only. Fresh machine evidence, independent review and current CI are checked separately. Bounded M0 contracts/feasibility is accepted; M1-M5 remain unaccepted.",
   "tasks": {
     "T00": {
       "status": "complete",
@@ -156,16 +156,25 @@
       "mergedRevision": "73a8cc8637d8044a1687dff67eab50cab057b5c1"
     },
     "T05": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "In review: the lead candidate combines main 705de34, handed-back proc head bc9eaba, corrected T04 completion ledger 91911d7 and catalog head 2613ba4, preserving all 21 cases. Historical b7fd6bc acceptance remains held because the old console matcher missed ERROR lines. The fresh combined suite, independent raw replay and T05 checkpoint remain pending. Prior worker evidence retains its original inputs; see dev/game-tests/findings/t05-suite.md. Physical P08/P09 and T08 composition remain later integration."
+      "status": "complete",
+      "completedRequirements": [
+        "bounded-procs"
+      ],
+      "evidence": {
+        "bounded-procs": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34028557123",
+          "revision": "e38334e7e43ffb94cf11bb4e5f56ba7ade27d7f4"
+        }
+      },
+      "mergedRevision": "3c35a85bfa5d6bf6788af7c26d59891cfb852175",
+      "reviewedRevision": "e38334e7e43ffb94cf11bb4e5f56ba7ade27d7f4",
+      "notice": "PR #48 merged at 3c35a85bfa5d6bf6788af7c26d59891cfb852175 after the complete 21-case hosted suite, independent raw replay/review, task checkpoints and current CI. Exact evidence: docs/planning/evidence/catalog-procs-suite.md. Bounded captured-snapshot proc coordinator and scheduler/session cleanup; physical P08/P09 and T08 composition remain later integration. Historical worker evidence retains its recorded inputs; earlier pending or held acceptance is not relabeled as passing."
     },
     "T06": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "T01b, T02 and accepted T04 are integrated; eligible for the lead's dispatch label. T09d is available for final production multiplayer firing tests. P02/P04, firing-input and automated-multiplayer-firing remain deferred; no accepted-M0 prerequisite or milestone acceptance is introduced."
+      "notice": "Lead applied the Symphony dispatch label to issue #9 after PR #48 merged at 3c35a85. Existing T01b/T02/T04 prerequisites are integrated. Production firing/claims, P02/P04 and feature-specific two-player evidence remain unfinished; no requirement is marked complete by dispatch."
     },
     "T07": {
       "status": "blocked",
@@ -219,10 +228,24 @@
       }
     },
     "T02b": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "Draft PR #46; clean runtime 90b5cf6775dcdf53003f89d1d5fb2cf7940edf58 includes main 4cfb7b9. 109 production tests, companion build, 92 checkpoint/suite tests and runtime-head Windows/Linux CI passed. Focused Paper: 30 positive assertions passed; abort control had 14 passes/one intended exception, restored the catalog and cleaned up. Exact evidence: docs/planning/evidence/t02b-focused-paper.md. Per owner coordination the lead owns the final combined suite and T02b automated acceptance checkpoint; no complete receipt, completed requirements or milestone/live dragon/reward acceptance claimed. Final normal merge 99118728e5110dabb51b2e8ec3bf2a972a0e0221 integrates T04/main 705de34 and preserves all 20 selected cases; prior focused evidence retains its original identity. Reconciled artifact acceptance remains with the lead. The lead candidate additionally retains the proc case and corrected T04 completion ledger (21 cases total); fresh combined runtime acceptance remains pending."
+      "status": "complete",
+      "completedRequirements": [
+        "dragon-definition-catalog",
+        "sample-loot-table-bindings"
+      ],
+      "evidence": {
+        "dragon-definition-catalog": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34028557123",
+          "revision": "e38334e7e43ffb94cf11bb4e5f56ba7ade27d7f4"
+        },
+        "sample-loot-table-bindings": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34028557123",
+          "revision": "e38334e7e43ffb94cf11bb4e5f56ba7ade27d7f4"
+        }
+      },
+      "mergedRevision": "3c35a85bfa5d6bf6788af7c26d59891cfb852175",
+      "reviewedRevision": "e38334e7e43ffb94cf11bb4e5f56ba7ade27d7f4",
+      "notice": "PR #48 merged at 3c35a85bfa5d6bf6788af7c26d59891cfb852175 after the complete 21-case hosted suite, independent raw replay/review, task checkpoints and current CI. Exact evidence: docs/planning/evidence/catalog-procs-suite.md. One shipped test-dragon definition and inert table/item bindings; no live spawn, reward calculation or delivery. Historical worker evidence retains its recorded inputs; earlier pending or held acceptance is not relabeled as passing."
     },
     "T08a": {
       "status": "planned",
@@ -276,12 +299,40 @@
       "reviewedRevision": "3047a56b0ed0c634034841b776752e71b55ac857",
       "notice": "Implementation and all five automated requirements verified: full 17-case hosted suite, independent unchanged-artifact replay and task checkpoint, 82 production/28 client tests, 238 Linux runner/checkpoint tests and passing current-runtime CI. Exact evidence: docs/planning/evidence/t09d-suite.md. PR #44 merged at 9def91f75d655caaccd6c7fa01313e4ba3a0ea54; the reviewed runtime evidence remains unchanged. Downstream dispatch still requires each task's remaining prerequisites and owner-applied label. Generic calibration does not complete production multiplayer firing/accounting, T04, P01-P14, human authentication/visual/feel checks or any milestone.",
       "mergedRevision": "9def91f75d655caaccd6c7fa01313e4ba3a0ea54"
+    },
+    "T09e": {
+      "status": "in-review",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Implementation in progress on GH-49; focused actual Paper and independent full-cohort acceptance pending. No gameplay or milestone acceptance."
     }
   },
   "milestones": {
     "M0": {
-      "status": "not-accepted",
-      "evidence": {}
+      "status": "accepted",
+      "evidence": {
+        "contract-consumers": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34028557123",
+          "revision": "e38334e7e43ffb94cf11bb4e5f56ba7ade27d7f4"
+        },
+        "projectile-observations": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34028557123",
+          "revision": "e38334e7e43ffb94cf11bb4e5f56ba7ade27d7f4"
+        },
+        "projectile-player-observations": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34028557123",
+          "revision": "e38334e7e43ffb94cf11bb4e5f56ba7ade27d7f4"
+        },
+        "listener-cleanup": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34028557123",
+          "revision": "e38334e7e43ffb94cf11bb4e5f56ba7ade27d7f4"
+        },
+        "projectile-impact-policy": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/31#issuecomment-5558603858",
+          "revision": "96ef4b3725aafe0674c4b057ffe7fd21df263ca7"
+        }
+      },
+      "notice": "Explicit lead and independent acceptance of the bounded written contracts/public-Paper feasibility gate after PR #48: T00/T04 current-cohort evidence, separate PR31 impact-policy review, current CI and PR48 acceptance. Supported T00/T04 checkpoint proves automated readiness only; no milestone CLI or human approval is claimed. See docs/planning/evidence/catalog-procs-suite.md. M1-M5 and production physical adapters remain unaccepted."
     },
     "M1": {
       "status": "not-accepted",

@@ -30,6 +30,7 @@ public final class ScenarioContext {
     private boolean finished;
 
     ScenarioContext(GameTestsPlugin plugin, String id) { this.plugin = plugin; this.id = id; }
+    public RestartPhase restartPhase() throws Exception { return RestartPhase.load(plugin.runId()); }
     public GameTestsPlugin harness() { return plugin; }
     public void mechanicRevision(String revision) {
         requireActive();

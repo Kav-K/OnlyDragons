@@ -4,6 +4,8 @@ Runtime source: `90b5cf6775dcdf53003f89d1d5fb2cf7940edf58`, clean, including mai
 `4cfb7b9525a186c1f6591173a550565fed3efd53`. Later context-only commits do not alter
 these runtime inputs. [Implementation PR](https://github.com/Kav-K/OnlyDragons/pull/46).
 
+Later disposition: PR #48 integrated T02b at `3c35a85` after the [combined 21-case acceptance](catalog-procs-suite.md). The focused checks below retain their original source/artifact identities and do not become the final combined receipt.
+
 ## Actual checks (6 September 2026)
 
 - JDK 25.0.4.1 root wrapper/API isolation: **109 production tests**, no failures,

@@ -148,7 +148,12 @@ def load_catalog(project):
         require(mode == declared and mode in (None, 'protocol-calibration', 'protocol-actions-v1'), 'Case player mode differs from scenario admission')
         if mode == 'protocol-actions-v1':
             try:
-                runner.player_actions.load_plan(project, descriptor)
+                if descriptor.get('catalogMode') == 'same-profile-restart-v1':
+                    import paper_restart
+                    phases = paper_restart.validate_descriptor(project, descriptor)
+                    require(phases[-1]['expectation'] == expectation, 'Restart case expectation differs from final phase')
+                else:
+                    runner.player_actions.load_plan(project, descriptor)
             except RuntimeError as error:
                 raise ValidationError(str(error)) from error
         control = case.get('playerControl', 'calibrate')
@@ -389,10 +394,16 @@ def reject_unstarted_run(result, record, result_path):
         raise ValidationError(f"Runner stopped before Paper started for {record['caseId']}: {reason}; see {result_path}")
 
 
-def verify_case(project, record, case, descriptor, source, suite_root):
+def verify_case(project, record, case, descriptor, source, suite_root, restart_context=None):
+    if descriptor.get("catalogMode") == "same-profile-restart-v1":
+        import paper_restart
+        return paper_restart.verify_case(sys.modules[__name__], project, record, case, descriptor, source, suite_root)
     run_id = record.get('runId')
     require(isinstance(run_id, str) and re.fullmatch('[0-9a-f]{32}', run_id), 'Invalid run ID')
-    report_root = project / 'build/reports/agent-paper' / run_id
+    report_root = (project / 'build/reports/agent-paper' / run_id if restart_context is None
+                   else restart_context['reportRoot'])
+    profile_id = run_id if restart_context is None else restart_context['parentRunId']
+    build_root = report_root if restart_context is None else report_root.parent
     result_path = checked_file(project, record, 'resultPath', 'resultSha256', report_root / 'result.json')
     result = runner.strict_json(result_path)
     reject_unstarted_run(result, record, result_path)
@@ -422,10 +433,16 @@ def verify_case(project, record, case, descriptor, source, suite_root):
     require(cleanup.get('clean') is True and cleanup.get('forced') is False
             and runner.json_values_equal(cleanup.get('exitCode'), 0), 'Paper was not reaped cleanly')
     scenario = runner.strict_json(scenario_path)
-    assertion_count = verify_scenario(scenario, case, descriptor, run_id, pins, start, end)
+    scenario_start, scenario_end = start, end
+    if restart_context is not None:
+        scenario_start, scenario_end = result.get('issuedAtEpochMs'), result.get('deadlineAtEpochMs')
+        require(type(scenario_start) is int and type(scenario_end) is int
+                and start <= scenario_start <= end and scenario_end == scenario_start + case.get('scenarioTimeout', 60) * 1000,
+                'Missing/wrong phase invocation window')
+    assertion_count = verify_scenario(scenario, case, descriptor, run_id, pins, scenario_start, min(end, scenario_end))
     if positive:
         require(runner.json_values_equal(result.get('scenario'), scenario), 'Raw scenario differs from accepted runner scenario')
-    profile = safe_path(project, 'run/agent-tests/' + run_id)
+    profile = safe_path(project, 'run/agent-tests/' + profile_id)
     try:
         runner.paper_bootstrap.validate_bootstrap(profile, result.get('bootstrap'), pins['paperSha256'])
     except RuntimeError as error:
@@ -440,7 +457,7 @@ def verify_case(project, record, case, descriptor, source, suite_root):
     require(runner.json_values_equal(assessed, memory), 'Memory admission evidence contradicts the shared gate')
     expected_settings = {'server-ip': '127.0.0.1', 'online-mode': 'false' if actor else 'true',
                          'enable-rcon': 'false', 'enable-query': 'false', 'enable-jmx-monitoring': 'false',
-                         'level-name': 'agent-world-' + run_id}
+                         'level-name': 'agent-world-' + profile_id}
     for key, value in expected_settings.items():
         require(settings.get(key) == value, 'Disposable profile policy mismatch: ' + key)
     profile_info = result.get('profile', {})
@@ -453,14 +470,14 @@ def verify_case(project, record, case, descriptor, source, suite_root):
     require(type(port) is int and 1 <= port <= 65535 and settings.get('server-port') == str(port), 'Wrong loopback port')
     process_cleanup(profile, port)
     server_log = checked_file(project, record, 'serverLogPath', 'serverLogSha256', report_root / 'server.log').read_text(encoding='utf-8', errors='replace')
-    checked_file(project, record, 'buildLogPath', 'buildLogSha256', report_root / 'build.log')
+    checked_file(project, record, 'buildLogPath', 'buildLogSha256', build_root / 'build.log')
     require('Stopping server' in server_log and not runner.paper_errors(server_log),
         'Paper error log or missing shutdown evidence')
     artifacts = result.get('artifacts', {})
     for relative, digest in [('server.jar', pins['paperSha256']),
                              ('plugins/OnlyDragons.jar', artifacts.get('productionSha256')),
                              ('plugins/OnlyDragonsGameTests.jar', artifacts.get('gameTestsSha256'))]:
-        require(runner.sha256(safe_path(project, 'run/agent-tests/' + run_id + '/' + relative)) == digest,
+        require(runner.sha256(safe_path(project, 'run/agent-tests/' + profile_id + '/' + relative)) == digest,
                 'Staged artifact differs from exact run build: ' + relative)
     build = result.get('build', {})
     require(build.get('wrapperInvoked') is True, 'Wrapper build evidence is missing')
@@ -505,14 +522,15 @@ def verify_case(project, record, case, descriptor, source, suite_root):
         player = runner.strict_json(player_path)
         if action_plan:
             _, plan_hash, plan = action_plan
-            staged_plan = safe_path(project, 'run/agent-tests/' + run_id + '/player-plan.json')
+            staged_plan = (safe_path(project, 'run/agent-tests/' + run_id + '/player-plan.json')
+                           if restart_context is None else safe_path(project, (report_root / 'player-plan.json').relative_to(project).as_posix()))
             require(runner.sha256(staged_plan) == plan_hash, 'Staged player plan changed')
             require(result.get('playerPlan') == {'sha256': plan_hash, 'planId': plan['planId']}, 'Player plan receipt changed')
             if case['expectation'] == 'cleanup-abort':
-                runner.player_actions.validate_abort_report(player, plan, plan_hash, run_id, pins, start, end)
+                runner.player_actions.validate_abort_report(player, plan, plan_hash, run_id, pins, scenario_start, end)
                 runner.player_actions.validate_abort_journal(scenario, player, plan)
             else:
-                runner.player_actions.validate_report(player, plan, plan_hash, run_id, pins, start, end)
+                runner.player_actions.validate_report(player, plan, plan_hash, run_id, pins, scenario_start, min(end, scenario_end))
                 runner.player_actions.validate_server_journal(scenario, player, plan)
             runner.player_actions.validate_messages(player, descriptor)
         else:
@@ -594,6 +612,21 @@ def capture_tests(project, suite_root, case_id, actor):
     return result
 
 
+def capture_run_files(project, reports, record, actor, build_root=None):
+    for kind in ('result', 'scenario', *(['player'] if actor else [])):
+        report = reports / (kind + '.json')
+        require(report.is_file(), 'Runner evidence is missing: ' + str(report))
+        record[kind + 'Path'] = report.relative_to(project).as_posix()
+        record[kind + 'Sha256'] = runner.sha256(report)
+        if kind == 'result':
+            reject_unstarted_run(runner.strict_json(report), record, report)
+    for kind in ('server', 'build'):
+        log = (build_root or reports) / 'build.log' if kind == 'build' else reports / 'server.log'
+        require(log.is_file(), 'Runner log is missing: ' + str(log))
+        record[kind + 'LogPath'] = log.relative_to(project).as_posix()
+        record[kind + 'LogSha256'] = runner.sha256(log)
+
+
 def run_child(command, project, log_path):
     """Forward cancellation to the owned runner; it retains its lease until JVM cleanup."""
     require(sys.platform == 'linux', 'Owned Paper runner processes require Linux/WSL')
@@ -665,18 +698,11 @@ def execute(args):
             require(len(matches) == 1 and matches[0][1] == case['scenarioId'], 'Runner did not identify one fresh scenario run; see ' + str(log_path))
             record['runId'] = matches[0][0]
             reports = project / 'build/reports/agent-paper' / record['runId']
-            for kind in ('result', 'scenario', *(['player'] if case.get('testPlayer') else [])):
-                report = reports / (kind + '.json')
-                require(report.is_file(), 'Runner evidence is missing: ' + str(report))
-                record[kind + 'Path'] = report.relative_to(project).as_posix()
-                record[kind + 'Sha256'] = runner.sha256(report)
-                if kind == 'result':
-                    reject_unstarted_run(runner.strict_json(report), record, report)
-            for kind in ('server', 'build'):
-                log = reports / (kind + '.log')
-                require(log.is_file(), 'Runner log is missing: ' + str(log))
-                record[kind + 'LogPath'] = log.relative_to(project).as_posix()
-                record[kind + 'LogSha256'] = runner.sha256(log)
+            if scenarios[case['scenarioId']].get('catalogMode') == 'same-profile-restart-v1':
+                import paper_restart
+                paper_restart.capture(sys.modules[__name__], project, reports, record)
+            else:
+                capture_run_files(project, reports, record, bool(case.get('testPlayer')))
             record['testEvidence'] = capture_tests(project, root, case_id, bool(case.get('testPlayer')))
             record['verified'] = verify_case(project, record, case, scenarios[case['scenarioId']], source, root)
             receipt['cases'].append(record)
