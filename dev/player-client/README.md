@@ -17,6 +17,11 @@ requires both reports, successful client exit and clean owned-process cleanup.
 
 ## Dependency provenance
 
+The source of truth is the `testPlayerProtocolLib`, `testPlayerProtocolLibSha256`
+and `testPlayerProtocolVersion` keys in `versions.properties`. Both Gradle and
+the runner read these pins; the client JAR embeds the same target for its codec
+check and report. Existing production/server version keys are unchanged.
+
 - Exact coordinate: `org.geysermc.mcprotocollib:protocol:26.2-20260824.124638-17`.
 - Publication: [OpenCollab timestamped artifact](https://repo.opencollab.dev/maven-snapshots/org/geysermc/mcprotocollib/protocol/26.2-SNAPSHOT/protocol-26.2-20260824.124638-17.jar).
 - Artifact SHA256: `07ec18ba92c8b4041286eeff2470e08257fd1f383881515cba4a0a9bf6fa98c1`,

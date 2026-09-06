@@ -1,9 +1,13 @@
 import org.gradle.api.artifacts.dsl.LockMode
+import java.util.Properties
 
 plugins { application }
 
 group = "com.kaveenk.onlydragons"
 version = "1.0.0"
+val projectPins = Properties().apply {
+    file("../../versions.properties").inputStream().use { load(it) }
+}
 
 repositories {
     mavenCentral()
@@ -17,7 +21,7 @@ repositories {
 
 // This timestamped publication is the 26.2 branch, protocol 776. Main targets 26.1.
 dependencies {
-    implementation("org.geysermc.mcprotocollib:protocol:26.2-20260824.124638-17")
+    implementation(projectPins.getProperty("testPlayerProtocolLib"))
     implementation("com.google.code.gson:gson:2.11.0")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.9")
     testImplementation(platform("org.junit:junit-bom:6.1.3"))
@@ -25,7 +29,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-java { toolchain.languageVersion.set(JavaLanguageVersion.of(25)) }
+java { toolchain.languageVersion.set(JavaLanguageVersion.of(projectPins.getProperty("javaVersion").toInt())) }
 application { mainClass.set("com.kaveenk.onlydragons.playerclient.ProtocolPlayer") }
 dependencyLocking {
     lockAllConfigurations()
@@ -36,6 +40,16 @@ dependencyLocking {
     // its entire transitive graph remains subject to strict dependency locking.
     ignoredDependencies.add("org.geysermc.mcprotocollib:protocol")
 }
-tasks.withType<JavaCompile>().configureEach { options.encoding = "UTF-8"; options.release.set(25) }
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+    options.release.set(projectPins.getProperty("javaVersion").toInt())
+}
+tasks.processResources {
+    val values = mapOf("artifact" to projectPins.getProperty("testPlayerProtocolLib"),
+                      "minecraftVersion" to projectPins.getProperty("minecraftVersion"),
+                      "protocolVersion" to projectPins.getProperty("testPlayerProtocolVersion"))
+    inputs.properties(values)
+    filesMatching("player-client.properties") { expand(values) }
+}
 tasks.test { useJUnitPlatform() }
 tasks.jar { archiveFileName.set("OnlyDragonsPlayerClient.jar") }

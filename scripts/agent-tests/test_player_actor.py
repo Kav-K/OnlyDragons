@@ -20,9 +20,11 @@ class PlayerActorContractTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.now = int(time.time() * 1000)
         self.run_id = 'a' * 32
+        self.pins = runner.properties(Path(__file__).resolve().parents[2] / 'versions.properties')
+        pinned = runner.player_pins(self.pins)
         self.report = {'schemaVersion': 1, 'runId': self.run_id, 'username': 'od_' + 'a' * 13,
-                       'authentication': 'offline-disposable-loopback', 'artifact': runner.PLAYER_ARTIFACT,
-                       'minecraftVersion': '26.2', 'protocolVersion': 776,
+                       'authentication': 'offline-disposable-loopback', 'artifact': pinned['artifact'],
+                       'minecraftVersion': pinned['minecraftVersion'], 'protocolVersion': pinned['protocolVersion'],
                        'startedAtEpochMs': self.now, 'completedAtEpochMs': self.now,
                        'loginReceived': True, 'playerLoadedSent': True, 'teleportsAcknowledged': 1,
                        'actions': ['select', 'draw', 'release', 'quit'], 'disconnected': True,
@@ -31,7 +33,13 @@ class PlayerActorContractTests(unittest.TestCase):
     def validate(self, report):
         path = self.root / 'player.json'
         runner.atomic_json(path, report)
-        return runner.validate_player_report(path, self.run_id, self.now, 60)
+        return runner.validate_player_report(path, self.run_id, self.now, 60, self.pins)
+
+    def test_floating_protocol_publication_and_malformed_hash_are_rejected(self):
+        for mutation in ({'testPlayerProtocolLib': 'org.geysermc.mcprotocollib:protocol:26.2-SNAPSHOT'},
+                         {'testPlayerProtocolLibSha256': 'bad'}, {'testPlayerProtocolVersion': 'true'}):
+            with self.subTest(mutation=mutation), self.assertRaises(runner.ValidationError):
+                runner.player_pins(dict(self.pins, **mutation))
 
     def test_only_explicit_named_scenario_can_enable_player_mode(self):
         self.assertFalse(runner.player_mode(None, 'foundation-contracts', 'calibrate'))

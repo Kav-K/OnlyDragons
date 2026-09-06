@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 
 class ProtocolPlayerTest {
     @Test void dependencyReallyProvidesPinnedProtocol() {
-        assertEquals(776, MinecraftCodec.CODEC.getProtocolVersion());
-        assertEquals("26.2", MinecraftCodec.CODEC.getMinecraftVersion());
+        assertEquals(ProtocolPlayer.EXPECTED_PROTOCOL, MinecraftCodec.CODEC.getProtocolVersion());
+        assertEquals(ProtocolPlayer.EXPECTED_MINECRAFT, MinecraftCodec.CODEC.getMinecraftVersion());
     }
 
     @Test void syntheticNameFitsMinecraftAndCannotContainUserSuppliedHostOrAccount() {

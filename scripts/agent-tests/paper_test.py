@@ -342,8 +342,17 @@ class OwnedPlayer(OwnedServer):
         return result
 
 
-PLAYER_ARTIFACT = 'org.geysermc.mcprotocollib:protocol:26.2-20260824.124638-17'
-PLAYER_PROTOCOL_SHA256 = '07ec18ba92c8b4041286eeff2470e08257fd1f383881515cba4a0a9bf6fa98c1'
+def player_pins(pins):
+    coordinate = pins.get('testPlayerProtocolLib', '')
+    require(re.fullmatch(r'org\.geysermc\.mcprotocollib:protocol:[0-9.]+-\d{8}\.\d{6}-\d+', coordinate),
+            'Player protocol pin must name an exact timestamped MCProtocolLib publication')
+    digest = pins.get('testPlayerProtocolLibSha256', '')
+    require(re.fullmatch(r'[a-f0-9]{64}', digest), 'Invalid player protocol SHA256')
+    protocol = pins.get('testPlayerProtocolVersion', '')
+    require(protocol.isdecimal() and int(protocol) > 0, 'Invalid player protocol version')
+    return {'artifact': coordinate, 'sha256': digest, 'protocolVersion': int(protocol),
+            'jarName': 'protocol-' + coordinate.rsplit(':', 1)[1] + '.jar',
+            'minecraftVersion': pins['minecraftVersion']}
 
 
 def player_mode(mode, scenario, control):
@@ -368,12 +377,13 @@ def test_settings(base, run_id, port, with_player=False):
     return settings
 
 
-def validate_player_report(path, run_id, issued_ms, timeout):
+def validate_player_report(path, run_id, issued_ms, timeout, pins):
     report = strict_json(path)
     require(isinstance(report, dict), 'Player report must be an object')
+    pinned = player_pins(pins)
     expected = {'schemaVersion': 1, 'runId': run_id, 'username': 'od_' + run_id[:13],
-                'authentication': 'offline-disposable-loopback', 'artifact': PLAYER_ARTIFACT,
-                'minecraftVersion': '26.2', 'protocolVersion': 776, 'loginReceived': True,
+                'authentication': 'offline-disposable-loopback', 'artifact': pinned['artifact'],
+                'minecraftVersion': pinned['minecraftVersion'], 'protocolVersion': pinned['protocolVersion'], 'loginReceived': True,
                 'playerLoadedSent': True, 'actions': ['select', 'draw', 'release', 'quit'],
                 'disconnected': True, 'passed': True, 'error': ''}
     for key, value in expected.items():
@@ -388,7 +398,8 @@ def validate_player_report(path, run_id, issued_ms, timeout):
     return report
 
 
-def build_player_client(project, java_home, report_root):
+def build_player_client(project, java_home, report_root, pins):
+    pinned = player_pins(pins)
     env = dict(os.environ, JAVA_HOME=str(java_home), GRADLE_USER_HOME=str(project / '.gradle/agent-home'))
     env['PATH'] = str(java_home / 'bin') + os.pathsep + env.get('PATH', '')
     with (report_root / 'build.log').open('a', encoding='utf-8') as log:
@@ -409,9 +420,9 @@ def build_player_client(project, java_home, report_root):
     jars = sorted((root / 'build/install/OnlyDragonsPlayerClient/lib').glob('*.jar'))
     hashes = {jar.name: sha256(jar) for jar in jars}
     require('OnlyDragonsPlayerClient.jar' in hashes, 'Player client artifact is missing')
-    require(hashes.get('protocol-26.2-20260824.124638-17.jar') == PLAYER_PROTOCOL_SHA256,
+    require(hashes.get(pinned['jarName']) == pinned['sha256'],
             'MCProtocolLib artifact differs from the verified exact 26.2 publication')
-    return jars, {'artifact': PLAYER_ARTIFACT, 'jars': hashes, 'unitTests': counts,
+    return jars, {'artifact': pinned['artifact'], 'jars': hashes, 'unitTests': counts,
                   'lockSha256': sha256(root / 'gradle.lockfile'),
                   'verificationMetadataSha256': sha256(root / 'gradle/verification-metadata.xml')}
 
@@ -498,7 +509,7 @@ def execute(args):
         outcome['build'] = build
         outcome['artifacts'] = {'productionSha256': sha256(main), 'gameTestsSha256': sha256(companion)}
         if with_player:
-            client_jars, outcome['playerBuild'] = build_player_client(project, java_home, report_root)
+            client_jars, outcome['playerBuild'] = build_player_client(project, java_home, report_root, pins)
         paper = fetch_paper(project, pins, args.paper_jar)
         with server_lease(args.lease_directory.resolve(), args.lease_timeout):
             outcome['memory'] = wait_for_memory(args.memory_mib, args.resource_timeout, 256 if with_player else 0)
@@ -561,7 +572,7 @@ def execute(args):
                                                       server.process, client.process if client else None)
                 if client:
                     require(client.process.wait(timeout=5) == 0, 'Protocol player exited unsuccessfully')
-                    outcome['player'] = validate_player_report(report_root / 'player.json', run_id, issued_ms, args.scenario_timeout)
+                    outcome['player'] = validate_player_report(report_root / 'player.json', run_id, issued_ms, args.scenario_timeout, pins)
             finally:
                 if server is not None:
                     # Ignore a repeated termination while saving this runner's own disposable world.

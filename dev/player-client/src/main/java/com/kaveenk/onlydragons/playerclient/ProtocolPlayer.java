@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +44,10 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.Serv
 
 /** Disposable loopback protocol actor; never authenticates or follows server transfers. */
 public final class ProtocolPlayer extends SessionAdapter {
-    public static final String ARTIFACT = "org.geysermc.mcprotocollib:protocol:26.2-20260824.124638-17";
+    private static final Properties PINS = readPins();
+    public static final String ARTIFACT = PINS.getProperty("artifact");
+    static final String EXPECTED_MINECRAFT = PINS.getProperty("minecraftVersion");
+    static final int EXPECTED_PROTOCOL = Integer.parseInt(PINS.getProperty("protocolVersion"));
     private final String runId;
     private final String behavior;
     private final List<String> actions = new ArrayList<>();
@@ -55,6 +59,15 @@ public final class ProtocolPlayer extends SessionAdapter {
     private String error;
 
     ProtocolPlayer(String runId, String behavior) { this.runId = runId; this.behavior = behavior; }
+
+    private static Properties readPins() {
+        var pins = new Properties();
+        try (var stream = ProtocolPlayer.class.getResourceAsStream("/player-client.properties")) {
+            if (stream == null) throw new IllegalStateException("Missing built client pins");
+            pins.load(stream);
+            return pins;
+        } catch (Exception failure) { throw new ExceptionInInitializerError(failure); }
+    }
 
     static String username(String runId) {
         if (runId == null || !runId.matches("[0-9a-f]{32}")) throw new IllegalArgumentException("Invalid run ID");
@@ -138,7 +151,8 @@ public final class ProtocolPlayer extends SessionAdapter {
                 || !List.of("calibrate", "early-exit", "idle").contains(args[4])) {
             throw new IllegalArgumentException("Invalid bounded fixture arguments");
         }
-        if (MinecraftCodec.CODEC.getProtocolVersion() != 776 || !MinecraftCodec.CODEC.getMinecraftVersion().equals("26.2")) {
+        if (MinecraftCodec.CODEC.getProtocolVersion() != EXPECTED_PROTOCOL
+                || !MinecraftCodec.CODEC.getMinecraftVersion().equals(EXPECTED_MINECRAFT)) {
             throw new IllegalStateException("Wrong MCProtocolLib codec");
         }
         long started = System.currentTimeMillis();
