@@ -7,8 +7,10 @@ Paper build 121, and JDK 25. Treat versions.properties as the source of truth.
 ## Shared project context
 
 When this checkout contains `docs/planning/`, every agent must read these three
-files before choosing, delegating, or implementing a task. Read them again after
-resuming with missing context, switching branches, or integrating relevant changes:
+files before choosing, delegating, or implementing a task. Read them in bounded
+sections so tool output is complete. After a main merge, inspect the context diff
+and reread affected sections; repeat the full read when changing tasks or resuming
+without the earlier context:
 
 1. `docs/planning/01-research.md`: researched mechanics, source confidence, and
    unresolved questions. A report about another game is not an implementation fact.
@@ -41,6 +43,10 @@ the active execution environment when applying the plan.
   available to subsequent clean workspaces after its PR is merged. Read relevant
   open PRs for pending work; a branch-local status entry is not a global lock.
   The integration lead reconciles shared edits and accepted status after merge.
+- Keep these three entry documents focused on current contracts, status and gates.
+  Link superseded run details from an evidence archive rather than accumulating
+  them in the required startup read. Read linked evidence when validating its
+  claim or changing that area; preserve the historical result and revision.
 
 This context is repository-specific. A generated starter without `docs/planning/`
 uses its own project brief; do not import the original game's design into it.
@@ -78,6 +84,9 @@ validation commands, subject to the Symphony server restrictions below.
 - The project Serena launcher activates this checkout automatically. Confirm it
   with `get_current_config` before symbol work and after switching folders. Serena
   exposes navigation tools; use the client's normal tools for edits and commands.
+  Use symbol/reference queries for cross-file API or lifecycle work when useful;
+  initialization alone is not navigation evidence. A simple known-file edit or
+  test-only reconciliation does not require ritual tool calls.
   Its local caches and memories are not shared project context.
 - Tool setup and checks are in `dev/agent-tools.md`. Keep skills, their references,
   and tool instructions current with verified discoveries in the same change;

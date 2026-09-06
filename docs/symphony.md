@@ -140,8 +140,10 @@ unrelated worker commit. A nested-only `.agents/skills` grant must reproduce the
 known read-only-ancestor failure. All owned processes and scratch files are cleaned up.
 
 The direct Linux/WSL smoke passed on Codex 0.153.4 during this maintenance
-verification; the app server exited 0 and scratch cleanup succeeded. Current
-head review, CI and lead integration remain pending. CI without this installed
+verification; the app server exited 0 and scratch cleanup succeeded. PR #34
+subsequently passed independent review and both CI platforms and merged as
+`5e8cfbf`. Both resumed GH-5/GH-8 workers then merged that main successfully and
+passed their actual-checkout doctor preflight. CI without this installed
 CLI does not run the smoke and must not count it as a sandbox pass. These are
 adapter checks; prior Paper receipts retain their original exact input identity
 and do not validate the changed adapter.
@@ -174,6 +176,15 @@ The planning documents are the shared memory for subsequent agents. Context
 changes travel with their implementation PR; later clean workspaces receive
 them after merge. The integration lead reconciles completed tasks and remaining
 operator gates under `docs/planning/03-agent-tasks-and-validation.md`.
+
+At handoff, check progress against verified deliverables: prerequisite integration,
+current-source tests, independent review and current-head CI. A running worker,
+token count, valid plan or increasing test count is not itself accepted progress.
+After a repeated blocker or milestone, sample actual tool use, context drift,
+suite/lease timing and failed-run causes before tuning concurrency or adding tools.
+Treat cumulative input counters as repeated-input accounting, not unique context
+or a dollar-cost estimate. Keep routine monitoring quiet when nothing actionable
+changes. See the [September 5 agent audit](agent-audit-2026-09-05.md).
 
 For missing access or another external blocker, the worker records the blocker
 and removes the dispatch label. If GitHub itself is inaccessible, the worker

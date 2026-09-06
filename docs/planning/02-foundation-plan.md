@@ -163,9 +163,10 @@ The factory regression fixture resolves a bare 100-damage bow to damage 100,
 crit damage 50, crit chance 0 and ferocity 0. A projected fixture adding crit
 chance 100, ferocity 25 and rolled damage 2.5 resolves to 102.5 / 50 / 100 / 25,
 with ordinary probability 1 and exactly three contributions. Those roll/enchant
-amounts are boundary fixtures, not a claim about unpublished T02 loadout values.
-T02's projection implementation and complete preset totals must still be checked
-after its integration; its branch was not yet published during this audit.
+amounts remain numeric boundary fixtures. T02's projection and all eight preset
+totals were verified after integration in item-codec-v4 (PR #24) and T01b
+equipment checks (PR #29/#32); see the [T02 evidence](03-agent-tasks-and-validation.md#t02-item-validation-evidence)
+and [T01b evidence](03-agent-tasks-and-validation.md#t01b-equipment-validation-gh-7).
 
 ### T01b equipment and inspection boundary (GH-7)
 
@@ -252,9 +253,10 @@ Per-definition allowlists gate named rolls; duplicate selections reject.
 This is a plugin data boundary, not a signature against privileged PDC writers
 or an anti-duplication ledger for cloned item UUIDs.
 
-`CalibrationLoadouts.registry()` is compiled development data at
-`calibration-items-v2`, ready for #7's later grant integration; it is not wired
-into root bootstrap/commands and is not reloadable configuration. All eight
+`CalibrationLoadouts.registry()` supplies compiled `calibration-items-v2`
+development data to the production equipment service and permission-gated
+calibration commands. T01b wired it through `OnlyDragonsPlugin`; changes require
+a restart because the registry is not reloadable configuration. All eight
 drawn bows supply base damage 100 and no crit-damage modifier. The lead
 confirmed T01 owns baseline crit damage 50; the initial item +50 was removed
 before handoff to avoid resolving 100. With T01
@@ -500,8 +502,9 @@ exact Paper target; [its evidence](../../dev/agent-paper-tests.md#protocol-playe
 is separate from gameplay acceptance. The explicitly named runner mode uses one
 offline synthetic identity only in its fresh loopback disposable profile,
 with both JVMs in the shared memory/lease lifecycle. Default tests and human
-profiles remain authenticated. T04 and equipment integration must add reviewed
-scenario admission and their own production assertions; the bow calibration
+profiles remain authenticated. PR #32 supplies reviewed catalog-declared actor
+admission, connected equipment assertions and a delayed-quit soak. T04 still
+requires its own reviewed player-owned damage/phase evidence; calibration alone
 does not settle native dragon suppression or change this combat design.
 
 ## 13. Milestones and completion gates

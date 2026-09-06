@@ -121,7 +121,7 @@ class CheckpointTests(unittest.TestCase):
         self.reject_plan('complete with missing requirements')
 
     def test_deferred_component_cannot_be_declared_complete(self):
-        self.change(PROGRESS, lambda value: value['tasks']['T04']['completedRequirements'].append('P02'))
+        self.change(PROGRESS, lambda value: value['tasks']['T06']['completedRequirements'].append('P02'))
         self.reject_plan('Deferred component declared complete')
 
     def test_active_dispatch_requires_integrated_dependencies(self):
@@ -244,9 +244,113 @@ class CheckpointTests(unittest.TestCase):
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'Duplicate receipt case'):
             self.acceptance()
 
-    def test_deferred_task_gate_cannot_be_satisfied_by_all_current_fixtures(self):
-        with self.assertRaisesRegex(checkpoint.CheckpointError, 'deferred automated requirements.*P02'):
+    def test_deferred_player_observations_cannot_be_satisfied_by_all_current_fixtures(self):
+        # Retain this negative control after the real player fixture later lands.
+        self.change(PLAN, lambda value: value['requirements']['projectile-player-observations'].update(
+            availability='deferred', fixtures=[]))
+        with self.assertRaisesRegex(checkpoint.CheckpointError,
+                                    'deferred automated requirements: projectile-player-observations'):
             self.acceptance(['T04'])
+
+    def implement_player_observation_fixture(self):
+        """Simulate a future distinct registration at the verified-receipt seam."""
+        fixture = 'projectile-player-feasibility'
+        plan = self.read(PLAN)
+        if fixture not in plan['fixtures']:
+            assertions = ['native_release_damage_positive', 'part_parent_mapping']
+            plan['fixtures'][fixture] = {'assertions': assertions, 'caseIds': [fixture],
+                                         'scope': 'Synthetic checkpoint fixture registration; no runtime claim.'}
+            self.change(SCENARIOS, lambda value: value.update({fixture: {'requiredAssertions': assertions}}))
+            self.change(SUITES, lambda value: value['cases'].update({fixture: {
+                'scenarioId': fixture, 'expectation': 'positive'}}))
+            path = self.project / JAVA
+            path.write_text(path.read_text().replace('scenarios = Map.ofEntries(',
+                'scenarios = Map.ofEntries(\nMap.entry("' + fixture + '", new SyntheticScenario()),'))
+        plan['requirements']['projectile-player-observations'].update(
+            availability='implemented', fixtures=[fixture])
+        self.write(PLAN, plan)
+        present = {case['caseId'] for case in self.suite.receipt['cases']}
+        for case in plan['fixtures'][fixture]['caseIds']:
+            if case not in present:
+                self.suite.receipt['cases'].append({'caseId': case})
+        return fixture
+
+    def record_bounded_t04_completion(self):
+        # These are synthetic ledger references, not acceptance of the real branch.
+        refs = self.read(PLAN)['tasks']['T04']
+        evidence = {ref: {'url': 'https://github.com/Kav-K/OnlyDragons/pull/31', 'revision': SHA}
+                    for ref in refs}
+        self.change(PROGRESS, lambda value: value['tasks']['T04'].update(
+            status='complete', mergedRevision=SHA, completedRequirements=refs, evidence=evidence))
+
+    def test_feasibility_prerequisite_does_not_require_its_dependent_adapter(self):
+        plan = self.read(PLAN)
+        bounded = {'projectile-observations', 'projectile-player-observations',
+                   'listener-cleanup', 'projectile-impact-policy'}
+        self.assertEqual(bounded, set(plan['tasks']['T04']))
+        self.assertEqual(bounded | {'contract-consumers'}, set(plan['milestones']['M0']['requirements']))
+        adapter = next(task for task in self.read(BACKLOG)['tasks'] if task['id'] == 'T06')
+        self.assertIn('T04', adapter['dependsOn'])
+        for requirement in ('P02', 'P04'):
+            self.assertIn(requirement, plan['tasks']['T06'])
+            self.assertIn(requirement, plan['milestones']['M1']['requirements'])
+            self.assertEqual([requirement], plan['paperCases'][requirement])
+            self.assertEqual('automated', plan['requirements'][requirement]['kind'])
+
+    def test_bounded_player_evidence_allows_machine_readiness_but_keeps_policy_external(self):
+        fixture = self.implement_player_observation_fixture()
+        result = self.acceptance(['T04'])
+        self.assertTrue(result['automatedReady'])
+        self.assertFalse(result['acceptanceApproved'])
+        self.assertIn('projectile-impact-policy', result['externalGates'])
+        self.assertEqual('external-review', self.read(PLAN)['requirements']['projectile-impact-policy']['kind'])
+        self.assertTrue({fixture, 'projectile-feasibility', 'projectile-cleanup-failure',
+                         'projectile-cleanup-abort'} <= set(result['requiredCases']))
+        self.assertTrue({'P02', 'P04'} <= set(result['pendingAutomatedRequirements']))
+        self.suite.receipt['cases'] = [case for case in self.suite.receipt['cases'] if case['caseId'] != fixture]
+        with self.assertRaisesRegex(checkpoint.CheckpointError, 'missing required.*projectile-player-feasibility'):
+            self.acceptance(['T04'])
+
+    def test_feasibility_completion_cannot_release_deferred_adapter_requirements(self):
+        self.implement_player_observation_fixture()
+        self.record_bounded_t04_completion()
+        self.assertTrue(self.plan()['summary']['planValid'])
+        with self.assertRaisesRegex(checkpoint.CheckpointError, 'deferred automated requirements: P02, P04'):
+            self.acceptance(['T06'])
+
+    def test_t04_and_m0_cannot_record_acceptance_without_policy_review_reference(self):
+        self.implement_player_observation_fixture()
+        self.record_bounded_t04_completion()
+        completed = self.read(PROGRESS)
+        self.change(PROGRESS, lambda value: value['tasks']['T04']['evidence'].pop('projectile-impact-policy'))
+        self.reject_plan('Missing evidence reference: T04/projectile-impact-policy')
+        self.write(PROGRESS, completed)
+        refs = self.read(PLAN)['milestones']['M0']['requirements']
+        evidence = {ref: {'url': 'https://github.com/Kav-K/OnlyDragons/pull/31', 'revision': SHA}
+                    for ref in refs if ref != 'projectile-impact-policy'}
+        self.change(PROGRESS, lambda value: value['milestones']['M0'].update(status='accepted', evidence=evidence))
+        self.reject_plan('Missing evidence reference: M0/projectile-impact-policy')
+        self.change(PROGRESS, lambda value: value['milestones']['M0']['evidence'].update({
+            'projectile-impact-policy': {'url': 'https://github.com/Kav-K/OnlyDragons/pull/31', 'revision': SHA}}))
+        self.assertTrue(self.plan()['summary']['planValid'])
+
+    def test_gate_relocation_still_requires_a_reviewed_new_comparison_base(self):
+        previous = self.read(PLAN)
+        previous['tasks']['T04'] = ['projectile-observations', 'listener-cleanup', 'P02', 'P04']
+        with self.assertRaisesRegex(checkpoint.CheckpointError, 'Acceptance requirement mapping weakened: tasks/T04'):
+            self.baseline({PLAN: previous})
+        # Once the reviewed relocation lands, neither downstream owner can drop it.
+        current = self.read(PLAN)
+        for group, owner in (('tasks', 'T06'), ('milestones', 'M1')):
+            with self.subTest(group=group, owner=owner):
+                self.write(PLAN, current)
+                def drop(value):
+                    refs = value[group][owner] if group == 'tasks' else value[group][owner]['requirements']
+                    refs.remove('P02')
+                self.change(PLAN, drop)
+                with self.assertRaisesRegex(checkpoint.CheckpointError,
+                                            'Acceptance requirement mapping weakened|Milestone gate weakened'):
+                    self.baseline({PLAN: current})
 
     def test_named_task_requires_all_of_its_bound_cases(self):
         self.suite.receipt['cases'] = [{'caseId': 'stats-resolution'}]

@@ -74,9 +74,19 @@ than creating duplicate commits, comments, or pull requests.
   maintenance task; do not execute the rest of the backlog. Reconcile relevant
   issue/PR state with the delivery ledger before assuming a dependency is done.
   Pass the context paths, revision, scope, and gates to any subagent.
+  Read the mandatory documents in bounded sections (about 120-180 lines at a
+  time), with output budgets large enough at both the shell and enclosing tool
+  layers. If output truncates, retrieve only the missing section. After merging
+  main, inspect the context diff and reread affected sections; do not repeatedly
+  dump all three documents when their earlier content is still in context.
 - Use the relevant repository skills under .agents/skills/ and tool routing in
   dev/agent-workflow.md. Context7 supplies API documentation; Serena is already
-  bound to this issue checkout for Java navigation. Confirm its current config.
+  bound to this issue checkout for Java navigation. Before symbol work, confirm
+  its current config and use a relevant symbol/reference query for cross-file
+  API or lifecycle investigation. Initialization alone is not useful navigation.
+  Simple known-file edits and test-only reconciliation need no ritual MCP calls.
+  Follow exact reference paths linked by the selected skill; keep required-read
+  errors visible and resolve them before work that depends on that guidance.
   Use native workspace tools for edits. An unavailable helper is not a gameplay
   blocker when local source, official docs, and the build supply the needed evidence.
 - Work only in the provided issue workspace. The isolated Paper runner may use
@@ -152,6 +162,10 @@ than creating duplicate commits, comments, or pull requests.
    handoff. Static plan validity does not mean runtime or milestone acceptance;
    busy, missing, skipped or stale evidence is an outstanding gate. An objectively
    automatable behavior must not be deferred merely as a human check.
+   Use targeted cases while iterating, then the complete changed-area suite once
+   on the final committed inputs. Do not repeat completed checks without changed
+   inputs, failure or an unresolved concern. Reusing a receipt must pass its
+   source-identity checks; a new comparison base never makes stale evidence valid.
 6. Review the diff for scope, correctness, generated files, credentials, worlds,
    and logs. Update the affected planning context under document 03's maintenance
    protocol: research in 01, design/contract changes in 02, status/evidence and
@@ -173,6 +187,9 @@ than creating duplicate commits, comments, or pull requests.
    branch. The description must explain the resulting behavior, reference the
    issue, list actual validation and results, and identify unrun Windows smoke
    or human checks. Never mark an existing human-ready PR back to draft.
+   Refresh an existing description after resolving a blocker and at final
+   handoff. State the current head/main integration, actual receipt/checkpoint,
+   and remaining gates; remove superseded blocker claims from the current summary.
    Keep the task's planning entry In review; a draft PR or passing starter tests
    cannot establish milestone completion. Add the resulting PR reference to
    the context entry and push that documentation update before final handoff.
