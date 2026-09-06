@@ -308,6 +308,55 @@ All percentage bonuses are converted to fractions once. Full draw has a scale of
 
 For an uncapped target with zero defense, a 100-damage weapon, a 40% additive bonus, and a critical multiplier of 1.5 yields 210 damage. This is a **test fixture for our model**, not a claim that these numbers reproduce an entire SkyBlock loadout.
 
+### T03 combat service contract
+
+Adopted within GH-6 scope, preserving all T00 records: `CombatProfile` freezes
+`MechanicRevision`, mitigation (`NONE` or `NONNEGATIVE_DEFENSE`), cap (`NONE` or
+`HISTORICAL_2021`), and a ferocity health fraction in [0, 1]. `calibration()` is
+uncapped with ordinary defense and full health/score; `dragonExperiment(...)`
+requires an explicitly named revision and experimental coefficient. There is no
+chosen production reduced-health default. Callers must change the revision when
+changing profile values and retain that immutable profile for the encounter.
+
+`DamageModifiers` accepts named nonnegative additive **fractions** (0.4 = +40%)
+and nonnegative separate factors, with deterministic source-ID ordering and
+immutable copies. Zero factors support complete reduction; negative additive
+bonuses are not part of this version. `CritResolver.roll(snapshot, random)`
+consumes one validated [0, 1) draw and uses a strict probability threshold,
+including probabilities 0 and 1. `DamageCalculator` uses captured effective
+weapon damage and crit damage (T01 baseline 50), draw/projectile scales, named
+bonuses, mitigation, then the cap. Every intermediate overflow fails.
+
+`CombatEncounter(target, variantId, profile)` starts a single target at full
+positive HP. Construct and access it on the server thread; it enforces its
+creating-thread ownership without importing Bukkit. `physical(shot, impact,
+modifiers, effectiveFerocity, adapterRejection)` consumes an already settled
+physical candidate. The adapter owns collision proof, arena/event cancellation,
+and native suppression. A supplied rejection earns nothing. Accepted physical
+keys are claimed once; IDs are deterministic from the full T00 key, independent
+of part/event names. Same-tick calls commit in server-thread call order.
+
+`proc(command, tick)` requires a due command with an accepted non-ferocity parent
+and matching origin, owner, shot, profile, crit and **mitigated pre-cap** basis.
+It never rerolls crit, redoes mitigation or uses a newly held weapon. Duplex
+parents retain their own scaled basis. Each child applies the cap once. T05 owns
+child count/IDs and scheduling; this service does not authorize an arbitrary
+number of children. No proc can become another proc's parent. Malformed,
+premature or mismatched-profile inputs throw before mutation; lifecycle and
+duplicate rejections return a zero-credit `DamageResult` with a reason.
+
+Accepted hits update per-UUID actual HP and capped contribution independently;
+lethal score is not clamped to remaining HP. Score-only children request zero HP.
+All numeric validation, including cumulative score overflow, precedes commit.
+One lethal commit freezes an `EncounterResult` (completion ID = lethal impact
+ID); subsequent matching-target calls return `TARGET_DEAD`, including duplicate
+and delayed children. `end()` terminates a live generation with `ENCOUNTER_ENDED`
+and no defeated result. On reset/shutdown, end and discard the instance, then
+use a fresh encounter UUID; immutable snapshots remain safe for consumers.
+Eyes/rewards, healing, native entity mirroring and the full encounter lifecycle
+remain later work. Rejected calls return traceable results but are not retained
+in the accepted ledger. Bounded diagnostic retention remains an adapter concern.
+
 ### Managed health
 
 Keep large boss HP in the domain model. The Paper dragon can carry a normalized health representation within native attribute limits; the custom boss bar displays domain HP. The adapter suppresses unmanaged native reductions and native crystal healing for owned targets, and mirrors authoritative changes without re-entering the damage engine.

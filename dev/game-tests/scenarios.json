@@ -222,6 +222,42 @@
       "owned_chunk_tickets_removed"
     ]
   },
+  "combat-accounting": {
+    "mechanicRevision": "combat-accounting-calibration-v1",
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "services_loaded_from_production",
+      "crit_baseline_and_raw_chance",
+      "crit_threshold",
+      "golden_critical_210",
+      "named_modifier",
+      "duplicate_physical",
+      "separate_health_score_floor",
+      "late_descendant",
+      "second_lethal_candidate",
+      "single_frozen_completion",
+      "final_totals",
+      "result_immutable",
+      "same_tick_physical_lethals",
+      "historical_cap_boundaries",
+      "cap_adjacent_boundaries",
+      "uncapped_profile",
+      "inherited_parent_and_crit",
+      "mitigation_and_single_child_cap",
+      "duplicate_proc",
+      "recursive_child_rejected",
+      "duplex_score_only_inheritance",
+      "ended_generation",
+      "settled_cancellation",
+      "overflow_atomic",
+      "profile_retained",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ]
+  },
   "projectile-player-feasibility": {
     "mechanicRevision": "projectile-player-v3",
     "requiredAssertions": [

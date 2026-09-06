@@ -15,17 +15,18 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameTestsPlugin extends JavaPlugin {
-    private final Map<String, Scenario> scenarios = Map.of(
-            "lifecycle-calibration", new CalibrationScenario(false),
-            "deliberate-failure", new CalibrationScenario(true),
-            "foundation-contracts", new ContractScenario(),
-            "protocol-player-calibration", new PlayerCalibrationScenario(),
-            "item-identity", new com.kaveenk.onlydragons.gametests.item.ItemIdentityScenario(),
-            "projectile-player-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectilePlayerFeasibilityScenario(),
-            "projectile-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectileFeasibilityScenario(),
-            "projectile-cleanup-failure", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(),
-            "projectile-cleanup-abort", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(true),
-            "stats-resolution", new com.kaveenk.onlydragons.gametests.stats.StatsResolutionScenario());
+    private final Map<String, Scenario> scenarios = Map.ofEntries(
+            Map.entry("lifecycle-calibration", new CalibrationScenario(false)),
+            Map.entry("deliberate-failure", new CalibrationScenario(true)),
+            Map.entry("foundation-contracts", new ContractScenario()),
+            Map.entry("protocol-player-calibration", new PlayerCalibrationScenario()),
+            Map.entry("item-identity", new com.kaveenk.onlydragons.gametests.item.ItemIdentityScenario()),
+            Map.entry("projectile-player-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectilePlayerFeasibilityScenario()),
+            Map.entry("projectile-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectileFeasibilityScenario()),
+            Map.entry("projectile-cleanup-failure", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario()),
+            Map.entry("projectile-cleanup-abort", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(true)),
+            Map.entry("stats-resolution", new com.kaveenk.onlydragons.gametests.stats.StatsResolutionScenario()),
+            Map.entry("combat-accounting", new com.kaveenk.onlydragons.gametests.combat.CombatAccountingScenario()));
     private final ExecutorService writer = Executors.newSingleThreadExecutor();
     private ScenarioContext active;
     private String runId;
