@@ -10,7 +10,7 @@ scripts remain the source of truth for build, server, and debugger actions.
 | Task | Guidance or tool |
 | --- | --- |
 | Implement commands, events, configuration, services, or plugin lifecycle | `minecraft-plugin-development` skill |
-| Verify a plugin on an actual Paper server | `paper-runtime-validation` skill and `mcdev.cmd` |
+| Verify a plugin on an actual Paper server | `paper-runtime-validation`; Symphony uses `scripts/agent-tests/paper_test.py`, human development uses `mcdev.cmd` |
 | Review async I/O, schedulers, shared state, or shutdown cleanup | `paper-threading-review` skill |
 | Check an unfamiliar or version-sensitive API | Context7, then official version-matching docs/API signatures as needed |
 | Navigate Java symbols and references | Project Serena MCP; launcher activates the checkout; confirm with `get_current_config` |
@@ -26,6 +26,14 @@ prerequisites, and connection checks. Serena must target the current project;
 its Java analysis and Cursor's Java tooling supplement the checked-in tests.
 Use native client tools for edits, Git, and build commands.
 
+For a cross-file Java contract or lifecycle change, confirm the active checkout
+and use `find_symbol`/`find_referencing_symbols` to inspect the implementation and
+its consumers when that helps scope the change. Use ordinary search for a known
+file or literal. Do not initialize MCP tools solely to record a usage tick; a
+test-only reconciliation can rely on already-understood code and checked reports.
+The current Serena configuration still starts its language server eagerly, so
+skipping a tool call does not itself save that startup cost.
+
 ## Read the project before changing it
 
 1. Inspect the working tree and preserve existing changes. Read `AGENTS.md`,
@@ -33,6 +41,11 @@ Use native client tools for edits, Git, and build commands.
    the code/tests relevant to the task. When `docs/planning/` exists, read all
    three planning documents under AGENTS.md's shared-context contract. Check
    the delivery ledger and relevant issues/PRs before claiming a task.
+   Read in bounded sections with complete tool output. Honor both nested command
+   and outer orchestration output limits; retrieve missing ranges after truncation.
+   On main integration, review the context diff and affected sections. Repeat all
+   three reads if changing tasks or recovering missing context. Historical
+   evidence is linked from the current summaries and read when relevant.
 2. Treat the repository pins as the target. Resolve Context7's library ID before
    requesting documentation, and include the pinned API version in the question.
    A result for another release is not proof an API exists here. Check official

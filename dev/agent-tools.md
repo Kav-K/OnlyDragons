@@ -9,7 +9,7 @@ Installations, credentials, indexes, and logs remain local.
 | Skill | Coverage |
 | --- | --- |
 | `minecraft-plugin-development` | Paper/Bukkit architecture, commands, events, permissions, Adventure, configuration, persistence, sessions, arenas, encounters, progression, and build integration. Eight implementation references plus an OnlyDragons planning route. |
-| `paper-runtime-validation` | Meaningful domain/MockBukkit tests, real Paper scenarios through the existing mcdev lab, version matching, client evidence, and profiling. |
+| `paper-runtime-validation` | Meaningful domain/MockBukkit tests, isolated real Paper scenarios for Symphony, the mcdev lab for human development, version matching, client evidence, and profiling. |
 | `paper-threading-review` | Scheduler ownership, async I/O, stale callbacks, player sessions, repeating tasks, persistence, and shutdown cleanup. |
 
 The committed `.agents/skills/` directory is supported by both
@@ -40,6 +40,15 @@ is available from the [Context7 dashboard](https://context7.com/dashboard);
 configure it in local client settings using an environment variable, never in
 committed configuration. See [Context7 setup](https://github.com/upstash/context7).
 GitHub access for Symphony is separate; see [Symphony credentials](../docs/symphony.md#credentials).
+
+Judge tool effectiveness by the question it resolves: a version-matched API
+lookup, an actual symbol/reference result, or an observed runtime assertion.
+An eight-session audit found relevant Minecraft skill use and version checks,
+but Serena calls only initialized and confirmed the project. Use navigation for
+cross-file work where helpful; do not add more MCP servers merely to enlarge the
+inventory. Eager Java startup remains a measured optimization opportunity, not
+a claimed saving from omitting calls. Keep the verified checkout binding and
+available navigation tools until a supported alternative is tested.
 
 The project MCP files are `.codex/config.toml` and `.cursor/mcp.json`. These use
 the existing `context7` and `serena` server names to override project-specific
