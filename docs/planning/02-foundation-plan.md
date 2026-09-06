@@ -317,9 +317,18 @@ Process an impact on the server thread:
 **T04 scoped refinement (Paper 121):** use `ProjectileHitEvent` as the sole
 physical-impact candidate source. Real shooterless dragon collisions can omit the
 damage event entirely, so that event is an optional native-damage/cancellation
-guard, not an impact prerequisite. Finalization must still honor later external
-damage cancellation when it occurs and distinguish it from the adapter's own
-suppression. Zero native arrow damage/critical randomness before managed flight;
+guard, not an impact prerequisite. Reserve one terminal claim at the first
+managed collision, then settle after synchronous handlers finish and honor the
+final externally cancelled `ProjectileHitEvent`. Do not cancel that event for
+owned native suppression. Retire the projectile on acceptance or rejection,
+including veto and unsupported phase; later multipart callbacks cannot create
+another claim or impact ordinal. Preserve any native cancellation observed before
+owned suppression as an additional veto. A single cancellation boolean cannot
+reveal arbitrary later setter provenance once our guard sets it; integrations
+requiring a guaranteed veto must use the physical-hit boundary. This explicit
+lead clarification replaces the earlier unsupported later-native-veto promise.
+Recheck encounter generation and target liveness before committing the claim.
+Zero native arrow damage/critical randomness before managed flight;
 centralize residual native managed-target damage suppression. The cow control
 supports this path; authenticated native dragon damage remains a separate gate.
 Use uniform part scaling until semantic head/body classification is verified:
@@ -512,6 +521,16 @@ admission, connected equipment assertions and a delayed-quit soak. T04 still
 requires its own reviewed player-owned damage/phase evidence; calibration alone
 does not settle native dragon suppression or change this combat design.
 
+T09d implements reusable multi-player/action and damage-observation primitives plus
+verified offline bootstrap. Its [brief coverage and fixture contract](06-brief-coverage.md)
+separates generic calibration, production feature acceptance and human
+authentication/visual observations. Numeric behavior, event registration effects
+and multi-player attribution require automation; a missing fixture is unfinished
+automated work. T06 proves real multi-player firing, registry and physical-owner
+behavior before T08 connects combat/procs; full HP/ghost-score attribution stays
+required at T08 and M3. This keeps the service consumer out of its producer's
+completion prerequisites. M3 still requires the requested human visual prefire rehearsal.
+
 ## 13. Milestones and completion gates
 
 | Milestone | Playable outcome | Exit gate |
@@ -520,7 +539,7 @@ does not settle native dragon suppression or change this combat design.
 | M1: stats and combat | Inspectable stats, tagged test bow, dummy, crits, ferocity, separate ledgers | Deterministic math tests and real-target hit reports agree; vanilla damage is not added twice. |
 | M2: enchant and arrow sandbox | Tracer, Duplex, Fatal Tempo, Snipe, shortbow; Power/Vicious and Overload hooks | Physical projectile identity, input cadence, swap/expiry, and proc bounds pass. |
 | M3: prefire rehearsal | Repeatable countdown and real dragon hatch | A human and automated trace prove pre-spawn arrows can hit, with valid misses remaining misses. |
-| M4: encounter | Eight-eye ritual, selected variants, abilities, leaderboard and completion | Concurrent placement/death/reset/refund tests; one spawn and one result. |
+| M4: initial encounter | Eight-eye ritual, the confirmed one test-dragon definition, leaderboard and completion; expanded variants/abilities remain later T12 scope | Existing eye gate plus type catalog, managed dragon and frozen ranking evidence; concurrent placement/death/reset/refund tests, one spawn and one result. |
 | M5: progression | Gear/eyes acquisition, enchanting flow, personal rewards | Durable grants/consumption, reward eligibility, and economy balance tested. |
 
 The first implementation should concentrate on **M0 and M1**. M2 is split into independent work packages once the shared contracts settle. M4/M5 remain planned dependencies, not prerequisites for verifying stats and bows. Detailed ownership and acceptance cases are in the [task and validation plan](03-agent-tasks-and-validation.md).

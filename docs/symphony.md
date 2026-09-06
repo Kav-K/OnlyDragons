@@ -190,10 +190,46 @@ For missing access or another external blocker, the worker records the blocker
 and removes the dispatch label. If GitHub itself is inaccessible, the worker
 cannot perform that update; inspect the dashboard/logs and resolve the problem
 before retrying. Closing the issue or removing its dispatch label can stop an
-active worker. The before-remove hook attempts to archive Git history and
-uncommitted source before cleanup. Upstream cleanup continues if the hook fails,
-so archives are best-effort recovery material; pushed branches and PRs are the
-durable results.
+active worker.
+
+### Terminal workspace retention
+
+For terminal workspace cleanup, the before-remove hook retains
+the complete checkout by a same-filesystem directory rename into
+`.symphony/results/GH-N/<unique timestamp>/workspace/`. This includes Git history,
+dirty/untracked source, ignored raw Paper reports, worlds, build artifacts and
+dependency caches. A sibling `retention.json` records the original and retained
+paths. Unlike the earlier source bundle, it does not omit ignored evidence, and
+Symphony no longer recursively traverses that large Windows-mounted tree before
+starting its dashboard and workers. Partial checkouts are retained too.
+
+The helper validates real operator, dispatch and result directories, accepts
+only a direct issue child, reserves a unique destination, and rejects symlinks,
+path escapes and cross-filesystem moves. It never falls back to copying or
+deleting. It runs only as the operator's cleanup hook after the issue worker is
+stopped; it does not change worker sandbox access or the shared Paper lease.
+Old bundle archives remain available. Retention consumes disk until the operator
+chooses what to remove; there is no automatic purge policy. The moved raw receipts
+retain their original source/path identities, so retention is not a new evidence
+pass or permission to rewrite those identities.
+
+Pinned [Symphony v0.0.2 cleanup](https://github.com/openai/symphony/blob/v0.0.2/elixir/lib/symphony_elixir/workspace.ex)
+ignores before-remove hook errors and then calls recursive removal. **A failed
+hook does not prevent upstream deletion.** Failures before the rename leave the
+helper's original tree untouched, but the caller can still remove it; failures
+writing the manifest after a successful rename leave the complete tree at the
+reported destination. Inspect hook failures and preserve affected checkouts
+before restarting cleanup. Pushed branches/PRs and checked-in evidence summaries
+remain the durable shared record. A strict archival-success prerequisite would
+require a separately reviewed upstream cleanup change.
+
+The temporary-fixture regression suite exercises the real shell hook, complete
+ignored-file preservation, repeated archival, containment, rename/cross-device
+failures and metadata failure without starting Symphony, Codex or Paper:
+
+```bash
+python3 -B -m unittest discover -s scripts/symphony/tests -p 'test_*.py' -v
+```
 
 The owner-applied dispatch label selects eligible tasks. Keep issue scope
 explicit: labels and assignment do not grant permission to read secrets,
