@@ -261,6 +261,14 @@ def validate_no_weakening(project, base, validated):
         for key, value in previous.items():
             require(set(value['requiredAssertions']) <= set(current_scenarios[key]['requiredAssertions']),
                     'Previously required scenario assertion removed: ' + key)
+            messages = {item['id']: item for item in current_scenarios[key].get('requiredPlayerMessages', [])}
+            for message in value.get('requiredPlayerMessages', []):
+                updated = messages.get(message['id'], {})
+                if 'exact' in message:
+                    preserved = updated.get('exact') == message['exact']
+                else:
+                    preserved = 'containsAll' in updated and set(message['containsAll']) <= set(updated['containsAll'])
+                require(preserved, 'Previously required player message weakened: ' + key + '/' + message['id'])
     previous = base_document(project, revision, 'dev/game-tests/suites.json')
     if previous is not None:
         current_suites = load_json(Path(project) / 'dev/game-tests/suites.json')

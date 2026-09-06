@@ -233,12 +233,11 @@ class CheckpointTests(unittest.TestCase):
         self.change(PLAN, drop)
         self.change(PROGRESS, lambda value: value['tasks']['T09a']['completedRequirements'].remove('runner-negative'))
         path = self.project / JAVA
-        path.write_text(path.read_text().replace('"deliberate-failure", new ', '"lifecycle-calibration", new ', 1))
-        # Baseline comparison is independent of the current-plan consistency check.
-        with patch.object(checkpoint.subprocess, 'check_output', return_value=(SHA + '\n').encode()), \
-                patch.object(checkpoint, 'base_document', side_effect=lambda project, revision, path: previous.get(path)):
-            with self.assertRaisesRegex(checkpoint.CheckpointError, 'Previously registered scenario removed'):
-                checkpoint.validate_no_weakening(self.project, 'origin/main', {'plan': self.read(PLAN), 'progress': self.read(PROGRESS)})
+        path.write_text(''.join(line for line in path.read_text().splitlines(keepends=True) if '"deliberate-failure"' not in line))
+        self.change(SUITES, lambda value: value['cases'].pop('deliberate-failure'))
+        self.assertTrue(self.plan()['summary']['planValid'])
+        with self.assertRaisesRegex(checkpoint.CheckpointError, 'Previously registered scenario removed'):
+            self.baseline(previous)
 
     def test_coordinated_assertion_removal_rejected(self):
         previous = {SCENARIOS: self.read(SCENARIOS)}
@@ -247,6 +246,20 @@ class CheckpointTests(unittest.TestCase):
         self.change(PLAN, lambda value: value['fixtures']['stats-resolution']['assertions'].remove(removed))
         with self.assertRaisesRegex(checkpoint.CheckpointError, 'Previously required scenario assertion removed'):
             self.baseline(previous)
+
+    def test_required_player_message_text_and_fragments_cannot_weaken(self):
+        requirements = [{'id': 'ferocity-values', 'exact': 'ferocity: raw=3.0 effective=3.0'},
+                        {'id': 'hand-labels', 'containsAll': ['Main hand: ordinary ', 'enchants={vicious=3}']}]
+        self.change(SCENARIOS, lambda value: value['protocol-player-calibration'].update(requiredPlayerMessages=requirements))
+        previous = {SCENARIOS: self.read(SCENARIOS)}
+        self.assertEqual(SHA, self.baseline(previous))
+        for replacement in (requirements[1:],
+                            [dict(requirements[0], exact='anything'), requirements[1]],
+                            [requirements[0], {'id': 'hand-labels', 'containsAll': ['Main hand: ordinary ']}]):
+            with self.subTest(replacement=replacement):
+                self.change(SCENARIOS, lambda value: value['protocol-player-calibration'].update(requiredPlayerMessages=replacement))
+                with self.assertRaisesRegex(checkpoint.CheckpointError, 'Previously required player message weakened'):
+                    self.baseline(previous)
 
     def test_requirement_fixture_and_completed_component_removal_rejected(self):
         previous_plan = self.read(PLAN)
