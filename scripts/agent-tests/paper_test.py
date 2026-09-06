@@ -189,36 +189,57 @@ def assess_memory(memory_mib, linux, windows_available=None, client_memory_mib=0
     return result
 
 
-def windows_available_memory():
+def windows_available_memory(timeout=15):
     powershell = shutil.which('powershell.exe') or '/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe'
-    command = '[int64]((Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory / 1024)'
+    command = ("$ErrorActionPreference='Stop'; "
+               "$memoryProbe = Get-CimInstance Win32_OperatingSystem -ErrorAction Stop; "
+               "if ($null -eq $memoryProbe.FreePhysicalMemory) { throw 'Missing FreePhysicalMemory' }; "
+               '[int64]($memoryProbe.FreePhysicalMemory / 1024)')
     try:
-        probe = subprocess.run([powershell, '-NoProfile', '-NonInteractive', '-Command', command], capture_output=True, text=True, check=True, timeout=15)
-        return int(probe.stdout.strip())
+        probe = subprocess.run([powershell, '-NoProfile', '-NonInteractive', '-Command', command], capture_output=True, text=True, check=True, timeout=timeout)
+        output = probe.stdout.strip()
+        if not re.fullmatch(r'[0-9]+', output):
+            raise ValueError('invalid nonnegative MiB response: ' + repr(output[:200]))
+        return int(output)
     except (OSError, ValueError, subprocess.SubprocessError) as error:
-        raise ValidationError('Cannot verify Windows host memory before starting WSL Paper') from error
+        if isinstance(error, subprocess.TimeoutExpired):
+            detail = f'probe exceeded {timeout:g}s'
+        elif isinstance(error, subprocess.CalledProcessError):
+            detail = f'probe exit {error.returncode}: ' + str(error.stderr or '').strip()[:300]
+        else:
+            detail = type(error).__name__ + ': ' + str(error)[:300]
+        raise ResourceBusy('Busy: Cannot verify Windows host memory before starting WSL Paper: ' + detail) from error
 
 
-def available_memory(memory_mib, client_memory_mib=0):
+def available_memory(memory_mib, client_memory_mib=0, probe_timeout=15):
+    is_wsl = 'microsoft' in Path('/proc/sys/kernel/osrelease').read_text().lower()
+    windows = windows_available_memory(probe_timeout) if is_wsl else None
     raw = dict(re.findall(r'^(\w+):\s+(\d+)\s+kB', Path('/proc/meminfo').read_text(), re.M))
     linux = {key: int(raw[key]) // 1024 for key in ('MemAvailable', 'MemFree', 'Buffers', 'Cached', 'SReclaimable', 'Shmem')}
-    is_wsl = 'microsoft' in Path('/proc/sys/kernel/osrelease').read_text().lower()
-    return assess_memory(memory_mib, linux, windows_available_memory() if is_wsl else None, client_memory_mib)
+    return assess_memory(memory_mib, linux, windows, client_memory_mib)
 
 
 def wait_for_memory(memory_mib, timeout, client_memory_mib=0):
     deadline = time.monotonic() + timeout
     announced = 0.0
+    last_busy = ResourceBusy('Busy: memory admission has no successful probe')
     while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise ResourceBusy(str(last_busy) + '; resource wait expired') from last_busy
         try:
-            return available_memory(memory_mib, client_memory_mib)
+            admitted = available_memory(memory_mib, client_memory_mib, probe_timeout=min(15, remaining))
+            if time.monotonic() >= deadline:
+                raise ResourceBusy('Busy: memory probe completed after the resource deadline')
+            return admitted
         except ResourceBusy as busy:
+            last_busy = busy
             if time.monotonic() >= deadline:
                 raise ResourceBusy(str(busy) + '; resource wait expired') from busy
             if time.monotonic() >= announced:
                 print(str(busy) + '; waiting', flush=True)
                 announced = time.monotonic() + 30
-            time.sleep(1)
+            time.sleep(min(1, max(0, deadline - time.monotonic())))
 
 
 def varint(value):

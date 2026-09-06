@@ -374,13 +374,24 @@ def checked_file(project, record, path_key, hash_key, exact=None):
     return path
 
 
+def reject_unstarted_run(result, record, result_path):
+    """Preserve a resource/preflight failure before demanding nonexistent runtime reports."""
+    require(isinstance(result, dict), 'Malformed runner result: ' + str(result_path))
+    reason = result.get('error') or 'runner supplied no failure reason'
+    if result.get('busy') is True or record.get('exitCode') == 75:
+        raise ValidationError(f"Runner resources unavailable for {record['caseId']}: {reason}; see {result_path}")
+    if result.get('passed') is False and not result.get('profile') and result.get('error'):
+        raise ValidationError(f"Runner stopped before Paper started for {record['caseId']}: {reason}; see {result_path}")
+
+
 def verify_case(project, record, case, descriptor, source, suite_root):
     run_id = record.get('runId')
     require(isinstance(run_id, str) and re.fullmatch('[0-9a-f]{32}', run_id), 'Invalid run ID')
     report_root = project / 'build/reports/agent-paper' / run_id
     result_path = checked_file(project, record, 'resultPath', 'resultSha256', report_root / 'result.json')
-    scenario_path = checked_file(project, record, 'scenarioPath', 'scenarioSha256', report_root / 'scenario.json')
     result = runner.strict_json(result_path)
+    reject_unstarted_run(result, record, result_path)
+    scenario_path = checked_file(project, record, 'scenarioPath', 'scenarioSha256', report_root / 'scenario.json')
     start, end = record.get('startedAtEpochMs'), record.get('completedAtEpochMs')
     require(type(start) is int and type(end) is int and start <= end, 'Missing case invocation window')
     timestamps(result, start, end, 'runner')
@@ -605,6 +616,7 @@ def execute(args):
                'source': source, 'selection': selected, 'cases': []}
     print('SUITE ' + suite_id + ': ' + str(path), flush=True)
     runner.atomic_json(path, receipt)
+    record = None
     try:
         for case_id in selected['caseIds']:
             require(source_identity(project) == source, 'Checkout changed before suite case')
@@ -633,6 +645,8 @@ def execute(args):
                 require(report.is_file(), 'Runner evidence is missing: ' + str(report))
                 record[kind + 'Path'] = report.relative_to(project).as_posix()
                 record[kind + 'Sha256'] = runner.sha256(report)
+                if kind == 'result':
+                    reject_unstarted_run(runner.strict_json(report), record, report)
             for kind in ('server', 'build'):
                 log = reports / (kind + '.log')
                 require(log.is_file(), 'Runner log is missing: ' + str(log))
@@ -649,6 +663,8 @@ def execute(args):
         print('PASS: ' + str(path), flush=True)
         return 0
     except (Exception, KeyboardInterrupt) as error:
+        if record is not None:
+            receipt['failedCase'] = record
         receipt.update(state='failed', passed=False, completedAtEpochMs=int(time.time() * 1000),
                        error=str(error) or type(error).__name__)
         runner.atomic_json(path, receipt)

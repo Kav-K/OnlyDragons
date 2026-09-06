@@ -1,8 +1,10 @@
 """Failure-boundary tests for suite selection and independently replayed evidence."""
 import copy
+import io
 import json
 import os
 from pathlib import Path
+from types import SimpleNamespace
 import signal
 import shutil
 import subprocess
@@ -271,6 +273,13 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, ['scripts/agent-tests/paper_suite.py'])))
         self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, ['dev/game-tests/acceptance.json'])))
 
+    def test_shared_player_client_code_and_build_settings_require_full_baseline(self):
+        catalog, _ = suite.load_catalog(self.root)
+        for path in ('dev/player-client/src/main/java/com/kaveenk/onlydragons/playerclient/ProtocolPlayer.java',
+                     'dev/player-client/gradle.properties'):
+            with self.subTest(path=path):
+                self.assertEqual(set(catalog['cases']), set(suite.required_cases(self.root, [path])))
+
     def test_unclassified_new_scenario_fails_catalog(self):
         path = self.root / 'dev/game-tests/scenarios.json'
         data = json.loads(path.read_text())
@@ -426,6 +435,41 @@ class NegativePolicyTests(unittest.TestCase):
 
 
 class ChildOwnershipTests(unittest.TestCase):
+    def test_prestart_resource_and_build_failures_preserve_real_error_in_failed_receipt(self):
+        for busy, reason, exit_code in ((True, 'Busy: Cannot verify Windows host memory: probe exceeded 2s; resource wait expired', 75),
+                                        (False, 'Player Gradle build or dependency verification failed; see build.log', 1)):
+            with self.subTest(reason=reason), tempfile.TemporaryDirectory() as name:
+                root = Path(name).resolve()
+                fixture = ReceiptFixture(root)
+                fixture.result.update(passed=False, busy=busy, error=reason, cleanup=None)
+                fixture.result.pop('profile')
+                fixture.result.pop('scenario')
+                fixture.json(fixture.reports / 'result.json', fixture.result)
+                (fixture.reports / 'scenario.json').unlink()
+                (fixture.reports / 'server.log').unlink()
+                def child(command, project, log_path):
+                    log_path.write_text(f'RUN {fixture.run_id}: fixture; reports: {fixture.reports}\nFAIL: {reason}\n')
+                    return exit_code
+                args = SimpleNamespace(project=root, suite=['all'], changed_since=None, plan=False,
+                                       eula_file=None, lease_directory=None, java_home=None, paper_jar=None,
+                                       memory_mib=None, startup_timeout=None, lease_timeout=None, resource_timeout=None)
+                suite_id = 'c' * 32
+                with patch.object(suite.sys, 'platform', 'linux'), patch.object(suite, 'run_child', side_effect=child), \
+                        patch.object(suite.uuid, 'uuid4', return_value=SimpleNamespace(hex=suite_id)), \
+                        patch.object(suite.sys, 'stdout', io.StringIO()), patch.object(suite.sys, 'stderr', io.StringIO()):
+                    self.assertEqual(1, suite.execute(args))
+                receipt = suite.runner.strict_json(root / 'build/reports/agent-paper-suites' / suite_id / 'receipt.json')
+                self.assertEqual('failed', receipt['state'])
+                self.assertIs(receipt['passed'], False)
+                self.assertEqual([], receipt['cases'])
+                self.assertIn(reason, receipt['error'])
+                self.assertNotIn('evidence is missing', receipt['error'])
+                self.assertEqual(exit_code, receipt['failedCase']['exitCode'])
+                self.assertEqual(fixture.run_id, receipt['failedCase']['runId'])
+                self.assertEqual(suite.runner.sha256(fixture.reports / 'result.json'), receipt['failedCase']['resultSha256'])
+                with self.assertRaises(suite.ValidationError):
+                    suite.validate_suite_receipt(root, root / 'build/reports/agent-paper-suites' / suite_id / 'receipt.json')
+
     def test_unsupported_platform_rejects_execution_before_opening_log_or_spawning(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)

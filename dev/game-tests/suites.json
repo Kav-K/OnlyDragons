@@ -271,6 +271,7 @@
         ".gitattributes",
         ".gitignore",
         "scripts/agent-tests/*",
+        "dev/player-client/*",
         "dev/server.properties",
         "dev/game-tests/build.gradle.kts",
         "dev/game-tests/settings.gradle.kts",
