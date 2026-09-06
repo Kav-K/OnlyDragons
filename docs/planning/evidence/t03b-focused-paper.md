@@ -92,8 +92,13 @@ from actual protocol release/collision evidence.
 Doctor was ready; static plan validation and changed-area suite selection pass.
 Per the [lead's validation ownership instruction](https://github.com/Kav-K/OnlyDragons/issues/67#issuecomment-5562644532),
 no duplicate complete local cohort was run while PR76's hosted cohort was active.
-PR76 main integration, any affected focused rerun, and the lead-owned final
-current-input hosted cohort/strict replay/T03b checkpoint remain pending.
-Independent review and current CI remain separate gates. Windows smoke,
+The lead's [independent focused review](https://github.com/Kav-K/OnlyDragons/issues/67#issuecomment-5562735116)
+found this implementation/evidence clear. PR76's gameplay cohort passed, but its
+separate checkpoint comparator needs a lead-owned correction. The lead explicitly
+requested a stable draft handoff now and will re-dispatch GH-67 after PR76 merges
+for loadout/formatter reconciliation and the final candidate. PR76 integration,
+any affected focused rerun, and the lead-owned final current-input hosted
+cohort/strict replay/T03b checkpoint remain pending. Final review and current CI
+remain separate gates. Windows smoke,
 authenticated-client compatibility, full-client visuals/feel and performance are
 unrun. T03b is In review; no completed requirement or milestone is claimed.

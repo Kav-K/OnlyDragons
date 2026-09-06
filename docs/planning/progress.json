@@ -453,7 +453,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Draft PR79: captured Overload/Gravity and exact v2/v3 compatibility. Focused clean 5bdb0ee passes 49 feature, 25 equipment, 30 catalog checks and exact abort control; see docs/planning/evidence/t03b-focused-paper.md. PR76 main integration and lead-owned final hosted cohort/replay/checkpoint remain pending; no completed requirements or milestone acceptance."
+      "notice": "Draft PR79: focused clean 5bdb0ee passes 49 feature, 25 equipment, 30 catalog checks and exact abort control; independent focused review is clear. Stable handoff requested by lead while PR76 checkpoint correction/integration is pending; lead will re-dispatch for loadout/formatter reconciliation after its merge. Final hosted cohort/replay/checkpoint remains lead-owned and pending; see docs/planning/evidence/t03b-focused-paper.md. No completed requirements or milestone acceptance."
     },
     "T06b": {
       "status": "planned",

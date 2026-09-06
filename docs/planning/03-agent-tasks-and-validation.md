@@ -119,8 +119,11 @@ production / six companion / 28 client tests; expanded-bow 49, equipment 25,
 catalog 30 assertions and the exact 15-row catalog-abort control, with clean owned
 JVM/resource cleanup. Real releases/collisions, fixture-controlled profiles/paused
 swap arrows and injected positive native damage remain explicitly distinguished.
-Static plan and changed-area selection pass. PR76 main integration and any affected
-focused rerun remain pending. The lead owns the final current-input hosted
+Static plan and changed-area selection pass. The lead's independent focused review
+is clear; it requested stable draft handoff while its PR76 checkpoint-comparator
+correction is pending. It will re-dispatch GH-67 after PR76 merges for the
+loadout/formatter reconciliation. PR76 integration and any affected focused rerun
+remain pending. The lead owns the final current-input hosted
 cohort/replay/T03b acceptance checkpoint per its issue instruction; no duplicate
 local cohort or automated/milestone acceptance is claimed. Independent review/CI,
 Windows smoke, authenticated-client visuals/feel and performance remain separate.
