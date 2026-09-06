@@ -319,7 +319,7 @@ Implement ferocity counts, stable child IDs, bounded scheduling, parent damage i
 
 ### T06 — Native bow, shortbow, and Duplex projectiles
 
-**Owner:** projectile agent. **Dependencies:** T00, T02, T04; consumes T01 snapshots. **Files:** `paper/projectile` firing adapter, `domain/projectile` shot/lifecycle portions, related tests.
+**Owner:** projectile agent. **Dependencies:** integrated T01b, T02 and accepted T04, using the existing T00 contracts. **Files:** `paper/projectile` firing adapter, `domain/projectile` shot/lifecycle portions, related tests.
 
 Capture native drawn-bow shots. Add an independent shortbow trigger/cooldown mode. Reserve capacity and ammo once per accepted shot group. Create a distinct Duplex child with captured ownership, launch transform, timing, and damage scale. Ensure cancelled launches, dual-hand events, and bow swaps cannot duplicate arrows or charges.
 
@@ -340,7 +340,7 @@ Implement deterministic target acquisition, bounded-angle steering, obstruction 
 
 ### T08 — Practice commands, dummy, and visible combat explanations
 
-**Owner:** integration lead or UX/debug agent. **Dependencies:** T01–T03; expands with T05/T06. **Files:** `command`, practice-target adapter and UI; registration changes owned by lead.
+**Owner:** integration lead or UX/debug agent. **Dependencies:** integrated T01b, T03, T05 and T06. **Files:** `command`, practice-target adapter and UI; registration changes owned by lead.
 
 Add player stats/last-hit inspection and permission-gated loadout/dummy/scenario controls. Make a practice target use the same health and damage path as a future dragon. Show crit/ferocity indicators and separate actual HP and score in development output. Preserve/update existing status and smoke checks as commands evolve.
 
