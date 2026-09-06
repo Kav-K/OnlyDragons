@@ -22,7 +22,7 @@ part of the worker's scope.
 | T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Partial PR #22 integrated at 586a170; full task blocked | Shooterless arrow/dragon findings are partial. Full acceptance awaits player-owned native suppression and semantic head/native-damage evidence after T09b; #9 stays blocked. |
 | T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | T09a, T00; PR #22 owned-listener helper integrated at 586a170 | Locally owned protocol-player calibration, dual reports and client/server failure cleanup. Full T04 acceptance is not a prerequisite. |
 | T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | T00, T01a integrated; active Symphony worker | Combat math, health and contribution; production-service tests remain required. |
-| T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a integrated; await T02 merge and lead dispatch | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
+| T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a/T02 integrated; active Symphony worker | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
 | T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | T01a, T02, T03 | Bounded procs and enchant state. |
 | T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b, T02, fully accepted T04; blocked | Bow/shortbow/Duplex capture and owned projectiles. Merging partial PR #22 or passing T09b alone does not release this gate. |
 | T07 | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | T04, T06 | Tracer steering and arrow continuity. |
