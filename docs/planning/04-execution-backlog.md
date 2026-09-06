@@ -17,13 +17,14 @@ part of the worker's scope.
 | --- | --- | --- | --- |
 | T00 | [#1](https://github.com/Kav-K/OnlyDragons/issues/1) | Complete: PR #15 merged at be920d0 | Shared contracts; 21 production tests and 29 actual-Paper assertions passed, independent review and final CI passed. |
 | T09a | [#2](https://github.com/Kav-K/OnlyDragons/issues/2) | Complete: PR #16 merged at 140f11c | Isolated runner; positive and deliberate-failure controls, independent review, and CI passed. |
-| T01a | [#3](https://github.com/Kav-K/OnlyDragons/issues/3) | T00, T09a | Base stat resolver and immutable explained snapshots. |
-| T02 | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | T00, T09a | Item definitions, codec/PDC and enchant validation. |
-| T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | T00, T09a | Real arrow/dragon feasibility findings. |
-| T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | T00, T01a | Combat math, health and contribution. |
-| T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a, T02 | Equipment/session stats and playable stats inspection. |
+| T01a | [#3](https://github.com/Kav-K/OnlyDragons/issues/3) | Complete: PR #23 merged at 1efa7d0 | Base stat resolver and immutable explanations; 30 production tests, 18 Paper assertions, independent review and final-head CI passed. |
+| T02 | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | T00, T09a integrated; PR #24 in review | Item definitions, codec/PDC and enchant validation; lead owns final item/stat integration and merge. |
+| T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Partial PR #22 integrated at 586a170; full task blocked | Shooterless arrow/dragon findings are partial. Full acceptance awaits player-owned native suppression and semantic head/native-damage evidence after T09b; #9 stays blocked. |
+| T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | T09a, T00; PR #22 owned-listener helper integrated at 586a170 | Locally owned protocol-player calibration, dual reports and client/server failure cleanup. Full T04 acceptance is not a prerequisite. |
+| T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | T00, T01a integrated; active Symphony worker | Combat math, health and contribution; production-service tests remain required. |
+| T01b | [#7](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a integrated; await T02 merge and lead dispatch | Equipment/session stats and playable stats inspection; independent service/command work does not wait on T04 or T09b. |
 | T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | T01a, T02, T03 | Bounded procs and enchant state. |
-| T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b, T02, T04 | Bow/shortbow/Duplex capture and owned projectiles. |
+| T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b, T02, fully accepted T04; blocked | Bow/shortbow/Duplex capture and owned projectiles. Merging partial PR #22 or passing T09b alone does not release this gate. |
 | T07 | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | T04, T06 | Tracer steering and arrow continuity. |
 | T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | T01b, T03, T05, T06 | Playable dummy combat and explanations. |
 | T10 | [#12](https://github.com/Kav-K/OnlyDragons/issues/12) | T04, T05, T06, T07, T08 | Integrated real-dragon prefire and load evidence. |
@@ -31,11 +32,33 @@ part of the worker's scope.
 | T12 | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus agreed roster/reward/acquisition scope | Later bounded content/progression planning. |
 
 Symphony has three coding slots. Label only tasks whose prerequisites are
-integrated into main and whose manual gates are satisfied. The local T00/T09a
-agents already own their issues; do not label them for a duplicate worker.
-The next eligible wave is #3, #4, and #5; their prerequisites are integrated.
+integrated into main and whose manual gates are satisfied. #6 is active; #7
+awaits the item merge. #20 is owned by a local delegated agent and must not be
+labeled for a duplicate worker. #5 remains a partial delivery awaiting further
+actor evidence, and #9 must remain undispatched. Issue/PR state owns live claims;
+the lead reconciles this summary after each serial merge.
 All server scenarios share one lease and obey the memory gate, regardless of
 how many agents are coding. A ready branch is not a satisfied dependency.
+
+### Protocol actor dependency boundary
+
+T09b depends on T09a/T00 and the reusable owned-listener cleanup helper in
+partial PR #22. Integrating that helper does not require accepting all T04
+dragon findings. After T09b passes its own positive/negative calibration and is
+merged, T04 can run its remaining player-owned experiments. This component
+ordering avoids a T04/T09b cycle while retaining the full T04 gate for #9.
+T09b protocol packets prove only their recorded Paper events; human visuals,
+authentication, multiplayer and feature-specific dragon behavior remain separate.
+
+### Completed maintenance
+
+Maintenance has explicit manifest IDs and does not complete gameplay milestones.
+These issues and their PRs are closed after review, validation and merge.
+
+| Task | Issue / PR | Integrated result and evidence |
+| --- | --- | --- |
+| MAINT-17 | [#17](https://github.com/Kav-K/OnlyDragons/issues/17) / [PR #19](https://github.com/Kav-K/OnlyDragons/pull/19) | Merged at 6f0ccfb. Recursive typed JSON assertion comparison; 27 Python tests passed and unchanged accepted T09/T00 reports were revalidated. No new Paper run. |
+| MAINT-18 | [#18](https://github.com/Kav-K/OnlyDragons/issues/18) / [PR #21](https://github.com/Kav-K/OnlyDragons/pull/21) | Merged at e72fb2a. Supported worker-only remote-plugin sync setting, issue/API refresh and clean-evidence policy; six bridge tests and isolated no-model skill/MCP smoke passed. |
 
 ## Keep branches compatible
 
