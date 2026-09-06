@@ -45,7 +45,12 @@ duplicate profile IDs and unknown phase compatibility references reject too.
 HP is finite in (0, 1e9]; defense is finite in [0, 1e9]. These are guardrails
 consistent with the stats calibration range, not native entity attribute limits.
 
-Change revisions whenever content changes, including affected enclosing catalogs.
+Authors should change revisions whenever content changes, including affected
+enclosing catalogs. Labels are author-maintained, not cryptographic content
+identities; the registry does not maintain a revision-history index or reject
+reused labels. The retained **full resolved Selection** is authoritative content
+provenance even if an author reuses the same labels with different values. IDs
+and revisions alone cannot reconstruct or prove the selected content.
 Selections retain resolved values, so later adoption/removal never changes already
 selected content. This is in-memory retention, not durable historical lookup or
 restart persistence. Extra type/table variants exist only in tests.

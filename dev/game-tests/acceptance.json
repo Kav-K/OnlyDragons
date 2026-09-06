@@ -523,6 +523,7 @@
         "no_inventory_mutation",
         "no_entities_items_or_xp_spawned",
         "no_production_tasks_or_listeners",
+        "same_labels_distinct_resolved_content",
         "owned_resources_released",
         "owned_listeners_removed",
         "owned_entities_removed",
@@ -533,6 +534,29 @@
         "dragon-definitions"
       ],
       "scope": "Production dragon loader/registry/bootstrap with synthetic candidates on Paper; immutable revision retention and inert bindings. No live dragon, player, reward policy or grant acceptance."
+    },
+    "dragon-definitions-abort": {
+      "assertions": [
+        "server_thread",
+        "production_enabled",
+        "loader_from_production",
+        "one_shipped_type",
+        "shipped_calibration",
+        "explicit_profiles",
+        "resolved_item_provenance",
+        "catalog_changed_before_abort",
+        "scenario_exception",
+        "bundled_catalog_restored",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-definitions-abort"
+      ],
+      "scope": "Intended abort after deployed production catalog mutation; owned cleanup restores original catalog and verifies full resolved values before releasing resources."
     }
   },
   "requirements": {
@@ -813,7 +837,8 @@
       "availability": "implemented",
       "description": "One production test-dragon/versioned definition registry: atomic validation, stable retained revisions and explicit type isolation on real Paper. Additional type fixtures are calibration-only.",
       "fixtures": [
-        "dragon-definitions"
+        "dragon-definitions",
+        "dragon-definitions-abort"
       ]
     },
     "sample-loot-table-bindings": {
@@ -821,7 +846,8 @@
       "availability": "implemented",
       "description": "Inert versioned sample table/item references validate without reward calculation, grant enabling or inventory mutation; no real product drop values approved.",
       "fixtures": [
-        "dragon-definitions"
+        "dragon-definitions",
+        "dragon-definitions-abort"
       ]
     },
     "managed-dragon-development": {

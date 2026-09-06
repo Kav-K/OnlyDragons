@@ -1,6 +1,6 @@
 package com.kaveenk.onlydragons.domain.encounter.definition;
 
-/** Exact content reference. IDs alone do not identify a selected revision. */
+/** Author-maintained reference labels, not a content hash. Retain the full resolved Selection as provenance. */
 public record DefinitionIdentity(String id, int schemaVersion, String revision) {
     public DefinitionIdentity {
         token(id);

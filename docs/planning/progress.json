@@ -209,7 +209,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Owner-dispatched implementation on symphony/gh-38: one lead-reviewed 1000-HP test dragon, immutable resolved references and inert sample table. JDK 25 wrapper build passed 107 production tests with no failures/errors/skips. Full 18-case Paper suite and T02b acceptance evidence pending; no milestone or live dragon/reward gate accepted."
+      "notice": "Draft PR #46; one lead-reviewed 1000-HP test dragon, immutable resolved references and inert sample table. Review fixes add owned abort restoration, author-maintained revision-label guidance and LF/CRLF fixture coverage. JDK 25 wrapper build passed 109 production tests with no failures/errors/skips; companion build passed. Focused Paper evidence pending. Per owner coordination, the lead will run the final combined suite and T02b checkpoint; no completed requirements or milestone/live dragon/reward acceptance claimed."
     },
     "T08a": {
       "status": "planned",

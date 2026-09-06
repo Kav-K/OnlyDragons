@@ -20,8 +20,11 @@ import org.bukkit.inventory.ItemStack;
 
 /** Production loader/registry on real Paper; synthetic catalog candidates, no live dragon or reward policy. */
 public final class DragonDefinitionScenario implements Scenario {
+    private final boolean abort;
+    public DragonDefinitionScenario() { this(false); }
+    public DragonDefinitionScenario(boolean abort) { this.abort = abort; }
     @Override public void start(ScenarioContext context) throws Exception {
-        context.mechanicRevision("dragon-definition-calibration-v1");
+        context.mechanicRevision(abort ? "dragon-definition-cleanup-v1" : "dragon-definition-calibration-v2");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
         context.check("production_enabled", true, context.production().isEnabled());
         context.check("loader_from_production", true,
@@ -31,6 +34,19 @@ public final class DragonDefinitionScenario implements Scenario {
         var retained = original.select("test_dragon");
         String dragons = resource("test-dragon-v1.properties");
         String tables = resource("sample-tables-v1.properties");
+        // Register before ANY candidate replacement, including rejection probes.
+        context.cleanup("production-dragon-catalog", () -> {
+            try {
+                var restored = registry.replace(stream(dragons), stream(tables));
+                boolean matches = restored.identity().equals(original.identity())
+                        && restored.definitions().equals(original.definitions()) && restored.tables().equals(original.tables());
+                context.check("bundled_catalog_restored", true, matches);
+                if (!matches) throw new IllegalStateException("Original production catalog was not restored");
+            } catch (IOException failure) {
+                context.observe("catalog_restore_failure", failure.toString());
+                throw new java.io.UncheckedIOException("Could not restore original production catalog", failure);
+            }
+        });
         context.check("one_shipped_type", List.of("test_dragon"), original.definitions().keySet().stream().sorted().toList());
         context.check("shipped_calibration", List.of(1000.0, 0.0, "v1", 1),
                 List.of(retained.maxHealth(), retained.defense(), retained.identity().revision(), retained.identity().schemaVersion()));
@@ -38,6 +54,15 @@ public final class DragonDefinitionScenario implements Scenario {
                 && retained.phaseProfile().compatibleCombatProfiles().contains(retained.combatProfile().mechanic()));
         context.check("resolved_item_provenance", true, retained.table().items().getFirst().catalogRevision().equals(CalibrationLoadouts.REVISION)
                 && retained.table().items().getFirst().definition().equals(CalibrationLoadouts.registry().definitions().get("ordinary")));
+
+        if (abort) {
+            registry.replace(stream(set(dragons, "type.test_dragon.maxHealth", "2000")), stream(tables));
+            context.check("catalog_changed_before_abort", true, registry.snapshot() != original
+                    && registry.snapshot().select("test_dragon").maxHealth() == 2000
+                    && original.select("test_dragon").maxHealth() == 1000);
+            context.abort();
+            return;
+        }
 
         // Independent real Paper state sentinels. The catalog is not given mutation capabilities.
         var inventory = Bukkit.createInventory(null, 9);
@@ -47,8 +72,8 @@ public final class DragonDefinitionScenario implements Scenario {
         int tasksBefore = Bukkit.getScheduler().getPendingTasks().size();
         int listenersBefore = HandlerList.getRegisteredListeners(context.production()).size();
         boolean missing = true;
-        for (String line : dragons.lines().filter(s -> s.contains("=")).toList()) missing &= rejects(registry, dragons.replace(line + "\n", ""), tables);
-        for (String line : tables.lines().filter(s -> s.contains("=")).toList()) missing &= rejects(registry, dragons, tables.replace(line + "\n", ""));
+        for (String line : dragons.lines().filter(s -> s.contains("=")).toList()) missing &= rejects(registry, withoutLine(dragons, line), tables);
+        for (String line : tables.lines().filter(s -> s.contains("=")).toList()) missing &= rejects(registry, dragons, withoutLine(tables, line));
         context.check("all_required_fields_rejected_atomically", true, missing);
         context.check("duplicate_ids_and_properties", true,
                 rejects(registry, dragons.replace("types=test_dragon", "types=test_dragon,test_dragon"), tables)
@@ -118,8 +143,10 @@ public final class DragonDefinitionScenario implements Scenario {
         try { retained.table().items().clear(); } catch (UnsupportedOperationException expected) { immutable = true; }
         context.check("immutable_selection", true, immutable && original.definitions().size() == 1 && original.select("test_dragon") == retained);
         context.check("io_failure_rollback", true, ioFailure(registry, tables));
-        registry.replace(stream(dragons), stream(tables));
-        context.check("bundled_catalog_restored", true, registry.snapshot().select("test_dragon").equals(retained));
+        var sameLabels = registry.replace(stream(set(dragons, "type.test_dragon.maxHealth", "2000")), stream(tables)).select("test_dragon");
+        context.check("same_labels_distinct_resolved_content", true, sameLabels.identity().equals(retained.identity())
+                && sameLabels.catalogIdentity().equals(retained.catalogIdentity()) && !sameLabels.equals(retained)
+                && sameLabels.maxHealth() == 2000 && retained.maxHealth() == 1000);
         context.check("no_inventory_mutation", true, inventory.getContents().length == 9 && inventory.getItem(3).getAmount() == 1
                 && Arrays.equals(inventoryBefore, inventory.getItem(3).serializeAsBytes())
                 && Arrays.stream(inventory.getContents()).filter(java.util.Objects::nonNull).count() == 1);
@@ -144,6 +171,9 @@ public final class DragonDefinitionScenario implements Scenario {
             registry.replace(new InputStream() { @Override public int read() throws IOException { throw new IOException("fixture"); } }, stream(tables));
             return false;
         } catch (IOException expected) { return before == registry.snapshot(); }
+    }
+    private static String withoutLine(String text, String removed) {
+        return text.lines().filter(line -> !line.equals(removed)).collect(java.util.stream.Collectors.joining("\n", "", "\n"));
     }
     private static String set(String text, String key, String value) {
         return text.replaceAll("(?m)^" + java.util.regex.Pattern.quote(key) + "=.*$", key + "=" + value);

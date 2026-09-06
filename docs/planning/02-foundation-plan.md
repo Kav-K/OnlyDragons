@@ -516,8 +516,10 @@ existing reload still handles greetings only.
 
 Future consumers retain `DragonCatalog.Selection`: full catalog/type identities,
 frozen HP/defense and combat/phase profiles, table catalog/table identities, and
-trusted item definitions with exact item/catalog revisions. Revisions must change
-with content. Full retained values survive replacement/removal without a historical
+trusted item definitions with exact item/catalog revision labels. Authors should
+change labels with content; the registry permits label reuse and keeps no history
+index. Labels are not hashes: the retained full resolved selection is authoritative
+content provenance even for same-label/different-content candidates. Full retained values survive replacement/removal without a historical
 lookup service; `EncounterResult.variantId` alone remains insufficient. T08a owns
 attaching this value to its future lifecycle/result, without changing T00/T03 here.
 The separate sample table references the ordinary calibration bow only. There is

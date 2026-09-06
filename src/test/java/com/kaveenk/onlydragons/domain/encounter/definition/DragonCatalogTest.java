@@ -57,9 +57,13 @@ class DragonCatalogTest {
                 stream(tables)).select("test_dragon").maxHealth());
     }
 
-    @Test void everyRequiredFieldIsRequiredAndUnknownFieldsReject() {
-        for (String line : dragons.lines().filter(s -> s.contains("=")).toList()) rejects(dragons.replace(line + "\n", ""), tables);
-        for (String line : tables.lines().filter(s -> s.contains("=")).toList()) rejects(dragons, tables.replace(line + "\n", ""));
+    @ParameterizedTest @ValueSource(booleans = {false, true})
+    void everyRequiredFieldIsRequiredAndUnknownFieldsReject(boolean crlf) throws IOException {
+        String dragons = this.dragons.replace("\r\n", "\n").replace("\n", crlf ? "\r\n" : "\n");
+        String tables = this.tables.replace("\r\n", "\n").replace("\n", crlf ? "\r\n" : "\n");
+        assertEquals(1000, loader.load(stream(dragons), stream(tables)).select("test_dragon").maxHealth());
+        for (String line : dragons.lines().filter(s -> s.contains("=")).toList()) rejects(withoutLine(dragons, line), tables);
+        for (String line : tables.lines().filter(s -> s.contains("=")).toList()) rejects(dragons, withoutLine(tables, line));
         rejects(dragons + "unknown=1\n", tables);
         for (String field : List.of("rewardsEnabled=true", "chance=1", "quantity=1", "xp=10", "currency=10", "rank=1")) {
             rejects(dragons, tables + field + "\n");
@@ -165,6 +169,20 @@ class DragonCatalogTest {
         rejects(dragons, set(tables, "table.test_dragon_sample.revision", token));
     }
 
+    @Test void reusedLabelsDoNotIdentifyContentButRetainedResolvedSelectionsDo() throws Exception {
+        var retained = registry.snapshot().select("test_dragon");
+        var next = registry.replace(stream(set(dragons, "type.test_dragon.maxHealth", "2000")),
+                stream(tables.replace("ordinary", "crit"))).select("test_dragon");
+        assertEquals(retained.catalogIdentity(), next.catalogIdentity());
+        assertEquals(retained.identity(), next.identity());
+        assertEquals(retained.table().identity(), next.table().identity());
+        assertNotEquals(retained, next);
+        assertEquals(1000, retained.maxHealth());
+        assertEquals(2000, next.maxHealth());
+        assertEquals("ordinary", retained.table().items().getFirst().identity().id());
+        assertEquals("crit", next.table().items().getFirst().identity().id());
+    }
+
     @Test void ioFailureAndAbsentStreamsDoNotAdoptPartialCatalog() {
         var before = registry.snapshot();
         var broken = new InputStream() { @Override public int read() throws IOException { throw new IOException("fixture failure"); } };
@@ -178,6 +196,9 @@ class DragonCatalogTest {
         var before = registry.snapshot();
         assertThrows(IllegalArgumentException.class, () -> registry.replace(stream(candidate), stream(candidateTables)));
         assertSame(before, registry.snapshot(), "Every rejection must retain the entire previous catalog");
+    }
+    private static String withoutLine(String text, String removed) {
+        return text.lines().filter(line -> !line.equals(removed)).collect(java.util.stream.Collectors.joining("\n", "", "\n"));
     }
     private static String set(String text, String key, String value) {
         return text.replaceAll("(?m)^" + java.util.regex.Pattern.quote(key) + "=.*$", key + "=" + value);
