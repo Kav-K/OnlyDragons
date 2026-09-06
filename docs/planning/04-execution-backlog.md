@@ -1,5 +1,10 @@
 # Execution backlog and integration
 
+PR #50 integrated T09e at `7b8ff0f` after the reviewed 23-case cohort,
+independent replay/task checkpoints and current CI. [Restart acceptance](evidence/t09e-suite.md).
+T08a now has its generic restart prerequisite; its T08 combat prerequisite
+and managed-dragon recovery evidence remain outstanding.
+
 PR #48 integrated T02b/T05 at `3c35a85`; bounded M0 contracts/feasibility is explicitly accepted. [Combined evidence](evidence/catalog-procs-suite.md). M1–M5 and all later feature gates remain unaccepted. T05 satisfies only one T08 prerequisite; T06 is still required. Catalog completion alone does not release T08a/T08c.
 
 The three original planning documents remain required shared context. This file
@@ -39,7 +44,7 @@ part of the worker's scope.
 | T05 | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Complete: PR #48 merged at `3c35a85`; [evidence](evidence/catalog-procs-suite.md) | Bounded procs and enchant state. |
 | T09c | [#28](https://github.com/Kav-K/OnlyDragons/issues/28) | Complete: PR #32 merged at 73a8cc8 | Shared regression suites, connected-player equipment/message fixture, actor lock-cycle regression/40-second soak, and evidence/dependency checkpoints. All 15 baseline cases met their declared outcomes; [T09c baseline](../../dev/game-tests/findings/t09c-baseline.md). P01–P14 remain pending; M0 was later separately accepted through PR #48, while M1–M5 remain unaccepted. |
 | T09d | [#43](https://github.com/Kav-K/OnlyDragons/issues/43) | Complete: PR #44 merged at `9def91f75d655caaccd6c7fa01313e4ba3a0ea54` | Reviewed `3047a56`: all 17 hosted suite outcomes, independent raw replay/task checkpoint and runtime CI passed; final documentation-head CI passed at `9c669ad`. [Evidence](evidence/t09d-suite.md). Reusable player/damage primitives and verified offline bootstrap are integrated; other task prerequisites and dispatch labels still apply. No duplicate Symphony dispatch or generic-to-feature acceptance substitution. |
-| T09e | [#49](https://github.com/Kav-K/OnlyDragons/issues/49) | In review: draft PR #50; focused Paper/replay passed | Fixed two-boot Paper fixture and generic persisted starter configuration after integrated T09a/T09b/T09c/T09d. [Focused evidence](evidence/t09e-focused-paper.md); final full-cohort acceptance remains lead-owned. |
+| T09e | [#49](https://github.com/Kav-K/OnlyDragons/issues/49) | Complete: PR #50 merged at `7b8ff0f` | Fixed two-boot Paper fixture and generic persisted starter configuration; accepted 23-case cohort, independent replay/review, actual-main checkpoint and CI. [Evidence](evidence/t09e-suite.md). Managed-dragon recovery remains T08a work. |
 | T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | In progress: lead-dispatched after PR #48 | T01b/T02/T04 integrated; physical firing/claims and multiplayer feature acceptance remain pending. |
 | T07 | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | T04, T06 | Tracer steering and arrow continuity. |
 | T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | T01b, T03, T05, T06, T09d | Playable dummy combat and explanations with shared headless fixtures. |
