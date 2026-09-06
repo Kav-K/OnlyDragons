@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import net.kyori.adventure.text.Component;
+import com.kaveenk.onlydragons.application.PresentationFormatter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -38,6 +39,7 @@ public final class StatsCommand {
                 if (slot < 0) { say(sender, "Inventory full; no loadout granted."); return; }
                 player.getInventory().setItem(slot, item);
                 stats.refresh(player);
+                sender.sendMessage(PresentationFormatter.heading("Loadout · " + PresentationFormatter.label(args[2])));
                 say(sender, "Granted " + args[2] + "; equip it in your main hand and use /onlydragons stats explain.");
             } else if (args.length == 4 && args[1].equalsIgnoreCase("bonus")) {
                 var key = Arrays.stream(StatKey.values()).filter(k -> k.id().equals(args[2])).findFirst()
@@ -54,6 +56,12 @@ public final class StatsCommand {
         var inspection = stats.refresh(player);
         var snapshot = inspection.stats().snapshot();
         if (!inspection.notice().isEmpty()) say(player, inspection.notice());
+        player.sendMessage(PresentationFormatter.heading("Your stats"));
+        if (!explain) {
+            for (var key : StatKey.values()) player.sendMessage(PresentationFormatter.value(PresentationFormatter.label(key.id()), snapshot.effective(key)));
+            player.sendMessage(PresentationFormatter.value("Critical hit chance (%)", snapshot.ordinaryCritProbability() * 100));
+            return;
+        }
         say(player, "Stats | profile " + inspection.stats().profileRevision() + " | revision " + snapshot.revision());
         say(player, "Main hand: " + describe(inspection.fingerprint().mainHand())
                 + " | Offhand (inactive): " + describe(inspection.fingerprint().offHand()));
@@ -89,5 +97,5 @@ public final class StatsCommand {
         if (args.length == 3 && args[1].equalsIgnoreCase("bonus")) return Arrays.stream(StatKey.values()).map(StatKey::id).toList();
         return List.of();
     }
-    private static void say(CommandSender sender, String text) { sender.sendMessage(Component.text(text)); }
+    private static void say(CommandSender sender, String text) { sender.sendMessage(PresentationFormatter.message(text)); }
 }

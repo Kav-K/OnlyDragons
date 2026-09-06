@@ -4,6 +4,7 @@ import com.kaveenk.onlydragons.paper.encounter.*;
 import java.io.IOException;
 import java.util.*;
 import net.kyori.adventure.text.Component;
+import com.kaveenk.onlydragons.application.PresentationFormatter;
 import org.bukkit.command.CommandSender;
 
 /** Production operator commands; no companion or player-position bootstrap. */
@@ -51,6 +52,13 @@ public final class DragonCommand {
             return dragons.generation().map(id -> List.of(id.toString())).orElse(List.of());
         return List.of();
     }
-    private static void usage(CommandSender sender) { say(sender, "Usage: /onlydragons dev dragon setup <world-key> <x> <y> <z> <radius 16-48> <test_dragon> | spawn | status | reset [generation] | result [generation]"); }
-    private static void say(CommandSender sender, String text) { sender.sendMessage(Component.text(text)); }
+    private void usage(CommandSender sender) { say(sender, "Usage: /onlydragons dev dragon setup <world-key> <x> <y> <z> <radius 16-48> <test_dragon> | spawn | status | reset [generation] | result [generation]"); }
+    private void say(CommandSender sender, String text) {
+        if (text.contains(" | generation=") || text.contains(" | dragon IDLE")) {
+            sender.sendMessage(PresentationFormatter.heading("Dragon · " + dragons.view().map(v -> PresentationFormatter.label(v.state().name())).orElse("Idle")));
+            dragons.view().ifPresent(view -> sender.sendMessage(PresentationFormatter.healthTitle(
+                    dragons.selection().orElseThrow().displayName(), view.target().currentHealth(), view.target().maxHealth())));
+        }
+        sender.sendMessage(PresentationFormatter.message(text));
+    }
 }

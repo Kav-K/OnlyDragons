@@ -7,6 +7,7 @@ import com.kaveenk.onlydragons.domain.combat.CombatProfile;
 import com.kaveenk.onlydragons.paper.encounter.DummyBackend;
 import java.util.*;
 import net.kyori.adventure.text.Component;
+import com.kaveenk.onlydragons.application.PresentationFormatter;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -31,7 +32,11 @@ public final class PracticeCommand {
             if (args.length != 2 || !args[1].equalsIgnoreCase("last")) { say(sender, "Usage: /onlydragons combat last"); return; }
             var last = plugin.combat().last(p.getUniqueId());
             if (last.isEmpty()) { say(sender, "No combat hit in this session."); return; }
-            var e = last.get(); say(sender, e.summary());
+            var e = last.get();
+            sender.sendMessage(PresentationFormatter.heading("Last hit · " + PresentationFormatter.label(e.damage().kind().name())));
+            sender.sendMessage(PresentationFormatter.value("Health removed", e.damage().amounts().actualHealthDamage())
+                    .append(Component.text("  |  ")).append(PresentationFormatter.value("Credited damage", e.damage().amounts().contributionDamage())));
+            say(sender, e.summary());
             var s = e.shot();
             say(sender, "Captured weapon=" + s.weapon().definitionId() + " stats=" + s.stats().revision()
                     + " draw=" + s.drawScale() + " projectile=" + s.projectileScale() + " ferocity=" + e.damage().effectiveFerocity());
@@ -55,6 +60,7 @@ public final class PracticeCommand {
                     }
                     if (empty.size() < 2) { say(sender, "Two empty storage slots required; no kit granted."); return; }
                     inventory.setItem(empty.get(0), bow); inventory.setItem(empty.get(1), new ItemStack(Material.ARROW, 64));
+                    sender.sendMessage(PresentationFormatter.heading("Practice kit · " + PresentationFormatter.label(args[2])));
                     say(sender, "Practice kit " + args[2] + " granted with 64 arrows; equip the bow and use /onlydragons stats explain.");
                 }
                 case "reset" -> {
@@ -102,5 +108,5 @@ public final class PracticeCommand {
         return List.of();
     }
     private static void usage(CommandSender s) { say(s, "Usage: /onlydragons dev kit <loadout> | dummy <full|reduced|score-only> [hp] | scenario <profile> [hp] | reset"); }
-    private static void say(CommandSender s, String message) { s.sendMessage(Component.text(message)); }
+    private static void say(CommandSender s, String message) { s.sendMessage(PresentationFormatter.message(message)); }
 }

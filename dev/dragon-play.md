@@ -61,3 +61,18 @@ new board; reset, abort, cancelled/revived native death and administrative follo
 death do not announce a victory. Offline participants remain in the result but
 have no queued chat delivery. No global history or rewards are enabled.
 Full-client readability and authenticated multiplayer remain operator checks.
+
+## Dragon health and presentation
+
+While a managed dragon is retained, everyone online in its configured world sees
+one top-screen bar, regardless of aim or line of sight. The title shows current
+**domain HP / max HP / percent**; credited or ghost damage never drives it. The
+zero-HP bar remains through native death animation and disappears on retirement,
+reset or shutdown. Leaving the world hides it; returning or reconnecting restores
+the current generation. This is a plugin bar with no sky, fog or music effects.
+
+Use `/onlydragons stats` for compact named values and `stats explain` for exact
+source diagnostics. `/onlydragons combat last` separates health removed from
+credited damage; live action-bar feedback uses the same distinction. Frozen
+ranking still orders full-precision contribution, with two-decimal grouped display.
+Client readability, colors and aim-independent placement need operator visual review.

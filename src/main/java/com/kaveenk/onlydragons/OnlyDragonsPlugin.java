@@ -20,6 +20,8 @@ public class OnlyDragonsPlugin extends JavaPlugin {
     public com.kaveenk.onlydragons.paper.projectile.OwnedBowService bows() { return bows; }
     private com.kaveenk.onlydragons.paper.encounter.DevelopmentDragonService dragons;
     public com.kaveenk.onlydragons.paper.encounter.DevelopmentDragonService dragons() { return dragons; }
+    private com.kaveenk.onlydragons.paper.encounter.presentation.DragonHealthPresenter dragonHealth;
+    public com.kaveenk.onlydragons.paper.encounter.presentation.DragonHealthPresenter dragonHealth() { return dragonHealth; }
     private GreetingService greetings;
     private EquipmentStatsService equipment;
     private DragonDefinitionRegistry dragonDefinitions;
@@ -44,6 +46,8 @@ public class OnlyDragonsPlugin extends JavaPlugin {
         combat.start();
         dragons = new com.kaveenk.onlydragons.paper.encounter.DevelopmentDragonService(combat, dragonDefinitions,
                 new com.kaveenk.onlydragons.paper.encounter.ArenaConfiguration(getDataFolder().toPath().resolve("config.yml"), dragonDefinitions), bows.continuity().tickets());
+        dragonHealth = new com.kaveenk.onlydragons.paper.encounter.presentation.DragonHealthPresenter(this, dragons, combat);
+        dragonHealth.start();
         equipmentListener = new EquipmentListener(this, equipment);
         getServer().getPluginManager().registerEvents(equipmentListener, this);
         getServer().getOnlinePlayers().forEach(equipmentListener::queue);
@@ -67,7 +71,10 @@ public class OnlyDragonsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         try {
-            try { if (dragons != null) dragons.close(); }
+            try {
+                try { if (dragonHealth != null) dragonHealth.close(); }
+                finally { if (dragons != null) dragons.close(); }
+            }
             finally { if (combat != null) combat.close(); }
         }
         finally {

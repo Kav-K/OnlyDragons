@@ -168,6 +168,11 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
+    },
+    "dragon-presentation": {
+      "scenarioId": "dragon-presentation",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1"
     }
   },
   "suites": {
@@ -195,7 +200,8 @@
       "dragon-restart-fresh",
       "dragon-restart-legacy",
       "dragon-restart-animation",
-      "dragon-ranking"
+      "dragon-ranking",
+      "dragon-presentation"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -241,7 +247,8 @@
       "dragon-restart-fresh",
       "dragon-restart-legacy",
       "dragon-restart-animation",
-      "dragon-ranking"
+      "dragon-ranking",
+      "dragon-presentation"
     ]
   },
   "areas": {
@@ -303,7 +310,8 @@
         "dragon-restart-fresh",
         "dragon-restart-legacy",
         "dragon-restart-animation",
-        "dragon-ranking"
+        "dragon-ranking",
+        "dragon-presentation"
       ],
       "affects": [
         "stats",
@@ -502,7 +510,8 @@
         "dragon-restart-fresh",
         "dragon-restart-legacy",
         "dragon-restart-animation",
-        "dragon-ranking"
+        "dragon-ranking",
+        "dragon-presentation"
       ],
       "affects": []
     },
@@ -611,6 +620,20 @@
       ],
       "cases": [
         "dragon-ranking"
+      ],
+      "affects": []
+    },
+    "dragon-presentation": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/application/PresentationFormatter.java",
+        "src/main/java/com/kaveenk/onlydragons/application/DragonHealthBar.java",
+        "src/main/java/com/kaveenk/onlydragons/paper/encounter/presentation/*",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/encounter/DragonPresentationScenario.java",
+        "dev/game-tests/player-plans/dragon-presentation-v1.json",
+        "scripts/agent-tests/bossbar_observation.py"
+      ],
+      "cases": [
+        "dragon-presentation"
       ],
       "affects": []
     }

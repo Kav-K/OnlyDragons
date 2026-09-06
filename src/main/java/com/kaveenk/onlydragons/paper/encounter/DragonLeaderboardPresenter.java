@@ -21,7 +21,7 @@ final class DragonLeaderboardPresenter {
             return player == null ? id.toString() : player.getName();
         }, (id, lines) -> {
             var player = Bukkit.getPlayer(id);
-            if (player != null) lines.forEach(line -> player.sendMessage(Component.text(line)));
+            if (player != null) lines.forEach(line -> player.sendMessage(com.kaveenk.onlydragons.application.PresentationFormatter.leaderboard(line)));
         });
     }
 

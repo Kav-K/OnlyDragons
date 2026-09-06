@@ -416,7 +416,7 @@
       "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+      "notice": "GH-64 active implementation: read-only per-generation health UI, shared display formatter and additive packet/restart fixtures. Current main 7a38040 merged; focused validation in progress. No completed requirement, clean-source Paper receipt or milestone acceptance claimed."
     },
     "T08e": {
       "status": "active",
