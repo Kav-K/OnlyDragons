@@ -174,3 +174,39 @@ available, and a 3113 MiB discounted resident-cache allowance, satisfying the
 7163 MiB and Windows available was 1697 MiB. These observations establish this
 calibration and cleanup behavior; gameplay mechanics still require their own
 scenarios. Raw reports and worlds stay in the ignored checkout-local paths.
+
+## Foundation contract evidence
+
+On 2026-09-05, `foundation-contracts` passed from clean revision
+`53f7e20ca0e0b571bbe169c5e3b1fb9293f8a458`, using Java `25.0.4.1` and pinned
+Paper `26.2-121-a2a42c5` (Minecraft `26.2`). Both wrapper builds passed, including
+21 production tests with no failures, errors, or skips. Run
+`75a8b5d6254a4527b1631fa172827cb0` returned exit 0 with all 29 assertions passing
+and mechanic revision `contract-fixture-v1`.
+
+The companion consumed the loaded production contract classes, captured a real
+native arrow's launch data, and verified that later changes to caller-owned
+values, modifier lists, and enchant lists did not alter the captured snapshot.
+It checked raw crit chance 175 with ordinary probability 1, collection
+immutability, one-ultimate and non-finite rejection, and retained proc ancestry.
+The explicit ordinary crit fixture was `100 * 1.4 * 1.5 = 210`. A separate
+ferocity result recorded requested HP 52.5, actual HP 20, and score 210; its
+0.25 HP coefficient is fixture data, not a chosen game default. Rejected
+results could not grant health damage or score, and a zero-HP target was dead.
+
+The actual arrow retained UUID `2efbb8aa-efa2-4f27-a242-b16062445f97` and moved
+0.7725530813753796 blocks between server ticks 23 and 31. The chunk reached
+entity-ticking readiness after 17 ticks. The scenario removed its entity,
+cancelled its tasks, and released its chunk force-load; all three cleanup
+assertions passed. The runner used loopback port 59099 under the shared lease
+and memory gate, then stopped its JVM with exit 0 without forced termination.
+
+The production SHA256 was
+`6b746b637e289fbdc58e62aa79fcfdcf837422aa3195a0060f7ca4e27361e156`;
+the companion SHA256 was
+`7f825535871cf8563e471d6646d46ce80ec540a0c8d6766feda4245fde86316d`.
+Reproduce with the environment above and
+`python3 scripts/agent-tests/paper_test.py --scenario foundation-contracts`.
+This proves contract consumers and immutable capture on Paper using synthetic
+actors. It does not implement or validate the production stat resolver, damage
+application, dragon collision, player input, or any complete gameplay milestone.
