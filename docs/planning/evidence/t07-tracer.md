@@ -1,6 +1,7 @@
 # T07 Tracer and continuous arrows (GH-10)
 
-Implementation ready for review on `symphony/gh-10`; no gameplay acceptance yet.
+Implementation in review in [draft PR #56](https://github.com/Kav-K/OnlyDragons/pull/56)
+on `symphony/gh-10`; no gameplay acceptance yet.
 T06's accepted registry/physical-hit contract remains authoritative. T07 adds
 pure homing rules and an attachment owned by the existing `OwnedBowService`
 tick/retirement lifetime, without a second registry, receiver or scheduler.
