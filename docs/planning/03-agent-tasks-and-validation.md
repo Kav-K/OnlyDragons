@@ -8,8 +8,8 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 Baseline reconciled **5 September 2026** from the checked-in source. The plugin
 still supplies starter status/reload commands and welcome messages. T00 adds
-immutable shared domain contracts integrated in main; the planned stat resolver, combat
-engine, and encounter systems remain to be implemented. The isolated Linux/WSL
+immutable shared domain contracts integrated in main. This branch adds the T01a
+stat resolver for review; combat and encounters remain planned. The isolated Linux/WSL
 Paper runner and companion are integrated through T09a. The integrated T00 code
 passes 21 production tests and its 29-assertion real-Paper contract scenario;
 these bounded checks do not establish the later gameplay or milestone gates.
@@ -19,13 +19,13 @@ on main. Fourteen issues now define the execution backlog. Symphony is running
 for three parallel coding workers and draft PR handoff; the lead may merge
 reviewed/tested PRs under the user's authorization. Actual Paper tests are
 serialized through the integrated T09a runner. Local delegated agents delivered
-T09a and T00; the automated Symphony issue-to-PR path remains to
-be exercised. See [execution order](04-execution-backlog.md).
+T09a and T00; GH-3 has now exercised the Symphony branch-to-draft-PR
+handoff in PR #23, with lead review/merge still pending. See [execution order](04-execution-backlog.md).
 
 | Task | Implementation state | Owner / issue / PR | Remaining acceptance gate |
 | --- | --- | --- | --- |
 | T00 — Contracts | Complete | [#1](https://github.com/Kav-K/OnlyDragons/issues/1), [PR #15](https://github.com/Kav-K/OnlyDragons/pull/15) | Merged at be920d0 after independent review, final-head Windows/Linux CI, 21 production tests and 29 real-Paper contract assertions; see [evidence](../../dev/agent-paper-tests.md#foundation-contract-evidence). Feature engines remain separate tasks. |
-| T01 — Stats | Planned (T01a ready) | [#3 resolver](https://github.com/Kav-K/OnlyDragons/issues/3), [#7 equipment/play](https://github.com/Kav-K/OnlyDragons/issues/7) | Resolver, snapshot, and equipment provenance acceptance cases. T01b waits for stats and item integration. |
+| T01 — Stats | In review (T01a; T01b pending) | [#3 resolver](https://github.com/Kav-K/OnlyDragons/issues/3), [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23), [#7 equipment/play](https://github.com/Kav-K/OnlyDragons/issues/7) | T01a: 30 production tests and 18 real-Paper assertions passed; see [evidence](#t01a-resolver-validation). Lead review/CI and merge pending. T01b equipment/play remains pending and waits for stats and item integration. |
 | T02 — Items | Planned (ready) | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | PDC/schema/identity and one-ultimate validation cases. |
 | T03 — Combat/ledger | Planned | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | Numeric fixtures, one impact authority, health/score/death invariants. |
 | T04 — Paper feasibility | Planned (ready) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Isolated real dragon/projectile scenarios and durable findings; client observations remain separate. |
@@ -109,8 +109,48 @@ design sections above are the current summary; this record explains changes.
 | 2026-09-05 | Shared agent tooling; user request | Bundled three Minecraft skills with references/provenance; configured Context7 and project-scoped Serena for Cursor, Codex, and isolated Symphony workers. | All three skill validators passed; Windows/Linux MCP initialize/tool-list and Java-symbol checks passed. A fresh Linux issue clone discovered all three skills, connected Context7 (2 tools) and Serena (8), queried Paper docs and production lifecycle symbols. Direct Codex from a nested directory also connected. Five bridge tests and scaffold skill-preservation checks passed. No gameplay milestone advanced; see dev/agent-tools.md. |
 | 2026-09-05 | User-confirmed execution policy | Authorized feature agents to test against isolated real Minecraft, parallel coding, and lead merges of reviewed/tested PRs into main. Reuse existing local EULA acceptance; preserve human worlds and serialize JVM tests. | Existing managed dev server stopped cleanly with user permission. Fourteen issues created; T00/T09a agents started in separate clones. Bridge tests include the narrow shared lease directory (6 pass); client/milestone gates remain distinct. |
 | 2026-09-05 | T09a / #2 / PR #16 | Integrated an isolated Linux/WSL runner and same-Paper companion with a shared lease, memory admission, strict reports, and owned-process cleanup. | Merged into main at 140f11c. Clean 946858d positive and deliberate-failure controls produced the expected outcomes and clean shutdown; [calibration evidence](../../dev/agent-paper-tests.md#accepted-calibration-evidence). Broader T09 gameplay and human gates remain. |
+| 2026-09-05 | T01a / #3 / [PR #23](https://github.com/Kav-K/OnlyDragons/pull/23) | Adopted named calibration defaults/ranges/caps and deterministic arithmetic policy within task scope; stable T00 records preserved. See document 02 section 3. | Clean 36a7e23: 30 production tests (9 new resolver tests), zero failures/errors/skips; 18 production-resolver Paper assertions and clean unforced shutdown. See [evidence](#t01a-resolver-validation). T01b equipment integration and human play remain separate. |
 | 2026-09-05 | T00 / #1 / PR #15 | Established shared immutable domain contracts without introducing resolver/combat engines or choosing unresolved balance rules. | Clean 53f7e20: 21 production tests, no failures/errors/skips; real Paper passed 29 assertions with clean unforced shutdown. Independent review and final e3a9e68 Windows/Linux CI passed; merged at be920d0. [Versions, hashes, and scope](../../dev/agent-paper-tests.md#foundation-contract-evidence). |
 | 2026-09-05 | Report validation / [#17](https://github.com/Kav-K/OnlyDragons/issues/17), In review | Reject boolean/number equivalence recursively in assertion evidence, even with forged pass flags; preserve integer/float numeric equivalence and JSON structure/order checks. | Implementation 4aa62f4: Ubuntu 24.04 / Python 3.12.3, `python3 -B -m unittest discover -s scripts/agent-tests -p 'test_*.py' -v` passed all 27 tests without skips. Revalidated unchanged stored T09 positive (13 assertions), negative (only `deliberate_failure` rejected), and T00 (29 assertions) reports within their original run windows. No new Paper JVM or gameplay gate; independent review/CI pending. |
+
+### T01a resolver validation
+
+GH-3 on `symphony/gh-3` is **In review** in [draft PR #23](https://github.com/Kav-K/OnlyDragons/pull/23). Clean runtime-code revision
+`36a7e23412c4271fc1fa76a980ceddb4c3740272` includes main `6f0ccfb` and its strict typed
+report validator from PR #19, merged normally before final verification. The ordinary
+wrapper build and both runner builds passed with JDK 25.0.4.1: 30 production
+tests, zero failures/errors/skips, including 9 new resolver behavior tests and
+API isolation. The resolver and source collection had all lines/branches covered;
+coverage supplements the explicit numeric and rejection assertions. The integrated
+runner suite also passed all 27 Python tests without skips.
+
+`python3 scripts/agent-tests/paper_test.py --scenario stats-resolution` returned
+exit 0 in run `50acd539aaae416481789e1b711bfa7f` on Paper
+`26.2-121-a2a42c5` / Minecraft 26.2, mechanic `stats-calibration-v1`.
+All 18 assertions passed. The scenario loaded the resolver from the production
+plugin classloader and verified complete snapshots, weapon base exactly once,
+crit damage baseline 50, raw crit 175 / ordinary probability 1, raw ferocity 750.5 / effective 500,
+and weapon damage 151.5 with step results 101, 151.5, 75.75, 151.5, 151.5.
+Input permutation retained the same explanation. Whole-source replacement
+changed damage to 111 and removed the source's crit/ferocity/multipliers while
+the old snapshot remained immutable. Invalid negative results failed.
+
+Production SHA256:
+`7f229dd2de086fb6bb0822abcade29fd5ec0e484e57a9d98d00f5a8e2580d59f`.
+Companion SHA256:
+`072ad52ffdfdfbb4229b123c292cffdf4594dc2fc6e94fdd80490c8fbf63301f`.
+The runner reused the accepted EULA, shared lease, memory gate and disposable
+issue-local world on loopback port 43443. All three cleanup assertions passed;
+the scenario owned no entities, scheduled tasks or chunk tickets. Paper exited
+0 with `forced=false`, `clean=true`. Raw reports stay in ignored
+`build/reports/agent-paper/50acd539aaae416481789e1b711bfa7f/`.
+
+These are synthetic domain inputs executed on real Paper. Windows smoke,
+authenticated clients, equipment changes, mouse input, visuals and multiplayer
+were not run. T01b owns equipment/play integration after T01a and T02 merge;
+no gameplay milestone is accepted here. Lead review and final-head CI remain
+pending. No research claims changed: the calibration rationale is recorded in
+document 02 rather than recasting document 01's upstream evidence.
 
 ## 1. Team operating contract
 
