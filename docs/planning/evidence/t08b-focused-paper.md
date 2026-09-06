@@ -1,6 +1,6 @@
 # T08b frozen ranking: focused worker evidence
 
-GH-40 is In review; focused verification is not final task/milestone acceptance.
+[Draft PR #62](https://github.com/Kav-K/OnlyDragons/pull/62) / GH-40 is In review; focused verification is not final task/milestone acceptance.
 Runtime/source revision **`bdde815229b6a9b5f90800b8c386b59a4e9ebdf5`** includes
 current main **`88d27c5c06705f72d576939e3ea012b134260636`** by ordinary fetch/merge
 (already up to date). Both final runs began and ended with unchanged clean inputs.

@@ -345,7 +345,7 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "GH-40 implements immutable credited ranking and per-spawn received presentation. Clean bdde815 passed 231 production/6 companion/28 client tests and focused ranking (24 assertions, ten message matchers) plus dragon-combat (49 assertions); docs/planning/evidence/t08b-focused-paper.md preserves exact inputs/hashes and prior iterations. Full hosted receipt, independent replay/CI and final acceptance remain lead-owned; human readability/authentication unrun. No completed requirement or milestone advanced."
+      "notice": "Draft PR #62 (https://github.com/Kav-K/OnlyDragons/pull/62) implements immutable credited ranking and per-spawn received presentation. Clean bdde815 passed 231 production/6 companion/28 client tests and focused ranking (24 assertions, ten message matchers) plus dragon-combat (49 assertions); docs/planning/evidence/t08b-focused-paper.md preserves exact inputs/hashes and prior iterations. Full hosted receipt, independent replay/CI and final acceptance remain lead-owned; human readability/authentication unrun. No completed requirement or milestone advanced."
     },
     "T08c": {
       "status": "planned",
