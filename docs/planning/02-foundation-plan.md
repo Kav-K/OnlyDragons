@@ -167,6 +167,39 @@ amounts are boundary fixtures, not a claim about unpublished T02 loadout values.
 T02's projection implementation and complete preset totals must still be checked
 after its integration; its branch was not yet published during this audit.
 
+### T01b equipment and inspection boundary (GH-7)
+
+Adopted within task scope: `EquipmentStatsService` owns UUID-keyed session
+inspections and session-only flat development bonuses on the classic Paper
+server thread. Each refresh decodes both hands through the production codec.
+Its value fingerprint includes full validated instances (UUID, revisions,
+enchants and named rolls), resolved catalog data, immutable profile, and external
+source contents. Only the active main-hand `resolvedWeapon()` is passed once to
+the factory. Offhand identity is inspectable but supplies no weapon modifiers;
+unmanaged or invalid main-hand items use profile defaults, including zero weapon
+damage before external bonuses. Invalid metadata is identified in the explanation.
+
+Unchanged fingerprints reuse the immutable inspection; changed inputs allocate a
+new session-independent revision. Accepted snapshots remain immutable. Inventory
+slot, held-slot, hand-swap, join and respawn events coalesce into one next-tick
+refresh per player. Quit/death cancel queued refreshes and clear cached state and
+bonuses; disable cancels all owned callbacks and clears sessions. Every inspection
+also revalidates live item contents, including edits that preserve UUID. This is
+an integration entry point for T06, **not shot-time firing integration**.
+
+`stats [explain]` requires `onlydragons.stats` (default true). `dev loadout <id>`,
+`dev bonus <stat> <nonnegative amount>`, and `dev clear` require
+`onlydragons.calibration` (default op) and act only on the caller. Grants use
+registry creation and the production codec, occupy an empty storage slot, and
+never replace existing equipment or drop overflow. Bonuses replace one flat
+`dev:bonus:<stat>` source and validate the entire candidate before adoption.
+Zero removes a source. If a later equipment change makes existing bonuses exceed
+profile ranges, bonuses clear atomically and inspection explains the reset.
+These are development additions, not progression, live player attributes or
+Fatal Tempo mechanics. Status/reload and the alias remain; reload changes greeting
+configuration only, with compiled catalogs requiring restart. See the
+[short Cursor Play procedure](../../dev/stats-play.md) and T01b evidence ledger.
+
 ### Initial test loadouts
 
 Provide deterministic calibration presets: normal damage with 0 ferocity; guaranteed crit; 25 ferocity; 100 ferocity; capped ferocity; a Tracer bow; a Duplex bow; and a Fatal Tempo bow with a nonzero base ferocity source. Each preset should state the stats it supplies. These are development gear grants, not the final acquisition loop.
