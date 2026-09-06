@@ -643,7 +643,11 @@ crit chance; no probability or mega-crit formula is adopted. Enchant tables and
 trusted loadouts remain T02/lead-owned and unchanged. These compiled calibration
 rules are not a hot-reload system; a later balance change must carry a new revision.
 
-### T05b level-based ghost policy (GH-66, in progress)
+### T05b level-based ghost policy (GH-66)
+
+Accepted through merged PR #73 at `29f0cf3`, exactly for
+`fatal-tempo-ghost-scaling`, P08 and P09; [verified cohort and scope](evidence/t05b-suite.md).
+Human balance and the remaining checkpoint features are separate.
 
 The user-confirmed `dragon-tempo/v2` policy keeps uncapped sandbox physical damage,
 zero-defense test targets and full proc credit. Only proc HP changes: no active
