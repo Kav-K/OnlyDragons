@@ -358,8 +358,8 @@ def player_pins(pins):
 def player_mode(mode, scenario, control):
     require(mode in (None, 'protocol-calibration'), 'Unknown isolated player mode')
     require(control in ('calibrate', 'early-exit', 'idle'), 'Unknown player failure control')
-    require((mode is not None) == (scenario == 'protocol-player-calibration'),
-            'Protocol player mode requires exactly the protocol-player-calibration scenario')
+    require((mode is not None) == (scenario in ('protocol-player-calibration', 'projectile-player-feasibility')),
+            'Protocol player mode requires an explicitly admitted player scenario')
     require(mode is not None or control == 'calibrate', 'Player failure controls require protocol player mode')
     return mode is not None
 

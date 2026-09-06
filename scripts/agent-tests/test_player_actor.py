@@ -51,6 +51,20 @@ class PlayerActorContractTests(unittest.TestCase):
             with self.subTest(args=args), self.assertRaises(runner.ValidationError):
                 runner.player_mode(*args)
 
+    def test_projectile_admission_is_exact_and_retains_failure_controls(self):
+        for scenario in ('protocol-player-calibration', 'projectile-player-feasibility'):
+            for control in ('calibrate', 'early-exit', 'idle'):
+                with self.subTest(scenario=scenario, control=control):
+                    self.assertTrue(runner.player_mode('protocol-calibration', scenario, control))
+                    with self.assertRaises(runner.ValidationError):
+                        runner.player_mode(None, scenario, control)
+        for scenario in ('projectile-feasibility', 'projectile-player-feasibility-extra',
+                         'PROJECTILE-PLAYER-FEASIBILITY', '', 'equipment-player'):
+            with self.subTest(scenario=scenario), self.assertRaises(runner.ValidationError):
+                runner.player_mode('protocol-calibration', scenario, 'calibrate')
+        with self.assertRaises(runner.ValidationError):
+            runner.player_mode('protocol-calibration', 'projectile-player-feasibility', 'repeat-shots')
+
     def test_default_authenticated_settings_and_input_are_preserved(self):
         source = {'online-mode': 'true', 'server-ip': '0.0.0.0', 'level-name': 'human-world'}
         original = dict(source)

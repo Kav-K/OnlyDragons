@@ -21,6 +21,7 @@ public final class GameTestsPlugin extends JavaPlugin {
             "foundation-contracts", new ContractScenario(),
             "protocol-player-calibration", new PlayerCalibrationScenario(),
             "item-identity", new com.kaveenk.onlydragons.gametests.item.ItemIdentityScenario(),
+            "projectile-player-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectilePlayerFeasibilityScenario(),
             "projectile-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectileFeasibilityScenario(),
             "projectile-cleanup-failure", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(),
             "projectile-cleanup-abort", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(true),
