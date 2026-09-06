@@ -506,7 +506,8 @@ The backend supplies T10's future target projection, not countdown/prefire or M3
 
 ### T08b frozen ranking and presentation
 
-Implemented on the GH-40 branch, pending focused Paper evidence and lead acceptance.
+Implemented on the GH-40 branch; [focused Paper evidence](evidence/t08b-focused-paper.md)
+passes on clean `bdde815`. Full cohort/lead acceptance remains pending.
 `RankedEncounterResult` retains the exact immutable `EncounterResult`, full Selection,
 and contribution/stamp values. It validates complete participant
 provenance, rejects ordinal ownership/tick conflicts and backdated stamps, then
