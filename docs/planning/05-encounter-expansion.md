@@ -54,7 +54,7 @@ same-tick zero participants and zero-to-positive transitions.
 | Task | Issue | Prerequisites | Owned result |
 | --- | --- | --- | --- |
 | T02b | [#38](https://github.com/Kav-K/OnlyDragons/issues/38) | T00, T02, T03, T09a | One test-dragon definition and extensible versioned type/table references; D4's catalog boundary. |
-| T08a | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | T08, T02b | D1/D2 real managed-dragon backend and development controls, consuming the shared combat path. |
+| T08a | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | T08, T02b, T09e | D1/D2 real managed-dragon backend and development controls, consuming the shared combat path. |
 | T08b | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | T08a | D3 frozen credited-damage projection, unique placements and received player output. |
 | T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b, T08b | Personal rank-based loot evaluation with hard locks and actual grants disabled. |
 
