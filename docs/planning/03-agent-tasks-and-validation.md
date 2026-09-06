@@ -33,9 +33,9 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T02 — Items | Complete | [#4](https://github.com/Kav-K/OnlyDragons/issues/4), [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24), `symphony/gh-4` | Final clean 7ebaa6b after main 586a170: 54 production tests and 35 item-codec-v4 Paper assertions passed, including real serialized loadouts through production snapshots and four cleanup checks. [Evidence](#t02-item-validation-evidence). Merged at 7c6d843 after independent review and final-head CI; authenticated inventory/visual checks are separate. #7 equipment/grants are integrated in PR #29/#32; #9 firing remains deferred. |
 | T02b — Test dragon definitions | Planned | [#38](https://github.com/Kav-K/OnlyDragons/issues/38) | After T00/T02/T03/T09a: one versioned test dragon and inert sample table bindings; atomic validation and actual production-loader Paper evidence pending. No spawn engine or real rewards. |
 | T03 — Combat/ledger | Complete | [#6](https://github.com/Kav-K/OnlyDragons/issues/6), [PR #26](https://github.com/Kav-K/OnlyDragons/pull/26), `symphony/gh-6` | Merged at 9092fbe after independent review and final-head Windows/Linux CI. Clean 633d81c includes actor main 5b0e030: 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions passed. [Evidence](#t03-combat-validation). Physical adapter/native suppression and human checks are separate. |
-| T04 — Paper feasibility | In review (player-owned follow-up delivered) | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22) | Partial PR #22 merged at 586a170 after review, final-head CI, 34 Paper assertions and expected exception/abort controls; [evidence](../../dev/game-tests/findings/projectile-feasibility.md). Player-owned follow-up is in draft PR #31 with native positive controls, cancellation/zero-damage observations, part geometry, phase and simultaneous-hit evidence. Issue #5 records the reviewed bounded phase/part policy; the foundation plan records that policy and clean `77c94a2` passed the full 16-case suite, feature early-exit and T04 automated checkpoint; [fresh evidence](../../dev/game-tests/findings/projectile-player-feasibility.md#recovery-verification-on-current-main). External current-input/policy acceptance remains with the lead. T04 remains partial, #9 stays blocked and M0 unaccepted. |
+| T04 — Paper feasibility | Complete | [#5](https://github.com/Kav-K/OnlyDragons/issues/5), [PR #31](https://github.com/Kav-K/OnlyDragons/pull/31) | Merged at `705de34` after clean `96ef4b3` passed all 18 hosted suite outcomes, independent raw replay/review and current CI; 82 production/28 client tests and all 52 required player-projectile assertions plus shared cleanup were verified. The external part/phase/terminal-impact policy was accepted separately; [exact evidence and review](evidence/t04-suite.md). P02/P04 remain production T06 work, and M0 remains unaccepted. |
 | T05 — Enchants/procs | In review | [#8](https://github.com/Kav-K/OnlyDragons/issues/8) | Draft PR #30 passed independent source review, 128 production tests and 38 real-Paper assertions. Current head `ee1721a` contains main `5e8cfbf` and passed [Windows/Linux CI](https://github.com/Kav-K/OnlyDragons/actions/runs/34014552319). Shared-suite evidence and lead acceptance remain pending. |
-| T06 — Firing/Duplex | Blocked | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b/T02 are complete; wait for accepted T04 impact/native-damage evidence. Partial PR #22 and a passing T09b calibration alone cannot satisfy this gate. Physical UUIDs, input/cadence, ownership, and ammo/cancellation evidence remain required. |
+| T06 — Firing/Duplex | Planned; eligible pending lead label | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b/T02 and T04 are integrated; no accepted-M0 prerequisite applies. Implement the accepted physical claim/native-suppression/phase boundary and prove physical UUIDs, input/cadence, ownership, ammo/cancellation and two-player firing through T09d. Production P02/P04 and feature acceptance remain deferred. |
 | T07 — Tracer/continuity | Planned | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | Radius/steering fixtures plus real flight, pre-spawn, and cleanup evidence. |
 | T08 — Practice tools | Planned | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | Repeatable player procedure, permissions, and explained damage. |
 | T08a — Managed dragon controls | Planned | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | After T08/T02b: real test-dragon backend and spawn/status/reset/result inspection through the existing shared lifecycle and T06 claims. All feature Paper/command evidence pending. |
@@ -47,7 +47,7 @@ PR #23, now merged at `1efa7d0`. See [execution order](04-execution-backlog.md).
 | T11 — Eight-eye lifecycle | Planned, later | [#13](https://github.com/Kav-K/OnlyDragons/issues/13) | M3 accepted, then transaction, spawn, cancellation, and recovery gates. |
 | T12 — Variants/progression | Planned, later | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus separately agreed roster, rewards, and acquisition scope. |
 
-No milestone M0–M5 is accepted yet. T09c and objective T01b acceptance are complete; the next focus is current-main integration of #8 procs and #5 player-owned findings. P01–P14 remain pending; the shared baseline does not accept future gameplay behavior. A task's
+No milestone M0–M5 is accepted yet. T09c and objective T01b acceptance are complete; T04 is also complete; the next focus is current-main integration of #8 procs and lead dispatch of eligible #9 firing. P01–P14 remain pending; the shared baseline does not accept future gameplay behavior. A task's
 full acceptance criteria below remain authoritative; this table is a summary.
 
 Use **Planned**, **In progress**, **In review**, **Blocked**, or **Complete** for
@@ -108,27 +108,14 @@ This instruction does not authorize implementing unassigned work packages.
 
 ### Context change record
 
-T04 recovery at clean `77c94a2` integrates main `799c01d`; former access,
-network and comparison-base blockers are resolved. Fresh full 16-case suite
-`bf523a75bc114b89ae70e6e9da4b5869`, independent replay and the separate feature
-early-exit control met their declared outcomes. T04 automated checkpoint is
-ready, with merge acceptance false. [Current receipt, hashes and observed
-geometry](../../dev/game-tests/findings/projectile-player-feasibility.md#recovery-verification-on-current-main)
-record 82 production / 7 client / 136 Python tests and runtime-head Windows/Linux
-CI. The lead's terminal-claim/veto clarification is recorded in document 02;
-production P02/P04 remain deferred under T06/M1. T04 stays In review, #9 blocked
-and M0 unaccepted pending current-input and policy acceptance.
-The lead independently reviewed that 16-case receipt. PR #44 is now integrated
-into this branch by ordinary merge `6936c6f`, including main `9def91f`. Final
-merge `37cd803` includes PR #45/main `4cfb7b9` and preserves its completed
-T09d context. All
-projectile and T09d registrations/coverage survive the additive reconciliation.
-The actual-sandbox doctor is ready and the plan checkpoint passes; changed-area
-selection requires 18 cases. Per the latest GH-5 owner instruction, the lead
-will dispatch the hosted suite and independently replay its evidence on the
-handed-back clean head. Current-input Paper acceptance and CI remain pending;
-the older receipt does not certify this reconciliation. See the
-[PR44 reconciliation handoff](../../dev/game-tests/findings/projectile-player-feasibility.md#pr44-reconciliation-handoff).
+T04 is accepted through PR #31 at `705de34`. Clean runtime `96ef4b3` passed
+all 18 hosted suite outcomes, independent raw replay/review and current CI;
+the lead separately accepted the scoped part/phase/terminal-impact policy.
+[Exact final evidence](evidence/t04-suite.md) retains the original source and
+artifact identities. [Historical recovery findings](../../dev/game-tests/findings/projectile-player-feasibility.md#recovery-verification-on-current-main)
+remain scoped to their earlier inputs. T06 is planned and eligible for the
+lead's label; P02/P04 and actual multiplayer firing remain its deferred
+production work. No milestone is accepted.
 
 Keep new decisions concise and update the current ledger/design in place. The
 [archived change record](history/2026-09-05-foundation-evidence.md#context-change-record)
@@ -347,18 +334,17 @@ phases and simultaneous physical hits. The reviewed uniform 1.0 part policy and
 single physical candidate source are recorded in document 02. No semantic head
 identifier or production adapter is claimed. [Exact current and historical evidence](../../dev/game-tests/findings/projectile-player-feasibility.md)
 preserves misses, failed iterations, pre-spawn/lifetime observations and cleanup.
-Main `799c01d` is integrated at clean `77c94a2`; the full affected suite and
-corrected T04 automated checkpoint passed on those historical inputs. The current
-PR44 reconciliation and pending 18-case hosted verification are recorded above.
-External current-input and policy acceptance remain separate; P02/P04 are deferred T06/M1 adapter acceptance.
-T04 stays In review, #9 blocked and M0 unaccepted.
+The final `96ef4b3` hosted 18-case suite, independent replay/current review and
+CI passed; the external policy was accepted separately before merge at `705de34`.
+[Final evidence and policy review](evidence/t04-suite.md) establish T04 completion.
+P02/P04 remain deferred T06/M1 production acceptance; T06 is eligible for lead
+dispatch and M0 remains unaccepted.
 
-PR #22 is a bounded partial delivery: shooterless native arrows establish useful
-collision/cancellation observations, but cannot establish player-owned native
-dragon damage suppression or semantic head/native-damage behavior. Keep #5 open
-and #9 undispatched until the continuation evidence and supported impact
-policy are accepted. T09b supplies a protocol actor for the follow-up; its initial
-bow calibration does not itself finish T04.
+PR #22 remains a bounded historical partial delivery: shooterless native arrows
+alone did not establish player-owned suppression or semantic head behavior.
+PR #31 now completes the separate player-owned observations and scoped policy;
+it claims uniform part scaling, not a semantic head selector. T09b calibration
+alone was not the acceptance evidence, and no production adapter is implied.
 
 ### T05 — Enchant effects, ferocity queue, and Fatal Tempo
 
