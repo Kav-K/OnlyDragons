@@ -18,7 +18,7 @@ part of the worker's scope.
 | T00 | [#1](https://github.com/Kav-K/OnlyDragons/issues/1) | Complete: PR #15 merged at be920d0 | Shared contracts; 21 production tests and 29 actual-Paper assertions passed, independent review and final CI passed. |
 | T09a | [#2](https://github.com/Kav-K/OnlyDragons/issues/2) | Complete: PR #16 merged at 140f11c | Isolated runner; positive and deliberate-failure controls, independent review, and CI passed. |
 | T01a | [#3](https://github.com/Kav-K/OnlyDragons/issues/3) | Complete: PR #23 merged at 1efa7d0 | Base stat resolver and immutable explanations; 30 production tests, 18 Paper assertions, independent review and final-head CI passed. |
-| T02 | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | T00, T09a integrated; PR #24 in review | Item definitions, codec/PDC and enchant validation; lead owns final item/stat integration and merge. |
+| T02 | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | Complete: PR #24 merged at 7c6d843 | Item definitions, codec/PDC and enchant validation; 54 production tests, 35 Paper assertions, independent review and final-head CI passed. |
 | T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Partial PR #22 integrated at 586a170; full task blocked | Shooterless arrow/dragon findings are partial. Full acceptance awaits player-owned native suppression and semantic head/native-damage evidence after T09b; #9 stays blocked. |
 | T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | T09a, T00; PR #22 owned-listener helper integrated at 586a170 | Locally owned protocol-player calibration, dual reports and client/server failure cleanup. Full T04 acceptance is not a prerequisite. |
 | T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | T00, T01a integrated; active Symphony worker | Combat math, health and contribution; production-service tests remain required. |
@@ -32,8 +32,7 @@ part of the worker's scope.
 | T12 | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus agreed roster/reward/acquisition scope | Later bounded content/progression planning. |
 
 Symphony has three coding slots. Label only tasks whose prerequisites are
-integrated into main and whose manual gates are satisfied. #6 is active; #7
-awaits the item merge. #20 is owned by a local delegated agent and must not be
+integrated into main and whose manual gates are satisfied. #6 and #7 are active after their prerequisites merged. #20 is owned by a local delegated agent and must not be
 labeled for a duplicate worker. #5 remains a partial delivery awaiting further
 actor evidence, and #9 must remain undispatched. Issue/PR state owns live claims;
 the lead reconciles this summary after each serial merge.

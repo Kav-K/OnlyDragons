@@ -128,11 +128,33 @@ The local project pins **Paper API 26.2.build.121-stable and Java 25**. Its down
 
 Paper's PDC supports namespaced metadata on items and entities. It is a suitable storage boundary for item definitions, enchant levels, shot ownership, and schema versions. Lore should be a presentation of that data. [Paper PDC documentation](https://docs.papermc.io/paper/dev/pdc/)
 
+**Observed locally, T02 / GH-4, 5 September 2026:** on pinned Paper
+26.2-121-a2a42c5, the production item codec preserved all eight calibration
+loadouts through `ItemStack.serializeAsBytes`/`deserializeBytes`; two bow UUIDs
+remained distinct across a synthetic inventory move. Copied names/lore/glint
+did not grant managed identity to an ordinary bow. Schema/type/revision and
+trusted enchant/roll rejection controls passed. This establishes the item
+metadata boundary, not authenticated inventory/anvil behavior, restart recovery,
+combat effects or protection against privileged plugins forging PDC.
+See [T02 evidence](03-agent-tasks-and-validation.md#t02-item-validation-evidence).
+
 The projectile hit event's cancellation semantics require care: cancelling an entity hit prevents its normal collision action, while cancellation does not generally prevent block collision. The plan must not cancel every hit and assume vanilla impact behavior remains. [Paper ProjectileHitEvent API](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
 
 World/entity mutation belongs on the server thread; asynchronous work is for immutable report data and file I/O. [Paper scheduling documentation](https://docs.papermc.io/paper/dev/scheduler/)
 
 API signatures do **not** prove multipart collision delivery, seated-dragon arrow behavior, exact event ordering, or same-tick damage behavior. The implementation plan starts with a bounded real-Paper experiment for those uncertainties. MockBukkit remains valuable for lifecycle, commands, inventory metadata, and event routing, but it is not a physics simulator.
+
+### T04 measured collision boundary (Paper 121)
+
+**Observed on exact pin, 2026-09-05:** real shooterless arrows delivered multipart
+`ProjectileHitEvent`s without damage events, including three distinct same-tick
+impacts and an arrow created before the dragon. Cows established hit-before-damage
+ordering and distinct cancellation behavior. Unchanged dragon HP does not prove
+native suppression because the shooterless native control also lost no HP.
+Part names are identical; a small-part aim hit a different part and is not a
+head-hit pass. See the [bounded findings and remaining gates](../../dev/game-tests/findings/projectile-feasibility.md).
+These observations are OnlyDragons test evidence, not Hypixel mechanics or
+player-owned dragon damage proof.
 
 ## Decisions still open
 

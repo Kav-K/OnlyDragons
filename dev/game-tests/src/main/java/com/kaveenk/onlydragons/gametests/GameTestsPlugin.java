@@ -19,6 +19,10 @@ public final class GameTestsPlugin extends JavaPlugin {
             "lifecycle-calibration", new CalibrationScenario(false),
             "deliberate-failure", new CalibrationScenario(true),
             "foundation-contracts", new ContractScenario(),
+            "item-identity", new com.kaveenk.onlydragons.gametests.item.ItemIdentityScenario(),
+            "projectile-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectileFeasibilityScenario(),
+            "projectile-cleanup-failure", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(),
+            "projectile-cleanup-abort", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(true),
             "stats-resolution", new com.kaveenk.onlydragons.gametests.stats.StatsResolutionScenario());
     private final ExecutorService writer = Executors.newSingleThreadExecutor();
     private ScenarioContext active;

@@ -192,6 +192,61 @@ An `EnchantDefinition` declares its ID, legal levels, item compatibility, ultima
 
 Initially, enchant application uses permission-gated development commands. Native enchanting-table generation, anvils, books, resource packs, and registry-backed client presentation are separate later features. PDC-based behavior avoids tying the combat engine to an experimental registration lifecycle. [Paper PDC background](https://docs.papermc.io/paper/dev/pdc/)
 
+### T02 adopted item boundary (GH-4)
+
+The additive implementation wraps the stable T00 `WeaponDefinition` in
+`ItemDefinition` for name/material/allowed rolls. `ItemInstance` carries its
+`WeaponIdentity`, registry revision, enchant ID/level selections and named roll
+IDs. `ItemRegistry.resolve` returns immutable trusted definition, enchant and
+modifier data for later equipment/snapshot consumers. Its `resolvedWeapon()`
+projection supplies the complete validated modifier/enchant lists on a T00
+weapon definition. #7 passes this projection once to T01
+`StatSnapshotFactory.create`, with only external gear/buffs in additionalSources;
+passing resolved item modifiers again would collide or double-count. It never adds
+`WeaponDefinition.baseDamage` again as a flat modifier. Create allocates a fresh
+UUID; edit replaces selections while retaining identity and validates both
+the original and replacement. Defaults apply on creation, not again on load.
+
+Schema v1 owns a nested `onlydragons:weapon` PDC container. Both schema and
+catalog/definition revisions must match exactly. Prior schema 0, future schema
+2 and changed revisions explicitly reject; no released legacy format exists
+to justify automatic migration. Unknown fields/IDs/types/levels, extra
+ultimates, raw stats, invalid UUIDs, wrong material and stack amounts other
+than one fail with a typed reason. Other plugins' outer PDC keys are ignored.
+The immutable trusted registry determines enchant kinds and finite modifier
+bundles; PDC cannot self-classify an ultimate or supply raw roll amounts.
+Per-definition allowlists gate named rolls; duplicate selections reject.
+This is a plugin data boundary, not a signature against privileged PDC writers
+or an anti-duplication ledger for cloned item UUIDs.
+
+`CalibrationLoadouts.registry()` is compiled development data at
+`calibration-items-v2`, ready for #7's later grant integration; it is not wired
+into root bootstrap/commands and is not reloadable configuration. All eight
+drawn bows supply base damage 100 and no crit-damage modifier. The lead
+confirmed T01 owns baseline crit damage 50; the initial item +50 was removed
+before handoff to avoid resolving 100. With T01
+base crit chance/ferocity 0, expected damage/crit damage totals are 100/50 for
+all presets, with crit chance/ferocity as specified below. Ordinary supplies
+zero crit/ferocity, crit supplies +100 crit chance, and the ferocity presets
+supply +25/+100/+500 ferocity. Tracer and Duplex use level V with zero
+ferocity; Fatal Tempo V has +25 ferocity. Effective values/caps depend on T01's
+base profile; these are explicit calibration contributions, not a second stat
+resolver or final balance. Vicious I–V contributes +1 ferocity per level as an
+adopted calibration choice. Power I–VII, Snipe I–IV and Tracer/Duplex/Tempo I–V
+remain validated identifiers for later effect consumers; no effect engine is
+introduced. Overload and Gravity/Dragon Hunter remain unsupported pending
+their unresolved profile decisions. All current enchants accept drawn and
+shortbows, with no conflict beyond the user-confirmed single ultimate.
+
+Display name/lore/glint are generated output, independent of decoding; no
+native damage enchants are applied. Encoding makes a new stack and does not
+promise to preserve foreign metadata or durability during an item edit.
+Both codec entry points require the classic Paper server thread; no session,
+async callback or task is introduced. See [item catalog/schema](../../src/main/resources/items/README.md)
+and [enchant catalog](../../src/main/resources/enchants/README.md) for consumer
+instructions. Authenticated inventory/rename/visual checks remain separate
+from the synthetic real-Paper round-trip scenario.
+
 ## 5. Shot ownership, snapshots, and swapping
 
 Each accepted trigger receives a `shotId`. Every real arrow has its own projectile UUID and ordinal; a Duplex child also references its parent. Record owner UUID, weapon instance/definition, immutable gear stats, enchant levels, mechanic revision, launch tick, launch position, and initial velocity.
@@ -222,7 +277,20 @@ Process an impact on the server thread:
 8. Determine bounded ferocity children from the pre-update buff snapshot; update eligible tempo state; schedule children.
 9. Publish immutable results for UI, traces, and future rewards.
 
-`ProjectileHitEvent` and `EntityDamageByEntityEvent` must not both call the engine independently. The real-Paper spike selects the supported physical-impact source and establishes event ordering. Track collision candidates and finalize only after relevant cancellation has settled. Centralize native damage suppression and managed damage application in one adapter; do not award managed damage from an event cancelled by another component. [Projectile event semantics](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
+`ProjectileHitEvent` and `EntityDamageByEntityEvent` must not both call the engine independently. The T04 findings below identify a physical-impact source and measured event ordering, with native player-damage acceptance still pending. Track collision candidates and finalize only after relevant cancellation has settled. Centralize native damage suppression and managed damage application in one adapter; do not award managed damage from an event cancelled by another component. [Projectile event semantics](https://jd.papermc.io/paper/26.2/org/bukkit/event/entity/ProjectileHitEvent.html)
+
+**T04 scoped refinement (Paper 121):** use `ProjectileHitEvent` as the sole
+physical-impact candidate source. Real shooterless dragon collisions can omit the
+damage event entirely, so that event is an optional native-damage/cancellation
+guard, not an impact prerequisite. Finalization must still honor later external
+damage cancellation when it occurs and distinguish it from the adapter's own
+suppression. Zero native arrow damage/critical randomness before managed flight;
+centralize residual native managed-target damage suppression. The cow control
+supports this path; authenticated native dragon damage remains a separate gate.
+Use uniform part scaling until semantic head/body classification is verified:
+actual parent mapping is exposed, but part display names and iteration order do
+not supply a semantic part identifier. See [T04 evidence and limits](../../dev/game-tests/findings/projectile-feasibility.md).
+No production adapter is introduced by the feasibility scenario.
 
 A proposed simple damage model is:
 
