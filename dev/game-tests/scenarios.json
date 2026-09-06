@@ -1,11 +1,40 @@
 {
   "lifecycle-calibration": {
     "mechanicRevision": "harness-v1",
-    "requiredAssertions": ["server_thread", "production_enabled", "production_command_registered", "production_service_initialized", "paper_item_pdc_roundtrip", "test_chunk_entity_ticking", "native_arrow_still_valid", "native_arrow_uuid_continuous", "server_ticks_advanced", "native_arrow_moved", "owned_entities_removed", "owned_tasks_cancelled", "owned_chunk_tickets_removed"]
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "production_command_registered",
+      "production_service_initialized",
+      "paper_item_pdc_roundtrip",
+      "test_chunk_entity_ticking",
+      "native_arrow_still_valid",
+      "native_arrow_uuid_continuous",
+      "server_ticks_advanced",
+      "native_arrow_moved",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ]
   },
   "deliberate-failure": {
     "mechanicRevision": "harness-v1",
-    "requiredAssertions": ["server_thread", "production_enabled", "production_command_registered", "production_service_initialized", "paper_item_pdc_roundtrip", "test_chunk_entity_ticking", "native_arrow_still_valid", "native_arrow_uuid_continuous", "server_ticks_advanced", "native_arrow_moved", "deliberate_failure", "owned_entities_removed", "owned_tasks_cancelled", "owned_chunk_tickets_removed"]
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "production_command_registered",
+      "production_service_initialized",
+      "paper_item_pdc_roundtrip",
+      "test_chunk_entity_ticking",
+      "native_arrow_still_valid",
+      "native_arrow_uuid_continuous",
+      "server_ticks_advanced",
+      "native_arrow_moved",
+      "deliberate_failure",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ]
   },
   "foundation-contracts": {
     "mechanicRevision": "contract-fixture-v1",
@@ -42,7 +71,7 @@
     ]
   },
   "item-identity": {
-    "mechanicRevision": "item-codec-v2",
+    "mechanicRevision": "item-codec-v3",
     "requiredAssertions": [
       "server_thread",
       "production_enabled",
@@ -73,6 +102,31 @@
       "trusted_roll_roundtrip",
       "resolved_weapon_projection",
       "unknown_roll_rejected",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "all_loadouts_production_snapshots",
+      "edited_item_production_snapshot"
+    ]
+  },
+  "stats-resolution": {
+    "mechanicRevision": "stats-calibration-v1",
+    "requiredAssertions": [
+      "server_thread",
+      "production_enabled",
+      "resolver_loaded_from_production",
+      "complete_snapshot",
+      "weapon_base_once",
+      "raw_crit_above_100",
+      "ordinary_probability",
+      "crit_damage_baseline",
+      "ferocity_cap",
+      "explanation_values",
+      "deterministic_order",
+      "source_replacement",
+      "old_snapshot_immutable",
+      "invalid_result_rejected",
+      "profile_revision",
       "owned_entities_removed",
       "owned_tasks_cancelled",
       "owned_chunk_tickets_removed"

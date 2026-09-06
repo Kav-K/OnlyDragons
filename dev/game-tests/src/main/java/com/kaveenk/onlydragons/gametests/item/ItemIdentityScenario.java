@@ -8,6 +8,9 @@ import com.kaveenk.onlydragons.domain.item.ItemValidationException;
 import com.kaveenk.onlydragons.domain.stats.ModifierOperation;
 import com.kaveenk.onlydragons.domain.stats.StatKey;
 import com.kaveenk.onlydragons.domain.stats.StatModifier;
+import com.kaveenk.onlydragons.domain.stats.ModifierSources;
+import com.kaveenk.onlydragons.domain.stats.StatProfile;
+import com.kaveenk.onlydragons.domain.stats.StatSnapshotFactory;
 import com.kaveenk.onlydragons.gametests.Scenario;
 import com.kaveenk.onlydragons.gametests.ScenarioContext;
 import com.kaveenk.onlydragons.paper.item.codec.ItemReadResult;
@@ -28,20 +31,33 @@ import static com.kaveenk.onlydragons.domain.item.ItemValidationException.Code.*
 /** Real Paper items and a synthetic inventory; no authenticated actor or combat implementation. */
 public final class ItemIdentityScenario implements Scenario {
     @Override public void start(ScenarioContext context) {
-        context.mechanicRevision("item-codec-v2");
+        context.mechanicRevision("item-codec-v3");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
         context.check("production_enabled", true, context.production().isEnabled());
         context.check("codec_loaded_from_production", true,
                 WeaponItemCodec.class.getClassLoader() == context.production().getClass().getClassLoader());
         ItemRegistry registry = CalibrationLoadouts.registry();
         WeaponItemCodec codec = new WeaponItemCodec(registry);
+        var snapshots = new StatSnapshotFactory(StatProfile.calibration());
         int roundtrips = 0;
+        int calibratedSnapshots = 0;
+        var expectedFerocity = Map.of("ordinary", 0.0, "crit", 0.0, "ferocity_25", 25.0,
+                "ferocity_100", 100.0, "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0);
         for (String id : registry.definitions().keySet()) {
             ItemInstance instance = registry.create(id);
             var result = codec.decode(bytes(codec.encode(instance)));
             if (result instanceof ItemReadResult.Valid valid && valid.item().equals(registry.resolve(instance))) roundtrips++;
+            if (result instanceof ItemReadResult.Valid valid) {
+                var snapshot = snapshots.create("item-calibration-" + id, valid.item().resolvedWeapon(),
+                        ModifierSources.empty()).snapshot();
+                if (snapshot.raw(StatKey.WEAPON_DAMAGE) == 100 && snapshot.raw(StatKey.CRIT_DAMAGE) == 50
+                        && snapshot.raw(StatKey.CRIT_CHANCE) == (id.equals("crit") ? 100 : 0)
+                        && snapshot.raw(StatKey.FEROCITY) == expectedFerocity.get(id)
+                        && snapshot.effective(StatKey.FEROCITY) == expectedFerocity.get(id)) calibratedSnapshots++;
+            }
         }
         context.check("all_loadouts_roundtrip", 8, roundtrips);
+        context.check("all_loadouts_production_snapshots", 8, calibratedSnapshots);
         context.check("calibration_no_crit_bonus", true, registry.definitions().keySet().stream()
                 .map(id -> registry.resolve(registry.create(id)).resolvedWeapon())
                 .allMatch(weapon -> weapon.statModifiers().stream().noneMatch(modifier -> modifier.key() == StatKey.CRIT_DAMAGE)));
@@ -118,6 +134,10 @@ public final class ItemIdentityScenario implements Scenario {
         var restored = (ItemReadResult.Valid) rollCodec.decode(bytes(rollCodec.encode(rolled)));
         context.check("trusted_roll_roundtrip", true, restored.item().instance().equals(rolled) && restored.item().statModifiers().contains(modifier));
         var projected = restored.item().resolvedWeapon();
+        var editedSnapshot = snapshots.create("edited-item-calibration", projected, ModifierSources.empty()).snapshot();
+        context.check("edited_item_production_snapshot", true, editedSnapshot.raw(StatKey.WEAPON_DAMAGE) == 100
+                && editedSnapshot.raw(StatKey.CRIT_DAMAGE) == 50 && editedSnapshot.raw(StatKey.CRIT_CHANCE) == 5
+                && editedSnapshot.raw(StatKey.FEROCITY) == 3);
         var expectedModifiers = new java.util.ArrayList<>(base.definition().weapon().statModifiers());
         expectedModifiers.add(modifier);
         expectedModifiers.add(new StatModifier("enchant:vicious", StatKey.FEROCITY, ModifierOperation.FLAT, 3, 0));

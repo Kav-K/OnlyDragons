@@ -100,6 +100,73 @@ Each modifier has a stable source ID, so refreshing equipment replaces its contr
 
 Use `double` internally, reject non-finite results, define tolerances in tests, and round only for display. Keep full precision in the ledger. UUID-keyed player session state is released on quit; item properties persist with the item. Session-only development overrides must be clearly identified and must not become permanent progression accidentally.
 
+### T01a calibration and resolver contract
+
+Adopted within GH-3 scope: `StatProfile.calibration()` loads the strict bundled
+`stats/calibration-v1.properties` profile (`stats-calibration-v1`). These are
+configurable calibration choices, not user-confirmed balance rules:
+
+| Stat | Default | Inclusive raw range | Effective upper cap |
+| --- | ---: | ---: | ---: |
+| Weapon damage | 0; weapon definition replaces base | 0–1,000,000,000 | 1,000,000,000 |
+| Crit chance | 0 | 0–1,000,000 | 1,000,000 |
+| Crit damage | 50 | 0–1,000,000 | 1,000,000 |
+| Ferocity | 0 | 0–1,000,000 | 500 |
+| Attack speed | 0 | 0–1,000,000 | 1,000,000 |
+| Max health | 20 | 0–1,000,000,000 | 1,000,000,000 |
+| Defense | 0 | 0–1,000,000,000 | 1,000,000,000 |
+
+Zero offensive defaults isolate explicit sources. Crit damage 50 supports the
+existing 1.5× calibration fixture; health 20 is a small test baseline, without
+player-health integration. Ferocity 500 follows the researched cap. Other high
+finite bounds are input guardrails with room for boss health and future tuning;
+attack speed has no invented 100-point cap. Ordinary probability remains
+`min(1, effectiveCritChance / 100)`, while raw crit chance is retained. No Strength
+or Overload formula is introduced.
+
+`StatResolver(profile).resolve(revision, baseOverrides, sources)` returns an
+`ExplainedStatSnapshot`, wrapping the complete stable T00 `StatSnapshot`, profile
+revision, and immutable per-stat base and arithmetic steps. Bases and final raw
+values must satisfy the profile range. Flat amounts are summed before adding to
+the base; percentage points are summed before multiplying by `1 + sum / 100`.
+Every arithmetic operation must remain finite; overflow fails even if a later
+zero multiplier or cap would hide it. Negative post-flat values and negative
+additive factors fail; no silent floor or sign reversal is allowed. Negative flat
+and percentage contributions are permitted when these resulting layers stay
+nonnegative. Effective caps are applied last and never rewrite raw values.
+
+All layers follow T00 `StatModifier.EXPLANATION_ORDER`: within stat/operation,
+ascending numeric order, then case-sensitive source ID, then amount. This also
+fixes floating-point summation and multiplier ties independently of input order;
+identical repeated modifiers remain repeated contributions. Explanations record
+the aggregate flat/percentage operands, each ordered factor, cap and results,
+with each step's source modifiers copied.
+
+`ModifierSources.empty().replace(sourceId, contributions)` returns a new value,
+replacing that source's entire collection; empty means removal. Every contribution
+must match the supplied source ID. `StatSnapshotFactory(profile).create(revision,
+weapon, additionalSources)` supplies `WeaponDefinition.baseDamage` as the weapon
+base exactly once and applies its modifiers afterward. Additional source IDs must
+be disjoint from weapon source IDs or creation fails. T01b owns equipment source
+naming, refresh, and snapshot revision allocation; callers must distinguish
+revisions when inputs change. Profile candidates validate all seven definitions,
+caps, identity/version and supported policies before returning; unknown, duplicate,
+missing or invalid properties fail. Existing resolvers/snapshots retain their old
+immutable profile. Runtime adoption/reload belongs to later integration.
+
+The lead's GH-3/GH-4 integration audit fixes ordinary calibration crit damage
+at 50 total: bows must not add a redundant flat 50. T02's requested
+`ResolvedItem.resolvedWeapon()` projection carries the validated base damage,
+complete definition/enchant/roll modifier list and enchantments. T01b passes that
+projection once to `StatSnapshotFactory`, with only external sources separately.
+The factory regression fixture resolves a bare 100-damage bow to damage 100,
+crit damage 50, crit chance 0 and ferocity 0. A projected fixture adding crit
+chance 100, ferocity 25 and rolled damage 2.5 resolves to 102.5 / 50 / 100 / 25,
+with ordinary probability 1 and exactly three contributions. Those roll/enchant
+amounts are boundary fixtures, not a claim about unpublished T02 loadout values.
+T02's projection implementation and complete preset totals must still be checked
+after its integration; its branch was not yet published during this audit.
+
 ### Initial test loadouts
 
 Provide deterministic calibration presets: normal damage with 0 ferocity; guaranteed crit; 25 ferocity; 100 ferocity; capped ferocity; a Tracer bow; a Duplex bow; and a Fatal Tempo bow with a nonzero base ferocity source. Each preset should state the stats it supplies. These are development gear grants, not the final acquisition loop.
