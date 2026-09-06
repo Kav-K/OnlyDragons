@@ -382,7 +382,38 @@ def test_settings(base, run_id, port, with_player=False):
     return settings
 
 
-def validate_player_report(path, run_id, issued_ms, timeout, pins):
+def validate_player_messages(report, descriptor):
+    """Replay bounded received text and catalog matchers, not sent command intent."""
+    require(isinstance(report, dict) and isinstance(descriptor, dict), 'Malformed player message evidence/catalog')
+    messages = report.get('messages')
+    require(isinstance(messages, list) and len(messages) <= 128
+            and all(isinstance(message, str) and 0 < len(message) <= 2048
+                    and not message.startswith('OD_PLAYER:') for message in messages),
+            'Missing/malformed bounded player messages')
+    expected = descriptor.get('requiredPlayerMessages', [])
+    require(isinstance(expected, list) and len(expected) <= 32, 'Malformed required player messages')
+    seen = set()
+    for requirement in expected:
+        require(isinstance(requirement, dict) and set(requirement) in ({'id', 'exact'}, {'id', 'containsAll'}),
+                'Malformed player message matcher')
+        identity = requirement['id']
+        require(isinstance(identity, str) and re.fullmatch(r'[a-z][a-z0-9-]{0,63}', identity)
+                and identity not in seen, 'Missing/duplicate player message matcher identity')
+        seen.add(identity)
+        if 'exact' in requirement:
+            value = requirement['exact']
+            require(isinstance(value, str) and 0 < len(value) <= 2048, 'Malformed exact player message')
+            matched = value in messages
+        else:
+            fragments = requirement['containsAll']
+            require(isinstance(fragments, list) and 0 < len(fragments) <= 8
+                    and all(isinstance(value, str) and 0 < len(value) <= 256 for value in fragments),
+                    'Malformed player message fragments')
+            matched = any(all(fragment in message for fragment in fragments) for message in messages)
+        require(matched, 'Missing/incorrect required player message: ' + identity)
+
+
+def validate_player_report(path, run_id, issued_ms, timeout, pins, descriptor=None):
     report = strict_json(path)
     require(isinstance(report, dict), 'Player report must be an object')
     pinned = player_pins(pins)
@@ -400,6 +431,7 @@ def validate_player_report(path, run_id, issued_ms, timeout, pins):
             'Stale/future player report')
     require(type(report.get('teleportsAcknowledged')) is int and report['teleportsAcknowledged'] > 0,
             'Player did not acknowledge teleportation')
+    validate_player_messages(report, descriptor if descriptor is not None else {})
     return report
 
 
@@ -576,7 +608,7 @@ def execute(args):
                                                       server.process, client.process if client else None)
                 if client:
                     require(client.process.wait(timeout=5) == 0, 'Protocol player exited unsuccessfully')
-                    outcome['player'] = validate_player_report(report_root / 'player.json', run_id, issued_ms, args.scenario_timeout, pins)
+                    outcome['player'] = validate_player_report(report_root / 'player.json', run_id, issued_ms, args.scenario_timeout, pins, plans[args.scenario])
             finally:
                 if server is not None:
                     # Ignore a repeated termination while saving this runner's own disposable world.

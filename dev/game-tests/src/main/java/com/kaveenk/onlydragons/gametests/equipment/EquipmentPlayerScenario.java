@@ -34,7 +34,7 @@ import org.bukkit.inventory.ItemStack;
 /** Real protocol player and production listeners; commands/edits/death use explicit public API fixtures. */
 public final class EquipmentPlayerScenario implements Scenario {
     @Override public void start(ScenarioContext context) {
-        context.mechanicRevision("equipment-player-v1");
+        context.mechanicRevision("equipment-player-v2");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
         context.check("production_enabled", true, context.production().isEnabled());
         context.check("disposable_protocol_mode", "protocol-calibration", System.getProperty("onlydragons.test.playerMode", ""));

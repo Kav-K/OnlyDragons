@@ -17,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.flattener.ComponentFlattener;
 import org.cloudburstmc.math.vector.Vector3i;
 import org.geysermc.mcprotocollib.network.ClientSession;
 import org.geysermc.mcprotocollib.network.Session;
@@ -51,6 +51,9 @@ public final class ProtocolPlayer extends SessionAdapter {
     private final String runId;
     private final String behavior;
     private final List<String> actions = new ArrayList<>();
+    private final List<String> messages = new ArrayList<>();
+    static final int MAX_MESSAGES = 128;
+    static final int MAX_MESSAGE_LENGTH = 2048;
     private final CountDownLatch disconnected = new CountDownLatch(1);
     private boolean login;
     private boolean loaded;
@@ -88,14 +91,40 @@ public final class ProtocolPlayer extends SessionAdapter {
             if (!loaded) { loaded = true; session.send(ServerboundPlayerLoadedPacket.INSTANCE); }
         } else if (packet instanceof ClientboundChunkBatchFinishedPacket) {
             session.send(new ServerboundChunkBatchReceivedPacket(10.0f));
-        } else if (packet instanceof ClientboundSystemChatPacket chat
-                && chat.getContent() instanceof TextComponent text) {
-            String prefix = "OD_PLAYER:" + runId + ":";
-            if (text.content().startsWith(prefix) && !behavior.equals("idle")) {
-                act(session, text.content().substring(prefix.length()));
+        } else if (packet instanceof ClientboundSystemChatPacket chat) {
+            try {
+                String action = captureChat(chat.getContent(), chat.isOverlay());
+                if (action != null && !behavior.equals("idle")) act(session, action);
+            } catch (IllegalStateException invalid) {
+                error = invalid.getMessage();
+                session.disconnect(Component.text(error));
             }
         }
     }
+
+    // Record received ordinary text, never control markers or action-bar overlays.
+    // Bounded flattening fails closed instead of truncating possible evidence.
+    synchronized String captureChat(Component component, boolean overlay) {
+        if (overlay) return null;
+        var text = new StringBuilder();
+        ComponentFlattener.basic().flatten(component, part -> {
+            if (text.length() + part.length() > MAX_MESSAGE_LENGTH) {
+                throw new IllegalStateException("Player message exceeded capture bound");
+            }
+            text.append(part);
+        });
+        String value = text.toString();
+        String prefix = "OD_PLAYER:" + runId + ":";
+        if (value.startsWith("OD_PLAYER:")) {
+            return value.startsWith(prefix) ? value.substring(prefix.length()) : null;
+        }
+        if (value.isEmpty()) return null;
+        if (messages.size() >= MAX_MESSAGES) throw new IllegalStateException("Player message count exceeded capture bound");
+        messages.add(value);
+        return null;
+    }
+
+    synchronized List<String> capturedMessages() { return List.copyOf(messages); }
 
     private void act(Session session, String action) {
         List<String> expected = List.of("select", "draw", "release", "quit");
@@ -135,6 +164,7 @@ public final class ProtocolPlayer extends SessionAdapter {
         report.put("playerLoadedSent", loaded);
         report.put("teleportsAcknowledged", teleports);
         report.put("actions", List.copyOf(actions));
+        report.put("messages", capturedMessages());
         report.put("disconnected", disconnected.getCount() == 0);
         report.put("passed", error == null && login && loaded && teleports > 0 && requestedQuit
                 && disconnected.getCount() == 0 && actions.equals(List.of("select", "draw", "release", "quit")));
