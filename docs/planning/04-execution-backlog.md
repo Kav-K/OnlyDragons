@@ -4,11 +4,12 @@ The three original planning documents remain required shared context. This file
 tracks execution order; `backlog.json` contains each bounded task specification
 and `github-issues.json` maps task IDs to repository issues.
 
-The [6 September encounter expansion proposal](05-encounter-expansion.md) scopes
-the user's next request without dispatching unapproved roster, reward or altar
-policies. It identifies child work packages for the existing T08/T10/T11/T12
-parents. Their final task/issue/acceptance bindings must be reviewed before
-dispatch; the current dependency and milestone gates remain in force.
+The [6 September encounter scope](05-encounter-expansion.md) records confirmed
+product direction and remaining limits. T02b and T08a/T08b/T08c register bounded
+definition, managed-dragon, ranking and simulation components below. Registration
+alone does not dispatch them. Their automated requirements remain deferred until
+implemented and evidenced; all prior dependency/milestone gates remain in force.
+Real reward delivery is disabled throughout this testing scope.
 
 The user authorized parallel implementation, real Minecraft integration tests
 in isolated agent environments, and integration-lead merges of reviewed/tested
@@ -25,6 +26,7 @@ part of the worker's scope.
 | T09a | [#2](https://github.com/Kav-K/OnlyDragons/issues/2) | Complete: PR #16 merged at 140f11c | Isolated runner; positive and deliberate-failure controls, independent review, and CI passed. |
 | T01a | [#3](https://github.com/Kav-K/OnlyDragons/issues/3) | Complete: PR #23 merged at 1efa7d0 | Base stat resolver and immutable explanations; 30 production tests, 18 Paper assertions, independent review and final-head CI passed. |
 | T02 | [#4](https://github.com/Kav-K/OnlyDragons/issues/4) | Complete: PR #24 merged at 7c6d843 | Item definitions, codec/PDC and enchant validation; 54 production tests, 35 Paper assertions, independent review and final-head CI passed. |
+| T02b | [#38](https://github.com/Kav-K/OnlyDragons/issues/38) | T00, T02, T03, T09a; planned, not dispatched | One versioned test dragon and inert sample table bindings; no spawn/combat clone or real reward path. |
 | T04 | [#5](https://github.com/Kav-K/OnlyDragons/issues/5) | Resumed after T09b merged at 5b0e030; partial PR #22 integrated at 586a170 | Shooterless arrow/dragon findings are partial. Full acceptance still requires player-owned native suppression and semantic head/native-damage evidence; #9 stays blocked. |
 | T09b | [#20](https://github.com/Kav-K/OnlyDragons/issues/20) | Complete: PR #27 merged at 5b0e030 | Final 1dd6ffe positive/early-exit/timeout calibration verified with dual reports and client/server cleanup; independent review and final-head CI passed. [Evidence](../../dev/agent-paper-tests.md#protocol-player-evidence). This does not accept the feature-specific T04 gates. |
 | T03 | [#6](https://github.com/Kav-K/OnlyDragons/issues/6) | Complete: PR #26 merged at 9092fbe | Clean 633d81c passed 74 production tests, 36 runner tests and 31 combat-accounting Paper assertions with clean shutdown; independent review and final-head CI passed. [Evidence](03-agent-tasks-and-validation.md#t03-combat-validation). |
@@ -34,7 +36,10 @@ part of the worker's scope.
 | T06 | [#9](https://github.com/Kav-K/OnlyDragons/issues/9) | T01b, T02, fully accepted T04; blocked | Bow/shortbow/Duplex capture and owned projectiles. Merging partial PR #22 or passing T09b alone does not release this gate. |
 | T07 | [#10](https://github.com/Kav-K/OnlyDragons/issues/10) | T04, T06 | Tracer steering and arrow continuity. |
 | T08 | [#11](https://github.com/Kav-K/OnlyDragons/issues/11) | T01b, T03, T05, T06 | Playable dummy combat and explanations. |
-| T10 | [#12](https://github.com/Kav-K/OnlyDragons/issues/12) | T04, T05, T06, T07, T08 | Integrated real-dragon prefire and load evidence. |
+| T08a | [#39](https://github.com/Kav-K/OnlyDragons/issues/39) | T08, T02b; planned, not dispatched | Shared real-dragon backend and development controls using T06 claims/T08 combat; published for T10. |
+| T08b | [#40](https://github.com/Kav-K/OnlyDragons/issues/40) | T08a; planned, not dispatched | Frozen credited-damage ranking including ghost/overkill, unique placement and actual multi-identity presentation. |
+| T08c | [#41](https://github.com/Kav-K/OnlyDragons/issues/41) | T02b, T08b; planned, not dispatched | Personal rank-based simulation with hard item locks; arbitrary labeled sample policies and no real grants. |
+| T10 | [#12](https://github.com/Kav-K/OnlyDragons/issues/12) | T04, T05, T06, T07, T08, T08a | Integrated real-dragon prefire and load evidence through the shared backend. |
 | T11 | [#13](https://github.com/Kav-K/OnlyDragons/issues/13) | T10 plus accepted human M3 evidence | Later eight-eye encounter. |
 | T12 | [#14](https://github.com/Kav-K/OnlyDragons/issues/14) | T11 plus agreed roster/reward/acquisition scope | Later bounded content/progression planning. |
 

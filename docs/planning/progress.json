@@ -204,6 +204,30 @@
           "revision": "e72fb2a"
         }
       }
+    },
+    "T02b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T08a": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T08b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
+    },
+    "T08c": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Additive registration only; no dispatch, implementation, accepted fixture or milestone completion. Await integrated prerequisites and lead dispatch."
     }
   },
   "milestones": {

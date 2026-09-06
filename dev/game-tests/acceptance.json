@@ -688,6 +688,36 @@
       "availability": "external",
       "description": "User decision for the bounded variant roster, rewards and acquisition scope.",
       "fixtures": []
+    },
+    "dragon-definition-catalog": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "One production test-dragon/versioned definition registry: atomic validation, stable retained revisions and explicit type isolation on real Paper. Additional type fixtures are calibration-only.",
+      "fixtures": []
+    },
+    "sample-loot-table-bindings": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Inert versioned sample table/item references validate without reward calculation, grant enabling or inventory mutation; no real product drop values approved.",
+      "fixtures": []
+    },
+    "managed-dragon-development": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Shared T08 lifecycle plus T06 physical claims on a real managed test dragon: supported phase/native damage boundary, one completion, permission-gated controls, reset/failure cleanup and no real rewards.",
+      "fixtures": []
+    },
+    "frozen-damage-ranking": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Post-kill unique ranking by frozen credited damage including reduced/zero-HP procs and lethal overkill, excluding post-death impacts. Compare total descending, then receiver commit tick of last strict represented-total increase and encounter-global monotonic committed accepted-impact ordinal. Zero-only existing combat participants instead use immutable first-successful-participation tick/ordinal after positive totals; repeated zeros cannot move it and zero-to-positive selects the credit stamp without choosing loot eligibility. Require complete production provenance, no backdated-input influence, unchanged-total and transitivity controls plus actual multi-identity Paper presentation.",
+      "fixtures": []
+    },
+    "personal-loot-preview": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Deterministic personal rank-based simulations with hard item exclusion, visible calibration provenance and actual no-grant side effects. Real rewards always disabled; cannot be enabled by configuration or command.",
+      "fixtures": []
     }
   },
   "tasks": {
@@ -764,6 +794,19 @@
     ],
     "MAINT-18": [
       "bridge-unit-checks"
+    ],
+    "T02b": [
+      "dragon-definition-catalog",
+      "sample-loot-table-bindings"
+    ],
+    "T08a": [
+      "managed-dragon-development"
+    ],
+    "T08b": [
+      "frozen-damage-ranking"
+    ],
+    "T08c": [
+      "personal-loot-preview"
     ]
   },
   "paperCases": {
