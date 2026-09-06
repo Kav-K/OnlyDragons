@@ -23,8 +23,13 @@ public final class DragonCommand {
                     say(sender, "Dragon arena saved. " + dragons.status());
                 }
                 case "spawn" -> {
-                    if (args.length != 3) { usage(sender); return; }
-                    dragons.spawn(); say(sender, "Dragon spawned. " + dragons.status());
+                    if (args.length < 3 || args.length > 4) { usage(sender); return; }
+                    DragonFlight.Mode mode = args.length == 3 ? DragonFlight.Mode.ORBIT : switch (args[3].toLowerCase(Locale.ROOT)) {
+                        case "stationary" -> DragonFlight.Mode.STATIONARY;
+                        case "orbit" -> DragonFlight.Mode.ORBIT;
+                        default -> throw new IllegalArgumentException("Motion must be orbit or stationary.");
+                    };
+                    dragons.spawn(mode); say(sender, "Dragon spawned. " + dragons.status());
                 }
                 case "status" -> { if (args.length > 3) { usage(sender); return; } say(sender, dragons.status()); }
                 case "reset" -> {
@@ -47,10 +52,11 @@ public final class DragonCommand {
         if (args.length == 2) return List.of("dragon");
         if (!handles(args)) return List.of();
         if (args.length == 3) return List.of("setup", "spawn", "status", "reset", "result");
+        if (args.length == 4 && args[2].equalsIgnoreCase("spawn")) return List.of("orbit", "stationary");
         if (args.length == 4 && (args[2].equalsIgnoreCase("reset") || args[2].equalsIgnoreCase("result")))
             return dragons.generation().map(id -> List.of(id.toString())).orElse(List.of());
         return List.of();
     }
-    private static void usage(CommandSender sender) { say(sender, "Usage: /onlydragons dev dragon setup <world-key> <x> <y> <z> <radius 16-48> <test_dragon> | spawn | status | reset [generation] | result [generation]"); }
+    private static void usage(CommandSender sender) { say(sender, "Usage: /onlydragons dev dragon setup <world-key> <x> <y> <z> <radius 16-48> <test_dragon> | spawn [orbit|stationary] | status | reset [generation] | result [generation]"); }
     private static void say(CommandSender sender, String text) { sender.sendMessage(Component.text(text)); }
 }

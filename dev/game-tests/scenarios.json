@@ -1444,7 +1444,8 @@
       "level_2_real_target_moved",
       "level_3_real_target_moved",
       "level_4_real_target_moved",
-      "level_5_real_target_moved"
+      "level_5_real_target_moved",
+      "v1_trace_profile_preserved"
     ]
   },
   "tracer-cleanup-abort": {
@@ -1499,9 +1500,10 @@
           "duplicate_preserves_generation",
           "active_at_first_shutdown",
           "failed_read_keeps_loaded_arena",
-          "failed_read_fixture_restores_saved_bytes"
+          "failed_read_fixture_restores_saved_bytes",
+          "moving_at_first_shutdown"
         ],
-        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-1-v1.json",
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-motion-1-v1.json",
         "requiredActorMessages": [
           {
             "id": "message-0",
@@ -1572,7 +1574,7 @@
           "restart_new_spawn_reset_cleanup",
           "repeat_reset_no_result"
         ],
-        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-motion-2-v1.json",
         "requiredActorMessages": [
           {
             "id": "message-0",
@@ -2118,6 +2120,87 @@
         "containsAll": [
           "Your placement: #2 - 100.00 credited damage"
         ]
+      }
+    ]
+  },
+  "dragon-motion-experiment": {
+    "mechanicRevision": "dragon-motion-experiment-v1",
+    "requiredAssertions": [
+      "public_moves_succeeded",
+      "parent_step_bounded",
+      "real_parts_follow",
+      "admitted_hover_retained",
+      "actual_parts_within_small_arena",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ]
+  },
+  "dragon-flight": {
+    "mechanicRevision": "dragon-flight-v1",
+    "requiredAssertions": [
+      "radius_16_sustained_geometry",
+      "radius_16_step_yaw_phase",
+      "radius_16_reset_cleanup",
+      "radius_24_sustained_geometry",
+      "radius_24_step_yaw_phase",
+      "radius_24_reset_cleanup",
+      "radius_48_sustained_geometry",
+      "radius_48_step_yaw_phase",
+      "radius_48_reset_cleanup",
+      "stationary_calibration_no_drift",
+      "cancelled_motion_retires_without_drift",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "redirected_yaw_retires",
+      "lost_ai_retires"
+    ]
+  },
+  "moving-tracer": {
+    "mechanicRevision": "moving-tracer-v2",
+    "requiredAssertions": [
+      "returning_volley_real_collisions",
+      "moving_volley_exact_health_credit",
+      "dragon_moved_during_volley",
+      "upward_arrow_curves_down_same_uuid",
+      "v2_turn_speed_and_grace",
+      "duplex_captured_v2_origin",
+      "moving_owned_native_suppression",
+      "v2_trace_profile",
+      "unenchanted_miss_honest",
+      "blocked_arrow_real_block_collision",
+      "out_of_range_exit_honest",
+      "targetless_v2_initial_ballistic",
+      "original_prefire_arrow_acquires_and_collides",
+      "parent_projectile_tickets_released",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "moving_native_positive_control",
+      "moving_lethal_freezes_exact_result",
+      "animation_retains_parent_tickets_motion_stopped",
+      "native_death_releases_all_tickets_no_rewards",
+      "native_velocity_curves_to_current_part",
+      "real_collision_during_ballistic_grace"
+    ],
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/moving-tracer-v2.json",
+    "requiredEntityMotion": [
+      {
+        "id": "moving-dragon-received",
+        "actor": "alpha",
+        "session": "first",
+        "targetRef": "moving-dragon",
+        "minPackets": 30,
+        "minPath": 5,
+        "maxStep": 1
       }
     ]
   }

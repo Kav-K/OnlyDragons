@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "planId": "dragon-restart-2-v1",
+  "planId": "dragon-restart-motion-2-v1",
   "targets": [],
   "actors": [
     {
@@ -20,7 +20,7 @@
               "id": "spawn",
               "action": "command",
               "args": {
-                "command": "onlydragons dev dragon spawn stationary"
+                "command": "onlydragons dev dragon spawn orbit"
               }
             },
             {

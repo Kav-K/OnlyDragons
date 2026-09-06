@@ -556,6 +556,20 @@ checkpoint and current CI passed; [accepted evidence](evidence/t08b-suite.md).
 No prior fixture/gate is removed. The first human checkpoint is next; T08c remains
 planned and undispatched until that checkpoint and lead assignment.
 
+### T08e — Bounded flight and returning Tracer (GH-65)
+
+**In progress** on `symphony/gh-65`, integrated main `7a38040`. The candidate backend
+route/immutable motion view and separate trusted returning profile are implemented;
+old calibration definitions and stationary fixture mode are retained. Initial
+production build passed236 tests; later route build and actual non-origin
+radii16/24/48 geometry/reset/cancellation checks passed as dirty iteration evidence.
+[Exact artifacts, measured values, failed iterations and remaining gates](evidence/t08e-motion-tracer.md).
+Both acceptance requirements remain pending: native-positive/owned moving collision,
+returning/pre-spawn controls, received entity motion, lifecycle and complete clean
+source-bound suite/checkpoint still need final proof. Human smoothness/feel and
+authenticated-client compatibility remain separate. T08d consumes only read-only
+views; T06b/T10 consume this backend/profile after lead integration.
+
 ### T08c — Personal placement-based loot simulation
 
 **Owner:** pure loot-preview/inspection agent, [#41](https://github.com/Kav-K/OnlyDragons/issues/41). **Dependencies:** T02b, T08b.

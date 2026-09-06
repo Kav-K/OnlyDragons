@@ -168,6 +168,22 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
+    },
+    "dragon-motion-experiment": {
+      "scenarioId": "dragon-motion-experiment",
+      "expectation": "positive",
+      "scenarioTimeout": 90
+    },
+    "dragon-flight": {
+      "scenarioId": "dragon-flight",
+      "expectation": "positive",
+      "scenarioTimeout": 150
+    },
+    "moving-tracer": {
+      "scenarioId": "moving-tracer",
+      "expectation": "positive",
+      "scenarioTimeout": 180,
+      "testPlayer": "protocol-actions-v1"
     }
   },
   "suites": {
@@ -195,7 +211,10 @@
       "dragon-restart-fresh",
       "dragon-restart-legacy",
       "dragon-restart-animation",
-      "dragon-ranking"
+      "dragon-ranking",
+      "dragon-motion-experiment",
+      "dragon-flight",
+      "moving-tracer"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -241,7 +260,10 @@
       "dragon-restart-fresh",
       "dragon-restart-legacy",
       "dragon-restart-animation",
-      "dragon-ranking"
+      "dragon-ranking",
+      "dragon-motion-experiment",
+      "dragon-flight",
+      "moving-tracer"
     ]
   },
   "areas": {
@@ -303,7 +325,10 @@
         "dragon-restart-fresh",
         "dragon-restart-legacy",
         "dragon-restart-animation",
-        "dragon-ranking"
+        "dragon-ranking",
+        "dragon-motion-experiment",
+        "dragon-flight",
+        "moving-tracer"
       ],
       "affects": [
         "stats",
@@ -502,7 +527,10 @@
         "dragon-restart-fresh",
         "dragon-restart-legacy",
         "dragon-restart-animation",
-        "dragon-ranking"
+        "dragon-ranking",
+        "dragon-motion-experiment",
+        "dragon-flight",
+        "moving-tracer"
       ],
       "affects": []
     },
@@ -578,7 +606,8 @@
       ],
       "cases": [
         "tracer-continuity",
-        "tracer-cleanup-abort"
+        "tracer-cleanup-abort",
+        "moving-tracer"
       ],
       "affects": []
     },
@@ -589,13 +618,19 @@
         "src/test/java/com/kaveenk/onlydragons/paper/encounter/**",
         "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/encounter/**",
         "dev/game-tests/player-plans/dragon-*.json",
-        "dev/game-tests/config-seeds/*"
+        "dev/game-tests/config-seeds/*",
+        "src/main/java/com/kaveenk/onlydragons/domain/encounter/motion/**",
+        "src/test/java/com/kaveenk/onlydragons/domain/encounter/motion/**",
+        "dev/game-tests/player-plans/moving-tracer-v2.json"
       ],
       "cases": [
         "dragon-combat",
         "dragon-restart-fresh",
         "dragon-restart-legacy",
-        "dragon-restart-animation"
+        "dragon-restart-animation",
+        "dragon-motion-experiment",
+        "dragon-flight",
+        "moving-tracer"
       ],
       "affects": []
     },

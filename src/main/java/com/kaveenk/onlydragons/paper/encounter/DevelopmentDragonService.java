@@ -64,11 +64,14 @@ public final class DevelopmentDragonService implements AutoCloseable {
         check(); if (active()) throw new IllegalArgumentException("Reset the active dragon generation before setup.");
         arena.save(candidate);
     }
-    public UUID spawn() {
+    /** Explicit legacy stationary calibration for deterministic API consumers. */
+    public UUID spawn() { return spawn(DragonFlight.Mode.STATIONARY); }
+    public Optional<DragonFlight.View> motion() { thread(); return Optional.ofNullable(backend).map(DragonBackend::motion); }
+    public UUID spawn(DragonFlight.Mode mode) {
         check(); if (active()) throw new IllegalArgumentException("Dragon already active; reset its generation first.");
         var config = arena.current().orElseThrow(() -> new IllegalArgumentException(arena.problem()));
         var selected = config.validate(definitions.snapshot());
-        DragonBackend candidate = new DragonBackend(config.location(), tickets, this::completed, value -> { if (backend == value) retirePresentation(); });
+        DragonBackend candidate = new DragonBackend(config.location(), config.bounds(), mode, tickets, this::completed, value -> { if (backend == value) retirePresentation(); });
         try {
             UUID id = combat.open(owner, candidate, config.bounds(), selected.maxHealth(), selected.defense(),
                     selected.identity().id(), selected.combatProfile(), Optional.of(selected), Math::random);
@@ -101,6 +104,7 @@ public final class DevelopmentDragonService implements AutoCloseable {
         double credit = v.contributions().values().stream().mapToDouble(c -> c.contributionDamage()).sum();
         return config + " | generation=" + generation + " native=" + v.entityId() + " state=" + v.state()
                 + " nativePresent=" + !backend.released() + " nativeHP=" + backend.entity().getHealth()
+                + " motion=" + backend.motion()
                 + " animation=" + backend.entity().getDeathAnimationTicks() + " nativeOutcome=" + backend.outcome()
                 + " | definition=" + selection.identity() + " catalog=" + selection.catalogIdentity()
                 + " combat=" + selection.combatProfile().mechanic() + " phase=" + selection.phaseProfile().mechanic()

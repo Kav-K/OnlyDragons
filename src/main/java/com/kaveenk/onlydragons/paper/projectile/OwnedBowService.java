@@ -307,7 +307,7 @@ public final class OwnedBowService implements AutoCloseable {
                 String current = aim.map(a -> a.part().targetId() + ":" + a.part().partId()).orElse("");
                 if (!previous.equals(current)) {
                     if (!previous.isEmpty()) record("tracer-released", owned, previous);
-                    if (!current.isEmpty()) record("tracer-acquired", owned, TracerRules.REVISION + " target:part=" + current + " distance=" + aim.orElseThrow().distance());
+                    if (!current.isEmpty()) record("tracer-acquired", owned, owned.tracerProfile().revision() + " target:part=" + current + " distance=" + aim.orElseThrow().distance());
                 }
             }
         }
@@ -356,7 +356,8 @@ public final class OwnedBowService implements AutoCloseable {
                 player.getUniqueId(), item.instance().identity(), inspection.stats().snapshot(), item.enchantments(),
                 group.arena.mechanic(), now(), vector(arrow.getLocation().toVector()), vector(arrow.getVelocity()),
                 new CritResolver().roll(inspection.stats().snapshot(), random), force, 1);
-        return new OwnedProjectile(shot, group.session);
+        return new OwnedProjectile(shot, group.session,
+                com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile.forDefinition(item.definition().weapon()), shot.launchTick());
     }
     private void own(Arrow arrow, OwnedProjectile owned, Group group) {
         suppress(arrow); arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED); arrow.setPersistent(false);
@@ -382,7 +383,7 @@ public final class OwnedBowService implements AutoCloseable {
                 Arrow child = group.arena.world().spawn(location, Arrow.class, created -> {
                     created.setShooter(Bukkit.getPlayer(group.owner));
                     created.setVelocity(new Vector(shot.initialVelocity().x(), shot.initialVelocity().y(), shot.initialVelocity().z()));
-                    own(created, new OwnedProjectile(FiringRules.child(shot, created.getUniqueId(), now(), group.duplex), group.session), group);
+                    own(created, group.primary.child(FiringRules.child(shot, created.getUniqueId(), now(), group.duplex)), group);
                 });
                 if (!child.isValid()) { fail(group); return; }
             } catch (RuntimeException failure) { fail(group); throw failure; }

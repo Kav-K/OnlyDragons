@@ -1,6 +1,8 @@
 """Strict, bounded contracts for real protocol-player action fixtures."""
 from __future__ import annotations
 
+import entity_motion
+
 import hashlib
 import json
 import math
@@ -324,12 +326,13 @@ def validate_report(report, plan, plan_sha256, run_id, pins, start, end):
         previous_finish = begin
         reconnect_delay = 0
         for expected_session, session in zip(expected_actor['sessions'], sessions):
-            _object(session, 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
+            _object({k: v for k, v in session.items() if k != 'entityMotion'} if isinstance(session, dict) else session, 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
                     'playerLoadedSent', 'teleportsAcknowledged', 'steps', 'messages', 'bindings', 'inventorySnapshots',
                     'inventoryConfirmations',
                     'disconnected', 'passed', 'error')
             require(session['id'] == expected_session['id'], 'Wrong or reordered actor session')
             session_start, session_end = _times(session, previous_finish + reconnect_delay, finish)
+            entity_motion.validate(session.get('entityMotion', []), session_start, session_end)
             require(session['loginReceived'] is True and session['playerLoadedSent'] is True
                     and session['disconnected'] is True and session['passed'] is True
                     and session['error'] == '', 'Incomplete/failed actor session or disconnect')
@@ -546,7 +549,7 @@ def validate_abort_report(report, plan, plan_sha256, run_id, pins, start, end):
                 and actor['uuid'] == identity['uuid'], 'Wrong cleanup-abort actor identity')
         session = _array(actor['sessions'], 1, 1)[0]
         expected_session = expected_actor['sessions'][0]
-        _object(session, 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
+        _object({k: v for k, v in session.items() if k != 'entityMotion'} if isinstance(session, dict) else session, 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
                 'playerLoadedSent', 'teleportsAcknowledged', 'steps', 'messages', 'bindings', 'inventorySnapshots',
                 'inventoryConfirmations',
                 'disconnected', 'passed', 'error')
@@ -555,6 +558,7 @@ def validate_abort_report(report, plan, plan_sha256, run_id, pins, start, end):
                 and session['passed'] is False and session['error'] == ABORT_ERROR,
                 'Cleanup-abort actor did not join and disconnect through named orderly cleanup')
         session_start, session_end = _times(session, begin, finish)
+        entity_motion.validate(session.get('entityMotion', []), session_start, session_end)
         _integer(session['teleportsAcknowledged'], 1, 4096)
         snapshots = _inventory_snapshots(session['inventorySnapshots'], session_start, session_end)
         _inventory_confirmations(session['inventoryConfirmations'], snapshots, session_start, session_end)
@@ -594,6 +598,7 @@ def validate_messages(player_report, descriptor):
             require(key not in messages_by_session, 'Duplicate message session identity')
             _messages(session.get('messages'))
             messages_by_session[key] = session['messages']
+    entity_motion.validate_required(player_report, descriptor)
     requirements = _array(descriptor.get('requiredActorMessages', []), 0, 32)
     seen = set()
     for requirement in requirements:

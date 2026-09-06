@@ -1018,7 +1018,8 @@
         "level_2_real_target_moved",
         "level_3_real_target_moved",
         "level_4_real_target_moved",
-        "level_5_real_target_moved"
+        "level_5_real_target_moved",
+        "v1_trace_profile_preserved"
       ],
       "caseIds": [
         "tracer-continuity"
@@ -1115,7 +1116,7 @@
       "caseIds": [
         "dragon-restart-fresh"
       ],
-      "scope": "Production managed dragon commands, lifecycle and immutable accounting on pinned Paper; offline actor, no authentication/visual/prefire acceptance."
+      "scope": "Production orbit active before shutdown (mandatory phase1 moving_at_first_shutdown), removed across real process restart, with saved config and fresh-generation controls; no authenticated or visual acceptance."
     },
     "dragon-restart-legacy": {
       "assertions": [
@@ -1183,6 +1184,83 @@
         "dragon-ranking"
       ],
       "scope": "Two real offline protocol identities: production owned-arrow death, frozen ranking, reconnect, proc lethal, diagnostic/no-board controls and received messages."
+    },
+    "dragon-motion-experiment": {
+      "assertions": [
+        "public_moves_succeeded",
+        "parent_step_bounded",
+        "real_parts_follow",
+        "admitted_hover_retained",
+        "actual_parts_within_small_arena",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-motion-experiment"
+      ],
+      "scope": "Bounded public dragon motion feasibility; no gameplay or client acceptance."
+    },
+    "dragon-flight": {
+      "assertions": [
+        "radius_16_sustained_geometry",
+        "radius_16_step_yaw_phase",
+        "radius_16_reset_cleanup",
+        "radius_24_sustained_geometry",
+        "radius_24_step_yaw_phase",
+        "radius_24_reset_cleanup",
+        "radius_48_sustained_geometry",
+        "radius_48_step_yaw_phase",
+        "radius_48_reset_cleanup",
+        "stationary_calibration_no_drift",
+        "cancelled_motion_retires_without_drift",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "redirected_yaw_retires",
+        "lost_ai_retires"
+      ],
+      "caseIds": [
+        "dragon-flight"
+      ],
+      "scope": "Production bounded route and stationary/reset/cancel cleanup; collision and received motion remain separate."
+    },
+    "moving-tracer": {
+      "assertions": [
+        "returning_volley_real_collisions",
+        "moving_volley_exact_health_credit",
+        "dragon_moved_during_volley",
+        "upward_arrow_curves_down_same_uuid",
+        "v2_turn_speed_and_grace",
+        "duplex_captured_v2_origin",
+        "moving_owned_native_suppression",
+        "v2_trace_profile",
+        "unenchanted_miss_honest",
+        "blocked_arrow_real_block_collision",
+        "out_of_range_exit_honest",
+        "targetless_v2_initial_ballistic",
+        "original_prefire_arrow_acquires_and_collides",
+        "parent_projectile_tickets_released",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "moving_native_positive_control",
+        "moving_lethal_freezes_exact_result",
+        "animation_retains_parent_tickets_motion_stopped",
+        "native_death_releases_all_tickets_no_rewards",
+        "native_velocity_curves_to_current_part",
+        "real_collision_during_ballistic_grace"
+      ],
+      "caseIds": [
+        "moving-tracer"
+      ],
+      "scope": "Production moving dragon volleys and honest controls, separate targetless T07 admission and original-arrow collision."
     }
   },
   "requirements": {
@@ -1293,7 +1371,10 @@
         "equipment-player",
         "protocol-player-soak",
         "projectile-player-feasibility",
-        "enchants-procs"
+        "enchants-procs",
+        "dragon-motion-experiment",
+        "dragon-flight",
+        "moving-tracer"
       ]
     },
     "equipment-service": {
@@ -1592,15 +1673,23 @@
     },
     "bounded-dragon-flight": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Versioned public-API native dragon motion and actual multipart containment within explicit arena margins, supported phases and lifecycle/ticket cleanup; stationary calibration remains available.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-flight",
+        "moving-tracer",
+        "dragon-restart-fresh"
+      ]
     },
     "moving-dragon-tracer": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Real moving-target Tracer flight, native physical collision and original pre-spawn projectile identity under a separately reviewed v2 profile; unenchanted/blocked/out-of-range controls and received motion evidence.",
-      "fixtures": []
+      "fixtures": [
+        "moving-tracer",
+        "tracer-continuity",
+        "tracer-cleanup-abort"
+      ]
     },
     "fatal-tempo-ghost-scaling": {
       "kind": "automated",

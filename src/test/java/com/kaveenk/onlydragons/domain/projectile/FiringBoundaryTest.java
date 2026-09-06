@@ -53,6 +53,18 @@ class FiringBoundaryTest {
         assertThrows(IllegalArgumentException.class, () -> FiringRules.child(primary, UUID.randomUUID(), 20, 5));
         assertThrows(IllegalArgumentException.class, () -> FiringRules.duplexScale(6));
     }
+    @Test void duplexKeepsOriginalTracerGraceAndProfile() {
+        var shot = shot(UUID.randomUUID(), UUID.randomUUID());
+        var primary = new OwnedProjectile(shot, UUID.randomUUID(),
+                com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile.RETURN_V2, 20);
+        var child = primary.child(FiringRules.child(shot, UUID.randomUUID(), 21, 5));
+        assertSame(primary.tracerProfile(), child.tracerProfile());
+        assertEquals(20, child.groupLaunchTick());
+        assertEquals(21, child.shot().launchTick());
+        assertTrue(child.tracerProfile().ballistic(22, child.groupLaunchTick()));
+        assertFalse(child.tracerProfile().ballistic(23, child.groupLaunchTick()));
+        assertThrows(IllegalArgumentException.class, () -> primary.child(shot(UUID.randomUUID(), UUID.randomUUID())));
+    }
     @Test void cadenceBoundariesRetainHighAttackSpeed() {
         assertEquals(10, FiringRules.cooldown(0)); assertEquals(6, FiringRules.cooldown(99.99));
         assertEquals(5, FiringRules.cooldown(100)); assertEquals(5, FiringRules.cooldown(100.01));

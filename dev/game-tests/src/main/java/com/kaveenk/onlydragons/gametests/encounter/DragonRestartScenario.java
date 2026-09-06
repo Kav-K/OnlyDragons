@@ -103,7 +103,13 @@ public final class DragonRestartScenario implements Scenario, Listener {
                 c.check("duplicate_preserves_generation", v.encounterId().toString(), dragons.generation().orElseThrow().toString());
                 // Do not own/reset the production dragon in fixture cleanup. onDisable must remove it.
                 c.check("active_at_first_shutdown", true, nativeDragon.isValid() && c.production().combat().activeCount() == 1);
-                if(animation) prepareAnimationShutdown(nativeDragon); else quit();
+                if(animation) prepareAnimationShutdown(nativeDragon);
+                else if(!legacy) c.later(40,()->{
+                    c.check("moving_at_first_shutdown",true,dragons.motion().orElseThrow().state().equals("MOVING")
+                            &&dragons.motion().orElseThrow().steps()>20&&nativeDragon.getLocation().distance(dragons.arena().orElseThrow().location())>.1);
+                    quit();
+                });
+                else quit();
             }));
         } else command("reset", () -> {
             c.check("restart_new_spawn_reset_cleanup", true, Bukkit.getEntity(nativeDragon.getUniqueId()) == null && c.production().combat().activeCount() == 0

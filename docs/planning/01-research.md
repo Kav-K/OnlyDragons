@@ -254,6 +254,19 @@ actual UUID disappearance after reset/restart. [Exact results and superseded
 iterations](evidence/t08a-focused-paper.md) preserve the earlier failed validity
 assumptions. Full-suite and human acceptance remain pending in [T08a status](03-agent-tasks-and-validation.md#t08a--managed-real-dragon-backend-and-development-controls).
 
+### T08e bounded motion experiment (Paper 121)
+
+**Observed, 6 September 2026, iteration evidence:** AI-enabled HOVER ignores
+assigned velocity (zero displacement over ten ticks). Small public position/rotation
+steps update actual multipart geometry: the 500-step non-origin radius16 experiment
+measured parent step ≤0.15924, part step ≤0.33661 and part-corner offset ≤9.43167
+blocks. The production candidate subsequently stayed bounded at arena radii16/24/48,
+with maximum parent step0.20614 and yaw delta2.86481 degrees. These are separate
+server observations, not received-client smoothness, native-positive collision,
+or final acceptance. [Exact iteration identities and remaining gates](evidence/t08e-motion-tracer.md).
+[The pinned public API](https://jd.papermc.io/paper/26.2/org/bukkit/entity/Entity.html)
+supplies the position adapter; no NMS/reflection is used by production or fixtures.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

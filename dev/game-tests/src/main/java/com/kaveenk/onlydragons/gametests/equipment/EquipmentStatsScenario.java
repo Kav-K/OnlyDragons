@@ -33,7 +33,8 @@ public final class EquipmentStatsScenario implements Scenario {
                     "tracer", List.of(100.0, 50.0, 0.0, 0.0),
                     "duplex", List.of(100.0, 50.0, 0.0, 0.0),
                     "fatal_tempo", List.of(100.0, 50.0, 0.0, 25.0),
-                    "shortbow_v1", List.of(100.0, 50.0, 0.0, 0.0));
+                    "shortbow_v1", List.of(100.0, 50.0, 0.0, 0.0),
+                    "tracer_return_v2", List.of(100.0, 50.0, 0.0, 0.0));
             var expectedIds = new TreeSet<>(expectedTotals.keySet());
             var actualIds = new TreeSet<>(stats.loadouts());
             context.check("all_loadout_ids", List.copyOf(expectedIds), List.copyOf(actualIds));

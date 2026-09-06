@@ -34,6 +34,21 @@ public final class TracerRules {
     public static Optional<Aim> acquire(Vector3 position, int level, Collection<Part> parts, Predicate<Aim> visible) {
         double radius = radius(level);
         if (level == 0) return Optional.empty();
+        return acquireWithin(position, radius, parts, visible);
+    }
+    /** Retain only an eligible visible current part of the same target; otherwise reacquire honestly. */
+    public static Optional<Aim> acquire(Vector3 position, int level, Collection<Part> parts, Predicate<Aim> visible,
+                                        TracerProfile profile, Optional<UUID> lock) {
+        double radius = profile.radius(level);
+        if (level == 0) return Optional.empty();
+        if (profile == TracerProfile.RETURN_V2 && lock.isPresent()) {
+            var retained = acquireWithin(position, profile.retentionRadius(level),
+                    parts.stream().filter(p -> p.targetId().equals(lock.get())).toList(), visible);
+            if (retained.isPresent()) return retained;
+        }
+        return acquireWithin(position, radius, parts, visible);
+    }
+    private static Optional<Aim> acquireWithin(Vector3 position, double radius, Collection<Part> parts, Predicate<Aim> visible) {
         return parts.stream().map(part -> {
             Vector3 point = part.box().nearest(position);
             return new Aim(part, point, length(subtract(point, position)));
