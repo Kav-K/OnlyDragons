@@ -50,6 +50,13 @@ validator, which rejects transient additional bars between samples. This replay
 is supplementary; the complete suite still must run on final integrated inputs.
 All 273 Python tests pass at `b7a0aff`.
 
+Death-animation two-boot run `076df57ea81842dba1e70b523a7e7745` also passed
+at clean `b7a0aff12d678fdb0d6c734cea8557052aa49ff2`. Both boots passed strict
+received-bar replay; first-boot production ownership persisted through native
+animation until shutdown, and the second boot started empty and removed its
+fresh bar after reset. Each of the four phase client/server processes exited 0,
+unforced and clean.
+
 Received styled-message observations cover ordinary chat. The protocol client
 currently ignores overlay SystemChat, so these receipts do not establish live
 action-bar delivery or full-client rendering. The production formatter and
@@ -67,8 +74,10 @@ under runner cleanup, both unforced. Missing later assertions were not removed.
 
 ## Remaining gates
 
-Death-animation two-boot UI checks, the complete changed-area suite receipt,
-strict replay and final T08d automated checkpoint are pending. Independent review,
+The complete changed-area suite receipt, strict replay and final T08d automated
+checkpoint are pending. Per lead sequencing comment `5562197128`, incorporate
+T05b/#66 from main before starting that cohort; its explicit calibration mode
+must be preserved in the T08d fixtures. Independent review,
 current CI, Windows smoke/Play and human visual/readability/authenticated-client
 observations remain separate. A connected presenter-close packet test is not a
 claim that a disconnected client received shutdown packets. Actual process
