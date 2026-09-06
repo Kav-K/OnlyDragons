@@ -5,8 +5,8 @@ api-version: '${apiVersion}'
 description: Main workspace for Minecraft Java plugin development.
 commands:
   onlydragons:
-    description: Check the plugin and reload its configuration.
-    usage: /onlydragons [status|reload]
+    description: Inspect stats, grant calibration gear, and manage plugin configuration.
+    usage: /onlydragons [status|reload|stats|dev]
     aliases: [mcdev]
     permission: onlydragons.use
 permissions:
@@ -15,4 +15,10 @@ permissions:
     default: true
   onlydragons.admin:
     description: Reload OnlyDragons configuration.
+    default: op
+  onlydragons.stats:
+    description: Inspect your current equipment stats and sources.
+    default: true
+  onlydragons.calibration:
+    description: Grant yourself calibration bows and session stat bonuses.
     default: op

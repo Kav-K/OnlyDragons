@@ -119,6 +119,21 @@ design sections above are the current summary; this record explains changes.
 | 2026-09-05 | T02 / #4 / [PR #24](https://github.com/Kav-K/OnlyDragons/pull/24) | Adopted schema v1 with explicit unsupported-schema/revision rejection, trusted enchant categories/levels and allowlisted named rolls. Added eight compiled calibration factories without changing T00 records or #7 equipment/bootstrap. Lead audit removed the redundant +50 crit-damage bonus (T01 owns baseline 50) and requested a resolvedWeapon projection to prevent duplicate contributions. | [Design and calibration rationale](02-foundation-plan.md#t02-adopted-item-boundary-gh-4). Final clean 7ebaa6b retains catalog v2 and adds required listener cleanup in scenario `item-codec-v4`: 54 production tests and 35 Paper assertions passed after merging stats/projectile main 586a170. Prior v2/v3 evidence remains in [validation history](#t02-item-validation-evidence). No milestone or human gate advanced. |
 | 2026-09-05 | T04 / #5 / [PR #22](https://github.com/Kav-K/OnlyDragons/pull/22), Partial delivery merged | Adopted projectile-hit candidates as the single impact source because real shooterless dragon impacts omit damage events; damage events remain optional cancellation/native guards. Uniform part scaling is the supported interim design until semantic classification is verified. Added companion-owned listener cleanup and preserved measured misses. | Final clean a093877 after main 1efa7d0: 30 production tests, 27 runner tests, 34 real-Paper feasibility assertions and expected exception/abort controls, all three servers clean/unforced. Runtime-head Windows/Linux CI passed. Earlier e38bfaf lifecycle/deliberate controls remain recorded for unchanged cleanup code. Native player-owned suppression is still an acceptance blocker; no dependent dispatch or milestone completion. [Evidence](../../dev/game-tests/findings/projectile-feasibility.md). |
 
+### T01b equipment validation (GH-7)
+
+Implementation in progress on `symphony/gh-7`, integrating main `11b3124`.
+The owned bootstrap/command slice adds validated grants, stats explanations,
+source replacement, full equipment fingerprints and session cleanup. Design and
+rationale are in document 02's T01b section; [Cursor Play](../../dev/stats-play.md)
+records the operator procedure. Final committed build and Paper evidence is
+pending. MockBukkit's default inventory view lacks `convertSlot`; the event test
+supplies a bounded view conversion and remains explicitly synthetic. No skipped
+test counts as a pass. Required `equipment-stats` and unchanged `item-identity`
+scenarios cover production codec/service/command integration and cleanup.
+Authenticated client, Windows smoke/Play, visual and multiplayer gates remain
+pending. #20 protocol integration is not yet in main; it does not block the
+independent service/command slice. T06 must still connect shot-time capture.
+
 ### T02 item validation evidence
 
 Final clean runtime revision `7ebaa6b36521913058b578cf27522d3c2e10c463` includes
