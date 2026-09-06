@@ -508,11 +508,13 @@ The backend supplies T10's future target projection, not countdown/prefire or M3
 
 Implemented on the GH-40 branch, pending focused Paper evidence and lead acceptance.
 `RankedEncounterResult` retains the exact immutable `EncounterResult`, full Selection,
-and contribution/stamp values. It validates complete participant and lethal-commit
+and contribution/stamp values. It validates complete participant
 provenance, rejects ordinal ownership/tick conflicts and backdated stamps, then
 assigns contiguous placements by normalized full-precision credit descending,
 strict-increase tick/ordinal ascending (first participation for zero-only totals).
-Names and two-decimal display never enter ordering; no imported-data fallback exists.
+A lethal HP reduction may leave stored credit unchanged through rounding, so its
+terminal ordinal need not appear in a last-increase stamp. Names and two-decimal
+display never enter ordering; no imported-data fallback exists.
 
 `LeaderboardMessages` formats top ten plus each participant's own placement/credit.
 Every successful `DevelopmentDragonService.spawn()` starts and subscribes its

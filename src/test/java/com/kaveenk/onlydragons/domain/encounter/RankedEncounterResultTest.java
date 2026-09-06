@@ -78,6 +78,21 @@ class RankedEncounterResultTest {
             assertEquals(250-200*fraction,ranked.placement(b).orElseThrow().contribution().actualHealthDamage());
         }
     }
+    @Test void lethalHealthRemovalCanLeaveStoredCreditAndLastIncreaseUnchanged() {
+        var c=encounter(1);
+        hit(c,a,.5,1);
+        hit(c,b,.5-Math.scalb(1.0,-50),2);
+        hit(c,b,Math.scalb(1.0,-50)-Math.scalb(1.0,-60),3);
+        var before=c.contributions().get(a);
+        var lethal=hit(c,a,Math.scalb(1.0,-60),4);
+        assertTrue(lethal.accepted());assertEquals(Math.scalb(1.0,-60),lethal.amounts().actualHealthDamage());
+        var result=c.completion().orElseThrow();assertEquals(4,result.completedOrdinal());
+        assertEquals(before.lastCreditIncrease(),result.participants().get(a).lastCreditIncrease());
+        assertEquals(before.contributionDamage(),result.participants().get(a).contributionDamage());
+        var ranked=new RankedEncounterResult(result);
+        assertEquals(List.of(a,b),ranked.placements().stream().map(RankedEncounterResult.Placement::playerId).toList());
+        assertSame(result,ranked.result());
+    }
     @Test void rejectsMissingCrossParticipantAndBackdatedProvenanceWithoutFallback() {
         assertThrows(IllegalArgumentException.class,()->new RankedEncounterResult(result(Map.of(a,new EncounterResult.Contribution(1,1,0,true)),1)));
         assertThrows(IllegalArgumentException.class,()->new RankedEncounterResult(result(Map.of(a,contribution(1,1,1,1),b,contribution(1,1,1,1)),2)));
@@ -90,7 +105,7 @@ class RankedEncounterResultTest {
         return new EncounterResult.Contribution(hp,credit,0,true,stamp,credit>0?stamp:Optional.empty());
     }
     EncounterResult result(Map<UUID,EncounterResult.Contribution> participants,long ordinal) {
-        return new EncounterResult(UUID.randomUUID(),generation,"dummy",profile.mechanic(),participants.values().stream().flatMap(c->c.firstParticipation().stream()).mapToLong(EncounterResult.CommitStamp::tick).max().orElse(0),participants,ordinal,Optional.empty());
+        return new EncounterResult(UUID.randomUUID(),generation,"dummy",profile.mechanic(),participants.values().stream().flatMap(c->java.util.stream.Stream.concat(c.firstParticipation().stream(),c.lastCreditIncrease().stream())).mapToLong(EncounterResult.CommitStamp::tick).max().orElse(0),participants,ordinal,Optional.empty());
     }
     static <T> List<List<T>> permutations(List<T> values) {
         if(values.isEmpty())return List.of(List.of());var result=new ArrayList<List<T>>();

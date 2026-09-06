@@ -34,10 +34,6 @@ public final class RankedEncounterResult {
             if (commit.tick() < tick) throw new IllegalArgumentException("Backdated accepted commit provenance");
             tick = commit.tick();
         }
-        boolean terminal = result.participants().values().stream().anyMatch(contribution ->
-                contribution.lastCreditIncrease().filter(stamp -> stamp.ordinal() == result.completedOrdinal()
-                        && stamp.tick() == result.completedTick()).isPresent());
-        if (!terminal) throw new IllegalArgumentException("Missing lethal commit provenance");
         var ordered = new ArrayList<>(result.participants().entrySet());
         ordered.sort(Comparator.<Map.Entry<UUID, EncounterResult.Contribution>>comparingDouble(
                         entry -> normalizedCredit(entry.getValue())).reversed()
