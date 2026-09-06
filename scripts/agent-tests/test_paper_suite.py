@@ -126,6 +126,35 @@ class EvidenceTests(unittest.TestCase):
         f.commit()
         self.assertTrue(f.validate()['passed'])
 
+    def test_native_path_alias_replays_receipt_and_profile_with_canonical_project(self):
+        f = self.fixture
+        path = f.path
+        if sys.platform == 'win32':
+            import ctypes
+            kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+            short_name = kernel.GetShortPathNameW
+            short_name.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_uint32]
+            short_name.restype = ctypes.c_uint32
+            def alias(value):
+                buffer = ctypes.create_unicode_buffer(32768)
+                length = short_name(str(value), buffer, len(buffer))
+                self.assertTrue(0 < length < len(buffer), 'Windows could not resolve an existing path alias')
+                return Path(buffer.value)
+            path = alias(f.path)
+            f.result['profile']['directory'] = str(alias(f.profile))
+            f.refresh()
+        with patch.object(suite, 'process_cleanup'):
+            self.assertTrue(suite.validate_suite_receipt(f.root.resolve(), path)['passed'])
+
+    def test_path_normalization_preserves_containment_and_linux_symlink_rejection(self):
+        f = self.fixture
+        with self.assertRaisesRegex(suite.ValidationError, 'escapes checkout'):
+            suite.resolved_evidence_path(f.root, f.root.parent / 'outside-receipt.json')
+        if sys.platform == 'linux':
+            link = f.root / 'build/alias'
+            link.symlink_to(f.suite_root, target_is_directory=True)
+            with self.assertRaisesRegex(suite.ValidationError, 'Symlink'):
+                suite.validate_suite_receipt(f.root, link / 'receipt.json')
     def test_missing_duplicate_or_planned_cases_cannot_pass(self):
         f = self.fixture
         for cases in ([], [f.record, f.record]):
@@ -273,6 +302,24 @@ class SelectionTests(unittest.TestCase):
         path.write_text(json.dumps(data))
         with self.assertRaisesRegex(suite.ValidationError, 'every catalog case'):
             suite.load_catalog(self.root)
+
+    def test_shared_contract_mapping_cannot_omit_any_catalog_case(self):
+        path = self.root / 'dev/game-tests/suites.json'
+        data = json.loads(path.read_text())
+        data['areas']['shared-contracts']['cases'].remove('protocol-player-idle')
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(suite.ValidationError, 'shared-contracts changes require every catalog case'):
+            suite.load_catalog(self.root)
+
+    def test_shared_contract_types_require_full_baseline_across_feature_packages(self):
+        catalog, _ = suite.load_catalog(self.root)
+        paths = ['application/TickClock.java', 'domain/DomainChecks.java', 'domain/stats/StatSnapshot.java',
+                 'domain/item/WeaponDefinition.java', 'domain/projectile/ShotContext.java',
+                 'domain/combat/DamageResult.java', 'domain/encounter/TargetState.java']
+        for path in paths:
+            with self.subTest(path=path):
+                required = suite.required_cases(self.root, ['src/main/java/com/kaveenk/onlydragons/' + path])
+                self.assertEqual(set(catalog['cases']), set(required))
 
 
 class NegativePolicyTests(unittest.TestCase):

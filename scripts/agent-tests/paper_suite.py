@@ -102,6 +102,21 @@ def safe_path(project, relative):
     return candidate
 
 
+def resolved_evidence_path(project, value):
+    """Normalize filesystem aliases only after rejecting original symlink/traversal paths."""
+    project = Path(project).resolve()
+    require(isinstance(value, (str, os.PathLike)), 'Missing evidence path')
+    candidate = Path(value)
+    require('..' not in candidate.parts, 'Evidence path escapes checkout')
+    if not candidate.is_absolute():
+        candidate = safe_path(project, candidate.as_posix())
+    require(not any(part.is_symlink() for part in (candidate, *candidate.parents)),
+            'Symlink evidence/input is not supported')
+    resolved = candidate.resolve()
+    require(resolved.is_relative_to(project), 'Evidence path escapes checkout')
+    return safe_path(project, resolved.relative_to(project).as_posix())
+
+
 def names(value, description):
     require(isinstance(value, list) and all(isinstance(item, str) and item for item in value)
             and len(value) == len(set(value)), 'Invalid/duplicate ' + description)
@@ -155,9 +170,10 @@ def load_catalog(project):
         require(set(names(area.get('cases'), 'area cases')).issubset(cases), 'Unknown area case')
         require(not area['paths'] or area['cases'], 'Mapped runtime paths require nonempty scenario coverage')
         require(set(names(area.get('affects'), 'affected areas')).issubset(areas), 'Unknown affected area')
-    if 'harness-and-build' in areas:
-        require(set(areas['harness-and-build']['cases']) == set(cases),
-                'Harness/build changes require every catalog case')
+    for full_area in ('harness-and-build', 'shared-contracts'):
+        if full_area in areas:
+            require(set(areas[full_area]['cases']) == set(cases),
+                    full_area + ' changes require every catalog case')
     names(catalog.get('ignoredChanges'), 'ignored changes')
     return catalog, scenarios
 
@@ -402,7 +418,9 @@ def verify_case(project, record, case, descriptor, source, suite_root):
     for key, value in expected_settings.items():
         require(settings.get(key) == value, 'Disposable profile policy mismatch: ' + key)
     profile_info = result.get('profile', {})
-    require(profile_info.get('directory') == str(profile) and profile_info.get('world') == expected_settings['level-name']
+    require(isinstance(profile_info.get('directory'), str) and Path(profile_info['directory']).is_absolute(),
+            'Disposable profile path must be absolute')
+    require(resolved_evidence_path(project, profile_info.get('directory')) == profile and profile_info.get('world') == expected_settings['level-name']
             and profile_info.get('testPlayerMode') == case.get('testPlayer')
             and profile_info.get('authentication') == ('offline-disposable-loopback' if actor else 'authenticated'), 'Wrong disposable profile identity')
     port = profile_info.get('port')
@@ -479,9 +497,7 @@ def verify_case(project, record, case, descriptor, source, suite_root):
 def validate_suite_receipt(project, receipt_path):
     """Replay raw evidence; return the verified receipt, never trusting its pass flags."""
     project = Path(project).resolve()
-    path = Path(receipt_path)
-    path = path if path.is_absolute() else project / path
-    path = safe_path(project, path.relative_to(project).as_posix())
+    path = resolved_evidence_path(project, receipt_path)
     receipt = runner.strict_json(path)
     require(receipt.get('kind') == 'paper-suite-receipt' and receipt.get('state') == 'complete'
             and receipt.get('passed') is True and runner.json_values_equal(receipt.get('schemaVersion'), 1),
