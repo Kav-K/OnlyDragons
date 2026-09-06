@@ -521,7 +521,8 @@
         "dragon-restart-legacy",
         "dragon-restart-animation",
         "dragon-ranking",
-        "tempo-ghost"
+        "tempo-ghost",
+        "expanded-bow"
       ],
       "affects": []
     },

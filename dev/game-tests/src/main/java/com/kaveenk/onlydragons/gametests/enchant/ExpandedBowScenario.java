@@ -27,7 +27,7 @@ public final class ExpandedBowScenario implements Scenario, Listener {
     final List<Arrow> held=new ArrayList<>(); final List<Vector> velocities=new ArrayList<>();
     final List<Map<String,Object>> trials=new ArrayList<>();
     int releases; boolean veto,hold,nativeGuard;
-    public void start(ScenarioContext context) {
+    public void start(ScenarioContext context) throws Exception {
         c=context;c.mechanicRevision("expanded-bow-v2");players=new PlayerFixture(c);probe=new DamageObservationProbe(c);c.listen(this);
         var observation=c.production().combat().observeSettled(settled::add);c.cleanup("expanded-observer",observation::close);
         c.cleanup("expanded-target",()->{c.production().combat().reset(players.identity("alpha"));if(backend!=null)backend.close();});
