@@ -156,6 +156,19 @@ head-hit pass. See the [bounded findings and remaining gates](../../dev/game-tes
 These observations are OnlyDragons test evidence, not Hypixel mechanics or
 player-owned dragon damage proof.
 
+### T09b measured protocol-player boundary (Paper 121)
+
+**Observed on exact pin, 2026-09-05:** the timestamped MCProtocolLib 26.2 /
+protocol 776 client joined as a real Paper Player in a disposable loopback
+offline profile. Paper observed the expected UUID, selected-slot change,
+full-force bow release, native player-owned Arrow, and quit. Positive and
+early-exit/timeout controls all produced their expected results and clean
+owned-process/resource cleanup from runtime revision `1dd6ffe`. See
+[reports, hashes and scope](../../dev/agent-paper-tests.md#protocol-player-evidence).
+This supplies a bounded actor for future T04/#5 and equipment/#7 experiments;
+it does not establish player-owned dragon damage, human visuals, authentication
+or multiplayer behavior, and changes no researched Hypixel mechanic.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

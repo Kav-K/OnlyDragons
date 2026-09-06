@@ -446,6 +446,15 @@ Use bounded in-memory trace buffers and export immutable batches off-thread. Rep
 
 Keep Paper-specific behavior in adapters and run its contract scenarios whenever pins change. The existing lab can launch many server versions, but this Java 25 / Paper 26.2 artifact does not thereby support older versions or plain Spigot. Claim a version only after compilation/runtime and gameplay contracts pass. Use fresh worlds/profiles for upgrade trials; never downgrade a previously upgraded world.
 
+The T09b validation fixture now demonstrates real protocol-player input on this
+exact Paper target; [its evidence](../../dev/agent-paper-tests.md#protocol-player-evidence)
+is separate from gameplay acceptance. The explicitly named runner mode uses one
+offline synthetic identity only in its fresh loopback disposable profile,
+with both JVMs in the shared memory/lease lifecycle. Default tests and human
+profiles remain authenticated. T04 and equipment integration must add reviewed
+scenario admission and their own production assertions; the bow calibration
+does not settle native dragon suppression or change this combat design.
+
 ## 13. Milestones and completion gates
 
 | Milestone | Playable outcome | Exit gate |

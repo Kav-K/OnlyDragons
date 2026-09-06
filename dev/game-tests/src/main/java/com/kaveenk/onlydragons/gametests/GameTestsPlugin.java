@@ -20,6 +20,7 @@ public final class GameTestsPlugin extends JavaPlugin {
             "lifecycle-calibration", new CalibrationScenario(false),
             "deliberate-failure", new CalibrationScenario(true),
             "foundation-contracts", new ContractScenario(),
+            "protocol-player-calibration", new PlayerCalibrationScenario(),
             "item-identity", new com.kaveenk.onlydragons.gametests.item.ItemIdentityScenario(),
             "projectile-feasibility", new com.kaveenk.onlydragons.gametests.projectile.ProjectileFeasibilityScenario(),
             "projectile-cleanup-failure", new com.kaveenk.onlydragons.gametests.projectile.ProjectileCleanupFailureScenario(),
