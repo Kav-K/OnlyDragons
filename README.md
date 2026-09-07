@@ -13,12 +13,14 @@ Only open issues labeled `symphony` are eligible. See [the setup and credential 
 
 Main includes [equipment stats and calibration gear](dev/stats-play.md), the
 [practice combat loop](dev/combat-play.md), and [managed test-dragon controls with
-post-kill ranking](dev/dragon-play.md). The next planned [checkpoint](docs/planning/07-checkpoint-two.md)
-adds held-fire loadouts and ten-enchant XP-cost books. Bounded dragon flight,
+post-kill ranking](dev/dragon-play.md), [held-fire loadouts](dev/shortbow-play.md)
+and [ten-enchant XP-cost books](dev/enchant-books-play.md). The scoped automated
+[checkpoint 2 work](docs/planning/07-checkpoint-two.md) is integrated. Bounded dragon flight,
 returning Tracer volleys, persistent health bars, shared combat/stat/result formatting,
 level-based Tempo proc HP and explicit standard/training/calibration spawn modes
-are integrated on main, alongside Infinite Quiver and owned Flame. Remaining checkpoint additions
-and combined acceptance are pending. Armor effects and real rewards remain
+are integrated on main, alongside Infinite Quiver and owned Flame.
+[Combined held-fire/anvil acceptance](docs/planning/evidence/checkpoint2-held-books.md)
+is recorded separately from pending current-profile Windows and human observations. Armor effects and real rewards remain
 out of the current scope. See the
 [foundation plan](docs/planning/02-foundation-plan.md), [mechanic research](docs/planning/01-research.md)
 and [delivery ledger](docs/planning/03-agent-tasks-and-validation.md) for exact acceptance and remaining gates.

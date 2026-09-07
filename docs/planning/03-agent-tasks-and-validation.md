@@ -21,7 +21,7 @@ source/raw review, strict replay, all three task checkpoints and current CI.
 It includes 286 production, six companion and 33 applicable client tests with
 zero failures/errors/skips; [exact evidence and limitations](evidence/checkpoint2-ui-flight.md).
 
-T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort). MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; the lead released and dispatched T06b/#68 and T02c/#69. Their existing prerequisites and feature gates remain unchanged. T08c/#41 remains planned and undispatched. Other requirements, prior
+T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort). MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; T06b/#68 and T02c/#69 were subsequently accepted through [PR #86](https://github.com/Kav-K/OnlyDragons/pull/86); [combined acceptance evidence](evidence/checkpoint2-held-books.md). T08c/#41 remains planned and undispatched. Other requirements, prior
 evidence and milestone states are unchanged; human outcomes remain separate.
 
 Baseline reconciled **6 September 2026** after PR #62 merged at
@@ -48,8 +48,8 @@ or milestone gates.
 
 GitHub authentication is configured and the source/shared context is published
 on main. The execution backlog includes the original feature issues plus the
-explicit T09b player fixture and maintenance mappings. Symphony is running
-for three parallel coding workers and draft PR handoff; the lead may merge
+explicit T09b player fixture and maintenance mappings. Symphony is configured
+for up to three parallel coding workers and draft PR handoff; the lead may merge
 reviewed/tested PRs under the user's authorization. Actual Paper tests are
 serialized through the integrated T09a runner. Local delegated agents delivered
 T09a and T00; GH-3 exercised the Symphony branch-to-draft-PR handoff in
@@ -112,7 +112,7 @@ expiry and frozen training overkill credit; [exact acceptance evidence](evidence
 identities and dispositions; their earlier pending statements describe that history.
 
 T03b/T08d/T08e are now separately accepted through [PR #76](evidence/checkpoint2-ui-flight.md).
-T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort). MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; the lead released and dispatched T06b/#68 and T02c/#69. Their existing prerequisites and feature gates remain unchanged. Human appearance,
+T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort). MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; T06b/#68 and T02c/#69 were subsequently accepted through [PR #86](https://github.com/Kav-K/OnlyDragons/pull/86); [combined acceptance evidence](evidence/checkpoint2-held-books.md). Human appearance,
 authenticated compatibility, balance/feel and M1–M5 remain unaccepted.
 
 ### T03b — Expanded bow enchants (GH-67)
@@ -138,7 +138,7 @@ in the [combined acceptance evidence](evidence/checkpoint2-ui-flight.md). The
 focused runs retain their original setup and scope. Current-profile Windows smoke,
 authenticated-client visuals/feel, performance and M1–M5 remain separate.
 T06c subsequently consumed these descriptors and is accepted through PR #81.
-T06b/T02c are dispatched consumers after accepted MAINT-82.
+T06b/T02c are subsequently accepted consumers through PR #86; [combined acceptance evidence](evidence/checkpoint2-held-books.md).
 
 ### T06c — Infinite Quiver and owned Flame (GH-70)
 
@@ -150,12 +150,13 @@ original identities. The fresh 42-case/48-boot cohort, strict replay, independen
 review, T06c checkpoint and Windows/Linux CI passed; only the named requirement
 is accepted. Human/full-client/Windows-final-deployment and M1–M5 remain pending.
 
-MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; the lead released and dispatched T06b/#68 and T02c/#69. Their existing prerequisites and feature gates remain unchanged.
+MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; T06b/#68 and T02c/#69 were subsequently accepted through [PR #86](https://github.com/Kav-K/OnlyDragons/pull/86); [combined acceptance evidence](evidence/checkpoint2-held-books.md).
 
 ### T02c — Custom enchant books and XP-cost anvils (GH-69)
 
-**In review**, [draft PR #85](https://github.com/Kav-K/OnlyDragons/pull/85),
-`symphony/gh-69`; clean tested runtime `4ed3d2de175d4fde921370630bf5c392efcd08a3`
+**Complete through [PR #86](https://github.com/Kav-K/OnlyDragons/pull/86) at `1a63ce5749e4debe4369cd154953ffea3e07e09a`, exactly `enchant-books-anvil`.** [combined acceptance evidence](evidence/checkpoint2-held-books.md).
+The original [PR #85](https://github.com/Kav-K/OnlyDragons/pull/85) worker branch
+`symphony/gh-69` retains clean focused runtime `4ed3d2de175d4fde921370630bf5c392efcd08a3`
 includes current main `2158a51572d65e7e8856ec77f44b3decc982450c`.
 [Owner dispatch](https://github.com/Kav-K/OnlyDragons/issues/69#issuecomment-5565338834)
 confirms T03b/T08d/T06c and MAINT-82 integrated; GH68 owns common hold-release reconciliation.
@@ -170,9 +171,9 @@ client/server exits. Builds passed 311 production, 6 companion and 37 client tes
 Python passed 50 existing action plus 6 anvil tests. [Exact revisions, artifact/report
 hashes, iteration failures and limitations](evidence/t02c-enchant-anvil.md).
 
-Checkpoint plan is valid. Final combined cohort/receipt, new-tier interaction,
-automated task acceptance, current CI and integration review remain lead-owned
-under dispatch. This handoff does not accept a milestone. Authenticated clients,
+The final combined cohort/receipt, new-tier interaction, T02c checkpoint,
+current CI and independent source/raw review passed; [combined acceptance evidence](evidence/checkpoint2-held-books.md).
+This scoped acceptance does not accept a milestone. Authenticated clients,
 GUI/lore appearance, Windows smoke and human feel remain unrun; [rehearsal](../../dev/enchant-books-play.md).
 Rewards and armor effects remain disabled.
 
@@ -188,19 +189,19 @@ acceptance advances no gameplay, human or milestone gate.
 
 ### T06b — Held shortbow tiers and combined loadouts
 
-**In review**, [draft PR #84](https://github.com/Kav-K/OnlyDragons/pull/84), [GH-68](https://github.com/Kav-K/OnlyDragons/issues/68),
-`symphony/gh-68` from accepted main2158a515. Additive seven named v4 presets,
+**Complete through [PR #86](https://github.com/Kav-K/OnlyDragons/pull/86) at `1a63ce5749e4debe4369cd154953ffea3e07e09a`, exactly `held-shortbow-loadouts`.**
+The original [PR #84](https://github.com/Kav-K/OnlyDragons/pull/84), [GH-68](https://github.com/Kav-K/OnlyDragons/issues/68),
+`symphony/gh-68` worker history starts from accepted main2158a515. Additive seven named v4 presets,
 `dev shortbow help/list/kit`, shared-input invalidation and native held-state
 checks reuse the existing firing authority. [Contract](02-foundation-plan.md#t06b-held-shortbow-calibration-gh-68),
 [human quickstart](../../dev/shortbow-play.md), [evidence](evidence/t06b-held-shortbows.md).
-T03b/T08e/T06c are integrated. GH69 owns shared lore/book/anvil/client edits;
-the lead owns final combined new-tier→real-anvil opening with native view and
-received ANVIL packet, complete regression, current CI and acceptance. Worker
+T03b/T08e/T06c are integrated. PR86 combines GH69 shared lore/book/anvil/client edits
+and verifies new-tier→real-anvil opening with native view and received ANVIL
+packets, complete regression, current CI and acceptance. Historical worker
 focused evidence passes313 production tests and five Paper cases/264 assertions
 on clean571cdb35 with strict raw/JUnit/artifact/cleanup replay. Static/no-weakening
-checks pass; the [lead combined interaction and 47-case receipt](evidence/checkpoint2-held-books.md)
-and task acceptance remain pending.
-No `held-shortbow-loadouts` completion yet;
+checks passed at that worker handoff. The [final combined interaction and receipt](evidence/checkpoint2-held-books.md)
+subsequently establishes exactly `held-shortbow-loadouts`;
 authenticated-client visuals/input feel, Windows smoke and milestones remain pending.
 
 ## Shared context update protocol
@@ -695,7 +696,7 @@ T08e/T03b and verified the complete current-input cohort, independent replay/rev
 all three task checkpoints and current CI; [final evidence](evidence/checkpoint2-ui-flight.md).
 The focused archive retains exact inputs and integration history. Human appearance/
 readability, authenticated-client compatibility and M1–M5 remain unaccepted.
-T06c is integrated. T02c/T06b may consume the formatter boundary in document 02
+T06c, T02c and T06b are integrated consumers of the formatter boundary in document 02
 under the lead’s released dispatch and shared ownership split.
 
 ### T08e — Bounded flight and returning Tracer (GH-65)
@@ -721,7 +722,7 @@ task checkpoints and current CI/independent review passed;
 runs and failed iterations remain preserved, including their separate geometry,
 collision, received-motion and human limits. Human full-client smoothness, aiming/
 return visibility and authenticated clients remain unrun. T08d consumes immutable
-views; T06b/T10 may consume this integrated backend/profile after their remaining
+views; T06b now consumes this integrated backend/profile; T10 retains its remaining
 prerequisites and lead assignment. The trusted new preset preserves the old nine/v1.
 
 ### T08c — Personal placement-based loot simulation

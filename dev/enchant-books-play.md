@@ -7,7 +7,8 @@ disabled.
 
 1. Follow the [shortbow quickstart](shortbow-play.md) for the seven-bow kit,
    512 arrows and configured training orbit. Equip the chosen bow only when firing.
-   This guide uses that same setup; the lead integrates the linked GH-68 guide.
+   This guide uses the same integrated setup; see the
+   [accepted combined interaction](../docs/planning/evidence/checkpoint2-held-books.md).
 2. Obtain `/onlydragons dev book power 1`. The command requires the existing
    `onlydragons.calibration` permission and an empty inventory slot. Tab completion
    lists all ten enchant IDs and their legal levels.

@@ -12,7 +12,9 @@ The user's next scoped work is [checkpoint 2](07-checkpoint-two.md): dragon heal
 UI/motion, Tracer volleys, revised Tempo ghost policy, held shortbows and ten-enchant
 XP-cost books. T05b and the scoped T03b/T08d/T08e behavior are accepted as recorded
 in the delivery ledger; T06c Quiver/Flame is accepted through PR #81 at
-`53164f85a0ba3f36d16f242429f3a0a7c5a403a7`. Held-fire kits and books/anvils remain pending.
+`53164f85a0ba3f36d16f242429f3a0a7c5a403a7`. T06b held-fire kits and T02c books/anvils
+are accepted through PR #86 for their two named requirements; [combined acceptance evidence](evidence/checkpoint2-held-books.md).
+Human outcomes remain separate.
 Preserve the accepted older profiles below. Armor effects and real rewards remain
 disabled/deferred.
 
@@ -295,7 +297,8 @@ from the synthetic real-Paper round-trip scenario.
 
 ### T02c books and native anvil transactions (GH-69)
 
-In progress on the issue branch, following the owner-selected checkpoint costs.
+Accepted through PR #86 at `1a63ce5749e4debe4369cd154953ffea3e07e09a` for exactly `enchant-books-anvil`;
+[combined acceptance evidence](evidence/checkpoint2-held-books.md). The owner-selected checkpoint costs remain unchanged.
 `EnchantRecipes` validates one-enchant books, combines only improving same-ID
 levels, and replaces the complete bow enchant map through its original catalog.
 `EnchantTarget` separates item category and active slot; no armor target is enabled.
@@ -1077,9 +1080,10 @@ preserves the shared cooldown and already accepted/airborne group ownership.
 seven bows and512 ordinary arrows only with15 empty storage slots. Setup remains
 an explicit dragon command; the first-use flow configures only when unconfigured,
 grants, spawns training orbit100000HP, checks status, then uses an operator-verified
-safe position. GH69 owns shared lore/book/anvil formatting and consumes resolved
-WeaponDefinition mode/modifiers plus FiringRules cadence. The lead combines those
-sources and verifies native anvil opening with matching received ANVIL metadata.
+safe position. Integrated GH69 shared lore/book/anvil formatting consumes resolved
+WeaponDefinition mode/modifiers plus FiringRules cadence. PR86 verifies native
+anvil opening and edited-bow use with matching received ANVIL metadata;
+[combined acceptance evidence](evidence/checkpoint2-held-books.md).
 No rewards, balance-table replacement or milestone acceptance is introduced.
 
 ## 13. Milestones and completion gates

@@ -63,9 +63,9 @@ All seven exact `held-shortbows-v1` definitions select returning Tracer v2;
 steering is inactive at Tracer level0. Tracer V acquires within40 blocks, retains
 8 blocks farther, turns at most18 degrees/tick and leaves the first3 volley ticks
 ballistic. Existing27 presets retain their original profiles/values. Books/lore
-use the shared T02c presentation and anvil workflow when integrated; the lead must
-verify actual anvil opening stops a new-tier hold and match the received screen
-packet on the combined sources before acceptance.
+use the integrated T02c presentation and anvil workflow. Actual anvil opening
+stops a new-tier hold, with matching received-screen and edited-bow evidence in
+the [accepted combined cohort](../docs/planning/evidence/checkpoint2-held-books.md).
 
 ## Input and remaining human checks
 
