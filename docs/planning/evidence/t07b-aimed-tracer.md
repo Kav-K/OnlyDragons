@@ -52,6 +52,13 @@ historical v1 and returning-v2 presets retain their profiles and original fixtur
   z138 within the same radius24 arena and aims20 degrees upward; both failed
   physical-path/swap assertions and every numeric oracle remain mandatory.
 
+- Clean `c2fd5c6`, run `931992c69a8746e6a52ba36ae63f23e0`: the z138/fixed-20-degree
+  held setup timed out waiting for all Duplex impacts; its five owned cleanup
+  checks passed. The next fixture uses z128/radius48 (lead-approved disposable
+  geometry), aiming24 degrees above the actual current body part before each
+  trial's real input. It retains bounded launch/path diagnostics on failure and
+  every physical collision, swap and exact accounting assertion.
+
 ## Candidate and remaining verification
 
 The corrected candidate routes all thirteen current definitions, tests arbitrary-
@@ -60,7 +67,8 @@ uses `ordinary_v4` plus Tracer in the focused aimed-hit phase. Other phases use
 held-kit drawn training. Actual native release/collision, live part/velocity samples,
 post-shot client turns while airborne, exact production HP/credit and setup walls
 remain distinct observations. The current held-kit regression expectations select
-v3 and their combat pose changes from z146/45 degrees upward to z138/20 degrees upward;
+v3 and their combat pose changes from z146/fixed45 degrees upward to z128/24 degrees above the current body part,
+within a disposable radius48 arena;
 all existing collision/damage/proc/ammo assertions remain. Historical evidence is
 unchanged and retains its own original inputs.
 

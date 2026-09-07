@@ -28,7 +28,10 @@ public final class HeldCombatScenario implements Scenario, Listener {
         c=context;c.mechanicRevision("held-combat-v1");players=new PlayerFixture(c);probe=new DamageObservationProbe(c);
         bows=new OwnedBowService(c.production(),c.production().equipment(),100,()->.75);
         combat=new ManagedCombatService(c.production(),bows);
-        c.cleanup("held-combat-services",()->{finished=true;combat.close();bows.close();});
+        c.cleanup("held-combat-services",()->{finished=true;
+            c.observe("heldFlightDiagnostics",Map.of("shots",launched.stream().map(p->Map.of("uuid",p.shot().projectileId().toString(),"launch",p.shot().launchPosition().toString(),"velocity",p.shot().initialVelocity().toString())).toList(),
+                    "paths",paths.entrySet().stream().map(e->Map.of("uuid",e.getKey().toString(),"frames",e.getValue())).toList(),"settled",settled.size()));
+            combat.close();bows.close();});
         c.listen(new OwnedBowListener(bows));c.listen(new ManagedCombatListener(combat));c.listen(this);
         bows.start();combat.start();var observer=combat.observeSettled(settled::add);c.cleanup("held-combat-observer",observer::close);
         players.await("held combat actor",300,players::allOnline,this::setup);
@@ -43,17 +46,23 @@ public final class HeldCombatScenario implements Scenario, Listener {
     }
     private void fresh(String id){
         if(fight!=null)combat.reset(players.identity("alpha"));
-        var center=new Location(player().getWorld(),160,100,160);var bounds=BoundingBox.of(center,24,24,24);
+        var center=new Location(player().getWorld(),160,100,160);var bounds=BoundingBox.of(center,48,48,48);
         backend=new DragonBackend(center,bounds,DragonFlight.Mode.ORBIT,bows.continuity().tickets(),ignored->{},ignored->{});
         fight=combat.open(players.identity("alpha"),backend,bounds,100000,0,"test_dragon",CombatProfile.tempoDragon(),Optional.empty(),()->.99);
         probe.watch(backend.entity());player().clearActiveItem();
-        players.setupPosition("alpha",new Location(player().getWorld(),160,100-player().getEyeHeight(),138,0,-20));
+        players.setupPosition("alpha",new Location(player().getWorld(),160,100-player().getEyeHeight(),128,0,-24));
         players.setupItem("alpha",0,c.production().equipment().createLoadout(id));
         players.setupItem("alpha",1,c.production().equipment().createLoadout("volley_duplex_v4"));
         players.setupItem("alpha",9,new ItemStack(Material.ARROW,64));player().getInventory().setHeldItemSlot(0);
         launched.clear();settled.clear();collisions.clear();paths.clear();
     }
+    private void aimCurrentPart(){
+        var part=backend.entity().getParts().stream().filter(p->p.getBoundingBox().getWidthX()==5).findFirst().orElseThrow();
+        var pose=player().getLocation().setDirection(part.getBoundingBox().getCenter().subtract(player().getEyeLocation().toVector()));
+        pose.setPitch(pose.getPitch()-24);players.setupPosition("alpha",pose);
+    }
     private void duplex(){
+        aimCurrentPart();
         start=backend.entity().getLocation();hold("duplex",6,()->{
             int total=launched.size();
             players.await("all moving Duplex impacts",140,()->settled.size()==total&&combat.fireMetrics(fight).burns()==0,()->{
@@ -80,6 +89,7 @@ public final class HeldCombatScenario implements Scenario, Listener {
         });
     }
     private void tempo(){
+        aimCurrentPart();
         hold("tempo",4,()->{
             int ft=launched.size();players.request("alpha","duplex-slot");
             players.await("real ultimate swap",80,()->player().getInventory().getHeldItemSlot()==1,()->{
@@ -120,7 +130,7 @@ public final class HeldCombatScenario implements Scenario, Listener {
         });
     }
     private void rejection(){
-        fresh("volley_duplex_v4");veto=true;c.later(30,()->hold("veto",3,()->{
+        fresh("volley_duplex_v4");veto=true;c.later(30,()->{aimCurrentPart();hold("veto",3,()->{
             int arrows=launched.size();players.await("all actual veto collisions",140,()->settled.size()==arrows,()->{
                 c.check("held_physical_veto_no_health_score_or_effects",true,collisions.size()==arrows&&vetoEvents>=arrows&&settled.stream().allMatch(h->h.rejection().orElseThrow()==SettledHit.Rejection.PHYSICAL_VETO)&&view().acceptedImpacts()==0&&view().target().currentHealth()==100000&&credit()==0
                         &&combat.fireMetrics(fight).burns()==0&&view().procs().tempoStates()==0);
@@ -130,7 +140,7 @@ public final class HeldCombatScenario implements Scenario, Listener {
                 c.observe("playerActions",players.journal());finished=true;players.request("alpha","end");
                 players.await("real end",100,()->players.quits("alpha")==1,c::finish);
             });
-        }));
+        });});
     }
     private void hold(String id,int groups,Runnable next){
         int before=launched.size();players.request("alpha",id+"-use");
@@ -147,7 +157,7 @@ public final class HeldCombatScenario implements Scenario, Listener {
         if(finished)return;
         for(var owned:bows.projectiles())bows.continuity().frame(owned.shot().projectileId()).ifPresent(frame->{
             var path=paths.computeIfAbsent(owned.shot().projectileId(),ignored->new ArrayList<>());
-            if(path.size()<60)path.add(List.of((double)frame.tick(),frame.before().y(),frame.after().y()));
+            if(path.size()<60)path.add(List.of((double)frame.tick(),frame.before().y(),frame.after().y(),frame.position().x(),frame.position().y(),frame.position().z(),frame.aim().isPresent()?1.0:0.0));
         });
         c.later(1,this::sample);
     }
