@@ -58,8 +58,26 @@ class ShortbowLoadoutsTest {
         assertEquals(TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(new WeaponDefinition("fake", 1, "held-shortbows-v1", definition.firingMode(), 100, List.of(), List.of())));
         assertThrows(ItemValidationException.class, () -> registry.resolve(new ItemInstance(new WeaponIdentity(original.identity().instanceId(), original.identity().definitionId(), 1, "fake"), original.registryRevision(), Map.of(), List.of())));
         for (var item : registry.definitions().values()) {
-            if (!ShortbowLoadouts.ids().contains(item.weapon().id())) assertEquals(item.weapon().id().equals("tracer_return_v2") ? TracerProfile.RETURN_V2 : TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(item.weapon()));
+            if (!ShortbowLoadouts.ids().contains(item.weapon().id())) assertEquals(
+                    item.weapon().revision().equals(CalibrationLoadouts.FIRE_REVISION) ? TracerProfile.AIMED_V3
+                            : item.weapon().id().equals("tracer_return_v2") ? TracerProfile.RETURN_V2 : TracerProfile.CALIBRATION_V1,
+                    TracerProfile.forDefinition(item.weapon()));
         }
         assertEquals(34, registry.definitions().size());
+    }
+    @Test void allSixCurrentV4DefinitionsKeepAimedProfileAfterTracerBookEdits() {
+        for (String id : List.of("ordinary_v4", "shortbow_v4", "quiver_v4", "flame_v4", "duplex_flame_v4", "tempo_flame_v4")) {
+            var original = registry.create(id);
+            var edited = registry.edit(original, Map.of("dragon_tracer", 5), List.of());
+            assertEquals(original.identity(), edited.identity());
+            var trusted = registry.resolve(edited).resolvedWeapon();
+            assertEquals(TracerProfile.AIMED_V3, TracerProfile.forDefinition(trusted));
+            assertEquals(5, trusted.enchantments().getFirst().level());
+            assertEquals(TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(
+                    new WeaponDefinition(id, 1, "fake", trusted.firingMode(), 100, List.of(), List.of())));
+        }
+        assertEquals(TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(
+                new WeaponDefinition("fake", 1, CalibrationLoadouts.FIRE_REVISION,
+                        WeaponDefinition.FiringMode.DRAWN_BOW, 100, List.of(), List.of())));
     }
 }

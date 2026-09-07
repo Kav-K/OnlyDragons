@@ -357,7 +357,8 @@
       "held-combat",
       "enchant-anvil",
       "anvil-boundaries",
-      "anvil-lifecycle"
+      "anvil-lifecycle",
+      "aimed-tracer"
     ]
   },
   "areas": {

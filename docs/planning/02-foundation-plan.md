@@ -965,11 +965,13 @@ implementation or dispatch. Preserve legacy calibration profiles and their evide
   naturally later, including after a target appears. The nearest real part-box
   point supplies cone and steering aim. Zero launch or launch-to-aim vectors
   cannot authorize guidance; non-finite magnitudes reject. The angle boundary
-  is inclusive. V3 retains the v2 whole-part arena admission check.
+  is inclusive with four ulps of cosine roundoff tolerance after normalization. V3 retains the v2 whole-part arena admission check.
   Turning the player later or looping an arrow nearby cannot authorize a shot
   originally aimed away. Preserve velocity magnitude, gravity, drag, collisions,
   line of sight, bounds and target generation/UUID; no snapping or guaranteed hits.
-  `tracer-aimed/v3` routes the current seven held-shortbow definitions to the new captured profile;
+  `tracer-aimed/v3` routes the seven held-kit definitions and six current
+  `FIRE_REVISION` bows to the new captured profile, including book-enchanted drawn
+  bows ([owner clarification](https://github.com/Kav-K/OnlyDragons/issues/90#issuecomment-5575641677));
   existing arrows and explicit legacy fixtures retain their original profiles.
   This is the lead's initial calibration, not user-selected final balance.
 

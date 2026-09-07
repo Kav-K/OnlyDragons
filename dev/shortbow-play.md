@@ -65,7 +65,10 @@ blocks of a real part, retains4 blocks farther, turns at most6 degrees/tick and
 leaves the first3 volley ticks ballistic. Acquisition and retention also require
 the part aim point within30 degrees of the shot’s captured launch direction,
 measured from its captured launch position. Turning afterward does not change
-that cone; sideways/behind shots remain misses. This is a first tuning pass. Existing27 presets retain their original profiles/values. Books/lore
+that cone; sideways/behind shots remain misses. This is a first tuning pass. The six other current v4 bows also use this aimed profile when given Tracer,
+including drawn bows enchanted through books. Historical v2/v3 catalogs and the
+explicit `tracer_return_v2` preset keep their original profiles; damage, ammo and
+proc values are unchanged. Books/lore
 use the integrated T02c presentation and anvil workflow. Actual anvil opening
 stops a new-tier hold, with matching received-screen and edited-bow evidence in
 the [accepted combined cohort](../docs/planning/evidence/checkpoint2-held-books.md).

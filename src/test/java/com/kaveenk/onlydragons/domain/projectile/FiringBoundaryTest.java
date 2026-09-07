@@ -55,15 +55,19 @@ class FiringBoundaryTest {
     }
     @Test void duplexKeepsOriginalTracerGraceAndProfile() {
         var shot = shot(UUID.randomUUID(), UUID.randomUUID());
-        var primary = new OwnedProjectile(shot, UUID.randomUUID(),
-                com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile.RETURN_V2, 20);
-        var child = primary.child(FiringRules.child(shot, UUID.randomUUID(), 21, 5));
-        assertSame(primary.tracerProfile(), child.tracerProfile());
-        assertEquals(20, child.groupLaunchTick());
-        assertEquals(21, child.shot().launchTick());
-        assertTrue(child.tracerProfile().ballistic(22, child.groupLaunchTick()));
-        assertFalse(child.tracerProfile().ballistic(23, child.groupLaunchTick()));
-        assertThrows(IllegalArgumentException.class, () -> primary.child(shot(UUID.randomUUID(), UUID.randomUUID())));
+        for (var profile : com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile.values()) {
+            var primary = new OwnedProjectile(shot, UUID.randomUUID(), profile, 20);
+            var child = primary.child(FiringRules.child(shot, UUID.randomUUID(), 21, 5));
+            assertSame(profile, child.tracerProfile());
+            assertEquals(shot.launchPosition(), child.shot().launchPosition());
+            assertEquals(shot.initialVelocity(), child.shot().initialVelocity());
+            assertEquals(20, child.groupLaunchTick());
+            assertEquals(21, child.shot().launchTick());
+            assertEquals(profile != com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile.CALIBRATION_V1,
+                    child.tracerProfile().ballistic(22, child.groupLaunchTick()));
+            assertFalse(child.tracerProfile().ballistic(23, child.groupLaunchTick()));
+            assertThrows(IllegalArgumentException.class, () -> primary.child(shot(UUID.randomUUID(), UUID.randomUUID())));
+        }
     }
     @Test void cadenceBoundariesRetainHighAttackSpeed() {
         assertEquals(10, FiringRules.cooldown(0)); assertEquals(6, FiringRules.cooldown(99.99));

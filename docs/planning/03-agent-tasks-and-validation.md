@@ -225,9 +225,10 @@ authenticated-client visuals/input feel, Windows smoke and milestones remain pen
 T06d is not dispatched. T07b was dispatched from main `b2f0254` in the
 [owner assignment](https://github.com/Kav-K/OnlyDragons/issues/90#issuecomment-5575533461).
 The `symphony/gh-90` candidate adds `tracer-aimed/v3` at the existing captured
-profile/rules/continuity seam. Build passes 327 production tests with no failures,
+profile/rules/continuity seam. Build passes 329 production tests with no failures,
 errors or skips. Focused Paper, regression receipt, review and current CI remain
-pending; human aiming/visuals are separate. No firing/damage ownership changes. The [design contract](02-foundation-plan.md#checkpoint-feedback-contracts)
+pending; human aiming/visuals are separate. No firing/damage ownership changes. The six current v4 bows also select v3
+under the owner clarification; [iteration evidence and remaining gates](evidence/t07b-aimed-tracer.md). The [design contract](02-foundation-plan.md#checkpoint-feedback-contracts)
 records the exact first calibration and API constraints; do not substitute broad
 engine, dependency or fixture work. Shared loadout/presentation/profile edits are
 lead-coordinated, and each small PR retains independent review/current CI/runtime

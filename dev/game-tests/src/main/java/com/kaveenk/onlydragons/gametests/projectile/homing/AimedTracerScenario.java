@@ -34,6 +34,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
     private final Map<UUID, List<Double>> sampledDistances = new LinkedHashMap<>();
     private boolean appliedCorrect = true;
     private Location dragonAtRelease;
+    private long turnTick;
 
     public void start(ScenarioContext context) throws Exception {
         c = context; c.mechanicRevision("aimed-tracer-v3"); players = new PlayerFixture(c);
@@ -64,7 +65,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
         dragons.spawn(DevelopmentDragonService.SpawnMode.CALIBRATION, DragonFlight.Mode.ORBIT);
         dragon = (EnderDragon) Bukkit.getEntity(dragons.view().orElseThrow().entityId());
         var registry = CalibrationLoadouts.fireRegistry();
-        var item = registry.edit(registry.create("drawn_training_v4"), level == 0 ? Map.of() : Map.of("dragon_tracer", level), List.of());
+        var item = registry.edit(registry.create(name.equals("aimed") ? "ordinary_v4" : "drawn_training_v4"), level == 0 ? Map.of() : Map.of("dragon_tracer", level), List.of());
         players.setupItem("alpha", 0, new WeaponItemCodec(registry).encode(item));
         players.setupItem("alpha", 9, new ItemStack(Material.ARROW, 64));
         players.setupPosition("alpha", new Location(player().getWorld(), 160, 100-player().getEyeHeight(), 128, 0, -24));
@@ -92,6 +93,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
                     dragonAtRelease = dragon.getLocation();
                     c.check(stage + "_captured_native_shot", true, captured.tracerProfile() == TracerProfile.AIMED_V3
                             && captured.shot().drawScale() == 1 && latest.hasGravity()
+                            && captured.shot().weapon().definitionId().equals(stage.equals("aimed") ? "ordinary_v4" : "drawn_training_v4")
                             && captured.shot().projectileId().equals(latest.getUniqueId())
                             && latest.getShooter() == player());
                     next.run();
@@ -102,7 +104,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
     private void aimed() {
         // Turning away after launch must not remove an already aimed shot's eligibility either.
         players.request("alpha", "aimed-turn");
-        players.await("post launch turn away", 60, () -> Math.abs(player().getYaw()-180) < .01, () -> c.later(45, () -> {
+        players.await("post launch turn away", 60, () -> Math.abs(player().getYaw()-180) < .01, () -> { observeTurn(); c.later(45, () -> {
             var path = path(); var impact = hit();
             c.check("aimed_moving_part_assistance_and_collision", true, impact.isPresent() && impact.get().accepted()
                     && "DRAGON".equals(collisions.get(captured.shot().projectileId()))
@@ -114,20 +116,27 @@ public final class AimedTracerScenario implements Scenario, Listener {
                     && path.stream().anyMatch(f -> f.groupLaunchAge() < 3 && f.aim().isEmpty()));
             c.check("aimed_postshot_turn_keeps_capture", true, captured.shot().initialVelocity().z() > 0
                     && Math.abs(player().getYaw()-180) < .01 && impact.isPresent()
-                    && impact.get().projectile().equals(captured));
+                    && impact.get().projectile().equals(captured)
+                    && path.stream().anyMatch(f -> f.tick() >= turnTick && f.aim().isPresent()));
             journal(); trial("plain", 0, () -> shoot(() -> miss(() -> trial("side", 5, () -> shoot(this::turnedMiss)))));
-        }));
+        }); });
     }
     private void turnedMiss() {
         players.request("alpha", stage + "-turn");
-        players.await("post launch turn toward target", 60, () -> Math.abs(player().getYaw()) < .01, () -> miss(() -> {
+        players.await("post launch turn toward target", 60, () -> Math.abs(player().getYaw()) < .01, () -> { observeTurn(); miss(() -> {
             c.check(stage + "_turn_cannot_authorize", true, path().stream().allMatch(f -> f.aim().isEmpty())
                     && (stage.equals("side") ? captured.shot().initialVelocity().x() < -2 : captured.shot().initialVelocity().z() < -2)
-                    && Math.abs(player().getYaw()) < .01);
+                    && Math.abs(player().getYaw()) < .01 && path().stream().anyMatch(f -> f.tick() >= turnTick));
             c.check(stage + "_inside_v_radius_still_misses", true, sampledDistances.getOrDefault(captured.shot().projectileId(), List.of()).stream().anyMatch(d -> d <= 20));
             if (stage.equals("side")) trial("behind", 5, () -> shoot(this::turnedMiss));
             else trial("range", 1, () -> shoot(() -> miss(this::obstruction)));
-        }));
+        }); });
+    }
+    private void observeTurn() {
+        turnTick = Integer.toUnsignedLong(Bukkit.getCurrentTick());
+        c.check(stage + "_turn_while_airborne", true, latest.isValid()
+                && c.production().bows().projectile(captured.shot().projectileId()).isPresent());
+        c.observe(stage + "TurnTick", turnTick);
     }
     private void miss(ScenarioContext.Step next) {
         c.later(50, () -> {
@@ -206,6 +215,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
     private void journal() {
         c.observe(stage+"Flight", Map.of("projectile",captured.shot().projectileId().toString(),"launch",vec(captured.shot().launchPosition()),
                 "direction",vec(captured.shot().initialVelocity()),"health",health(),"credit",credit(),"collision",collisions.getOrDefault(captured.shot().projectileId(),"NONE"),
+                "currentPartDistancesAfterGrace",sampledDistances.getOrDefault(captured.shot().projectileId(),List.of()),
                 "frames",path().stream().map(f -> Map.of("age",f.groupLaunchAge(),"position",vec(f.position()),"before",vec(f.before()),"after",vec(f.after()),
                         "aim",f.aim().map(a -> Map.of("point",vec(a.point()),"distance",a.distance(),"part",a.part().partId().toString())).orElse(Map.of()))).toList()));
     }

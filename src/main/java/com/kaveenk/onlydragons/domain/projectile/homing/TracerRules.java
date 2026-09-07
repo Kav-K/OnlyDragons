@@ -71,7 +71,9 @@ public final class TracerRules {
         double speed = length(initialVelocity), distance = length(launchToAim);
         if (!Double.isFinite(speed) || !Double.isFinite(distance)) throw new IllegalArgumentException("Vector magnitude overflow");
         if (speed == 0 || distance == 0) return false;
-        return dot(divide(initialVelocity, speed), divide(launchToAim, distance)) >= Math.cos(halfAngle);
+        double boundary = Math.cos(halfAngle);
+        // Normalizing arbitrary axes can round an exact boundary dot downward by a few ulps.
+        return dot(divide(initialVelocity, speed), divide(launchToAim, distance)) >= boundary - 4 * Math.ulp(boundary);
     }
     private static Optional<Aim> acquireWithin(Vector3 position, double radius, Collection<Part> parts, Predicate<Aim> visible) {
         return parts.stream().map(part -> {

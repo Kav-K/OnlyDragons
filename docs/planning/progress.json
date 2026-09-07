@@ -208,7 +208,7 @@
       },
       "reviewedRevision": "f4178ba53f4db1d75ff7d58503411a8bfe44d943",
       "mergedRevision": "25891c0f1c04a9df5ec796d8ba972f62c8c9cd50",
-      "notice": "PR #52 merged at 25891c0 after the complete 24-case f4178ba cohort, independent raw replay/review, actual-main T06/combined task checkpoints and current CI. Owned firing passed 115 assertion rows; the repaired equipment case passed 25. See evidence/t06-suite.md for exact identities and preserved failed iteration. Bounded firing/physical claims are complete; T08 accounting, successor dispatch and M1\u2013M5 remain separate."
+      "notice": "PR #52 merged at 25891c0 after the complete 24-case f4178ba cohort, independent raw replay/review, actual-main T06/combined task checkpoints and current CI. Owned firing passed 115 assertion rows; the repaired equipment case passed 25. See evidence/t06-suite.md for exact identities and preserved failed iteration. Bounded firing/physical claims are complete; T08 accounting, successor dispatch and M1–M5 remain separate."
     },
     "T07": {
       "status": "complete",
@@ -228,7 +228,7 @@
       },
       "reviewedRevision": "576e394181a2dde740ed5b4c5ceac231afaedf81",
       "mergedRevision": "2c0be584247a0fbaa409e21565f7289cc27daa06",
-      "notice": "PR #56 merged at 2c0be58 after the complete 26-case 576e394 cohort, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions and its cleanup control met the exact expected abort; retained firing passed 115. See evidence/t07-suite.md. Exactly P07/P10 are accepted; T08 accounting, T10 rehearsal and M1\u2013M5 remain separate."
+      "notice": "PR #56 merged at 2c0be58 after the complete 26-case 576e394 cohort, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions and its cleanup control met the exact expected abort; retained firing passed 115. See evidence/t07-suite.md. Exactly P07/P10 are accepted; T08 accounting, T10 rehearsal and M1–M5 remain separate."
     },
     "T08": {
       "status": "complete",
@@ -263,7 +263,7 @@
       },
       "reviewedRevision": "24ddf86eaa2fa870e90ae2d1face3ebd3f79a494",
       "mergedRevision": "3505d6cc58cd2cf9b09c2d21ac38ec6eca3f4c45",
-      "notice": "PR #57 merged at 3505d6c after the complete 28-case 24ddf86 cohort, independent raw replay/review, unchanged-input c0e6b2e replay, original/latest-main checkpoints and current CI. Exactly five T08 requirements complete; see evidence/t08-suite.md. Human/client observations, managed-dragon controls and M1\u2013M5 remain separate."
+      "notice": "PR #57 merged at 3505d6c after the complete 28-case 24ddf86 cohort, independent raw replay/review, unchanged-input c0e6b2e replay, original/latest-main checkpoints and current CI. Exactly five T08 requirements complete; see evidence/t08-suite.md. Human/client observations, managed-dragon controls and M1–M5 remain separate."
     },
     "T10": {
       "status": "blocked",
@@ -337,7 +337,7 @@
           "revision": "854287c4017f284b9263d54affd57fca02c033df"
         }
       },
-      "notice": "PR #60 merged at 889a3db after the complete hosted cohort, independent raw/source review, strict replay, actual-main checkpoint and current CI. Exactly managed-dragon-development complete; evidence/t08a-suite.md. Ranking and M1\u2013M5 remain separate.",
+      "notice": "PR #60 merged at 889a3db after the complete hosted cohort, independent raw/source review, strict replay, actual-main checkpoint and current CI. Exactly managed-dragon-development complete; evidence/t08a-suite.md. Ranking and M1–M5 remain separate.",
       "reviewedRevision": "854287c4017f284b9263d54affd57fca02c033df",
       "mergedRevision": "889a3db3ca7d43ebdd98bae262a61cccf20cca3a"
     },
@@ -598,7 +598,7 @@
       "notice": "User decision, 7 September 2026: keep vanilla bows and defer the animation fix. shortbow-no-draw remains deferred with no evidence. Preserve working native held input; do not research or dispatch this task unless the user reopens it. See issue #89 comment5575451702."
     },
     "T07b": {
-      "status": "in-progress",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
       "notice": "Dispatched from main b2f0254. Captured aimed profile implemented on symphony/gh-90; focused Paper and regression evidence pending. Earlier profiles and milestone gates retained."

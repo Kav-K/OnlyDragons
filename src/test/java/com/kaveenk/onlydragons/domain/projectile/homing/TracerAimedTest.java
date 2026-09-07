@@ -52,6 +52,16 @@ class TracerAimedTest {
         assertThrows(IllegalArgumentException.class, () -> TracerRules.acquire(ZERO, 5,
                 List.of(point(FORWARD)), a -> true, PROFILE, Optional.empty()));
     }
+    @Test void arbitraryAxisBoundarySurvivesNormalizationRoundoff() {
+        double length = Math.sqrt(35), perpendicularLength = Math.sqrt(10);
+        Vector3 direction = new Vector3(1 / length, 3 / length, 5 / length);
+        for (double delta : new double[]{-1e-10, 0, 1e-10}) {
+            double angle = Math.toRadians(30) + delta;
+            Vector3 point = new Vector3(Math.cos(angle) / length - Math.sin(angle) * 3 / perpendicularLength,
+                    Math.cos(angle) * 3 / length + Math.sin(angle) / perpendicularLength, Math.cos(angle) * 5 / length);
+            assertEquals(delta <= 0, TracerRules.withinLaunchCone(direction, point, PROFILE.aimHalfAngleRadians()));
+        }
+    }
     @Test void zeroVectorsCannotAuthorizeAndFiniteExtremesAreExplicit() {
         assertTrue(aim(ZERO, 5, FORWARD, false, ZERO).isEmpty());
         assertTrue(aim(ZERO, 5, ZERO, true, FORWARD).isEmpty());
