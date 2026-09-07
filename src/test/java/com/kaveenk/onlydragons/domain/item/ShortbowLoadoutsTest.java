@@ -23,7 +23,7 @@ class ShortbowLoadoutsTest {
             assertEquals(List.of(100d, 0d, 50d), List.of(stats.raw(StatKey.WEAPON_DAMAGE), stats.raw(StatKey.CRIT_CHANCE), stats.raw(StatKey.CRIT_DAMAGE)));
             assertEquals(row.getValue(), List.of(stats.effective(StatKey.ATTACK_SPEED), stats.effective(StatKey.FEROCITY), (double) FiringRules.cooldown(stats.effective(StatKey.ATTACK_SPEED))));
             assertEquals(row.getKey().equals("drawn_training_v4") ? WeaponDefinition.FiringMode.DRAWN_BOW : WeaponDefinition.FiringMode.SHORTBOW, item.resolvedWeapon().firingMode());
-            assertEquals(TracerProfile.RETURN_V2, TracerProfile.forDefinition(item.definition().weapon()));
+            assertEquals(TracerProfile.AIMED_V3, TracerProfile.forDefinition(item.definition().weapon()));
             assertEquals("calibration-items-v4", item.instance().registryRevision());
         }
     }
@@ -51,15 +51,33 @@ class ShortbowLoadoutsTest {
         var edited = registry.edit(original, Map.of("dragon_tracer", 5, "vicious", 5), List.of());
         assertEquals(original.identity(), edited.identity());
         var resolved = registry.resolve(edited);
-        assertEquals(TracerProfile.RETURN_V2, TracerProfile.forDefinition(resolved.definition().weapon()));
+        assertEquals(TracerProfile.AIMED_V3, TracerProfile.forDefinition(resolved.definition().weapon()));
         assertEquals(5, new StatSnapshotFactory(StatProfile.calibration()).create("edited", resolved.resolvedWeapon(), ModifierSources.empty()).snapshot().raw(StatKey.FEROCITY));
         var definition = resolved.definition().weapon();
         assertEquals(TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(new WeaponDefinition(definition.id(), 1, "fake", definition.firingMode(), 100, List.of(), List.of())));
         assertEquals(TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(new WeaponDefinition("fake", 1, "held-shortbows-v1", definition.firingMode(), 100, List.of(), List.of())));
         assertThrows(ItemValidationException.class, () -> registry.resolve(new ItemInstance(new WeaponIdentity(original.identity().instanceId(), original.identity().definitionId(), 1, "fake"), original.registryRevision(), Map.of(), List.of())));
         for (var item : registry.definitions().values()) {
-            if (!ShortbowLoadouts.ids().contains(item.weapon().id())) assertEquals(item.weapon().id().equals("tracer_return_v2") ? TracerProfile.RETURN_V2 : TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(item.weapon()));
+            if (!ShortbowLoadouts.ids().contains(item.weapon().id())) assertEquals(
+                    item.weapon().revision().equals(CalibrationLoadouts.FIRE_REVISION) ? TracerProfile.AIMED_V3
+                            : item.weapon().id().equals("tracer_return_v2") ? TracerProfile.RETURN_V2 : TracerProfile.CALIBRATION_V1,
+                    TracerProfile.forDefinition(item.weapon()));
         }
         assertEquals(34, registry.definitions().size());
+    }
+    @Test void allSixCurrentV4DefinitionsKeepAimedProfileAfterTracerBookEdits() {
+        for (String id : List.of("ordinary_v4", "shortbow_v4", "quiver_v4", "flame_v4", "duplex_flame_v4", "tempo_flame_v4")) {
+            var original = registry.create(id);
+            var edited = registry.edit(original, Map.of("dragon_tracer", 5), List.of());
+            assertEquals(original.identity(), edited.identity());
+            var trusted = registry.resolve(edited).resolvedWeapon();
+            assertEquals(TracerProfile.AIMED_V3, TracerProfile.forDefinition(trusted));
+            assertEquals(5, trusted.enchantments().getFirst().level());
+            assertEquals(TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(
+                    new WeaponDefinition(id, 1, "fake", trusted.firingMode(), 100, List.of(), List.of())));
+        }
+        assertEquals(TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(
+                new WeaponDefinition("fake", 1, CalibrationLoadouts.FIRE_REVISION,
+                        WeaponDefinition.FiringMode.DRAWN_BOW, 100, List.of(), List.of())));
     }
 }

@@ -249,6 +249,12 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 240
+    },
+    "aimed-tracer": {
+      "scenarioId": "aimed-tracer",
+      "expectation": "positive",
+      "scenarioTimeout": 180,
+      "testPlayer": "protocol-actions-v1"
     }
   },
   "suites": {
@@ -290,7 +296,8 @@
       "held-combat",
       "enchant-anvil",
       "anvil-boundaries",
-      "anvil-lifecycle"
+      "anvil-lifecycle",
+      "aimed-tracer"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -350,7 +357,8 @@
       "held-combat",
       "enchant-anvil",
       "anvil-boundaries",
-      "anvil-lifecycle"
+      "anvil-lifecycle",
+      "aimed-tracer"
     ]
   },
   "areas": {
@@ -426,7 +434,8 @@
         "held-combat",
         "enchant-anvil",
         "anvil-boundaries",
-        "anvil-lifecycle"
+        "anvil-lifecycle",
+        "aimed-tracer"
       ],
       "affects": [
         "stats",
@@ -643,7 +652,8 @@
         "held-combat",
         "enchant-anvil",
         "anvil-boundaries",
-        "anvil-lifecycle"
+        "anvil-lifecycle",
+        "aimed-tracer"
       ],
       "affects": []
     },
@@ -723,7 +733,10 @@
       "cases": [
         "tracer-continuity",
         "tracer-cleanup-abort",
-        "moving-tracer"
+        "moving-tracer",
+        "aimed-tracer",
+        "held-shortbows",
+        "held-combat"
       ],
       "affects": []
     },

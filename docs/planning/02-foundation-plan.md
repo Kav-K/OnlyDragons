@@ -961,10 +961,17 @@ implementation or dispatch. Preserve legacy calibration profiles and their evide
   retention**. Radii I–V are **4/8/12/16/20 blocks**, retention adds **4 blocks**,
   steering is at most **6 degrees/tick**, with the existing **3-tick ballistic
   grace**. Finite/zero-vector and exact-boundary cases require explicit handling.
+  Radius means current arrow-to-part surface distance: a far shot can enter range
+  naturally later, including after a target appears. The nearest real part-box
+  point supplies cone and steering aim. Zero launch or launch-to-aim vectors
+  cannot authorize guidance; non-finite magnitudes reject. The angle boundary
+  is inclusive with four ulps of cosine roundoff tolerance after normalization. V3 retains the v2 whole-part arena admission check.
   Turning the player later or looping an arrow nearby cannot authorize a shot
   originally aimed away. Preserve velocity magnitude, gravity, drag, collisions,
   line of sight, bounds and target generation/UUID; no snapping or guaranteed hits.
-  Route the current seven held-shortbow definitions to the new captured profile;
+  `tracer-aimed/v3` routes the seven held-kit definitions and six current
+  `FIRE_REVISION` bows to the new captured profile, including book-enchanted drawn
+  bows ([owner clarification](https://github.com/Kav-K/OnlyDragons/issues/90#issuecomment-5575641677));
   existing arrows and explicit legacy fixtures retain their original profiles.
   This is the lead's initial calibration, not user-selected final balance.
 
@@ -1098,7 +1105,8 @@ into the consumer-capable v4 registry, preserving all27 prior identities/values.
 is the calibration reference: drawn training; Swift AS100/5 ticks; Volley
 AS400/2 ticks; plain F0/F25/F100 controls; separate Tracer V+Duplex V and
 Tracer V+Fatal Tempo V bows, both baseF25, Infinite Quiver X and Flame II.
-All seven select returning Tracer v2 through trusted ID/revision; Tracer0 is inert.
+All seven now select aimed Tracer v3 through trusted ID/revision (T07b); Tracer0 is inert.
+The original held-fire evidence used returning v2 and retains that provenance.
 F100 guarantees one extra damage hit before buffs, not a visible projectile.
 
 The existing SHORTBOW loop remains the sole input/cooldown/ammo authority.

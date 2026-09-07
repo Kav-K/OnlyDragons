@@ -229,7 +229,7 @@ public final class HeldShortbowScenario implements Scenario, Listener {
                     var edited = ((ItemReadResult.Valid) codec.decode(anvilExpected)).item().instance();
                     c.check("held_anvil_collected_shot_keeps_enchant_and_return_profile",true,
                             shot.shot().weapon().equals(edited.identity())
-                            && shot.tracerProfile().revision().equals("tracer-return/v2")
+                            && shot.tracerProfile().revision().equals("tracer-aimed/v3")
                             && shot.shot().enchantments().stream().anyMatch(e -> e.id().equals("dragon_tracer") && e.level() == 5));
                     c.check("held_anvil_prior_arrows_keep_original_snapshot",true,
                             emissions.subList(0,anvilShots).stream().allMatch(p -> p.shot().enchantments().isEmpty()));
@@ -254,7 +254,7 @@ public final class HeldShortbowScenario implements Scenario, Listener {
         hold("capacity",()->c.later(22,()->{
             c.check("capacity_six_primary_six_children",List.of(6,12,58),List.of(primaries().size(),emissions.size(),ammo()));
             c.check("duplex_one_child_and_captured_profile",true,primaries().stream().allMatch(p->emissions.stream().filter(child->child.shot().parentProjectileId().filter(p.shot().projectileId()::equals).isPresent()).count()==1)
-                    &&emissions.stream().allMatch(p->p.tracerProfile().revision().equals("tracer-return/v2")));
+                    &&emissions.stream().allMatch(p->p.tracerProfile().revision().equals("tracer-aimed/v3")));
             c.check("capacity_saturation_preserves_settled_ammo",true,bows.trace().stream().anyMatch(t->t.kind().equals("ammo-settled"))&&bows.capacityUsed()==12);
             release("capacity",()->{journal("capacity");rejects();});
         }));

@@ -35,7 +35,7 @@ public final class ArrowContinuity implements AutoCloseable {
                     || !target.bounds().contains(vector(dragon.getLocation().toVector()))) continue;
             for (var part : dragon.getParts()) {
                 var box = part.getBoundingBox();
-                if (owned.tracerProfile() == com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile.RETURN_V2
+                if (owned.tracerProfile().requiresWholePartBounds()
                         && (!target.bounds().contains(vector(box.getMin())) || !target.bounds().contains(vector(box.getMax())))) continue;
                 parts.add(new TracerRules.Part(target.targetId(), part.getUniqueId(),
                         new TracerRules.Box(vector(box.getMin()), vector(box.getMax()))));
@@ -44,7 +44,8 @@ public final class ArrowContinuity implements AutoCloseable {
         var aim = owned.tracerProfile().ballistic(tick, owned.groupLaunchTick()) ? Optional.<TracerRules.Aim>empty()
                 : TracerRules.acquire(position, level, parts, candidate -> candidate.distance() == 0
                 || arrow.getWorld().rayTraceBlocks(arrow.getLocation(), bukkit(TracerRules.subtract(candidate.point(), position)),
-                candidate.distance(), FluidCollisionMode.NEVER, false) == null, owned.tracerProfile(), Optional.ofNullable(locks.get(id)));
+                candidate.distance(), FluidCollisionMode.NEVER, false) == null, owned.tracerProfile(), Optional.ofNullable(locks.get(id)),
+                owned.shot().launchPosition(), owned.shot().initialVelocity());
         if (aim.isPresent()) locks.put(id, aim.get().part().targetId()); else locks.remove(id);
         Vector3 after = aim.map(a -> TracerRules.steer(before, TracerRules.subtract(a.point(), position), owned.tracerProfile().turnRadians())).orElse(before);
         if (!after.equals(before)) arrow.setVelocity(bukkit(after));

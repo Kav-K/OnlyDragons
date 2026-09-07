@@ -1,6 +1,6 @@
 # Checkpoint 2: combat feedback, volleys and enchant books
 
-**Checkpoint 2 — the original seven scoped tasks retain automated acceptance. T07b is planned next; T06d is deferred by the user. Human milestone outcomes remain separate.**
+**Checkpoint 2 — the original seven scoped tasks retain automated acceptance. T07b is In review with focused Paper passes and hosted acceptance pending; T06d is deferred by the user. Human milestone outcomes remain separate.**
 
 The first managed dragon/ranking slice is integrated on main `36b420c`.
 The user now prioritizes a persistent dragon health bar, smoother bounded flight,
@@ -22,7 +22,7 @@ too bounded; other tested experience was reported good, without formal M3 accept
 | T07b / [#90](https://github.com/Kav-K/OnlyDragons/issues/90) | New captured aimed Tracer profile; preserve explicit old profiles and airborne arrows. |
 
 The [foundation contract](02-foundation-plan.md#checkpoint-feedback-contracts) records
-the first lead-selected calibration. T07b is the next single small chunk;
+the first lead-selected calibration. T07b is the single small chunk in review;
 T06d requires the user to reopen it. Neither is dispatched or implemented by registration. The selected
 [Old/Young/Armored/Master roles](05-encounter-expansion.md#selected-later-roster) remain
 later gated content, separate from these fixes and from armor gear.

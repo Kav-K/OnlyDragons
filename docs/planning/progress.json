@@ -598,10 +598,10 @@
       "notice": "User decision, 7 September 2026: keep vanilla bows and defer the animation fix. shortbow-no-draw remains deferred with no evidence. Preserve working native held input; do not research or dispatch this task unless the user reopens it. See issue #89 comment5575451702."
     },
     "T07b": {
-      "status": "planned",
+      "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Registered checkpoint-feedback issue #90; deferred requirement aimed-dragon-tracer. No implementation or acceptance evidence. Wait for integrated context and explicit lead dispatch; preserve earlier accepted profiles and every milestone gate."
+      "notice": "In review from main b2f0254. Clean e6ac40f passes aimed-tracer 36/36 and held-combat 23/23; see evidence/t07b-aimed-tracer.md. Per owner comment5575912810, lead owns hosted 48-case receipt, replay, acceptance and CI on published head. Human checks and milestone gates retained."
     }
   },
   "milestones": {

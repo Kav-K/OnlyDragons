@@ -21,7 +21,7 @@ OnlyDragons build. Start the human profile with Cursor Play as described in
    Run that teleport only after the operator confirms the pad and active arena.
    Adapt coordinates to an existing arena. Workers never edit the preserved human
    world or teleport its player. Recheck dragon `status` after positioning.
-5. Equip **Returning Volley · Tracer V + Duplex V**, aim upward into the cube and
+5. Equip **Returning Volley · Tracer V + Duplex V**, aim generally toward the dragon and
    hold right-click. One press starts instant arrows while held; releasing stops.
    Swap to **Returning Volley · Tracer V + Fatal Tempo V** and press again. Inspect
    `/onlydragons stats explain` and `/onlydragons combat last` for equipped totals
@@ -59,10 +59,16 @@ no Vicious bonus. Fatal Tempo starts from base25 and builds a shared temporary
 bonus on accepted hits. Ferocity procs are damage events, not extra visible arrows.
 Use the plain F0/F25/F100 bows to separate those comparisons from ultimate effects.
 
-All seven exact `held-shortbows-v1` definitions select returning Tracer v2;
-steering is inactive at Tracer level0. Tracer V acquires within40 blocks, retains
-8 blocks farther, turns at most18 degrees/tick and leaves the first3 volley ticks
-ballistic. Existing27 presets retain their original profiles/values. Books/lore
+All seven exact `held-shortbows-v1` definitions select aimed Tracer v3;
+steering is inactive at Tracer level0. Tracer I–V acquires within4/8/12/16/20
+blocks of a real part, retains4 blocks farther, turns at most6 degrees/tick and
+leaves the first3 volley ticks ballistic. Acquisition and retention also require
+the part aim point within30 degrees of the shot’s captured launch direction,
+measured from its captured launch position. Turning afterward does not change
+that cone; sideways/behind shots remain misses. This is a first tuning pass. The six other current v4 bows also use this aimed profile when given Tracer,
+including drawn bows enchanted through books. Historical v2/v3 catalogs and the
+explicit `tracer_return_v2` preset keep their original profiles; damage, ammo and
+proc values are unchanged. Books/lore
 use the integrated T02c presentation and anvil workflow. Actual anvil opening
 stops a new-tier hold, with matching received-screen and edited-bow evidence in
 the [accepted combined cohort](../docs/planning/evidence/checkpoint2-held-books.md).

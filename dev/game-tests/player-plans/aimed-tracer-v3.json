@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "planId": "aimed-tracer-v3",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "first",
+          "steps": [
+            {
+              "id": "aimed-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "aimed-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "aimed-turn",
+              "action": "look",
+              "args": {
+                "yaw": 180,
+                "pitch": 0
+              }
+            },
+            {
+              "id": "plain-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "plain-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "side-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "side-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "side-turn",
+              "action": "look",
+              "args": {
+                "yaw": 0,
+                "pitch": 0
+              }
+            },
+            {
+              "id": "behind-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "behind-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "behind-turn",
+              "action": "look",
+              "args": {
+                "yaw": 0,
+                "pitch": 0
+              }
+            },
+            {
+              "id": "range-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "range-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "blocked-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "blocked-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "end",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
