@@ -21,7 +21,7 @@ source/raw review, strict replay, all three task checkpoints and current CI.
 It includes 286 production, six companion and 33 applicable client tests with
 zero failures/errors/skips; [exact evidence and limitations](evidence/checkpoint2-ui-flight.md).
 
-T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort). T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 implementation hold. The lead must resume both after this single maintenance PR is accepted and merged; their existing prerequisites and feature gates remain unchanged. T08c/#41 remains planned and undispatched. Other requirements, prior
+T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort). MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; the lead released and dispatched T06b/#68 and T02c/#69. Their existing prerequisites and feature gates remain unchanged. T08c/#41 remains planned and undispatched. Other requirements, prior
 evidence and milestone states are unchanged; human outcomes remain separate.
 
 Baseline reconciled **6 September 2026** after PR #62 merged at
@@ -112,7 +112,7 @@ expiry and frozen training overkill credit; [exact acceptance evidence](evidence
 identities and dispositions; their earlier pending statements describe that history.
 
 T03b/T08d/T08e are now separately accepted through [PR #76](evidence/checkpoint2-ui-flight.md).
-T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort). T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 implementation hold. The lead must resume both after this single maintenance PR is accepted and merged; their existing prerequisites and feature gates remain unchanged. Human appearance,
+T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort). MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; the lead released and dispatched T06b/#68 and T02c/#69. Their existing prerequisites and feature gates remain unchanged. Human appearance,
 authenticated compatibility, balance/feel and M1–M5 remain unaccepted.
 
 ### T03b — Expanded bow enchants (GH-67)
@@ -138,7 +138,7 @@ in the [combined acceptance evidence](evidence/checkpoint2-ui-flight.md). The
 focused runs retain their original setup and scope. Current-profile Windows smoke,
 authenticated-client visuals/feel, performance and M1–M5 remain separate.
 T06c subsequently consumed these descriptors and is accepted through PR #81.
-Next consumers are T06b/T02c after the temporary MAINT-82 hold.
+T06b/T02c are dispatched consumers after accepted MAINT-82.
 
 ### T06c — Infinite Quiver and owned Flame (GH-70)
 
@@ -150,21 +150,30 @@ original identities. The fresh 42-case/48-boot cohort, strict replay, independen
 review, T06c checkpoint and Windows/Linux CI passed; only the named requirement
 is accepted. Human/full-client/Windows-final-deployment and M1–M5 remain pending.
 
-T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 implementation hold. The lead must resume both after this single maintenance PR is accepted and merged; their existing prerequisites and feature gates remain unchanged.
+MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; the lead released and dispatched T06b/#68 and T02c/#69. Their existing prerequisites and feature gates remain unchanged.
 
 ### MAINT-82 — Catalog and combat lifecycle readability
 
-**In review**, [draft PR #83](https://github.com/Kav-K/OnlyDragons/pull/83), [#82](https://github.com/Kav-K/OnlyDragons/issues/82),
-`symphony/gh-82`, dispatched from accepted main `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`.
-Bounded private catalog reuse/launch-veto extraction, local lifecycle readability,
-player JUnit pin reuse and documentation reconciliation; [scope and audit rationale](evidence/maintenance-82.md).
-Existing requirements, fixture bindings, public APIs and gameplay policy remain.
-Worker checks pass: pinned production/companion/client builds (303/6/33 tests),
-288 Python/25 bridge tests, static/no-weakening checks and clean-commit
-equipment-stats/owned-firing/owned-flame Paper scenarios (25/115/61 assertions),
-including focused raw/JUnit/artifact/cleanup replay. Tested inputs: `7ae38e3`. The lead owns the single fresh complete hosted cohort, strict
-raw/JUnit/artifact/cleanup replay, independent review and current-head CI.
-No maintenance acceptance or feature/milestone advancement is claimed.
+**Complete**, [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83), merged at
+`2158a51572d65e7e8856ec77f44b3decc982450c`; issue82 closed completed.
+The lead accepted the fresh42-case/48-boot hosted suite34082923431, strict replay,
+MAINT-82 checkpoint, independent reviews and final-head CI34082803590.
+[Acceptance and preserved worker evidence](evidence/maintenance-82.md#lead-acceptance).
+Public APIs and all27 prior definitions remain unchanged. This maintenance
+acceptance advances no gameplay, human or milestone gate.
+
+### T06b — Held shortbow tiers and combined loadouts
+
+**In progress**, [GH-68](https://github.com/Kav-K/OnlyDragons/issues/68),
+`symphony/gh-68` from accepted main2158a515. Additive seven named v4 presets,
+`dev shortbow help/list/kit`, shared-input invalidation and native held-state
+checks reuse the existing firing authority. [Contract](02-foundation-plan.md#t06b-held-shortbow-calibration-gh-68),
+[human quickstart](../../dev/shortbow-play.md), [evidence](evidence/t06b-held-shortbows.md).
+T03b/T08e/T06c are integrated. GH69 owns shared lore/book/anvil/client edits;
+the lead owns final combined new-tier→real-anvil opening with native view and
+received ANVIL packet, complete regression, current CI and acceptance. Worker
+focused evidence is separate. No `held-shortbow-loadouts` completion yet;
+authenticated-client visuals/input feel, Windows smoke and milestones remain pending.
 
 ## Shared context update protocol
 
@@ -659,7 +668,7 @@ all three task checkpoints and current CI; [final evidence](evidence/checkpoint2
 The focused archive retains exact inputs and integration history. Human appearance/
 readability, authenticated-client compatibility and M1–M5 remain unaccepted.
 T06c is integrated. T02c/T06b may consume the formatter boundary in document 02
-after the temporary MAINT-82 hold ends and the lead dispatches them.
+under the lead’s released dispatch and shared ownership split.
 
 ### T08e — Bounded flight and returning Tracer (GH-65)
 

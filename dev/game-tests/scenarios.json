@@ -2654,5 +2654,138 @@
     ],
     "testPlayerMode": "protocol-actions-v1",
     "playerActionPlan": "dev/game-tests/player-plans/owned-flame-v1.json"
+  },
+  "held-shortbows": {
+    "mechanicRevision": "held-shortbows-v1",
+    "requiredAssertions": [
+      "kit_permission_no_mutation",
+      "real_kit_exact_bows_arrows",
+      "real_kit_all_identities",
+      "mixed_input_shared_five_tick_cooldown",
+      "mixed_input_one_ammo_per_group",
+      "crossbow_swap_stops_hold",
+      "returning_slot_does_not_resume_old_hold",
+      "same_uuid_edit_stops_hold",
+      "old_shot_keeps_unenchanted_snapshot",
+      "capacity_six_primary_six_children",
+      "duplex_one_child_and_captured_profile",
+      "capacity_saturation_preserves_settled_ammo",
+      "empty_no_admission_or_ammo",
+      "last_arrow_no_negative_or_duplicate",
+      "launch_veto_refunds_capacity_ammo",
+      "arena_exit_clears_hold",
+      "target_death_stops_and_cleans_hold",
+      "reset_stops_and_releases_all",
+      "owner_death_stops_and_cleans",
+      "quit_clears_session",
+      "reconnect_does_not_resume_hold",
+      "disable_stops_only_owned_loop_and_resources",
+      "swift_literal_20_tick_primary_count",
+      "swift_literal_cadence",
+      "swift_native_hold_still_raised",
+      "swift_literal_ammo",
+      "swift_release_stops_and_no_native_duplicate",
+      "swift_one_debit_per_primary",
+      "volley_literal_20_tick_primary_count",
+      "volley_literal_cadence",
+      "volley_native_hold_still_raised",
+      "volley_literal_ammo",
+      "volley_release_stops_and_no_native_duplicate",
+      "volley_one_debit_per_primary",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "owned_listeners_removed",
+      "launch_callback_stop_not_overwritten"
+    ],
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/held-shortbows-v1.json",
+    "requiredPlayerMessages": [
+      {
+        "id": "held-0",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "You do not have permission to use calibration tools."
+        ]
+      },
+      {
+        "id": "held-1",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Usage: /onlydragons dev shortbow"
+        ]
+      },
+      {
+        "id": "held-2",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "swift_shortbow_v4"
+        ]
+      },
+      {
+        "id": "held-3",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "volley_duplex_v4"
+        ]
+      },
+      {
+        "id": "held-4",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "volley_tempo_v4"
+        ]
+      },
+      {
+        "id": "held-5",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "25 Ferocity = 25% extra hit"
+        ]
+      },
+      {
+        "id": "held-6",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Granted seven training bows and 512 arrows."
+        ]
+      }
+    ]
+  },
+  "held-combat": {
+    "mechanicRevision": "held-combat-v1",
+    "requiredAssertions": [
+      "sustained_duplex_real_all_collisions",
+      "duplex_literal_damage_fire_hp_credit",
+      "duplex_literal_fire_nine_observed_duration",
+      "duplex_25f_no_proc_at_point99",
+      "sustained_quiver_one_charge_per_trigger",
+      "moving_dragon_and_same_uuid_return",
+      "new_volley_captured_return_profile",
+      "injected_native_positive_guard_observed",
+      "exact_native_projection",
+      "tempo_captured_after_swap",
+      "tempo_shared_bonus_built",
+      "swapped_duplex_uses_shared_base25_buff",
+      "tempo_before_original_expiry",
+      "duplex_does_not_refresh_tempo",
+      "swapped_literal_health_credit",
+      "swapped_no_unplanned_procs",
+      "held_physical_veto_no_health_score_or_effects",
+      "moving_held_reset_releases_resources",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "owned_listeners_removed"
+    ],
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/held-combat-v1.json"
   }
 }

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "planId": "held-combat-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "duplex-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "duplex-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "tempo-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "tempo-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "duplex-slot",
+              "action": "selectSlot",
+              "args": {
+                "slot": 1
+              }
+            },
+            {
+              "id": "after-swap",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "end",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

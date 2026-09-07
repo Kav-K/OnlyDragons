@@ -51,6 +51,18 @@
     {
       "command": "onlydragons dev dragon spawn standard orbit extra",
       "expect": "Usage: .*spawn \\[standard\\|training\\|calibration\\] \\[orbit\\|stationary\\]"
+    },
+    {
+      "command": "onlydragons dev shortbow help",
+      "expect": "Usage: /onlydragons dev shortbow"
+    },
+    {
+      "command": "onlydragons dev shortbow list",
+      "expect": "volley_tempo_v4"
+    },
+    {
+      "command": "onlydragons dev shortbow kit",
+      "expect": "This command requires a player\\."
     }
   ]
 }

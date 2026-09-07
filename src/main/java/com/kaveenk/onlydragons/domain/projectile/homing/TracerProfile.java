@@ -1,6 +1,7 @@
 package com.kaveenk.onlydragons.domain.projectile.homing;
 
 import com.kaveenk.onlydragons.domain.item.WeaponDefinition;
+import com.kaveenk.onlydragons.domain.item.ShortbowLoadouts;
 import java.util.Objects;
 
 /** Trusted, immutable OnlyDragons calibration. No item-supplied profile field is decoded. */
@@ -29,7 +30,8 @@ public enum TracerProfile {
     /** Call only with the registry-resolved definition, never raw PDC identity. */
     public static TracerProfile forDefinition(WeaponDefinition trusted) {
         Objects.requireNonNull(trusted);
-        return trusted.id().equals("tracer_return_v2") && trusted.revision().equals("tracer-return-v2")
+        return (trusted.id().equals("tracer_return_v2") && trusted.revision().equals("tracer-return-v2"))
+                || ShortbowLoadouts.returningTracer(trusted)
                 ? RETURN_V2 : CALIBRATION_V1;
     }
 }

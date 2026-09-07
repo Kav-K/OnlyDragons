@@ -493,16 +493,16 @@
       "reviewedRevision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
     },
     "T06b": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged. Temporary lead implementation hold during MAINT-82; lead must resume after cleanup acceptance and merge. No prerequisite or evidence is removed."
+      "notice": "MAINT-82 accepted and merged at2158a515; lead released and dispatched this task. Implementation is not requirement acceptance. Existing prerequisites and gates remain; rewards disabled. T06b owns common status reconciliation and quickstart; T02c owns shared lore/books/anvil/client changes."
     },
     "T02c": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged. Temporary lead implementation hold during MAINT-82; lead must resume after cleanup acceptance and merge. No prerequisite or evidence is removed."
+      "notice": "MAINT-82 accepted and merged at2158a515; lead released and dispatched this task. Implementation is not requirement acceptance. Existing prerequisites and gates remain; rewards disabled. T06b owns common status reconciliation and quickstart; T02c owns shared lore/books/anvil/client changes."
     },
     "T06c": {
       "status": "complete",
@@ -520,10 +520,58 @@
       "notice": "Exactly T06c accepted after PR81 fresh 42-case cohort, strict replay, independent review, task checkpoint and current CI. See docs/planning/evidence/t06c-focused-paper.md#accepted-hosted-cohort. Failed run34074476010 remains failed. Human/full-client/Windows-final-deployment/M1-M5 remain unaccepted; rewards disabled."
     },
     "MAINT-82": {
-      "status": "active",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "In review: draft PR83 https://github.com/Kav-K/OnlyDragons/pull/83 from accepted main53164f85. Clean inputs7ae38e3 pass worker builds303/6/33, Python288/bridge25, static/no-weakening, focused Paper25/115/61 and strict focused replay. Lead complete final-head hosted cohort/replay/review/current CI and acceptance pending. No completed requirements claimed. See docs/planning/evidence/maintenance-82.md."
+      "status": "complete",
+      "completedRequirements": [
+        "item-codec",
+        "equipment-service",
+        "expanded-bow-enchantments",
+        "firing-input",
+        "quiver-flame-integration",
+        "managed-dragon-development",
+        "suite-baseline",
+        "checkpoint-unit-checks",
+        "bridge-unit-checks"
+      ],
+      "evidence": {
+        "item-codec": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "equipment-service": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "expanded-bow-enchantments": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "firing-input": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "quiver-flame-integration": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "managed-dragon-development": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "suite-baseline": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "checkpoint-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "bridge-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        }
+      },
+      "notice": "Accepted PR83; full42-case/48-boot hosted suite34082923431, strict replay, checkpoint, independent review and final-head CI34082803590 passed. Acceptance5565312809. Original worker evidence retained in docs/planning/evidence/maintenance-82.md. No gameplay/human/milestone advancement.",
+      "mergedRevision": "2158a51572d65e7e8856ec77f44b3decc982450c"
     }
   },
   "milestones": {

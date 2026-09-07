@@ -219,6 +219,18 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 240
+    },
+    "held-shortbows": {
+      "scenarioId": "held-shortbows",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
+    },
+    "held-combat": {
+      "scenarioId": "held-combat",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
     }
   },
   "suites": {
@@ -255,7 +267,9 @@
       "dragon-restart-moving",
       "expanded-bow",
       "quiver-ammo",
-      "owned-flame"
+      "owned-flame",
+      "held-shortbows",
+      "held-combat"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -310,7 +324,9 @@
       "dragon-restart-moving",
       "expanded-bow",
       "quiver-ammo",
-      "owned-flame"
+      "owned-flame",
+      "held-shortbows",
+      "held-combat"
     ]
   },
   "areas": {
@@ -381,7 +397,9 @@
         "dragon-restart-moving",
         "expanded-bow",
         "quiver-ammo",
-        "owned-flame"
+        "owned-flame",
+        "held-shortbows",
+        "held-combat"
       ],
       "affects": [
         "stats",
@@ -422,7 +440,9 @@
       ],
       "cases": [
         "foundation-contracts",
-        "item-identity"
+        "item-identity",
+        "held-shortbows",
+        "held-combat"
       ],
       "affects": [
         "combat",
@@ -466,7 +486,9 @@
         "projectile-player-feasibility",
         "owned-firing",
         "tracer-continuity",
-        "tracer-cleanup-abort"
+        "tracer-cleanup-abort",
+        "held-shortbows",
+        "held-combat"
       ],
       "affects": [
         "practice-combat"
@@ -589,7 +611,9 @@
         "dragon-restart-moving",
         "expanded-bow",
         "quiver-ammo",
-        "owned-flame"
+        "owned-flame",
+        "held-shortbows",
+        "held-combat"
       ],
       "affects": []
     },
@@ -604,7 +628,9 @@
         "stats-resolution",
         "item-identity",
         "equipment-stats",
-        "equipment-player"
+        "equipment-player",
+        "held-shortbows",
+        "held-combat"
       ],
       "affects": [
         "combat",
@@ -773,6 +799,19 @@
       "cases": [
         "quiver-ammo",
         "owned-flame"
+      ],
+      "affects": []
+    },
+    "held-shortbows": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/command/ShortbowCommand.java",
+        "src/test/java/com/kaveenk/onlydragons/command/ShortbowCommandTest.java",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/projectile/HeldShortbowScenario.java",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/projectile/HeldCombatScenario.java"
+      ],
+      "cases": [
+        "held-shortbows",
+        "held-combat"
       ],
       "affects": []
     }

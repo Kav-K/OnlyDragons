@@ -326,6 +326,27 @@ these historical inputs do not validate changed MAINT-82 source.
 The [quiver-fire profile](02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70)
 is owner-selected OnlyDragons balance, with no new upstream mechanic claim.
 
+## Pinned client held-use semantics (T06b)
+
+Inspection of Mojang's official26.2 client binary, SHA1
+`2dc72797acbc1b63fc16a11c4ac393605f453754` (39,193,383 bytes), establishes the
+input distinction used by the fixture. Provenance: [official version metadata](https://piston-meta.mojang.com/v1/packages/3592ebc61c6b6c33bb8228fe5a9e90221df0be68/26.2.json).
+`javap -p -c` of the unobfuscated `Minecraft.handleKeybinds` shows that while
+LocalPlayer.isUsingItem is true, the client consumes click queues and releases
+when keyUse is no longer down; the trailing startUseItem branch requires
+!isUsingItem. `MultiPlayerGameMode.releaseUsingItem` sends RELEASE_USE_ITEM.
+The inventory key creates InventoryScreen; `Gui.setScreen` releases mouse/key
+mappings via KeyMapping.releaseAll, feeding that same native release path.
+This is pinned binary evidence, not a report of an authenticated human rehearsal.
+
+A faithful bounded protocol hold therefore sends one use, observes Paper's
+native main-hand raised state for a measured tick interval, then sends release.
+Repeated use packets alone do not establish a human hold. Ordinary client
+inventory opening is not necessarily a server InventoryOpenEvent; real server
+anvil opening requires separate event/view and received-screen evidence. Keep
+that combined GH68/GH69 check and full-client input feel pending. [T06b evidence](evidence/t06b-held-shortbows.md)
+records actual server tests separately from this client inspection.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

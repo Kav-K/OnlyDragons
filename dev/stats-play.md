@@ -1,8 +1,9 @@
 # Stats calibration in Cursor Play
 
-T01b supplies inspection and calibration items. T06 supplies owned firing inside
-API-admitted arenas; managed damage and player-facing practice arena commands
-remain T08 work. Outside an admitted arena the bows retain ordinary behavior.
+Stats inspection, owned firing and managed practice/dragon combat are integrated.
+For setup, seven modern bows, arrows and safe training-arena entry, follow the
+[held shortbow rehearsal](shortbow-play.md) first. Outside an admitted arena the
+bows retain ordinary behavior. The older presets below remain available.
 
 1. In Cursor use **Tasks: Run Build Task**, then **Tasks: Run Task → Minecraft:
    Play (build + start server)** (or `.\mcdev play`). Connect an authenticated

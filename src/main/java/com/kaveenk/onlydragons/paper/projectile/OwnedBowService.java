@@ -8,8 +8,8 @@ import com.kaveenk.onlydragons.domain.enchant.EnchantEffects;
 import com.kaveenk.onlydragons.domain.enchant.OverloadCapture;
 import com.kaveenk.onlydragons.domain.enchant.QuiverFlameProfile;
 import com.kaveenk.onlydragons.domain.item.ItemRegistry;
+import com.kaveenk.onlydragons.domain.item.ItemInstance;
 import com.kaveenk.onlydragons.domain.item.WeaponDefinition;
-import com.kaveenk.onlydragons.domain.item.WeaponIdentity;
 import com.kaveenk.onlydragons.domain.projectile.ArrowRegistry;
 import com.kaveenk.onlydragons.domain.projectile.FiringRules;
 import com.kaveenk.onlydragons.domain.projectile.OwnedProjectile;
@@ -78,8 +78,8 @@ public final class OwnedBowService implements AutoCloseable {
     }
 
     private record Target(UUID id, UUID encounter, LivingEntity entity) {}
-    private record Input(PlayerInteractEvent event, UUID session, long tick) {}
-    private record Hold(UUID session, WeaponIdentity weapon) {}
+    private record Input(PlayerInteractEvent event, UUID session, long tick, ItemInstance weapon, int slot) {}
+    private record Hold(UUID session, ItemInstance weapon, int slot) {}
     private static final class Group {
         final UUID id, owner, session;
         final Arena arena;
@@ -467,10 +467,13 @@ public final class OwnedBowService implements AutoCloseable {
                 || valid.item().resolvedWeapon().firingMode() != WeaponDefinition.FiringMode.SHORTBOW) return;
         activate(event.getPlayer());
         // Keep the final event object for next-tick veto. Do not poison its cancellation state ourselves.
-        inputs.putIfAbsent(event.getPlayer().getUniqueId(), new Input(event, sessions.get(event.getPlayer().getUniqueId()), now()));
+        inputs.putIfAbsent(event.getPlayer().getUniqueId(), new Input(event, sessions.get(event.getPlayer().getUniqueId()), now(),
+                valid.item().instance(), event.getPlayer().getInventory().getHeldItemSlot()));
     }
 
     void stopUsing(UUID owner) {
+        check();
+        inputs.remove(owner);
         holds.remove(owner);
     }
 
@@ -543,29 +546,36 @@ public final class OwnedBowService implements AutoCloseable {
         }
         for (var entry : List.copyOf(inputs.entrySet())) {
             Input input = entry.getValue();
-            if (input.tick() >= tick) {
+            if (input.tick() >= tick || inputs.get(entry.getKey()) != input) {
                 continue;
             }
-            inputs.remove(entry.getKey());
-            Player player = input.event().getPlayer();
-            if (isCurrentSession(entry.getKey(), input.session()) && input.event().useItemInHand() != Event.Result.DENY) {
-                shortbow(player);
-                if (input.event().getAction().isRightClick() && player.isHandRaised()) {
-                    var inspection = equipment.refresh(player);
-                    if (inspection.fingerprint().mainHand() instanceof ItemReadResult.Valid valid)
-                        holds.put(entry.getKey(), new Hold(input.session(), valid.item().instance().identity()));
+            try {
+                Player player = input.event().getPlayer();
+                if (isCurrentSession(entry.getKey(), input.session()) && input.event().useItemInHand() != Event.Result.DENY
+                        && sameInputWeapon(player, input.weapon(), input.slot())) {
+                    shortbow(player);
+                    // Launch callbacks can stop this press or end its session. Never recreate that authorization.
+                    if (inputs.get(entry.getKey()) == input && isCurrentSession(entry.getKey(), input.session())
+                            && sameInputWeapon(player, input.weapon(), input.slot())
+                            && input.event().getAction().isRightClick() && player.isHandRaised()
+                            && player.getHandRaised() == EquipmentSlot.HAND) {
+                        holds.put(entry.getKey(), new Hold(input.session(), input.weapon(), input.slot()));
+                    }
                 }
+            } finally {
+                inputs.remove(entry.getKey(), input);
             }
         }
         for (var entry : List.copyOf(holds.entrySet())) {
+            if (holds.get(entry.getKey()) != entry.getValue()) continue;
             Player player = Bukkit.getPlayer(entry.getKey());
             Hold hold = entry.getValue();
-            if (player == null || !player.isHandRaised() || !isCurrentSession(entry.getKey(), hold.session())) {
+            if (player == null || !player.isHandRaised() || player.getHandRaised() != EquipmentSlot.HAND
+                    || !isCurrentSession(entry.getKey(), hold.session())) {
                 holds.remove(entry.getKey());
                 continue;
             }
-            var inspection = equipment.refresh(player);
-            if (!(inspection.fingerprint().mainHand() instanceof ItemReadResult.Valid valid) || !hold.weapon().equals(valid.item().instance().identity())) {
+            if (!sameInputWeapon(player, hold.weapon(), hold.slot())) {
                 holds.remove(entry.getKey());
                 continue;
             }
@@ -599,6 +609,12 @@ public final class OwnedBowService implements AutoCloseable {
                 }
             }
         }
+    }
+
+    private boolean sameInputWeapon(Player player, ItemInstance weapon, int slot) {
+        return player.getInventory().getHeldItemSlot() == slot
+                && equipment.refresh(player).fingerprint().mainHand() instanceof ItemReadResult.Valid valid
+                && weapon.equals(valid.item().instance());
     }
 
     private void shortbow(Player player) {

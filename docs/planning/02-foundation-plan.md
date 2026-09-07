@@ -1029,6 +1029,34 @@ satisfy that future feature gate. Human profiles and single-boot contracts remai
 unchanged; [runner details](../../dev/agent-paper-tests.md#same-profile-restart-fixtures)
 define the fixed evidence envelope.
 
+## T06b held shortbow calibration (GH-68)
+
+Owner-selected development data adds seven exact `held-shortbows-v1` definitions
+into the consumer-capable v4 registry, preserving all27 prior identities/values.
+[The quickstart table](../../dev/shortbow-play.md#published-development-calibration)
+is the calibration reference: drawn training; Swift AS100/5 ticks; Volley
+AS400/2 ticks; plain F0/F25/F100 controls; separate Tracer V+Duplex V and
+Tracer V+Fatal Tempo V bows, both baseF25, Infinite Quiver X and Flame II.
+All seven select returning Tracer v2 through trusted ID/revision; Tracer0 is inert.
+F100 guarantees one extra damage hit before buffs, not a visible projectile.
+
+The existing SHORTBOW loop remains the sole input/cooldown/ammo authority.
+A pending input and active hold capture the complete validated item instance
+and selected slot. Release, slot/hand/drop/inventory activity invalidates input;
+session/arena/target/death/quit/reset/disable retain their existing cleanup.
+Copied entries must still be current before dispatch. A synchronous launch
+callback that invalidates input must not reinstall the old hold. Invalidation
+preserves the shared cooldown and already accepted/airborne group ownership.
+
+`dev shortbow help/list/kit` uses the existing calibration permission. Kit grants
+seven bows and512 ordinary arrows only with15 empty storage slots. Setup remains
+an explicit dragon command; the first-use flow configures only when unconfigured,
+grants, spawns training orbit100000HP, checks status, then uses an operator-verified
+safe position. GH69 owns shared lore/book/anvil formatting and consumes resolved
+WeaponDefinition mode/modifiers plus FiringRules cadence. The lead combines those
+sources and verifies native anvil opening with matching received ANVIL metadata.
+No rewards, balance-table replacement or milestone acceptance is introduced.
+
 ## 13. Milestones and completion gates
 
 | Milestone | Playable outcome | Exit gate |

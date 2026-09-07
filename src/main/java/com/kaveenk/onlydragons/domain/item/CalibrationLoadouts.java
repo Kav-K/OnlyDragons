@@ -137,6 +137,7 @@ public final class CalibrationLoadouts {
                     100, id.equals("tempo_flame_v4") ? List.of(flat("item:tempo_flame_v4", StatKey.FEROCITY, 25)) : List.of(), selected),
                     id.replace('_', ' ') + " (Development)", "BOW", Set.of()));
         }
+        definitions.addAll(ShortbowLoadouts.definitions());
         return new ItemRegistry(FIRE_REVISION, definitions, enchants, Map.of());
     }
 
