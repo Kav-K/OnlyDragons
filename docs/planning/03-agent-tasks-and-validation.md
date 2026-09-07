@@ -152,6 +152,31 @@ is accepted. Human/full-client/Windows-final-deployment and M1–M5 remain pendi
 
 T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 implementation hold. The lead must resume both after this single maintenance PR is accepted and merged; their existing prerequisites and feature gates remain unchanged.
 
+### T02c — Custom enchant books and XP-cost anvils (GH-69)
+
+**In progress**, `symphony/gh-69`, dispatched by the owner from accepted main
+`2158a51572d65e7e8856ec77f44b3decc982450c`; [current dispatch and settled contracts](https://github.com/Kav-K/OnlyDragons/issues/69#issuecomment-5565338834).
+T03b/T08d/T06c and MAINT-82 are integrated. GH68 owns the common hold-release
+reconciliation; this entry records the feature's actual resumed state.
+
+Implemented candidate: strict ten-enchant books/command, pure compatibility and
+cost recipes, metadata-preserving bow edits, native-debit anvil service/listener,
+readable item presentation and bounded protocol anvil observations/actions.
+[Contract](02-foundation-plan.md#t02c-books-and-native-anvil-transactions-gh-69).
+Build passed 311 production tests with no failures/errors/skips; the first client
+build and focused Python replay checks passed. These remain iteration evidence.
+Paper iteration `82fc5bd9c0c74c26b0774f461b5b9478` passed all ten command/preview/
+native XP/metadata transactions, then failed the collected-bow firing stage because
+the fixture shot origin intersected its placed anvil. Both owned JVMs cleaned up
+without force; the incomplete client exited 1. The firing setup is moved clear.
+No complete Paper or acceptance pass is claimed from that run.
+
+Next: fresh all-ten, compatibility and lifecycle cases on clean committed inputs,
+received-preview/XP/conservation replay and affected cross-feature regressions.
+Final combined cohort/review/current CI remains lead-owned under dispatch.
+Authenticated clients, GUI/lore appearance, Windows smoke and human feel remain
+unrun. No milestone or reward/armor behavior is enabled.
+
 ### MAINT-82 — Catalog and combat lifecycle readability
 
 **In review**, [draft PR #83](https://github.com/Kav-K/OnlyDragons/pull/83), [#82](https://github.com/Kav-K/OnlyDragons/issues/82),

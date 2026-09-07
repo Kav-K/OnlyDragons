@@ -499,10 +499,10 @@
       "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged. Temporary lead implementation hold during MAINT-82; lead must resume after cleanup acceptance and merge. No prerequisite or evidence is removed."
     },
     "T02c": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged. Temporary lead implementation hold during MAINT-82; lead must resume after cleanup acceptance and merge. No prerequisite or evidence is removed."
+      "notice": "GH69 dispatched after integrated prerequisites at2158a51. Implementation and focused native/received-client validation in progress; no automated acceptance or human gate claimed. Final combined suite/replay/CI/review remains lead-owned under issue69 dispatch. Rewards and armor effects disabled."
     },
     "T06c": {
       "status": "complete",

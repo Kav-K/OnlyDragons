@@ -114,6 +114,17 @@ record ActionPlan(String planId, List<String> targets, List<Actor> actors, Strin
                 result.put("slot", integer(args.get("slot"), 5, 45));
                 result.put("button", choice(args.get("button"), "left", "right"));
             }
+            case "anvilClick" -> {
+                args = object(raw, "slot", "button");
+                result.put("slot", integer(args.get("slot"), 0, 38));
+                result.put("button", choice(args.get("button"), "left", "right", "shift-left", "shift-right", "drop", "hotbar-1"));
+            }
+            case "anvilRename" -> {
+                args = object(raw, "name"); String name = string(args.get("name"));
+                require(name.length() <= 50 && name.codePoints().noneMatch(c -> Character.isISOControl(c) || c == 0xA7), "Invalid anvil name");
+                result.put("name", name);
+            }
+            case "anvilClose" -> object(raw);
             case "dropItem" -> { args = object(raw, "all"); result.put("all", bool(args.get("all"))); }
             case "reconnect" -> { args = object(raw, "delayMillis"); result.put("delayMillis", integer(args.get("delayMillis"), 100, 5000)); }
             case "interactBlock" -> {

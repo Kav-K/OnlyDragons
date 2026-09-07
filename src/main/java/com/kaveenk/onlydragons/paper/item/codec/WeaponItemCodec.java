@@ -51,6 +51,32 @@ public final class WeaponItemCodec {
         return stack;
     }
 
+    /** Edits only the owned root and generated lore; identity, rolls and all other components survive. */
+    public ItemStack edit(ItemStack original, ItemInstance replacement) {
+        requireServerThread();
+        if (!(decode(original) instanceof ItemReadResult.Valid valid)) {
+            throw malformed("Cannot edit an invalid or unmanaged weapon");
+        }
+        var before = valid.item().instance();
+        if (!before.identity().equals(replacement.identity())
+                || !before.registryRevision().equals(replacement.registryRevision())
+                || !before.rolledModifierIds().equals(replacement.rolledModifierIds())) {
+            throw malformed("An enchant edit cannot change identity, catalog or rolls");
+        }
+        var resolved = registry.resolve(replacement);
+        var result = original.clone();
+        var meta = result.getItemMeta();
+        var encoded = encode(replacement).getItemMeta().getPersistentDataContainer();
+        meta.getPersistentDataContainer().set(ROOT, PersistentDataType.TAG_CONTAINER,
+                required(encoded, ROOT, PersistentDataType.TAG_CONTAINER));
+        ItemPresentation.refreshLore(meta, resolved, registry);
+        result.setItemMeta(meta);
+        if (!(decode(result) instanceof ItemReadResult.Valid after) || !after.item().instance().equals(replacement)) {
+            throw malformed("Edited weapon failed final validation");
+        }
+        return result;
+    }
+
     public ItemReadResult decode(ItemStack stack) {
         requireServerThread();
         if (stack == null || !stack.hasItemMeta()) return new ItemReadResult.NotManaged();

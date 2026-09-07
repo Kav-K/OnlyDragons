@@ -13,6 +13,8 @@ import com.kaveenk.onlydragons.paper.encounter.ManagedCombatService;
 import com.kaveenk.onlydragons.paper.encounter.presentation.DragonHealthPresenter;
 import com.kaveenk.onlydragons.paper.item.equipment.EquipmentListener;
 import com.kaveenk.onlydragons.paper.item.equipment.EquipmentStatsService;
+import com.kaveenk.onlydragons.paper.item.anvil.CustomAnvilService;
+import com.kaveenk.onlydragons.paper.item.anvil.CustomAnvilListener;
 import com.kaveenk.onlydragons.paper.projectile.OwnedBowListener;
 import com.kaveenk.onlydragons.paper.projectile.OwnedBowService;
 import com.kaveenk.onlydragons.service.GreetingService;
@@ -21,6 +23,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 // MockBukkit subclasses the entry point while loading it in tests.
 public class OnlyDragonsPlugin extends JavaPlugin {
+    private CustomAnvilService anvils;
+    public CustomAnvilService anvils() { return anvils; }
     private ManagedCombatService combat;
     public ManagedCombatService combat() {
         return combat;
@@ -62,6 +66,8 @@ public class OnlyDragonsPlugin extends JavaPlugin {
         equipment = new EquipmentStatsService(
                 items,
                 StatProfile.calibration());
+        anvils = new CustomAnvilService(this, items);
+        getServer().getPluginManager().registerEvents(new CustomAnvilListener(anvils), this);
         bows = new OwnedBowService(this, equipment, 2000, Math::random);
         getServer().getPluginManager().registerEvents(new OwnedBowListener(bows), this);
         bows.start();
@@ -95,6 +101,15 @@ public class OnlyDragonsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         try {
+            if (anvils != null) anvils.close();
+        } finally {
+            closeCombatServices();
+        }
+        getLogger().info("OnlyDragons disabled");
+    }
+
+    private void closeCombatServices() {
+        try {
             try {
                 try {
                     if (dragonHealth != null) {
@@ -121,6 +136,5 @@ public class OnlyDragonsPlugin extends JavaPlugin {
                 }
             }
         }
-        getLogger().info("OnlyDragons disabled");
     }
 }

@@ -42,6 +42,7 @@ final class ActionSession extends SessionAdapter {
     private final BossBarObservation bossBars = new BossBarObservation();
     private final List<Map<String,Object>> styledMessages = new ArrayList<>();
     private final InventoryState inventory = new InventoryState();
+    private final AnvilState anvil = new AnvilState();
     private boolean login, loaded, requestedDisconnect, disconnected, dead;
     private int next, sequence, teleports;
     private String error = "";
@@ -83,6 +84,7 @@ final class ActionSession extends SessionAdapter {
     private synchronized Effects receive(Packet packet) {
         if (!error.isEmpty() || disconnected || requestedDisconnect) return new Effects(List.of(), null, null);
         inventory.receive(packet);
+        anvil.receive(packet);
         if (observeUi && packet instanceof org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundBossEventPacket boss) bossBars.receive(boss);
         entityMotion.receive(packet);
         var outgoing = new ArrayList<Packet>();
@@ -111,6 +113,7 @@ final class ActionSession extends SessionAdapter {
             // A new world/session view invalidates all previously observed network IDs.
             entities.clear(); entityIds.clear(); loaded = false; dead = false;
             inventory.reset();
+            anvil.reset();
         } else if (packet instanceof ClientboundAddEntityPacket entity) {
             check(entities.size() < 4096 || entities.containsKey(entity.getUuid()), "Observed entity limit exceeded");
             UUID old = entityIds.put(entity.getEntityId(), entity.getUuid());
@@ -162,14 +165,17 @@ final class ActionSession extends SessionAdapter {
         if (behavior.equals("idle")) return new Effects(List.of(), null, null);
         ActionPlan.Step step = definition.steps().get(next);
         InventoryState.Click click = step.action().equals("inventoryClick") ? inventory.click(step) : null;
-        List<Packet> packets = click == null ? packets(step) : List.of(click.packet());
+        AnvilState.Action anvilAction = step.action().startsWith("anvil") ? anvil.action(step) : null;
+        List<Packet> packets = anvilAction != null ? List.of(anvilAction.packet()) : click == null ? packets(step) : List.of(click.packet());
+        if (step.action().equals("anvilClose")) inventory.clientClosedContainer();
         next++;
         String disconnect = null;
         if (step.action().equals("disconnect") || step.action().equals("reconnect")) {
             inventory.requireSettled();
+            anvil.requireSettled();
             requestedDisconnect = true; disconnect = "Declared action " + step.action();
         }
-        Map<String, Object> evidence = click != null ? click.evidence() : step.action().equals("attackEntity")
+        Map<String, Object> evidence = anvilAction != null ? anvilAction.evidence() : click != null ? click.evidence() : step.action().equals("attackEntity")
                 ? Map.of("targetUuid", targets.get(step.text("targetRef")).toString(),
                          "networkEntityId", ((ServerboundAttackPacket) packets.getFirst()).getEntityId()) : Map.of();
         return new Effects(packets, step, disconnect, evidence);
@@ -243,6 +249,7 @@ final class ActionSession extends SessionAdapter {
         result.put("entityMotion", entityMotion.report());
         result.put("inventorySnapshots", inventory.snapshots());
         result.put("inventoryConfirmations", inventory.confirmations());
+        if (anvil.observed()) result.put("anvil",anvil.report());
         result.put("disconnected", disconnected); result.put("passed", successful()); result.put("error", error);
         return Collections.unmodifiableMap(result);
     }
