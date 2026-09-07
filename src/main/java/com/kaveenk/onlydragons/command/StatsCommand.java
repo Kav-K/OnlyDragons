@@ -11,10 +11,25 @@ import com.kaveenk.onlydragons.application.PresentationFormatter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-/** Parsing/presentation only; item validation and resolution belong to the equipment service. */
+/**
+ * Parsing and display boundary for equipment inspection and session-only bonuses.
+ * {@link EquipmentStatsService} owns validation and arithmetic; generated chat never
+ * becomes an input to stats. Invoke commands on the classic Paper server thread.
+ */
 public final class StatsCommand {
     private final EquipmentStatsService stats;
+    /**
+     * Binds the command to its existing authority; does not register listeners or tasks.
+     * @param stats server-thread equipment/snapshot authority
+     */
     public StatsCommand(EquipmentStatsService stats) { this.stats = stats; }
+    /**
+     * Checks stats/calibration permission and player ownership before inspection or
+     * a development edit. Bonus candidates validate atomically; a full inventory
+     * rejects a loadout grant without replacing or dropping existing items.
+     * @param sender requester and feedback recipient
+     * @param args nonempty root arguments starting with stats or dev
+     */
     public void execute(CommandSender sender, String[] args) {
         boolean dev = args[0].equalsIgnoreCase("dev");
         if (!sender.hasPermission(dev ? "onlydragons.calibration" : "onlydragons.stats")) {
@@ -52,6 +67,12 @@ public final class StatsCommand {
             } else say(sender, "Usage: /onlydragons dev loadout <id> | bonus <stat> <nonnegative amount> | clear");
         } catch (IllegalArgumentException invalid) { say(sender, "Invalid calibration request: " + invalid.getMessage()); }
     }
+    /**
+     * Revalidates both hands before emitting effective totals or full source provenance.
+     * Offhand identity is diagnostic only; it supplies no active weapon modifiers.
+     * @param player owner of the inspected equipment and output
+     * @param explain whether to include raw values, revision and arithmetic sources
+     */
     private void show(Player player, boolean explain) {
         var inspection = stats.refresh(player);
         var snapshot = inspection.stats().snapshot();
@@ -79,6 +100,11 @@ public final class StatsCommand {
         }
         say(player, "Ordinary crit probability=" + snapshot.ordinaryCritProbability());
     }
+    /**
+     * Renders typed codec outcomes without trusting item names or lore.
+     * @param result validated, invalid or unmanaged hand classification
+     * @return diagnostic identity/selections or the explicit invalid/unmanaged reason
+     */
     private String describe(ItemReadResult result) {
         return switch (result) {
             case ItemReadResult.Valid valid -> valid.item().instance().identity().definitionId() + " "
@@ -88,6 +114,12 @@ public final class StatsCommand {
             case ItemReadResult.NotManaged ignored -> "no validated weapon";
         };
     }
+    /**
+     * Lists permitted stat/development subcommands and trusted loadout/stat identifiers.
+     * @param sender requester used for permission filtering
+     * @param args nonempty root arguments including the partial token
+     * @return non-null candidate list, possibly empty; candidates are not prefix-filtered here
+     */
     public List<String> complete(CommandSender sender, String[] args) {
         if (args[0].equalsIgnoreCase("stats")) return sender.hasPermission("onlydragons.stats") && args.length == 2
                 ? List.of("explain") : List.of();
@@ -97,5 +129,10 @@ public final class StatsCommand {
         if (args.length == 3 && args[1].equalsIgnoreCase("bonus")) return Arrays.stream(StatKey.values()).map(StatKey::id).toList();
         return List.of();
     }
+    /**
+     * Sends semantic command text through the shared Adventure formatter.
+     * @param sender command recipient
+     * @param text plain semantic content; formatting does not change command state
+     */
     private static void say(CommandSender sender, String text) { sender.sendMessage(PresentationFormatter.message(text)); }
 }

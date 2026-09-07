@@ -16,25 +16,69 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-/** Strict PDC books. Ordinary names/lore/glint are never authority. */
+/**
+ * Strict schema-v1 custom-book codec, separate from managed weapon metadata.
+ * PDC and trusted {@link EnchantRecipes} validation supply authority; names, lore,
+ * native glint and native stored enchantments do not. All operations touching stacks
+ * require the classic Paper server thread. Only generated lore/glint and the owned
+ * root are replaced during an edit; foreign components and the existing name survive.
+ */
 public final class EnchantBookCodec {
+    /**
+     * Owned nested book root; its exact schema is independent of the weapon root.
+     */
     public static final NamespacedKey ROOT = key("enchant_book");
     private static final NamespacedKey SCHEMA = key("schema"), CATALOG = key("catalog"), ENCHANT = key("enchant"), LEVEL = key("level");
+    /**
+     * Separates validated custom books, malformed owned roots and ordinary items.
+     */
     public sealed interface Read {
+        /**
+         * Trusted single-enchantment book selection.
+         * @param book validated catalog revision, enchant ID and legal level
+         */
         record Valid(EnchantBook book) implements Read {}
+        /**
+         * Present custom root that failed schema, material, amount or recipe validation.
+         * @param reason diagnostic failure, never a replacement enchant selection
+         */
         record Invalid(String reason) implements Read {}
+        /**
+         * Absent book root, including null or metadata-free stacks; display text is ignored.
+         */
         record Ordinary() implements Read {}
     }
     private final EnchantRecipes recipes;
 
+    /**
+     * Uses a trusted catalog/router for legal levels, categories and exact revisions.
+     * @param registry registry used by book recipes and weapon consumers
+     */
     public EnchantBookCodec(ItemRegistry registry) { recipes = new EnchantRecipes(registry); }
 
+    /**
+     * Encodes a new amount-one enchanted book and verifies its decoded selection.
+     * @param book full trusted selection to encode
+     * @return new stack with generated name/lore/glint and owned PDC
+     * @throws IllegalArgumentException if recipe/catalog validation fails
+     * @throws IllegalStateException if called off the server thread
+     */
     public ItemStack encode(EnchantBook book) {
         requireThread();
         var stack = new ItemStack(Material.ENCHANTED_BOOK);
         return write(stack, book, false);
     }
 
+    /**
+     * Clones a single valid left book while retaining its catalog and enchant ID.
+     * This primitive validates the resulting level; recipe improvement/cost policy is
+     * owned by {@link EnchantRecipes}, not by the clone operation.
+     * @param original amount-one valid custom book, never modified
+     * @param book replacement selection with the same catalog and enchant ID
+     * @return separately owned edited stack
+     * @throws IllegalArgumentException for invalid original, changed identity or illegal level
+     * @throws IllegalStateException if called off the server thread
+     */
     public ItemStack edit(ItemStack original, EnchantBook book) {
         requireThread();
         if (!(decode(original) instanceof Read.Valid before) || original.getAmount() != 1
@@ -44,6 +88,14 @@ public final class EnchantBookCodec {
         return write(original.clone(), book, true);
     }
 
+    /**
+     * Writes validated owned metadata and generated lore, then decodes the final stack.
+     * @param stack caller-owned new/clone stack to mutate
+     * @param book replacement selection
+     * @param preserveName true for edits; false generates the initial book name
+     * @return the same mutated stack after exact selection validation
+     * @throws IllegalArgumentException for invalid recipes or final codec mismatch
+     */
     private ItemStack write(ItemStack stack, EnchantBook book, boolean preserveName) {
         var enchant = recipes.validate(book);
         var meta = stack.getItemMeta();
@@ -69,6 +121,14 @@ public final class EnchantBookCodec {
         return stack;
     }
 
+    /**
+     * Classifies a candidate without modifying it; valid right books may be stacked.
+     * The owned root must contain exactly schema/catalog/enchant/level with matching
+     * types and schema1. Unsupported catalog/category/level data fails closed.
+     * @param stack nullable item to inspect
+     * @return non-null ordinary, invalid or validated-book result
+     * @throws IllegalStateException if called off the server thread
+     */
     public Read decode(ItemStack stack) {
         requireThread();
         if (stack == null || !stack.hasItemMeta()) return new Read.Ordinary();
@@ -91,10 +151,24 @@ public final class EnchantBookCodec {
         }
     }
 
+    /**
+     * Creates a literal non-italic lore line; no markup is evaluated.
+     * @param text generated display text
+     * @param color visual enchant category
+     * @return new component
+     */
     private static Component line(String text, NamedTextColor color) {
         return Component.text(text, color).decoration(TextDecoration.ITALIC, false);
     }
+    /**
+     * Constructs an owned local book field key.
+     * @param value constant local key
+     * @return key in the onlydragons namespace
+     */
     private static NamespacedKey key(String value) { return new NamespacedKey("onlydragons", value); }
+    /**
+     * Rejects asynchronous stack/PDC access; this codec has no scheduling fallback.
+     */
     private static void requireThread() {
         if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Book access belongs to the server thread");
     }

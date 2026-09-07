@@ -7,13 +7,33 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-/** All-or-nothing development grant into empty storage slots; never replaces or drops items. */
+/**
+ * All-or-nothing capacity-preflighted development kit placement into empty storage.
+ * It creates every bow before writing inventory and never replaces or drops existing
+ * items. Permission checking belongs to the command; all work uses the server thread.
+ */
 public final class ShortbowKitService {
+    /**
+     * Ordinary arrows per kit, split into eight native stacks of 64.
+     */
     public static final int ARROWS = 512;
     private final EquipmentStatsService equipment;
 
+    /**
+     * Uses the shared trusted equipment service for every generated weapon.
+     * @param equipment loadout factory and post-grant snapshot authority
+     */
     public ShortbowKitService(EquipmentStatsService equipment) { this.equipment = equipment; }
 
+    /**
+     * Places the seven declared bows and arrow stacks only when all fifteen slots fit.
+     * Successful placement is followed by equipment refresh; arbitrary downstream API
+     * exceptions are not an inventory transaction rollback mechanism.
+     * @param player destination storage owner; permission is checked by the caller
+     * @return false without mutation for insufficient slots, true after placement/refresh
+     * @throws IllegalStateException if called off the server thread
+     * @throws IllegalArgumentException if a trusted loadout cannot be constructed
+     */
     public boolean grant(Player player) {
         if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Kit grants require the server thread");
         var contents = player.getInventory().getStorageContents();

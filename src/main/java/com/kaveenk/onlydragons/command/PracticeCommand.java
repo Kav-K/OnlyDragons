@@ -14,14 +14,35 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 
-/** Bounded practice commands; all grants use the existing production equipment/codec service. */
+/**
+ * Player-scoped practice controls and captured-hit explanations on the server thread.
+ * Grants use the production equipment codec. Dummy/calibration modes call the same
+ * combat pipeline as dragons; fixed random samples are explicitly a development aid.
+ * @see com.kaveenk.onlydragons.paper.encounter.ManagedCombatService
+ */
 public final class PracticeCommand {
     private final OnlyDragonsPlugin plugin;
+    /**
+     * Binds the command to its existing authority; does not register listeners or tasks.
+     * @param plugin constructed plugin graph supplying equipment and the single combat owner
+     */
     public PracticeCommand(OnlyDragonsPlugin plugin) { this.plugin = plugin; }
+    /**
+     * Tests routing only; this does not authorize execution.
+     * @param args nonempty root arguments without a leading slash
+     * @return true when the namespace belongs to this delegate
+     */
     public boolean handles(String[] args) {
         return args[0].equalsIgnoreCase("combat") || (args[0].equalsIgnoreCase("dev") && args.length > 1
                 && List.of("kit", "dummy", "scenario", "reset").contains(args[1].toLowerCase(Locale.ROOT)));
     }
+    /**
+     * Enforces inspect/practice permissions, then grants a kit, opens/resets the caller
+     * practice target or displays its captured last hit. Failed combat admission closes
+     * the newly created dummy; invalid calibration requests become chat feedback.
+     * @param sender requester and feedback recipient
+     * @param args nonempty root arguments previously recognized by handles; HP is finite in [1, 1000000]
+     */
     public void execute(CommandSender sender, String[] args) {
         boolean inspect = args[0].equalsIgnoreCase("combat");
         if (!sender.hasPermission(inspect ? "onlydragons.combat" : "onlydragons.practice")) {
@@ -99,6 +120,12 @@ public final class PracticeCommand {
             }
         } catch (IllegalArgumentException invalid) { say(sender, "Invalid practice request: " + invalid.getMessage()); }
     }
+    /**
+     * Suggests existing loadouts and explicit calibration modes without applying them.
+     * @param sender requester used for permission filtering
+     * @param args nonempty root arguments including the partial token
+     * @return non-null candidate list, possibly empty; candidates are not prefix-filtered here
+     */
     public List<String> complete(CommandSender sender, String[] args) {
         if (args[0].equalsIgnoreCase("combat")) return sender.hasPermission("onlydragons.combat") && args.length == 2 ? List.of("last") : List.of();
         if (!args[0].equalsIgnoreCase("dev") || !sender.hasPermission("onlydragons.practice")) return List.of();
@@ -107,6 +134,15 @@ public final class PracticeCommand {
         if (args.length == 3 && (args[1].equalsIgnoreCase("dummy") || args[1].equalsIgnoreCase("scenario"))) return List.of("full", "reduced", "score-only");
         return List.of();
     }
+    /**
+     * Shows the registered practice profile/kit/reset syntax without creating a target.
+     * @param s command recipient
+     */
     private static void usage(CommandSender s) { say(s, "Usage: /onlydragons dev kit <loadout> | dummy <full|reduced|score-only> [hp] | scenario <profile> [hp] | reset"); }
+    /**
+     * Sends practice diagnostics through the shared Adventure formatter.
+     * @param s command recipient
+     * @param message plain semantic content
+     */
     private static void say(CommandSender s, String message) { s.sendMessage(PresentationFormatter.message(message)); }
 }
