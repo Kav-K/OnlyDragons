@@ -90,7 +90,11 @@ def evidence_reference(value, label):
 
 
 def validate_task_gates(key, tasks, progress, dependencies, milestone_gates):
-    """Require a task's dependencies, named manual gate and prerequisite milestones to be complete."""
+    """Require completed dependencies, accepted milestones and well-formed manual-gate evidence.
+
+    A recorded manual reference is checked structurally; this helper does not fetch
+    its URL or independently establish that a human performed the claimed review.
+    """
     missing = sorted(dep for dep in dependencies[key] if progress['tasks'][dep]['status'] != 'complete')
     require(not missing, 'Unsatisfied task prerequisites for ' + key + ': ' + ', '.join(missing))
     if tasks[key].get('manualGate'):

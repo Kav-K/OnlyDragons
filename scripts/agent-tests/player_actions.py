@@ -7,7 +7,9 @@ damage acceptance from an action request or a successful socket write.
 
 Schema 2 receipts use epoch milliseconds, while server journals use monotonically
 ordered Paper ticks. Offline identities exist only in disposable loopback profiles.
-All validators reject unknown fields rather than silently accepting schema drift.
+Exact plan/receipt schema boundaries reject unknown fields. Focused validators may
+read only their relevant projection; explicit server-setup payloads admit bounded
+JSON dictionaries and never substitute for an observed gameplay effect.
 """
 from __future__ import annotations
 

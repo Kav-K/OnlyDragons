@@ -252,7 +252,7 @@ def required_cases(project, changed_paths):
 
 
 def changed_paths(project, base, head='HEAD'):
-    """Resolve a comparison commit and return its sorted no-rename diff paths against HEAD."""
+    """Return the resolved comparison revision and sorted no-rename diff paths against head."""
     require(isinstance(base, str) and base and not base.startswith('-'), 'Invalid changed base')
     revision = git(project, 'rev-parse', '--verify', base + '^{commit}').decode().strip()
     paths = git(project, 'diff', '--no-renames', '--name-only', '-z', revision, head).decode().split('\0')
