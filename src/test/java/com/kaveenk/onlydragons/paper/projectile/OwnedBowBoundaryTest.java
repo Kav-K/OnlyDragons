@@ -10,6 +10,8 @@ import org.bukkit.event.entity.*;
 import org.bukkit.inventory.*;
 import org.bukkit.util.BoundingBox;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockbukkit.mockbukkit.*;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,6 +89,36 @@ class OwnedBowBoundaryTest {
         bows.launched(launch); launch.setCancelled(true); server.getScheduler().performOneTick();
         assertFalse(arrow.isValid()); assertEquals(0, bows.reservedCapacity()); assertEquals(0, bows.pendingGroups());
         assertEquals(10, player.getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum()); assertTrue(hits.isEmpty());
+    }
+    @ParameterizedTest
+    @CsvSource({"replacement,false", "replacement,true", "bow,true", "launch,true"})
+    void finalLaunchVetoCannotRetainPrimaryOrRefundTwice(String veto, boolean sessionExit) {
+        Arrow primary = shoot("duplex");
+        Arrow replacement = player.getWorld().spawn(player.getEyeLocation(), Arrow.class);
+        switch (veto) {
+            case "replacement" -> lastBowEvent.setProjectile(replacement);
+            case "bow" -> lastBowEvent.setCancelled(true);
+            case "launch" -> {
+                var event = new ProjectileLaunchEvent(primary);
+                bows.launched(event);
+                event.setCancelled(true);
+            }
+            default -> throw new AssertionError(veto);
+        }
+        if (sessionExit) {
+            UUID token = bows.currentSession(player.getUniqueId()).orElseThrow();
+            bows.clearSession(player.getUniqueId(), token, false);
+        }
+        server.getScheduler().performOneTick();
+        assertFalse(primary.isValid());
+        assertTrue(replacement.isValid());
+        assertEquals(0, bows.capacityUsed());
+        assertEquals(0, bows.pendingGroups());
+        assertEquals(10, player.getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum());
+        bows.endEncounter(encounter);
+        server.getScheduler().performOneTick();
+        assertEquals(10, player.getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum());
+        assertTrue(hits.isEmpty());
     }
     @Test void unrelatedProjectileIsNotSuppressedClaimedOrRemoved() {
         Arrow arrow = player.getWorld().spawn(player.getEyeLocation(), Arrow.class); arrow.setDamage(4); arrow.setCritical(true);

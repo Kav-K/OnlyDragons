@@ -378,8 +378,7 @@ public final class OwnedBowService implements AutoCloseable {
         Player owner = Bukkit.getPlayer(group.owner);
         if (owner == null || owner.isDead() || !group.arena.contains(owner.getLocation())
                 || arenas.get(group.arena.id()) != group.arena || !isCurrentSession(group.owner, group.session)
-                || group.bowEvent != null && (group.bowEvent.isCancelled() || !group.bowEvent.getProjectile().getUniqueId().equals(group.primary.shot().projectileId()))
-                || group.launchEvent != null && group.launchEvent.isCancelled()) { fail(group); return; }
+                || launchVetoed(group)) { fail(group); return; }
         Arrow primary = entities.get(group.primary.shot().projectileId());
         if (!group.physicalRetirement && (primary == null || !primary.isValid())) { fail(group); return; }
         if (primary != null) suppress(primary);
@@ -430,11 +429,14 @@ public final class OwnedBowService implements AutoCloseable {
             default -> false;
         };
     }
+    private boolean launchVetoed(Group group) {
+        return group.bowEvent != null && (group.bowEvent.isCancelled()
+                || !group.bowEvent.getProjectile().getUniqueId().equals(group.primary.shot().projectileId()))
+                || group.launchEvent != null && group.launchEvent.isCancelled();
+    }
     /** A separate later player lifecycle event can observe completed native launch dispatch before our next tick. */
     private boolean primaryLaunched(Group group) {
-        if (group.primary == null || group.bowEvent != null && (group.bowEvent.isCancelled()
-                || !group.bowEvent.getProjectile().getUniqueId().equals(group.primary.shot().projectileId()))
-                || group.launchEvent != null && group.launchEvent.isCancelled()) return false;
+        if (group.primary == null || launchVetoed(group)) return false;
         Arrow arrow = entities.get(group.primary.shot().projectileId());
         return group.physicalRetirement || candidates.containsKey(group.primary.shot().projectileId())
                 || arrow != null && arrow.isValid();

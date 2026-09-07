@@ -53,10 +53,18 @@ public final class CalibrationLoadouts {
     public static final String EXPANDED_REVISION = "calibration-items-v3";
 
     /** Production catalog exposes both explicit histories. No automatic identity migration. */
-    public static ItemRegistry compatibleRegistry() { return new ItemRegistry(List.of(registry(), expandedRegistry(), fireRegistry())); }
+    public static ItemRegistry compatibleRegistry() {
+        ItemRegistry legacy = registry();
+        ItemRegistry expanded = expandedRegistry(legacy);
+        ItemRegistry fire = fireRegistry(expanded);
+        return new ItemRegistry(List.of(legacy, expanded, fire));
+    }
 
     public static ItemRegistry expandedRegistry() {
-        var legacy = registry();
+        return expandedRegistry(registry());
+    }
+
+    private static ItemRegistry expandedRegistry(ItemRegistry legacy) {
         var enchants = new ArrayList<>(legacy.enchantments().values());
         for (String id : List.of("overload", "gravity", "infinite_quiver", "flame")) {
             var levels = new LinkedHashMap<Integer, List<StatModifier>>();
@@ -95,7 +103,11 @@ public final class CalibrationLoadouts {
 
     /** Explicit consumer-capable catalog; v2/v3 identities and unavailable controls remain unchanged. */
     public static ItemRegistry fireRegistry() {
-        var enchants = expandedRegistry().enchantments().values().stream()
+        return fireRegistry(expandedRegistry());
+    }
+
+    private static ItemRegistry fireRegistry(ItemRegistry expanded) {
+        var enchants = expanded.enchantments().values().stream()
                 .map(e -> new EnchantDefinition(e.id(), e.displayName(), e.kind(), e.compatibleModes(), e.levelModifiers(), true)).toList();
         var definitions = new ArrayList<ItemDefinition>();
         for (String id : List.of("ordinary_v4", "shortbow_v4", "quiver_v4", "flame_v4", "duplex_flame_v4", "tempo_flame_v4")) {
