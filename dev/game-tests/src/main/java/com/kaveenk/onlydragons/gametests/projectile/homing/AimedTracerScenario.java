@@ -42,7 +42,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
         var observer = c.production().combat().observeSettled(hits::add);
         c.cleanup("aimed-tracer", () -> {
             finished = true; observer.close(); restoreWall();
-            if (dragons.generation().isPresent()) dragons.reset(dragons.generation().orElseThrow());
+            if (c.production().combat().activeCount() > 0) dragons.reset(dragons.generation().orElseThrow());
         });
         players.await("aimed tracer actor", 300, players::allOnline, this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY " + c.harness().runId());

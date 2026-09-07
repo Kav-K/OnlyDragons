@@ -34,6 +34,17 @@ historical v1 and returning-v2 presets retain their profiles and original fixtur
   turn and records observed yaw/pitch/tick. The captured ordinary_v4 native shot
   and five owned cleanup assertions passed; no gameplay acceptance is claimed.
 
+- Clean `7304f79`, run `96f01e4b9112436785563e74c3512bcc`: all31 mechanic and
+  explicit reset checks passed; four framework cleanup checks passed, but the
+  framework resource check failed because the fixture attempted a second reset
+  of its already-retired generation. The registered cleanup now checks active
+  combat before resetting, using the existing fixture pattern. Both JVMs exited0
+  unforced; this remains a failed run. Actual yaw was -180. The aimed native shot
+  produced one real dragon collision,900 domainHP/180 nativeHP/100 credit; plain,
+  side, behind and range controls retained1000HP/zero credit, and the acquired
+  obstructed shot lost lock and collided with the wall. These observations retain
+  their failed-run provenance and do not replace final clean acceptance.
+
 ## Candidate and remaining verification
 
 The corrected candidate routes all thirteen current definitions, tests arbitrary-
