@@ -143,7 +143,8 @@ Next dependency: T06c consumes the descriptors and existing firing authority;
 
 ### T06c — Infinite Quiver and owned Flame (GH-70)
 
-In review on `symphony/gh-70`, clean runtime `016bd69`, main `e95447ae` integrated.
+In review in [draft PR #81](https://github.com/Kav-K/OnlyDragons/pull/81) on
+`symphony/gh-70`, clean runtime `016bd69`, main `e95447ae` integrated.
 The [owner-published profile](02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70)
 adds explicit v4 descriptors, conserved trigger ammo and bounded owned fire via
 existing firing/combat authorities. [Focused evidence](evidence/t06c-focused-paper.md)

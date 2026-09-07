@@ -508,7 +508,7 @@
       "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "In review on symphony/gh-70. Clean runtime 016bd69 includes main e95447ae; 299/6/33 Java tests and six focused Paper scenarios pass with clean cleanup. Lead independent source/raw review is clear. Evidence: docs/planning/evidence/t06c-focused-paper.md. Full cohort receipt/replay/task acceptance checkpoint/current CI and human gates remain pending; no requirement is marked complete. T06b/T02c await integration."
+      "notice": "In review in draft PR #81 on symphony/gh-70. Clean runtime 016bd69 includes main e95447ae; 299/6/33 Java tests and six focused Paper scenarios pass with clean cleanup. Lead independent source/raw review is clear. Evidence: docs/planning/evidence/t06c-focused-paper.md. Full cohort receipt/replay/task acceptance checkpoint/current CI and human gates remain pending; no requirement is marked complete. T06b/T02c await integration."
     }
   },
   "milestones": {
