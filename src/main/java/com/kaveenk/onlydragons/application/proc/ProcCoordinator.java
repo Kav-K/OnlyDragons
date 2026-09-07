@@ -52,7 +52,7 @@ public final class ProcCoordinator implements AutoCloseable {
     public enum Admission {
         /** The entire rolled child group was admitted. */ QUEUED,
         /** The accepted physical impact rolled zero children. */ NO_CHILDREN,
-        /** The whole child group was refused by a queue or due-tick bound. */ CAPACITY_REJECTED,
+        /** The whole child group was refused by queue capacity. */ CAPACITY_REJECTED,
         /** The captured session is not currently active; no new children are admitted. */ INACTIVE_SESSION,
         /** The encounter rejected the parent, so no children are requested. */ PHYSICAL_REJECTED
     }

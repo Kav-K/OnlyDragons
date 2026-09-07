@@ -48,9 +48,11 @@ import org.bukkit.util.BoundingBox;
  */
 public final class ManagedCombatService implements AutoCloseable {
     /**
-     * Idempotently removable post-processing observer; removal must occur outside read-only notification.
+     * Removal handle for a post-processing observer; close once outside read-only notification.
+     * Removal uses consumer equality rather than a registration token. Repeated closes
+     * can remove another equal registration, so this handle is not generally idempotent.
      */
-    public interface Observation extends AutoCloseable { /** Detaches this observer idempotently on the server thread, outside read-only notification.
+    public interface Observation extends AutoCloseable { /** Removes the first equal consumer on the server thread, outside read-only notification; call once.
  * @throws IllegalStateException for forbidden thread or notification-time mutation
  */ @Override void close(); }
     /**
@@ -181,7 +183,7 @@ public final class ManagedCombatService implements AutoCloseable {
      * An observer cannot replace accounting or mutate shared controls. Failures are
      * isolated and diagnosed; the returned handle removes only this registration.
      * @param observer non-null recipient of the immutable physical claim/rejection
-     * @return removable registration; repeated removal is harmless
+     * @return call-once removal handle; repeated closes may remove another equal registration
      * @throws IllegalStateException for capacity, thread, closed state or observer reentry
      * @throws NullPointerException if observer is null
      */

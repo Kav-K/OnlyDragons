@@ -45,7 +45,7 @@ public final class TracerRules {
     }
     /**
      * One current eligible real part projected by the adapter; no native entity reference is retained.
-     * @param targetId nonnull managed parent UUID
+     * @param targetId nonnull logical managed combat target ID, distinct from the native dragon UUID
      * @param partId nonnull real part UUID, used for deterministic ties
      * @param box nonnull current part bounds in the arrow's world
      */
