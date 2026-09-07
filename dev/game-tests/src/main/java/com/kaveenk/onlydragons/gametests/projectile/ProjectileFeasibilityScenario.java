@@ -16,7 +16,13 @@ import org.bukkit.entity.EnderDragonPart;
 import org.bukkit.entity.Cow;
 import org.bukkit.util.Vector;
 
-/** Bounded native physics experiment, using API-spawned actors without a player. */
+/**
+ * Bounded public-API native physics experiment without a player shooter.
+ * Real spawned arrows test hit/damage ordering, veto controls, part UUID geometry,
+ * pre-spawn continuity and grounded lifetime. Requested dragon phases and geometry
+ * labels are measurements, not guarantees about semantic head/body identity or
+ * natural End behavior. No production physical receiver is installed by this case.
+ */
 public final class ProjectileFeasibilityScenario implements Scenario {
     private final ImpactProbe probe = new ImpactProbe();
     private final List<Map<String, Object>> trials = new ArrayList<>();
@@ -25,6 +31,10 @@ public final class ProjectileFeasibilityScenario implements Scenario {
     private Location origin;
     private int dragonHits;
 
+    /**
+     * Owns the probe and finite chunk region before waiting for entity-ticking readiness.
+     * @param context server-thread report/resource owner
+     */
     @Override public void start(ScenarioContext context) {
         this.context = context;
         context.mechanicRevision("projectile-feasibility-v2");
@@ -38,6 +48,9 @@ public final class ProjectileFeasibilityScenario implements Scenario {
         }
         awaitTicking(200);
     }
+    /**
+     * Requires every measured chunk to be ENTITY_TICKING before starting physics trials.
+     */
     private void awaitTicking(int remaining) {
         if (chunks.stream().allMatch(c -> c.getLoadLevel() == Chunk.LoadLevel.ENTITY_TICKING)) {
             context.check("test_chunks_entity_ticking", true, true);
@@ -45,6 +58,10 @@ public final class ProjectileFeasibilityScenario implements Scenario {
         } else if (remaining == 0) throw new IllegalStateException("Test chunks not entity ticking");
         else context.later(1, () -> awaitTicking(remaining - 1));
     }
+    /**
+     * Creates a real no-gravity calibration arrow and registers its explicit probe policy.
+     * @return the same owned native arrow, never a teleported/replacement projectile
+     */
     private Arrow launch(Location start, Vector velocity, ImpactProbe.Mode mode) {
         Arrow arrow = context.own(start.getWorld().spawn(start, Arrow.class, a -> {
             a.setGravity(false);
@@ -57,6 +74,9 @@ public final class ProjectileFeasibilityScenario implements Scenario {
         probe.arrows.put(arrow.getUniqueId(), mode);
         return arrow;
     }
+    /**
+     * Runs native, hit-veto, damage-veto and zero-damage controls against separate real cows.
+     */
     private void cowTrial(int index) {
         ImpactProbe.Mode mode = ImpactProbe.Mode.values()[index];
         Cow cow = context.own(origin.getWorld().spawn(origin, Cow.class, c -> {
@@ -87,6 +107,9 @@ public final class ProjectileFeasibilityScenario implements Scenario {
             else dragonTrial(0);
         });
     }
+    /**
+     * Measures nine part/phase/volley trials, recording misses separately from asserted contacts.
+     */
     private void dragonTrial(int index) {
         if (index == 9) { preSpawn(); return; }
         EnderDragon.Phase phase = index == 6 ? EnderDragon.Phase.CIRCLING
@@ -150,11 +173,17 @@ public final class ProjectileFeasibilityScenario implements Scenario {
             });
         });
     }
+    /**
+     * Spawns a disposable real dragon in the requested phase and registers entity cleanup.
+     */
     private EnderDragon spawnDragon(EnderDragon.Phase phase) {
         return context.own(origin.getWorld().spawn(origin, EnderDragon.class, d -> {
             d.setPersistent(false); d.setPhase(phase);
         }));
     }
+    /**
+     * Launches first, spawns the target later and requires same-UUID collision after spawn.
+     */
     private void preSpawn() {
         Location start = origin.clone().add(0, 18, 0);
         Arrow arrow = launch(start, new Vector(0, -1, 0), ImpactProbe.Mode.CANCEL_HIT);
@@ -176,6 +205,9 @@ public final class ProjectileFeasibilityScenario implements Scenario {
             });
         });
     }
+    /**
+     * Measures the public lifetime counter on an airborne arrow without assuming it is a wall-clock TTL.
+     */
     private void lifetime() {
         Arrow arrow = launch(origin.clone().add(0, 20, 0), new Vector(0.1, 0, 0), ImpactProbe.Mode.NATIVE);
         arrow.setLifetimeTicks(1199);
@@ -190,6 +222,11 @@ public final class ProjectileFeasibilityScenario implements Scenario {
             groundedLifetime();
         });
     }
+    /**
+     * Compares real embedded arrows with near-expiry versus reset lifetime counters.
+     * The separate cancelled block-hit observation prevents treating cancellation as proof
+     * that physical block embedding was prevented.
+     */
     private void groundedLifetime() {
         var ground = origin.getWorld().getHighestBlockAt(origin.getBlockX(), origin.getBlockZ());
         Location start = ground.getLocation().add(0.5, 5, 0.5);
@@ -210,6 +247,9 @@ public final class ProjectileFeasibilityScenario implements Scenario {
             });
         });
     }
+    /**
+     * Publishes raw native trials and explicit unsupported scopes before shared resource cleanup.
+     */
     private void finish() {
         context.check("multipart_collision_observed", true, dragonHits > 0);
         context.observe("trials", List.copyOf(trials));

@@ -18,7 +18,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
-/** Real client bow releases, native collisions, production capture/effects/accounting and catalog routing. */
+/**
+ * Real firing/collision coverage for captured Overload and descriptor-based Gravity.
+ * Literal v3 preset IDs and numeric oracles preserve historical catalogs, including
+ * their deliberate Quiver/Flame rejection. Paused native arrows support the swap
+ * trial; a positive native-damage probe is tied to the exact accepted projectiles.
+ * This fixture does not validate full-client appearance or later content profiles.
+ */
 public final class ExpandedBowScenario implements Scenario, Listener {
     ScenarioContext c; PlayerFixture players; DamageObservationProbe probe; TargetBackend backend; UUID generation;
     final ItemRegistry catalog=CalibrationLoadouts.compatibleRegistry();
@@ -27,6 +33,11 @@ public final class ExpandedBowScenario implements Scenario, Listener {
     final List<Arrow> held=new ArrayList<>(); final List<Vector> velocities=new ArrayList<>();
     final List<Map<String,Object>> trials=new ArrayList<>();
     int releases; boolean veto,hold,nativeGuard;
+    /**
+     * Registers the settled observer, native probe and cleanup before actor setup.
+     * @param context server-thread report/resource owner
+     * @throws Exception if actor-plan admission fails
+     */
     public void start(ScenarioContext context) throws Exception {
         c=context;c.mechanicRevision("expanded-bow-v2");players=new PlayerFixture(c);probe=new DamageObservationProbe(c);c.listen(this);
         var observation=c.production().combat().observeSettled(settled::add);c.cleanup("expanded-observer",observation::close);
@@ -34,6 +45,9 @@ public final class ExpandedBowScenario implements Scenario, Listener {
         players.await("expanded actor",300,players::allOnline,this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY "+c.harness().runId());
     }
+    /**
+     * Begins literal legacy, airborne Gravity and zero-probability Overload trials.
+     */
     void setup() {
         var p=players.player("alpha");p.setGameMode(GameMode.SURVIVAL);p.setAllowFlight(true);p.setFlying(true);p.setInvulnerable(true);
         p.getInventory().clear();p.getInventory().setHeldItemSlot(0);
@@ -59,6 +73,9 @@ public final class ExpandedBowScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Requires the exact v3 ID set, real item-byte projections and historical unavailable-enchant controls.
+     */
     void metadata() {
         boolean preserved=true;
         for(String id:CalibrationLoadouts.registry().definitions().keySet()) {
@@ -106,6 +123,9 @@ public final class ExpandedBowScenario implements Scenario, Listener {
         meta.getPersistentDataContainer().set(WeaponItemCodec.ROOT,PersistentDataType.TAG_CONTAINER,root);forged.setItemMeta(meta);
         c.check("cross_catalog_forgery_rejected",true,codec.decode(forged) instanceof ItemReadResult.Invalid);
     }
+    /**
+     * Pauses both native primary/Duplex arrows and proves the same captured mega-critical data survives a real slot swap.
+     */
     void swap() {
         long before=view().acceptedImpacts();double hp=view().target().currentHealth(),credit=credit();hold=true;
         draw("swap",()->players.await("both captured physical arrows",80,()->held.size()==2,()->{
@@ -127,6 +147,9 @@ public final class ExpandedBowScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Checks physical veto, then a successful positive-native-damage suppression recovery and grounded descriptor trial.
+     */
     void rejection() {
         veto=true;int before=settled.size();long count=view().acceptedImpacts();double hp=view().target().currentHealth();
         draw("veto",()->players.await("vetoed collisions",100,()->settled.size()==before+2,()->{
@@ -156,6 +179,9 @@ public final class ExpandedBowScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Checks explicit mitigation/cap arithmetic and terminal overkill without late child credit.
+     */
     void capped() {
         reset();open(true,1000,100,CombatProfile.dragonExperiment(new MechanicRevision("expanded-paper-cap","v1"),.5),()->{
             combo();trial("cap",4,21.37640625,28.501875,()->{
@@ -173,6 +199,9 @@ public final class ExpandedBowScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Ends a live paused group and proves reservation/claim cleanup plus immutable old capture in a new generation.
+     */
     void resetAirborne() {
         combo();hold=true;draw("reset-flight",()->players.await("airborne reset group",80,()->held.size()==2,()->{
             var old=c.production().bows().projectiles().getFirst().shot();UUID oldGeneration=generation;reset();hold=false;
@@ -185,12 +214,21 @@ public final class ExpandedBowScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Stages the fixed Overload/Gravity/Power/Duplex combination used by independent 476.625-based oracles.
+     */
     void combo(){equip("ordinary_v3",Map.of("overload",5,"gravity",6,"power",7,"duplex",5),195,100);}
+    /**
+     * Creates validated fixture gear and replaces the declared chance/Ferocity bonuses through production APIs.
+     */
     void equip(String id,Map<String,Integer> levels,double cc,double f) {
         var instance=catalog.edit(catalog.create(id),levels,List.of());players.setupItem("alpha",0,codec.encode(instance));
         c.production().equipment().bonus(players.player("alpha"),StatKey.CRIT_CHANCE,cc);
         c.production().equipment().bonus(players.player("alpha"),StatKey.FEROCITY,f);
     }
+    /**
+     * Opens the actual chosen backend with explicit profile/HP and waits for initialized multipart geometry.
+     */
     void open(boolean airborne,double hp,double defense,CombatProfile profile,Runnable next) {
         var location=new Location(players.player("alpha").getWorld(),0,100,0);
         backend=airborne?new DragonBackend(location,c.production().bows().continuity().tickets(),r->{},b->{}):new DummyBackend(location);
@@ -198,11 +236,29 @@ public final class ExpandedBowScenario implements Scenario, Listener {
         generation=c.production().combat().open(players.identity("alpha"),backend,org.bukkit.util.BoundingBox.of(location,24,24,24),hp,defense,"test",profile,Optional.empty(),()->.99);
         players.await("native geometry ready",100,()->!(backend.entity() instanceof EnderDragon dragon)||dragon.getParts().stream().allMatch(part->part.getLocation().getY()>75),next::run);
     }
+    /**
+     * Retires the fixture owner's encounter and closes its backend before the next independent trial.
+     */
     void reset(){c.production().combat().reset(players.identity("alpha"));if(backend!=null)backend.close();}
+    /**
+     * Reads the exact currently owned generation, including retained completion evidence.
+     */
     ManagedCombatService.View view(){return c.production().combat().view(generation).orElseThrow();}
+    /**
+     * Returns alpha's committed full contribution or zero before participation.
+     */
     double credit(){var value=view().contributions().get(players.identity("alpha"));return value==null?0:value.contributionDamage();}
+    /**
+     * Applies the fixture's declared absolute floating-point tolerance to independent numeric values.
+     */
     static boolean near(double a,double b){return Math.abs(a-b)<1e-7;}
+    /**
+     * Captures pre-shot ledger/HP values before real draw/release and delegates exact delta checks.
+     */
     void trial(String step,int count,double hp,double score,Runnable next){long before=view().acceptedImpacts();double oldHp=view().target().currentHealth(),oldScore=credit();draw(step,()->awaitTrial(step,before,oldHp,oldScore,count,hp,score,next));}
+    /**
+     * Requires drained procs, exact counts/deltas, real collision UUIDs and the pinned native HP projection.
+     */
     void awaitTrial(String step,long before,double oldHp,double oldScore,int count,double hp,double score,Runnable next){
         players.await(step+" accounting",120,()->view().acceptedImpacts()>=before+count&&view().procs().queued()==0,()->{
             var results=view().impacts().stream().skip(before).toList();
@@ -213,6 +269,9 @@ public final class ExpandedBowScenario implements Scenario, Listener {
             trials.add(Map.of("step",step,"hp",oldHp-view().target().currentHealth(),"credit",credit()-oldScore,"results",results.toString()));next.run();
         });
     }
+    /**
+     * Aims setup at the measured part/target box and waits for actual hand raise and release callbacks.
+     */
     void draw(String step,Runnable next) {
         var p=players.player("alpha");var entity=backend.entity();
         var box=entity instanceof EnderDragon dragon?dragon.getParts().stream().max(Comparator.comparingDouble(part->part.getBoundingBox().getVolume())).orElseThrow().getBoundingBox():entity.getBoundingBox();
@@ -221,10 +280,22 @@ public final class ExpandedBowScenario implements Scenario, Listener {
             players.request("alpha",step+"-release");players.await("release "+step,80,()->releases>before,next::run);
         }));
     }
+    /**
+     * Counts native player bow releases for stage readiness.
+     * @param e native release event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void release(EntityShootBowEvent e){if(e.getEntity() instanceof Player)releases++;}
+    /**
+     * Performs explicit probe setup: positive native damage or a reversible captured-arrow pause.
+     * @param e actual projectile launch event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void launch(ProjectileLaunchEvent e){if(e.getEntity() instanceof Arrow arrow){
         if(nativeGuard)c.later(1,()->{if(arrow.isValid())arrow.setDamage(2);});
         if(hold){held.add(arrow);velocities.add(arrow.getVelocity().clone());arrow.setGravity(false);arrow.setVelocity(new Vector());}
     }}
+    /**
+     * Binds actual native contact to the selected backend and optionally applies the veto control.
+     * @param e native projectile hit event
+     */
     @EventHandler(priority=EventPriority.HIGHEST)public void hit(ProjectileHitEvent e){Entity parent=e.getHitEntity() instanceof EnderDragonPart part?part.getParent():e.getHitEntity();if(parent!=null&&backend!=null&&parent.getUniqueId().equals(backend.entity().getUniqueId())){collisions.add(e.getEntity().getUniqueId());if(veto)e.setCancelled(true);}}
 }

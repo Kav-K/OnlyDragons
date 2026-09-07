@@ -16,7 +16,13 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachment;
 
-/** A copyable real-input fixture. Native combat observation is independent of the future dragon adapter. */
+/**
+ * Two-actor cookbook proving packets through native events and independently sampled effects.
+ * The sequence separates command permissions, tagged inventory transactions, movement,
+ * melee veto/acceptance, physical arrows, death/respawn and reconnect. Setup teleports,
+ * items and API-induced death are labeled; they never count as client input. The
+ * damage probe is calibrated against native HP, not used to invent production credit.
+ */
 public final class PlayerPrimitivesScenario implements Scenario, Listener {
     private ScenarioContext context;
     private PlayerFixture players;
@@ -35,6 +41,11 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
     private final List<Double> damageHealthBefore = new ArrayList<>(), damageHealthAfter = new ArrayList<>();
     private static final double CANCELLED_FIXTURE_DAMAGE = 7.0;
 
+    /**
+     * Registers the strict actor plan, bounded damage probe and scenario timeout.
+     * @param context server-thread cleanup/report owner
+     * @throws Exception if the isolated actor plan cannot be admitted
+     */
     @Override public void start(ScenarioContext context) throws Exception {
         this.context = context;
         context.mechanicRevision("headless-primitives-v1");
@@ -49,6 +60,9 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
         context.later(2200, () -> context.fail(new IllegalStateException("Player primitive fixture deadline exceeded")));
         context.harness().getLogger().info("OD_PLAYER_READY " + context.harness().runId());
     }
+    /**
+     * Builds reversible native targets/lever and begins denied then permitted command trials.
+     */
     private void setup() {
         context.check("two_distinct_real_players", true, !players.identity("alpha").equals(players.identity("beta"))
                 && Bukkit.getOnlinePlayers().size() == 2);
@@ -92,11 +106,17 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Waits for a new actual command event before advancing to post-dispatch checks.
+     */
     private void command(String id, ScenarioContext.Step next) {
         int previous = count("command");
         players.request("alpha", id);
         players.await("command packet " + id, 60, () -> count("command") > previous, () -> after(2, next));
     }
+    /**
+     * Checks the production stat result, then stages exact tagged-bow inventory inputs.
+     */
     private void equipment() {
         context.check("three_real_command_events", 3, count("command"));
         var inspection = context.production().equipment().refresh(originalAlpha);
@@ -109,6 +129,11 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
         originalAlpha.updateInventory();
         after(5, () -> inventoryClick(0));
     }
+    /**
+     * Verifies each real raw-slot transaction against cursor and item identity before resync.
+     * Every next click waits for a fresh authoritative full inventory snapshot; the
+     * client never predicts tagged component changes.
+     */
     private void inventoryClick(int index) {
         String[] steps = {"inventory-pickup", "inventory-place", "inventory-pickup-back", "inventory-restore"};
         players.request("alpha", steps[index]);
@@ -130,6 +155,9 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Requires applied slot, yaw and position changes plus a native swing before advancing.
+     */
     private void select() {
         players.request("alpha", "select");
         players.await("selected slot", 50, () -> originalAlpha.getInventory().getHeldItemSlot() == 1, () -> {
@@ -145,6 +173,9 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Checks both hand swaps and the one-item drop delta, preserving ownership of the dropped entity.
+     */
     private void swap() {
         context.check("real_swing_event", true, count("swing") > 0);
         players.request("alpha", "swap");
@@ -164,6 +195,9 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Requires the lever's native state change before a deliberately vetoed melee hit.
+     */
     private void block() {
         players.request("alpha", "block");
         players.await("block interaction accepted", 60, () -> ((Switch) lever.getBlockData()).isPowered(), () -> {
@@ -181,6 +215,10 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
             }));
         });
     }
+    /**
+     * Separates two players' accepted melee hits by cooldown, then requests real bow draw/release.
+     * Health deltas are checked against native final damage before the target is removed.
+     */
     private void accepted() {
         healthBefore = melee.getHealth();
         damageHealthBefore.add(healthBefore);
@@ -214,6 +252,10 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Binds arrow damage to the observed release UUID, then uses API death and packet respawn.
+     * The death setup is explicit; only the subsequent respawn/reconnect actions are packet claims.
+     */
     private void shot() {
         after(2, () -> {
             var row = damage.events().stream().filter(event -> event.cause().equals("PROJECTILE")).findFirst().orElseThrow();
@@ -238,6 +280,10 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
             }));
         });
     }
+    /**
+     * Cross-checks all four ordered native events, source UUIDs and next-tick health cohorts.
+     * Independent before/after HP samples catch a probe that confuses dispatch with application.
+     */
     private void checkDamageProbe() {
         var rows = damage.events();
         var cohorts = damage.healthCohorts();
@@ -266,6 +312,9 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
         }
         context.check("damage_probe_fields_and_tick_boundaries", true, fields);
     }
+    /**
+     * Requires a fresh Player object for the same UUID, then verifies both sessions quit and caches clear.
+     */
     private void reconnected() {
         context.check("reconnect_same_uuid_new_player", true, players.player("alpha") != originalAlpha
                 && players.player("alpha").getUniqueId().equals(originalAlpha.getUniqueId()) && players.quits("alpha") == 1);
@@ -281,30 +330,90 @@ public final class PlayerPrimitivesScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Schedules the next stage through the context's failure and cancellation owner.
+     */
     private void after(int ticks, ScenarioContext.Step step) { context.later(ticks, step); }
+    /**
+     * Reads a native-event counter, returning zero before its first observation.
+     */
     private int count(String kind) { return events.getOrDefault(kind, 0); }
+    /**
+     * Increments the matching native-event counter without advancing the client plan.
+     */
     private void record(String kind) { events.merge(kind, 1, Integer::sum); }
+    /**
+     * Filters callbacks by the declared alpha UUID across reconnect.
+     */
     private boolean alpha(Player player) { return player.getUniqueId().equals(players.identity("alpha")); }
+    /**
+     * Counts alpha's actual command dispatch; message receipts separately prove command output.
+     * @param e native command event
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void command(PlayerCommandPreprocessEvent e) { if (alpha(e.getPlayer())) record("command"); }
+    /**
+     * Counts accepted native hotbar changes.
+     * @param e native selection event
+     */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true) public void held(PlayerItemHeldEvent e) { if (alpha(e.getPlayer())) record("held"); }
+    /**
+     * Records actual raw slots and rejects a button different from the declared left-click plan.
+     * @param e native inventory transaction event
+     */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true) public void inventory(InventoryClickEvent e) {
         if (e.getWhoClicked() instanceof Player player && alpha(player)) {
             if (!e.isLeftClick()) { context.fail(new IllegalStateException("Unexpected inventory click button")); return; }
             clickedSlots.add(e.getRawSlot());
         }
     }
+    /**
+     * Counts actual movement/look callbacks for alpha.
+     * @param e native movement event
+     */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true) public void move(PlayerMoveEvent e) { if (alpha(e.getPlayer())) record("move"); }
+    /**
+     * Counts actual arm-animation callbacks.
+     * @param e native animation event
+     */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true) public void swing(PlayerAnimationEvent e) { if (alpha(e.getPlayer())) record("swing"); }
+    /**
+     * Counts accepted native hand-swap callbacks.
+     * @param e native hand-swap event
+     */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true) public void swap(PlayerSwapHandItemsEvent e) { if (alpha(e.getPlayer())) record("swap"); }
+    /**
+     * Owns each observed dropped item so the primitive test cannot leak entities.
+     * @param e native item-drop event
+     */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true) public void drop(PlayerDropItemEvent e) { if (alpha(e.getPlayer())) { record("drop"); context.own(e.getItemDrop()); } }
+    /**
+     * Counts interactions with the exact fixture lever, independent of its later powered-state check.
+     * @param e native block interaction
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void block(PlayerInteractEvent e) { if (alpha(e.getPlayer()) && e.getClickedBlock() != null && e.getClickedBlock().equals(lever)) record("block"); }
+    /**
+     * Injects the explicit first-melee veto and diagnostic damage override only for the fixture target.
+     * @param e real native damage event, not a synthesized dispatch
+     */
     @EventHandler(priority=EventPriority.HIGH) public void cancel(EntityDamageByEntityEvent e) {
         if (cancelDamage && e.getEntity().equals(melee)) {
             e.setDamage(CANCELLED_FIXTURE_DAMAGE); // Test-only modifier proves LOWEST/MONITOR capture is distinct.
             e.setCancelled(true);
         }
     }
+    /**
+     * Captures actual released projectile identity and registers its removal ownership.
+     * @param e native bow release event
+     */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true) public void shoot(EntityShootBowEvent e) { if (e.getEntity() instanceof Player p && alpha(p)) { record("shoot"); releasedArrow = e.getProjectile().getUniqueId(); context.own(e.getProjectile()); } }
+    /**
+     * Observes the API-induced death while suppressing fixture drops/XP contamination.
+     * @param e native death event
+     */
     @EventHandler(priority=EventPriority.HIGH) public void death(PlayerDeathEvent e) { if (alpha(e.getEntity())) { record("death"); e.getDrops().clear(); e.setDroppedExp(0); } }
+    /**
+     * Counts the native callback produced by the requested respawn packet.
+     * @param e native respawn event
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void respawn(PlayerRespawnEvent e) { if (alpha(e.getPlayer())) record("respawn"); }
 }

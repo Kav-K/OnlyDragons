@@ -14,7 +14,13 @@ import org.bukkit.entity.EnderDragonPart;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-/** Public-API fixtures; arrows are never teleported or replaced. All callbacks are server-owned. */
+/**
+ * Controlled real-dragon geometry trials with explicit input provenance.
+ * Only {@link #nativeRelease} receives the actor's actual bow release. Later trials
+ * spawn native arrows through public APIs with that online shooter, never teleporting
+ * or replacing them. Phase control is disposable overworld setup, not natural End
+ * flight/landing or a semantic guarantee about which part is the head.
+ */
 final class PlayerDragonTrials {
     private final ScenarioContext context;
     private final ImpactProbe probe = new ImpactProbe();
@@ -26,10 +32,17 @@ final class PlayerDragonTrials {
     private Runnable complete;
     private boolean ownersValid = true;
 
+    /**
+     * Registers native impact and part-geometry observers with scenario-owned cleanup.
+     */
     PlayerDragonTrials(ScenarioContext context) {
         this.context = context;
         context.listen(probe);
         context.listen(new org.bukkit.event.Listener() {
+            /**
+             * Captures actual contacted part bounds and phase at collision time.
+             * @param event native projectile-hit event
+             */
             @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR)
             public void hit(org.bukkit.event.entity.ProjectileHitEvent event) {
                 if (!probe.arrows.containsKey(event.getEntity().getUniqueId())
@@ -43,6 +56,9 @@ final class PlayerDragonTrials {
         });
     }
 
+    /**
+     * Acquires the finite ticking region and creates the first real dragon before client release.
+     */
     void prepare(Player player) {
         this.player = player;
         for (int x = -2; x <= 2; x++) for (int z = -2; z <= 3; z++) {
@@ -52,11 +68,19 @@ final class PlayerDragonTrials {
         nativeHealth = nativeDragon.getHealth();
     }
 
+    /**
+     * Creates a tracked disposable dragon in the declared native phase.
+     */
     private EnderDragon dragon(EnderDragon.Phase phase) {
         return context.own(player.getWorld().spawn(new Location(player.getWorld(), 0.5, 100, 12.5),
                 EnderDragon.class, d -> { d.setPersistent(false); d.setPhase(phase); }));
     }
 
+    /**
+     * Observes positive native damage from the actual client arrow before beginning API-spawned controls.
+     * @param arrow exact released native arrow with the real actor as shooter
+     * @param complete continuation invoked after every bounded geometry trial
+     */
     void nativeRelease(Arrow arrow, Runnable complete) {
         this.complete = complete;
         probe.arrows.put(arrow.getUniqueId(), ImpactProbe.Mode.NATIVE);
@@ -73,6 +97,10 @@ final class PlayerDragonTrials {
         });
     }
 
+    /**
+     * Runs cancellation controls, geometry attempts, phase observations and a three-arrow native volley.
+     * Only explicit assertions are passes; other attempt outcomes remain raw observations.
+     */
     private void trial(int index) {
         // Four isolated controls, eight geometry attempts, then flying/seated/volley attempts.
         if (index == 15) {
@@ -175,11 +203,17 @@ final class PlayerDragonTrials {
         });
     }
 
+    /**
+     * Selects actual part-hit rows by both arrow UUID and resolved parent-dragon UUID.
+     */
     private List<Map<String, Object>> hits(Arrow arrow, EnderDragon dragon) {
         return probe.forArrow(arrow.getUniqueId(), "hit_monitor").stream()
                 .filter(e -> e.get("parent").equals(dragon.getUniqueId().toString())).toList();
     }
 
+    /**
+     * Snapshots launch-time native part/arrow geometry and identity before physics advances.
+     */
     private Map<String, Object> begin(String id, EnderDragon dragon, List<Arrow> arrows) {
         var row = new LinkedHashMap<String, Object>();
         row.put("trial", id); row.put("launchTick", Bukkit.getCurrentTick());
@@ -193,6 +227,9 @@ final class PlayerDragonTrials {
         return row;
     }
 
+    /**
+     * Serializes a real part UUID, parent UUID and exact bounds without guessing semantic part names.
+     */
     private Map<String, Object> box(EnderDragonPart part) {
         var b = part.getBoundingBox();
         return Map.of("uuid", part.getUniqueId().toString(), "parent", part.getParent().getUniqueId().toString(),
@@ -200,6 +237,9 @@ final class PlayerDragonTrials {
                 "max", List.of(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
     }
 
+    /**
+     * Adds observed post-flight health/geometry and an explicit miss-or-contact outcome to the trial.
+     */
     private void record(Map<String, Object> row, EnderDragon dragon, List<Arrow> arrows, double before) {
         var impacts = arrows.stream().flatMap(a -> hits(a, dragon).stream()).toList();
         row.put("healthBefore", before); row.put("healthAfter", dragon.getHealth());

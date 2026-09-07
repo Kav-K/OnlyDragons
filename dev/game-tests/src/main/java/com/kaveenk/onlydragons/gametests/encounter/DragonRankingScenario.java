@@ -14,7 +14,15 @@ import org.bukkit.event.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-/** Two actual protocol identities, real bow releases and received production leaderboard text. */
+/**
+ * Exercises immutable post-defeat ranking with two actual protocol identities.
+ * Real releases drive production accounting and native death; literal tied-credit,
+ * overkill and proc-lethal expectations are checked against retained results.
+ * Reconnect changes the Player object but not participant UUID. Packet-received
+ * leaderboard text is validated separately from these server assertions; neither
+ * establishes reward eligibility or full-client appearance. Cleanup retires fights
+ * and the settled-hit subscription on the server thread.
+ */
 public final class DragonRankingScenario implements Scenario, Listener {
     ScenarioContext c; PlayerFixture players; DamageObservationProbe probe; DevelopmentDragonService dragons;
     EnderDragon dragon; UUID generation; Player originalAlpha; boolean veto, cancelDeath;
@@ -23,6 +31,11 @@ public final class DragonRankingScenario implements Scenario, Listener {
     final Map<UUID,UUID> physicalOwners=new LinkedHashMap<>();
     RankedEncounterResult firstRanking;
 
+    /**
+     * Registers native/settled observations and cleanup before the two actors enter.
+     * @param context isolated run scheduling, identity evidence and cleanup
+     * @throws Exception if the declared player fixture cannot initialize
+     */
     public void start(ScenarioContext context)throws Exception {
         c=context;c.mechanicRevision("dragon-ranking-v1");dragons=c.production().dragons();
         players=new PlayerFixture(c);probe=new DamageObservationProbe(c);c.listen(this);
@@ -34,6 +47,7 @@ public final class DragonRankingScenario implements Scenario, Listener {
         players.await("two distinct actors",300,players::allOnline,this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY "+c.harness().runId());
     }
+    /** Checks rejected-hit exclusion, exact initial damage and reconnect identity before a tied-credit native lethal hit. */
     void setup()throws Exception {
         for(String actor:List.of("alpha","beta"))prepare(actor);
         originalAlpha=players.player("alpha");
@@ -54,6 +68,7 @@ public final class DragonRankingScenario implements Scenario, Listener {
             });
         });
     }
+    /** Checks unique tie order and retained result/selection, then proves late releases and equipment edits cannot reorder the board. */
     void firstComplete(){
         players.await("ordinary frozen board",80,()->dragons.ranking().isPresent(),()->{
             firstRanking=dragons.ranking().orElseThrow();var result=view().completion().orElseThrow();
@@ -70,6 +85,7 @@ public final class DragonRankingScenario implements Scenario, Listener {
             },false);
         });
     }
+    /** Proves a new generation clears the visible prior board while the old frozen projection stays unchanged through proc-lethal completion. */
     void secondFight(){
         spawn(()->{
             c.check("next_fight_starts_without_old_board",true,dragons.ranking().isEmpty());
@@ -82,6 +98,7 @@ public final class DragonRankingScenario implements Scenario, Listener {
                 })));
         });
     }
+    /** Checks cancelled death, administrative follow-up and reset cannot announce an ordinary board, then verifies resources and no rewards. */
     void diagnosticFight(){
         spawn(()->{
             cancelDeath=true;draw("alpha","cancelled","ordinary",900,()->{
@@ -103,14 +120,18 @@ public final class DragonRankingScenario implements Scenario, Listener {
             });
         });
     }
+    /** Uses explicit calibration selection, watches its native dragon and subscribes to this generation before waiting for real parts. */
     void spawn(Runnable next){
         generation=dragons.spawn(DevelopmentDragonService.SpawnMode.CALIBRATION);dragon=(EnderDragon)Bukkit.getEntity(view().entityId());probe.watch(dragon);dragons.subscribe(generation,completions::add);
         players.await("native parts initialized",100,()->dragon.getParts().stream().allMatch(part->part.getLocation().getY()>75),next::run);
     }
+    /** Sets labelled survival/flight, empty inventory and zero-XP sentinels for an actor, including after reconnect. */
     void prepare(String actor){
         var p=players.player(actor);p.setGameMode(GameMode.SURVIVAL);p.setAllowFlight(true);p.setFlying(true);p.setInvulnerable(true);p.getInventory().clear();p.getInventory().setHeldItemSlot(0);p.setTotalExperience(0);p.setLevel(0);p.setExp(0);
     }
+    /** Runs the ordinary draw helper requiring a new settled physical impact. */
     void draw(String actor,String step,String loadout,double bonus,Runnable next){draw(actor,step,loadout,bonus,next,true);}
+    /** Positions actors and sets trusted equipment/bonus, then waits for actual draw/release; late-terminal trials deliberately expect no new settlement. */
     void draw(String actor,String step,String loadout,double bonus,Runnable next,boolean expectSettled){
         String other=actor.equals("alpha")?"beta":"alpha";
         players.setupPosition(other,new Location(players.player(other).getWorld(),20,100,20));
@@ -125,13 +146,19 @@ public final class DragonRankingScenario implements Scenario, Listener {
             });
         }));
     }
+    /** Reads the captured generation rather than a later active encounter. */
     ManagedCombatService.View view(){return c.production().combat().view(generation).orElseThrow();}
+    /** Counts native player releases for protocol-action synchronization. */
     @EventHandler(priority=EventPriority.MONITOR)public void release(EntityShootBowEvent e){if(e.getEntity()instanceof Player)releases++;}
+    /** Adds labelled native-positive damage pressure so the independent probe can verify production suppression. */
     @EventHandler(priority=EventPriority.MONITOR)public void launch(ProjectileLaunchEvent e){
         // Labeled native-positive pressure: the existing production guard must suppress it.
         if(e.getEntity() instanceof Arrow arrow)c.later(1,()->{if(arrow.isValid())arrow.setDamage(2);});
     }
+    /** Records actual part collision/shooter ownership and applies the selected veto before settlement. */
     @EventHandler(priority=EventPriority.HIGHEST)public void hit(ProjectileHitEvent e){if(e.getHitEntity()instanceof EnderDragonPart part&&part.getParent()==dragon&&e.getEntity()instanceof Arrow a&&a.getShooter()instanceof Player p){physicalOwners.put(a.getUniqueId(),p.getUniqueId());if(veto)e.setCancelled(true);}}
+    /** Cancels the selected generation's native death only for the diagnostic-board control. */
     @EventHandler(priority=EventPriority.HIGHEST)public void cancel(EntityDeathEvent e){if(cancelDeath&&e.getEntity()==dragon)e.setCancelled(true);}
+    /** Counts only uncancelled deaths of the currently selected native dragon. */
     @EventHandler(priority=EventPriority.MONITOR)public void death(EntityDeathEvent e){if(e.getEntity()==dragon&&!e.isCancelled())deaths++;}
 }

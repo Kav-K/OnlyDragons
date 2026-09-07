@@ -13,8 +13,19 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.inventory.*
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.player.ClientboundSetExperiencePacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.*;
 
-/** A separate bounded real-ANVIL container. Never relaxes window-0 inventory rules. */
+/**
+ * Observes a real 39-slot ANVIL menu independently of player-window authority.
+ * Owned and serialized by {@link ActionSession}; no optimistic inventory edits or XP
+ * debits occur here. Actions require an observed ANVIL open and fresh full contents.
+ * Received costs/XP and packet hashes supplement the companion's actual event and
+ * conservation assertions; they do not themselves establish transaction acceptance.
+ */
 final class AnvilState {
+    /**
+     * An anvil packet request and the exact open/snapshot used to prepare it.
+     * @param packet click, rename or close request for the currently observed menu
+     * @param evidence immutable container, state ID and snapshot provenance
+     */
     record Action(Packet packet, Map<String, Object> evidence) {}
     private final List<Map<String,Object>> opens = new ArrayList<>(), snapshots = new ArrayList<>(), costs = new ArrayList<>(), xp = new ArrayList<>(), closes = new ArrayList<>();
     private int container = -1, openSequence, stateId;
@@ -23,6 +34,11 @@ final class AnvilState {
     private String[] slots;
     private Map<String,Object> lastSnapshot;
 
+    /**
+     * Tracks matching menu opens, full contents, cost/XP packets and closes with bounded histories.
+     * Any matching slot delta, changed cursor or stateless player-inventory update removes
+     * readiness; only full contents settle a pending click/rename. Other menu types cannot authorize actions.
+     */
     void receive(Packet packet) {
         if (packet instanceof ClientboundOpenScreenPacket open) {
             ready = false; pending = false; container = -1;
@@ -62,6 +78,11 @@ final class AnvilState {
         }
     }
 
+    /**
+     * Prepares an admitted click, rename or close against the current full menu snapshot.
+     * Clicks and renames wait for authoritative resynchronization; a prepared client close
+     * records its own source explicitly. The caller sends the packet outside its state lock.
+     */
     Action action(ActionPlan.Step step) {
         check(container > 0 && ready && !pending && lastSnapshot != null, "Anvil action needs an observed open and fresh full snapshot");
         var evidence = Map.<String,Object>of("anvilOpenSequence",openSequence,"containerId",container,"stateId",stateId,
@@ -90,17 +111,28 @@ final class AnvilState {
         }
         return new Action(packet,evidence);
     }
+    /** Discards world-specific menu authority without concealing a pending transaction; keeps historical observations. */
     void reset() { check(!pending,"World changed with unsettled anvil action"); container = -1; ready = false; }
+    /** Rejects terminal connection actions while an anvil click or rename awaits a full refresh. */
     void requireSettled() { check(!pending,"Anvil action awaits full resynchronization"); }
+    /** Reports whether any actual ANVIL open was received, controlling optional receipt inclusion. */
     boolean observed() { return !opens.isEmpty(); }
+    /** Copies independent open, snapshot, cost, XP and close histories for strict replay. */
     Map<String,Object> report() { return Map.of("opens",List.copyOf(opens),"snapshots",List.copyOf(snapshots),"costs",List.copyOf(costs),"xp",List.copyOf(xp),"closes",List.copyOf(closes)); }
+    /** Appends a receipt row with a separate 256-row bound for each observation category. */
     private static void add(List<Map<String,Object>> rows, Map<String,Object> row) {
         check(rows.size() < 256,"Anvil observation bound exceeded"); rows.add(row);
     }
+    /**
+     * Adds packet-body provenance and the observation time. The legacy field name
+     * {@code receivedAtEpochMs} also timestamps preparation of an explicitly client-sourced close.
+     */
     private static Map<String,Object> row(MinecraftPacket packet, Map<String,Object> fields) {
         var row = new LinkedHashMap<>(fields); row.put("receivedAtEpochMs",System.currentTimeMillis()); row.put("sha256",digest(packet)); return Map.copyOf(row);
     }
+    /** Uses a common pinned item encoding so snapshots can compare identity/component bytes. */
     private static String itemDigest(ItemStack item) { return digest(new ClientboundSetCursorItemPacket(item)); }
+    /** Hashes pinned serialized packet-body bytes and always releases the temporary buffer. */
     private static String digest(MinecraftPacket packet) {
         var bytes = Unpooled.buffer();
         try {
@@ -109,5 +141,6 @@ final class AnvilState {
         } catch (NoSuchAlgorithmException impossible) { throw new IllegalStateException(impossible); }
         finally { bytes.release(); }
     }
+    /** Uses the session failure mechanism for invalid anvil state or evidence bounds. */
     private static void check(boolean condition,String reason) { ActionSession.check(condition,reason); }
 }

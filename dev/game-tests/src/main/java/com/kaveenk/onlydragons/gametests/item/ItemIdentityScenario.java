@@ -28,8 +28,18 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import static com.kaveenk.onlydragons.domain.item.ItemValidationException.Code.*;
 
-/** Real Paper items and a synthetic inventory; no authenticated actor or combat implementation. */
+/**
+ * Real Paper item-byte/PDC validation with a synthetic inventory and pinned legacy catalog.
+ * An explicit complete ID map supplies independent per-loadout expectations; adding
+ * a catalog entry requires a deliberate oracle update. Forged presentation, malformed
+ * tags and unsupported identities must fail through the actual codec. No logged-in
+ * player, equipment event or combat effect is claimed here.
+ */
 public final class ItemIdentityScenario implements Scenario {
+    /**
+     * Checks exact catalog coverage, serialized identity, trusted projections and typed rejection codes.
+     * @param context server-thread report and cleanup owner
+     */
     @Override public void start(ScenarioContext context) {
         context.mechanicRevision("item-codec-v4");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
@@ -166,18 +176,30 @@ public final class ItemIdentityScenario implements Scenario {
         context.finish();
     }
 
+    /**
+     * Round-trips through Paper's native serialized item bytes, not a Java clone.
+     */
     private static ItemStack bytes(ItemStack stack) { return ItemStack.deserializeBytes(stack.serializeAsBytes()); }
+    /**
+     * Requires a production-valid decode before returning canonical instance identity.
+     */
     private static ItemInstance instance(WeaponItemCodec codec, ItemStack stack) {
         var result = codec.decode(stack);
         if (!(result instanceof ItemReadResult.Valid valid)) throw new AssertionError("Expected valid item, got " + result);
         return valid.item().instance();
     }
+    /**
+     * Re-serializes a malformed item and requires the exact nonempty codec rejection diagnostic.
+     */
     private static void reject(ScenarioContext context, WeaponItemCodec codec, String assertion,
                                ItemValidationException.Code expected, ItemStack stack) {
         var result = codec.decode(bytes(stack));
         context.check(assertion, expected.name(), result instanceof ItemReadResult.Invalid invalid && !invalid.reason().isBlank()
                 ? invalid.code().name() : "not rejected: " + result);
     }
+    /**
+     * Mutates the managed PDC subtree of a valid seed to create one explicit invalid-input trial.
+     */
     private static ItemStack changed(WeaponItemCodec codec, ItemRegistry registry, Consumer<PersistentDataContainer> change) {
         var stack = codec.encode(registry.create("ordinary"));
         stack.editMeta(meta -> {
@@ -188,10 +210,16 @@ public final class ItemIdentityScenario implements Scenario {
         });
         return stack;
     }
+    /**
+     * Writes a deliberately chosen raw enchant tag for codec-boundary trials.
+     */
     private static void enchant(PersistentDataContainer data, String id, int level) {
         var enchants = data.get(key("enchants"), PersistentDataType.TAG_CONTAINER);
         enchants.set(key(id), PersistentDataType.INTEGER, level);
         data.set(key("enchants"), PersistentDataType.TAG_CONTAINER, enchants);
     }
+    /**
+     * Uses the production namespace for controlled malformed-tag construction.
+     */
     private static NamespacedKey key(String id) { return new NamespacedKey("onlydragons", id); }
 }

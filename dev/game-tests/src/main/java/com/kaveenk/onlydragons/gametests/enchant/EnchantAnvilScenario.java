@@ -22,7 +22,13 @@ import org.bukkit.inventory.view.AnvilView;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
 
-/** Real placed-anvil input/output packets, native XP debit, then production firing of the collected item. */
+/**
+ * Placed-anvil protocol transactions followed by a real shot from the collected managed bow.
+ * All ten book grants, rename requests and output extractions are real input. Only
+ * the first trial moves both inputs by packets; later inputs are labeled server setup.
+ * Literal level costs/fraction preservation and copied metadata prove conservation;
+ * the final 165-damage shot connects the output to production effects.
+ */
 public final class EnchantAnvilScenario implements Scenario, Listener {
     private static final List<String> IDS = List.of("snipe","dragon_tracer","vicious","overload","gravity","infinite_quiver","flame","duplex","fatal_tempo","power");
     private static final NamespacedKey FOREIGN = new NamespacedKey("fixture","foreign");
@@ -34,6 +40,11 @@ public final class EnchantAnvilScenario implements Scenario, Listener {
     private long commits; private DummyBackend target; private UUID generation; private DamageObservationProbe probe;
     private final List<Map<String,Object>> transactions = new ArrayList<>();
     private final Set<UUID> collisions = new HashSet<>();
+    /**
+     * Owns the view/backend cleanup and native observers before admitting the actor.
+     * @param context server-thread report/resource owner
+     * @throws Exception if actor-plan admission fails
+     */
     public void start(ScenarioContext context) throws Exception {
         c = context; c.mechanicRevision("enchant-anvil-v1"); players = new PlayerFixture(c); c.listen(this); probe = new DamageObservationProbe(c);
         c.cleanup("anvil-view", () -> { if (players.allOnline()) players.player("alpha").closeInventory(); });
@@ -41,7 +52,13 @@ public final class EnchantAnvilScenario implements Scenario, Listener {
         players.await("anvil actor",300,players::allOnline,this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY " + c.harness().runId());
     }
+    /**
+     * Resolves the current actor connection for each stage rather than retaining a stale player.
+     */
     private Player p() { return players.player("alpha"); }
+    /**
+     * Builds a reversible placed anvil and requires denied grant followed by actual native open.
+     */
     private void setup() {
         var p=p(); p.setGameMode(GameMode.SURVIVAL); p.setAllowFlight(true); p.setFlying(true); p.setInvulnerable(true);
         p.getInventory().clear(); p.setItemOnCursor(null); p.getInventory().setHeldItemSlot(0);
@@ -60,6 +77,9 @@ public final class EnchantAnvilScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Stages one enchant trial with preserved foreign/durability metadata and literal XP oracle.
+     */
     private void trial() {
         if(index==IDS.size()) { fire(); return; }
         String id=IDS.get(index); int level=registry.enchant(id).maxLevel();
@@ -85,18 +105,33 @@ public final class EnchantAnvilScenario implements Scenario, Listener {
             }
         });
     }
+    /**
+     * Requests the first native pickup of the bow after authoritative inventory resynchronization.
+     */
     private void inputBow() {
         resync(() -> requestClick("input-bow", () -> !empty(p().getItemOnCursor()), this::placeBow));
     }
+    /**
+     * Requests placement into the actual anvil left slot and waits for native state.
+     */
     private void placeBow() {
         resync(() -> requestClick("place-bow", () -> !empty(view.getTopInventory().getItem(0)), this::inputBook));
     }
+    /**
+     * Requests native pickup of the command-granted book.
+     */
     private void inputBook() {
         resync(() -> requestClick("input-book", () -> !empty(p().getItemOnCursor()), this::placeBook));
     }
+    /**
+     * Requests native placement into the right input before rename/preview checks.
+     */
     private void placeBook() {
         resync(() -> requestClick("place-book", () -> !empty(view.getTopInventory().getItem(1)), this::rename));
     }
+    /**
+     * Waits for Paper's actual rename/cost/result while proving preview consumes neither inputs nor XP.
+     */
     private void rename() {
         String id=IDS.get(index);
         resync(()->{players.request("alpha","name-"+id.replace('_','-')); players.await("received rename reaches Paper",100,
@@ -107,6 +142,9 @@ public final class EnchantAnvilScenario implements Scenario, Listener {
             resync(()->requestClick("collect-"+id.replace('_','-'),()->empty(view.getTopInventory().getItem(0)),this::collected));
         });});
     }
+    /**
+     * Checks native cursor/shift destination, one commit, exact level debit and immutable item identity.
+     */
     private void collected() {
         String id=IDS.get(index); boolean shift=index%3==2;
         players.await("native completed transaction",60,()->c.production().anvils().metrics().committed()==commits+1,()->{
@@ -122,6 +160,9 @@ public final class EnchantAnvilScenario implements Scenario, Listener {
             if(shift){index++;trial();}else resync(()->requestClick("store-"+id.replace('_','-'),()->empty(p().getItemOnCursor()),()->{index++;trial();}));
         });
     }
+    /**
+     * Closes the actual anvil, stages the collected bow and requires a physical production hit with literal 165 HP/credit.
+     */
     private void fire() {
         resync(()->{players.request("alpha","close");players.await("real anvil close",100,()->!(p().getOpenInventory() instanceof AnvilView),()->{
             c.check("all_ten_native_commits",10L,c.production().anvils().metrics().committed());
@@ -141,11 +182,36 @@ public final class EnchantAnvilScenario implements Scenario, Listener {
             }));});
         });});
     }
+    /**
+     * Requests the server's full inventory state and yields five ticks before another transaction.
+     */
     private void resync(Runnable next) { p().updateInventory();c.later(5,next::run); }
+    /**
+     * Requires a new native click plus the operation's actual state predicate before proceeding.
+     */
     private void requestClick(String step,java.util.function.BooleanSupplier done,Runnable next) {int before=clicks;players.request("alpha",step);players.await(step,100,()->clicks>before&&done.getAsBoolean(),()->c.later(2,next::run));}
+    /**
+     * Normalizes absent and AIR inventory representations for conservation checks.
+     */
     private static boolean empty(ItemStack item){return item==null||item.getType().isAir();}
+    /**
+     * Counts uncancelled native ANVIL openings for the declared actor.
+     * @param event native inventory-open event
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void open(InventoryOpenEvent event){if(event.getPlayer().getUniqueId().equals(players.identity("alpha"))&&event.getView() instanceof AnvilView&&!event.isCancelled())opens++;}
+    /**
+     * Counts the actor's actual native inventory dispatches, separate from transaction success.
+     * @param event native click event
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void click(InventoryClickEvent event){if(event.getWhoClicked().getUniqueId().equals(players.identity("alpha")))clicks++;}
+    /**
+     * Counts actual bow-release dispatches for the collected-item firing trial.
+     * @param event native bow event
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void release(EntityShootBowEvent event){if(event.getEntity().getUniqueId().equals(players.identity("alpha")))releases++;}
+    /**
+     * Records physical arrow UUIDs from the actor when a real entity contact occurs.
+     * @param event native hit event
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void hit(ProjectileHitEvent event){if(event.getEntity().getShooter() instanceof Player player&&player.getUniqueId().equals(players.identity("alpha"))&&event.getHitEntity()!=null)collisions.add(event.getEntity().getUniqueId());}
 }

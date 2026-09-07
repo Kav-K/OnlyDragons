@@ -31,8 +31,18 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-/** Real protocol player and production listeners; commands/edits/death use explicit public API fixtures. */
+/**
+ * Real single-player equipment listener calibration using legacy protocol actions.
+ * Login/select/draw/release/quit are packets. Commands, item edits, death and respawn
+ * are explicitly public server-API setup, so their outcomes must not be relabeled as
+ * packet transactions. Immutable old snapshots and session cleanup are independent
+ * of the native arrow's observed flight.
+ */
 public final class EquipmentPlayerScenario implements Scenario {
+    /**
+     * Admits the legacy disposable actor mode and installs an owned bounded flow.
+     * @param context server-thread report and cleanup owner
+     */
     @Override public void start(ScenarioContext context) {
         context.mechanicRevision("equipment-player-v2");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
@@ -47,6 +57,11 @@ public final class EquipmentPlayerScenario implements Scenario {
         context.harness().getLogger().info("OD_PLAYER_READY " + context.harness().runId());
     }
 
+    /**
+     * One connection's server-thread progression through equipment edits, death and quit.
+     * Event booleans prevent duplicate stage advancement; cached inspections must be
+     * produced by actual production listeners before the next assertion.
+     */
     private static final class Flow implements Listener {
         private final ScenarioContext c;
         private final EquipmentStatsService stats;
@@ -58,26 +73,50 @@ public final class EquipmentPlayerScenario implements Scenario {
         private UUID weaponId;
         private EquipmentStatsService.Inspection beforeEdit;
 
+        /**
+         * Captures the production service and exact runner-derived actor UUID.
+         */
         Flow(ScenarioContext context) {
             c = context; stats = c.production().equipment();
             name = "od_" + c.harness().runId().substring(0, 13);
             id = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8));
         }
+        /**
+         * Filters native callbacks by the bound actor UUID.
+         */
         private boolean ours(Player candidate) { return candidate.getUniqueId().equals(id); }
+        /**
+         * Requests a legacy protocol action using this boot's nonce.
+         */
         private void request(String action) { player.sendMessage(Component.text("OD_PLAYER:" + c.harness().runId() + ":" + action)); }
+        /**
+         * Converts synchronous event-stage exceptions into the context's failed cleanup path.
+         */
         private void guarded(ScenarioContext.Step action) {
             try { action.run(); } catch (Exception | AssertionError failure) { c.fail(failure); }
         }
+        /**
+         * Requires the production listener cache to exist; it never refreshes it to manufacture readiness.
+         */
         private EquipmentStatsService.Inspection cached() {
             var value = stats.cached(id);
             if (value == null) throw new IllegalStateException("Production equipment listener has not populated the cache");
             return value;
         }
+        /**
+         * Reads the observed cached snapshot's raw stat before profile caps.
+         */
         private double raw(StatKey key) { return cached().stats().snapshot().raw(key); }
+        /**
+         * Rejects any inventory item that the real managed-item codec does not validate.
+         */
         private ItemReadResult.Valid valid(ItemStack stack) {
             if (codec.decode(stack) instanceof ItemReadResult.Valid value) return value;
             throw new IllegalStateException("Expected a production-validated managed bow");
         }
+        /**
+         * Scopes a calibration permission to setup commands and verifies its removal in finally.
+         */
         private void permitted(ScenarioContext.Step commands) throws Exception {
             var attachment = player.addAttachment(c.harness(), "onlydragons.calibration", true);
             try { commands.run(); }
@@ -89,6 +128,10 @@ public final class EquipmentPlayerScenario implements Scenario {
             }
         }
 
+        /**
+         * Checks real identity/loopback/non-op status before delayed setup.
+         * @param event native join callback
+         */
         @EventHandler(priority = EventPriority.MONITOR)
         public void join(PlayerJoinEvent event) {
             if (!ours(event.getPlayer())) return;
@@ -101,6 +144,9 @@ public final class EquipmentPlayerScenario implements Scenario {
                 c.later(2, this::prepare);
             });
         }
+        /**
+         * Uses explicit API commands/inventory setup, then requests a real hotbar selection.
+         */
         private void prepare() throws Exception {
             player.setGameMode(GameMode.SURVIVAL);
             player.setAllowFlight(true); player.setFlying(true);
@@ -132,6 +178,10 @@ public final class EquipmentPlayerScenario implements Scenario {
             });
         }
 
+        /**
+         * Waits for the production held-slot refresh before editing the same item UUID.
+         * @param event native selection callback
+         */
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void held(PlayerItemHeldEvent event) {
             if (!ours(event.getPlayer()) || selected || event.getNewSlot() != 1) return;
@@ -150,6 +200,9 @@ public final class EquipmentPlayerScenario implements Scenario {
                 });
             });
         }
+        /**
+         * Checks immutable old stats, edited fingerprint and invalid-stack quarantine/recovery.
+         */
         private void afterEdit() {
             c.check("same_uuid_item_edit", weaponId.toString(), valid(player.getInventory().getItemInMainHand()).item().instance().identity().instanceId().toString());
             c.check("item_edit_listener_refresh", 3.0, raw(StatKey.FEROCITY));
@@ -166,6 +219,9 @@ public final class EquipmentPlayerScenario implements Scenario {
                 c.later(2, this::commandsAndDraw);
             });
         }
+        /**
+         * Checks public-API command/bonus replacement behavior before the packet-driven bow trial.
+         */
         private void commandsAndDraw() throws Exception {
             c.check("restored_item_listener_refresh", List.of(100.0, 3.0), List.of(raw(StatKey.WEAPON_DAMAGE), raw(StatKey.FEROCITY)));
             var before = cached();
@@ -186,12 +242,19 @@ public final class EquipmentPlayerScenario implements Scenario {
             request("draw");
         }
 
+        /**
+         * Begins draw polling after a real main-hand bow-use callback.
+         * @param event native interaction
+         */
         @EventHandler(priority = EventPriority.MONITOR)
         public void interact(PlayerInteractEvent event) {
             if (!ours(event.getPlayer()) || drawing || !selected || event.getHand() != EquipmentSlot.HAND
                     || !event.getAction().isRightClick() || event.getMaterial() != Material.BOW) return;
             guarded(() -> { drawing = true; awaitDraw(0); });
         }
+        /**
+         * Requires observed native hand-raised state before the full draw delay and release request.
+         */
         private void awaitDraw(int elapsed) {
             c.later(1, () -> {
                 if (player.isHandRaised()) {
@@ -201,6 +264,10 @@ public final class EquipmentPlayerScenario implements Scenario {
                 else awaitDraw(elapsed + 1);
             });
         }
+        /**
+         * Owns the native released arrow and later induces API death to check production session cleanup.
+         * @param event real uncancelled bow release
+         */
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void shoot(EntityShootBowEvent event) {
             if (!(event.getEntity() instanceof Player owner) || !ours(owner) || shot) return;
@@ -222,6 +289,10 @@ public final class EquipmentPlayerScenario implements Scenario {
                 });
             });
         }
+        /**
+         * Keeps fixture inventory while removing drops/XP from the deliberate death trial.
+         * @param event native death callback from API health change
+         */
         @EventHandler(priority = EventPriority.HIGHEST)
         public void death(PlayerDeathEvent event) {
             if (!ours(event.getEntity())) return;
@@ -230,6 +301,10 @@ public final class EquipmentPlayerScenario implements Scenario {
                 event.setKeepInventory(true); event.getDrops().clear(); event.setDroppedExp(0);
             });
         }
+        /**
+         * Checks session rebuilding after public-API respawn, without retaining the previous bonus.
+         * @param event native respawn callback
+         */
         @EventHandler(priority = EventPriority.MONITOR)
         public void respawn(PlayerRespawnEvent event) {
             if (!ours(event.getPlayer()) || respawned) return;
@@ -245,6 +320,10 @@ public final class EquipmentPlayerScenario implements Scenario {
                 });
             });
         }
+        /**
+         * Verifies the requested quit removes both the real player and production equipment session.
+         * @param event native quit callback
+         */
         @EventHandler(priority = EventPriority.MONITOR)
         public void quit(PlayerQuitEvent event) {
             if (!ours(event.getPlayer())) return;

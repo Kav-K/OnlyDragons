@@ -14,7 +14,14 @@ import org.bukkit.event.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 
-/** Real held v4 arrows into the deployed orbit/Tracer/combat services, using their existing random ports. */
+/**
+ * Sustained real shortbow input against an orbiting native dragon, through production
+ * bow and combat service classes with deterministic random ports. Native collision
+ * receipts are joined to immutable shots and domain impacts; literal HP, contribution,
+ * Flame cadence and Tempo expiry oracles are calculated independently below.
+ * Server positioning and a positive native-damage sentinel are labelled setup.
+ * This bounded protocol trial does not establish human aiming feel or rendering.
+ */
 public final class HeldCombatScenario implements Scenario, Listener {
     private ScenarioContext c; private PlayerFixture players; private OwnedBowService bows; private ManagedCombatService combat;
     private DragonBackend backend; private UUID fight; private DamageObservationProbe probe;
@@ -24,6 +31,13 @@ public final class HeldCombatScenario implements Scenario, Listener {
     private final Map<UUID,List<List<Double>>> paths = new LinkedHashMap<>();
     private boolean finished, veto; private int vetoEvents; private Location start;
 
+    /**
+     * Installs fixture-owned service instances, their real listeners and a settled-hit
+     * observer on the server thread. Cleanup closes combat before its projectile owner
+     * and stops sampling even when a later stage fails.
+     * @param context report, scheduler and resource owner for this disposable boot
+     * @throws Exception if initial fixture setup cannot complete
+     */
     public void start(ScenarioContext context) throws Exception {
         c=context;c.mechanicRevision("held-combat-v1");players=new PlayerFixture(c);probe=new DamageObservationProbe(c);
         bows=new OwnedBowService(c.production(),c.production().equipment(),100,()->.75);
@@ -37,13 +51,28 @@ public final class HeldCombatScenario implements Scenario, Listener {
         players.await("held combat actor",300,players::allOnline,this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY "+c.harness().runId());
     }
+    /**
+     * Resolves the current connection for the declared actor instead of retaining a
+     * Player across session changes.
+     * @return the online alpha actor
+     */
     private Player player(){return players.player("alpha");}
+    /**
+     * Sets Survival inventory and safe flight as setup, then lets the native orbit
+     * settle before the first held input. Survival keeps ammo debits observable.
+     */
     private void setup(){
         player().setGameMode(GameMode.SURVIVAL);player().setAllowFlight(true);player().setFlying(true);player().setInvulnerable(true);
         player().getInventory().clear();player().getInventory().setHeldItemSlot(0);
         players.permission("alpha","onlydragons.fire",true);
         fresh("volley_duplex_v4");sample();c.later(180,this::duplex);
     }
+    /**
+     * Resets the preceding fight and opens a 100,000-HP native ORBIT encounter with
+     * the selected trusted bow. Random values force charged ammo and suppress the
+     * fractional Ferocity roll, leaving exact Flame/Tempo accounting observable.
+     * @param id production loadout identifier for the primary held slot
+     */
     private void fresh(String id){
         if(fight!=null)combat.reset(players.identity("alpha"));
         var center=new Location(player().getWorld(),160,100,160);var bounds=BoundingBox.of(center,48,48,48);
@@ -56,11 +85,21 @@ public final class HeldCombatScenario implements Scenario, Listener {
         players.setupItem("alpha",9,new ItemStack(Material.ARROW,64));player().getInventory().setHeldItemSlot(0);
         launched.clear();settled.clear();collisions.clear();paths.clear();
     }
+    /**
+     * Positions the launch view relative to the current native body box with the
+     * calibrated upward offset; it never relocates or redirects a fired arrow.
+     */
     private void aimCurrentPart(){
         var part=backend.entity().getParts().stream().filter(p->p.getBoundingBox().getWidthX()==5).findFirst().orElseThrow();
         var pose=player().getLocation().setDirection(part.getBoundingBox().getCenter().subtract(player().getEyeLocation().toVector()));
         pose.setPitch(pose.getPitch()-24);players.setupPosition("alpha",pose);
     }
+    /**
+     * Releases a sustained Duplex volley and waits for every physical settlement and
+     * burn expiry. The oracle derives 120 damage per group and nine per observed
+     * 20-tick fire opportunity, then checks native projection, charge count, moving
+     * target and retained projectile/group identity.
+     */
     private void duplex(){
         aimCurrentPart();
         start=backend.entity().getLocation();hold("duplex",6,()->{
@@ -88,6 +127,13 @@ public final class HeldCombatScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Swaps to Duplex through the real held-slot packet while captured Tempo arrows
+     * remain airborne. It checks frozen source enchantments, the shared 75-Ferocity
+     * benefit and the original 59/60-tick expiry boundary; Duplex must not refresh it.
+     * Fire totals are recomputed from collision/receiver timing, never copied from
+     * the combat total being asserted.
+     */
     private void tempo(){
         aimCurrentPart();
         hold("tempo",4,()->{
@@ -129,6 +175,11 @@ public final class HeldCombatScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Vetoes actual multipart collisions after a positive volley, requiring observed
+     * veto notifications and rejected settlements with zero HP, score, burn or Tempo
+     * effects. Reset must release resources before the actor's actual final quit.
+     */
     private void rejection(){
         fresh("volley_duplex_v4");veto=true;c.later(30,()->{aimCurrentPart();hold("veto",3,()->{
             int arrows=launched.size();players.await("all actual veto collisions",140,()->settled.size()==arrows,()->{
@@ -142,17 +193,51 @@ public final class HeldCombatScenario implements Scenario, Listener {
             });
         });});
     }
+    /**
+     * Sends one use request, observes native raised-hand state and enough primary
+     * emissions, then sends release and waits for the native stop before advancing.
+     * @param id action-plan prefix for the use/release pair
+     * @param groups minimum primary groups to observe, excluding Duplex children
+     * @param next stage after release and a short server-settlement delay
+     */
     private void hold(String id,int groups,Runnable next){
         int before=launched.size();players.request("alpha",id+"-use");
         players.await("native sustained "+id,100,()->player().isHandRaised()&&launched.subList(before,launched.size()).stream().filter(p->p.shot().ordinal()==0).count()>=groups,()->{
             players.request("alpha",id+"-release");players.await("native release "+id,80,()->!player().isHandRaised(),()->c.later(3,next::run));
         });
     }
+    /**
+     * Requests one real click and waits for the expected primary/child pair.
+     * @param id declared action step
+     * @param next stage after both native emissions are observed
+     */
     private void click(String id,Runnable next){int count=launched.size();players.request("alpha",id);players.await("native click "+id,80,()->launched.size()>=count+2,next::run);}
+    /**
+     * Reads the active fight's production snapshot.
+     * @return current domain/native encounter view
+     * @throws NoSuchElementException if the expected fight has disappeared
+     */
     private ManagedCombatService.View view(){return combat.view(fight).orElseThrow();}
+    /**
+     * Reads alpha's full contribution total, treating absent participation as zero.
+     * @return credited damage, distinct from actual HP loss
+     */
     private double credit(){return view().contributions().getOrDefault(players.identity("alpha"),new com.kaveenk.onlydragons.domain.encounter.EncounterResult.Contribution(0,0,0,false)).contributionDamage();}
+    /**
+     * Counts real inventory arrows for the Survival debit oracle.
+     * @return total remaining ordinary arrows
+     */
     private int ammo(){return player().getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum();}
+    /**
+     * Converts first physical-collision ticks into JSON-safe provenance rows.
+     * @return ordered projectile UUID and server tick pairs
+     */
     private List<Map<String,Object>> collisionRows(){return collisions.entrySet().stream().map(e->Map.<String,Object>of("projectile",e.getKey().toString(),"tick",e.getValue())).toList();}
+    /**
+     * Collects at most 60 continuity samples per projectile on the server thread.
+     * The report retains vertical before/after velocity and position for same-entity
+     * returning-flight evidence; sampling ends with the owned scenario lifecycle.
+     */
     private void sample(){
         if(finished)return;
         for(var owned:bows.projectiles())bows.continuity().frame(owned.shot().projectileId()).ifPresent(frame->{
@@ -161,12 +246,28 @@ public final class HeldCombatScenario implements Scenario, Listener {
         });
         c.later(1,this::sample);
     }
+    /**
+     * Records only emissions already owned by this fixture's service.
+     * @param e native projectile launch, not a synthetic domain submission
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void launch(ProjectileLaunchEvent e){bows.projectile(e.getEntity().getUniqueId()).ifPresent(launched::add);}
+    /**
+     * Binds a known launched projectile to this dragon's actual multipart collision.
+     * The rejection stage intentionally cancels that native event, retaining its first
+     * tick and every veto notification for the negative oracle.
+     * @param e native physical hit event
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void hit(ProjectileHitEvent e){
         if(e.getHitEntity() instanceof EnderDragonPart part&&backend!=null&&part.getParent().getUniqueId().equals(backend.entity().getUniqueId())&&launched.stream().anyMatch(p->p.shot().projectileId().equals(e.getEntity().getUniqueId()))){
             collisions.putIfAbsent(e.getEntity().getUniqueId(),Integer.toUnsignedLong(Bukkit.getCurrentTick()));if(veto){e.setCancelled(true);vetoEvents++;}
         }
     }
+    /**
+     * Seeds positive native damage on a live owned arrow after launch. This explicit
+     * probe makes suppression meaningful: a naturally zero event could not prove the
+     * production guard prevented duplicate native HP loss.
+     * @param e native launch whose arrow may receive the fixture sentinel
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void sentinel(ProjectileLaunchEvent e) {
         if(e.getEntity() instanceof Arrow arrow && bows.projectile(arrow.getUniqueId()).isPresent())
             c.later(2,()->{if(arrow.isValid())arrow.setDamage(2);});

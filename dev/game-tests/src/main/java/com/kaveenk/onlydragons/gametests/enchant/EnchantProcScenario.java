@@ -13,7 +13,13 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 import org.bukkit.Bukkit;
 
-/** Synthetic settled impacts; actual owned Paper callbacks drive the production queue and expiry. */
+/**
+ * Production proc-queue calibration with synthetic settled impacts and real scheduled Paper ticks.
+ * Controlled random samples prove counts and thresholds; immutable item/shot inputs
+ * prove ancestry and snapshot retention. The fixture does not create native collisions
+ * or authenticate players. Its bounded coordinator is separate from the live gameplay
+ * coordinator and is closed on terminal tick or a tick-stage exception.
+ */
 public final class EnchantProcScenario implements Scenario {
     private final UUID encounterId = UUID.randomUUID(), owner = UUID.randomUUID(), target = UUID.randomUUID();
     private final ProcCoordinator.Session session = new ProcCoordinator.Session(owner, UUID.randomUUID());
@@ -24,6 +30,10 @@ public final class EnchantProcScenario implements Scenario {
     private ProcCoordinator.PhysicalResult parent;
     private final List<DamageResult> children = new ArrayList<>();
 
+    /**
+     * Checks deterministic count/item oracles, then admits a five-child parent into a bounded queue.
+     * @param c active server-thread report owner
+     */
     @Override public void start(ScenarioContext c) {
         c.mechanicRevision("enchants-procs-v1");
         c.check("server_thread", true, Bukkit.isPrimaryThread());
@@ -60,6 +70,11 @@ public final class EnchantProcScenario implements Scenario {
         c.later(1, () -> step(c, 1));
     }
 
+    /**
+     * Drains actual tick deadlines and checks queue capacity, Tempo expiry and stale-session isolation.
+     * Assertions use fixed counts/amounts and the captured start tick; no wall-clock sleep
+     * is substituted for advancing the production queue.
+     */
     private void step(ScenarioContext c, int elapsed) {
         try {
             long tick = Bukkit.getCurrentTick();
@@ -120,6 +135,10 @@ public final class EnchantProcScenario implements Scenario {
         }
     }
 
+    /**
+     * Round-trips trusted PDC before direct domain submission and edits the same item UUID afterward.
+     * The 72-damage oracle combines explicit Power/Snipe fractions and defense once.
+     */
     private void itemPipeline(ScenarioContext c) {
         var registry = CalibrationLoadouts.registry();
         var codec = new WeaponItemCodec(registry);
@@ -149,6 +168,9 @@ public final class EnchantProcScenario implements Scenario {
         }
     }
 
+    /**
+     * Creates a synthetic critical shot with explicit captured Ferocity/ultimate and Duplex scale.
+     */
     private ShotContext shot(double ferocity, int tempo, boolean duplex) {
         var stats = new StatResolver(StatProfile.calibration()).resolve("proc-fixture-v1", Map.of(StatKey.WEAPON_DAMAGE, 100.0,
                 StatKey.FEROCITY, ferocity), ModifierSources.empty()).snapshot();
@@ -159,9 +181,15 @@ public final class EnchantProcScenario implements Scenario {
                 owner, new WeaponIdentity(UUID.randomUUID(), "proc-test", 1, "v1"), stats, enchants, profile.mechanic(), 0,
                 new Vector3(0, 0, 0), new Vector3(1, 0, 0), CritOutcome.CRITICAL, 1, duplex ? .2 : 1);
     }
+    /**
+     * Submits a synthetic physical candidate using the original captured session token.
+     */
     private ProcCoordinator.PhysicalResult hit(ShotContext shot, long tick) {
         return hit(shot, tick, session);
     }
+    /**
+     * Submits a synthetic candidate with an explicit session to exercise reconnect rejection.
+     */
     private ProcCoordinator.PhysicalResult hit(ShotContext shot, long tick, ProcCoordinator.Session captured) {
         var impact = new PhysicalImpact(new PhysicalImpact.Key(encounterId, shot.projectileId(), target, 0), owner, tick, new Vector3(10, 0, 0), Optional.empty());
         return coordinator.physical(shot, impact, DamageModifiers.none(), captured, Optional.empty());

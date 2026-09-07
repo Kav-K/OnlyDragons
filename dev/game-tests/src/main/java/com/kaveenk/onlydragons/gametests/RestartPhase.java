@@ -5,9 +5,26 @@ import com.google.gson.JsonParser;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/** Public test context for fixed two-boot consumers; never owns production cleanup. */
+/**
+ * Public runner provenance for a fixed two-boot scenario using one disposable profile.
+ * It carries prior immutable evidence, not production state to restore by hand.
+ * Filesystem containment, hashes and exact phase descriptors are independently
+ * validated by the Python runner/replay; this parser checks the local boot binding.
+ * @param parentRunId parent suite-case identity shared by both boots
+ * @param index one-based phase index, either one or two
+ * @param nonce current boot nonce, sharing the parent's actor-name prefix
+ * @param previousNonce first boot nonce for phase two; {@code null} in phase one
+ * @param initialConfigPath runner-preserved pre-boot configuration evidence
+ * @param previousReportPath immutable first-phase report path; {@code null} in phase one
+ */
 public record RestartPhase(String parentRunId, int index, String nonce, String previousNonce,
                            Path initialConfigPath, Path previousReportPath) {
+    /**
+     * Loads the optional phase context and rejects a mismatched parent/nonce/order binding.
+     * @param runId exact nonce of the current companion boot
+     * @return phase metadata, or {@code null} when no restart context was declared
+     * @throws Exception if parsing, reading or local provenance validation fails
+     */
     public static RestartPhase load(String runId) throws Exception {
         String path = System.getProperty("onlydragons.test.phaseContext");
         if (path == null) return null;
@@ -26,7 +43,14 @@ public record RestartPhase(String parentRunId, int index, String nonce, String p
                 Path.of(json.get("initialConfigPath").getAsString()),
                 index == 1 ? null : Path.of(json.get("previousReportPath").getAsString()));
     }
-    /** Prior immutable scenario JSON includes consumer-defined observations (e.g. native UUID/chunks). */
+    /**
+     * Reads the prior immutable report for consumer-defined continuity assertions.
+     * Examples include native UUID absence, world identity and persisted configuration;
+     * the report does not authorize reconstructing a fresh world to imitate a restart.
+     * @return original first-phase JSON text
+     * @throws IllegalStateException when called outside phase two
+     * @throws Exception if the preserved report cannot be read
+     */
     public String previousReport() throws Exception {
         if (index != 2) throw new IllegalStateException("No previous phase");
         return Files.readString(previousReportPath);

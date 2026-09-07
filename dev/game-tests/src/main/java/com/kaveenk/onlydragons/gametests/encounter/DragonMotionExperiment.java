@@ -6,7 +6,13 @@ import org.bukkit.*;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.util.Vector;
 
-/** Bounded public-API feasibility only; no production flight or collision acceptance. */
+/**
+ * Bounded public-API feasibility experiment using a fixture-owned native dragon.
+ * It observes HOVER velocity and applies explicit public teleports while measuring
+ * actual multipart positions. This is not the production flight controller, physical
+ * collision acceptance or proof of visual smoothness. Context owns the dragon,
+ * entity-ticking chunk leases and all server-thread sample callbacks.
+ */
 public final class DragonMotionExperiment implements Scenario {
     private ScenarioContext context;
     private EnderDragon dragon;
@@ -14,6 +20,10 @@ public final class DragonMotionExperiment implements Scenario {
     private int tick;
     private double maxStep, maxPartOffset, maxPartStep;
     private Map<UUID, Vector> previousParts = new HashMap<>();
+    /**
+     * Owns the experimental chunk region before waiting for real entity ticking.
+     * @param context isolated fixture scheduling, entities, observations and cleanup
+     */
     @Override public void start(ScenarioContext context) {
         this.context = context;
         context.mechanicRevision("dragon-motion-experiment-v1");
@@ -22,6 +32,7 @@ public final class DragonMotionExperiment implements Scenario {
         for (int x = 8; x <= 12; x++) for (int z = 8; z <= 12; z++) context.tickChunk(world.getChunkAt(x, z));
         awaitChunks(0);
     }
+    /** Waits at most 200 ticks for entity ticking, spawns HOVER, then separates velocity displacement from the teleport experiment. */
     private void awaitChunks(int waited) {
         if (origin.getChunk().getLoadLevel() != Chunk.LoadLevel.ENTITY_TICKING) {
             if (waited >= 200) throw new IllegalStateException("Chunk never ticks");
@@ -40,6 +51,7 @@ public final class DragonMotionExperiment implements Scenario {
             });
         });
     }
+    /** Samples parent and real-part motion over 500 public moves, enforcing the radius-16 box on every sample before final bounds. */
     private void move() {
         var actual = dragon.getLocation();
         if (tick > 0) maxStep = Math.max(maxStep, actual.distance(previous));

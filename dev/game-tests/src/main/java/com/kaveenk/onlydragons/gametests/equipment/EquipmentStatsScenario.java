@@ -13,8 +13,17 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import static com.kaveenk.onlydragons.domain.stats.StatKey.*;
 
-/** Real item serialization and production service with synthetic UUIDs and a capturing command sender. */
+/**
+ * Loaded equipment-service calibration using real item bytes and synthetic actor UUIDs.
+ * The exact ID-to-stat matrix covers every admitted historical/current loadout with
+ * literal expected values. Command calls use a public-interface capturing sender,
+ * not client packets. Real inventory event wiring belongs to the player scenario.
+ */
 public final class EquipmentStatsScenario implements Scenario {
+    /**
+     * Checks stat/cache identity, item edits and console permissions; always forgets its synthetic actor.
+     * @param context server-thread report and cleanup owner
+     */
     @Override public void start(ScenarioContext context) {
         context.mechanicRevision("equipment-stats-v2");
         var stats = context.production().equipment();
@@ -112,6 +121,11 @@ public final class EquipmentStatsScenario implements Scenario {
         context.finish();
     }
     // Public API interface test double only; no reflection into server internals.
+    /**
+     * Creates a limited public CommandSender test double and captures plain Adventure output.
+     * Unsupported methods fail explicitly. This proxy does not inspect server internals
+     * and cannot stand in for a real player's command, inventory or connection behavior.
+     */
     private CommandSender sender(List<String> messages, boolean permission) {
         return (CommandSender)java.lang.reflect.Proxy.newProxyInstance(CommandSender.class.getClassLoader(),new Class<?>[]{CommandSender.class},(proxy,method,args)-> {
             return switch(method.getName()) {

@@ -4,9 +4,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-/** Small report serializer, avoiding a runtime dependency or server-internal JSON library. */
+/**
+ * Minimal serializer for explicit report primitives, maps and iterables.
+ * It deliberately rejects arbitrary Java/Bukkit objects and non-finite numbers so
+ * an unsupported observation cannot silently become misleading string evidence.
+ */
 final class Json {
+    /**
+     * Prevents instances of the stateless report serializer.
+     */
     private Json() { }
+    /**
+     * Serializes recursively, escaping strings and requiring finite numeric values.
+     * Map keys are represented by their string form; callers provide stable unique keys.
+     * @param value JSON-shaped report value, including {@code null}
+     * @return JSON text ready to freeze before handing it to the report writer
+     * @throws IllegalArgumentException for non-finite numbers or unsupported value types
+     */
     static String write(Object value) {
         if (value == null) return "null";
         if (value instanceof Boolean) return value.toString();

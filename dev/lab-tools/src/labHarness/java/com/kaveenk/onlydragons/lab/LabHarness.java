@@ -5,8 +5,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/** Test-only companion: verifies actual plugin state, not just startup log messages. */
+/**
+ * Separate legacy-API lab companion that queries real enabled-plugin state.
+ * Its compatibility classpath must remain isolated from the modern production
+ * plugin. A positive response proves name/version/enabled state, not gameplay.
+ */
 public class LabHarness extends JavaPlugin {
+    /**
+     * Checks exactly one plugin name and emits the lab's stable machine-readable marker.
+     * @param sender recipient of the check result
+     * @param command registered lab command
+     * @param label invoked alias
+     * @param args one exact plugin name
+     * @return true for both explicit success and explicit rejection
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length != 1) {
