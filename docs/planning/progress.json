@@ -598,10 +598,10 @@
       "notice": "User decision, 7 September 2026: keep vanilla bows and defer the animation fix. shortbow-no-draw remains deferred with no evidence. Preserve working native held input; do not research or dispatch this task unless the user reopens it. See issue #89 comment5575451702."
     },
     "T07b": {
-      "status": "active",
+      "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Dispatched from main b2f0254. Captured aimed profile implemented on symphony/gh-90; focused Paper and regression evidence pending. Earlier profiles and milestone gates retained."
+      "notice": "In review from main b2f0254. Clean e6ac40f passes aimed-tracer 36/36 and held-combat 23/23; see evidence/t07b-aimed-tracer.md. Per owner comment5575912810, lead owns hosted 48-case receipt, replay, acceptance and CI on published head. Human checks and milestone gates retained."
     }
   },
   "milestones": {

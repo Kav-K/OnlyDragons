@@ -7,8 +7,8 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 ## Current delivery status
 
 **7 September feedback follow-ups:** T07b/#90 (`aimed-dragon-tracer`) is the
-single **In progress** dispatched feature. T06d/#89 (`shortbow-no-draw`) is **blocked** by
-the user's decision to keep vanilla bows and defer the animation fix. T07b automated verification is pending; T06d remains deferred. [Small task contracts](#checkpoint-feedback-tasks)
+single **In review** feature. T06d/#89 (`shortbow-no-draw`) is **blocked** by
+the user's decision to keep vanilla bows and defer the animation fix. T07b focused Paper checks pass; lead-owned hosted suite acceptance is pending; T06d remains deferred. [Small task contracts](#checkpoint-feedback-tasks)
 follow the user's visual/aiming observations; existing acceptance and M1–M5 are
 unchanged. Prefer these distinct chunks over a broad follow-up change.
 
@@ -226,8 +226,10 @@ T06d is not dispatched. T07b was dispatched from main `b2f0254` in the
 [owner assignment](https://github.com/Kav-K/OnlyDragons/issues/90#issuecomment-5575533461).
 The `symphony/gh-90` candidate adds `tracer-aimed/v3` at the existing captured
 profile/rules/continuity seam. Build passes 329 production tests with no failures,
-errors or skips. Focused Paper, regression receipt, review and current CI remain
-pending; human aiming/visuals are separate. No firing/damage ownership changes. The six current v4 bows also select v3
+errors or skips. Clean runtime `e6ac40f` passes aimed-tracer (36 assertions) and
+held-combat (23 assertions), with both owned JVMs cleaned up. The lead requested
+draft handoff and owns the hosted 48-case receipt, independent replay, acceptance
+and current CI; human aiming/visuals are separate. No firing/damage ownership changes. The six current v4 bows also select v3
 under the owner clarification; [iteration evidence and remaining gates](evidence/t07b-aimed-tracer.md). The [design contract](02-foundation-plan.md#checkpoint-feedback-contracts)
 records the exact first calibration and API constraints; do not substitute broad
 engine, dependency or fixture work. Shared loadout/presentation/profile edits are

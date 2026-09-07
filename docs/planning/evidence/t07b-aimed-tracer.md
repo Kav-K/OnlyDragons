@@ -72,10 +72,41 @@ within a disposable radius48 arena;
 all existing collision/damage/proc/ammo assertions remain. Historical evidence is
 unchanged and retains its own original inputs.
 
-Fetch/merge of `origin/main` reported already up to date at `b2f0254` before this
-candidate. The corrected wrapper build passes329 production tests with zero
-failures/errors/skips, and the plan checkpoint passes. Focused Paper and complete
-regression/receipt/checkpoint are pending;
-owner permits the supported1024MiB Paper heap only with fresh normal admission.
-Independent review/current CI, Windows smoke, authenticated clients and human
-appearance/aiming feel remain separate pending gates. No milestone is accepted.
+## Clean focused verification and handoff
+
+Clean runtime/scenario revision `e6ac40f3156f8491edb38ff1155fdea7f732c99a`
+passed both focused runs on pinned Paper 26.2 build121 and JDK25.0.4.1:
+
+| Scenario | Run ID | Result |
+| --- | --- | --- |
+| aimed-tracer | `09ab018009ed49ffbc21e224275a5627` | 36/36 assertions passed |
+| held-combat | `ec33b8631f104832bb1490bbcd624280` | 23/23 assertions passed |
+
+Reports remain under `build/reports/agent-paper/<run-id>/`: `result.json`,
+`scenario.json`, player evidence, logs and build reports. Both runs identify a
+clean worktree, successful fresh memory admission at1024MiB Paper heap, and clean
+unforced server/client exits0. Each wrapper build passed329 production, six
+companion and37 client tests with zero failures/errors/skips.
+
+Both runs used production SHA-256
+`522358c28a5163eeaaaa2156114ec5be30355f4dab64e91eaf2ebda47e886813`
+and companion SHA-256
+`dc4f4510cf4101d3c0a82f7237c3e8bba7d9e9c59a28a3ffb1f04c252531c61e`.
+The aimed case checks a real moving-dragon collision and exact900 domainHP,
+180 nativeHP and100 credit; plain, side, behind and range controls miss with
+1000HP/zero credit. Post-shot actual player turns cannot authorize the off-axis
+shots or revoke the aimed shot. An acquired shot loses lock at an obstruction
+and physically hits its wall. UUID, velocity magnitude, gravity, turn/grace,
+real part geometry and owned cleanup assertions pass. Held combat retains all
+original numeric, physical-path, actual slot-swap, proc, ammo and veto assertions.
+
+Final fetch/merge again found `origin/main` unchanged at `b2f0254`. Later commits
+only record evidence/status and PR linkage, so these runs retain the explicit
+runtime-code identity above. The plan checkpoint is structural evidence only.
+The complete changed-area plan selects48 cases, including legacy profiles and
+failure controls. Under the [lead handoff instruction](https://github.com/Kav-K/OnlyDragons/issues/90#issuecomment-5575912810),
+no duplicate complete local suite is run: root owns the hosted cohort on the
+published clean head, raw replay, full receipt, acceptance and current CI.
+Those gates remain pending; the focused passes do not substitute for them.
+Windows smoke, authenticated clients and human appearance/aiming feel remain
+separate pending gates. T07b is In review; no milestone is accepted.
