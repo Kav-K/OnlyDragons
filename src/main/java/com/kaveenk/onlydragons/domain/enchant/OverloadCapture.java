@@ -44,7 +44,6 @@ public record OverloadCapture(String revision, int level, double rawCritChance,
 
     /**
      * Called after the ordinary crit draw, even when equipped probability is exactly zero or one.
-     * <p>
      * @param level 0–5; zero returns absent without consulting stats or random
      * @param stats captured stats whose raw CC already includes the trusted item contribution
      * @param random launch-time source, consumed once when equipped

@@ -2,7 +2,6 @@ package com.kaveenk.onlydragons.domain.encounter.definition;
 
 /**
  * Author-maintained reference labels, not a content hash. Retain the full resolved Selection as provenance.
- * <p>
  * @param id 1–64 token characters; first letter/digit/underscore/hyphen, then dot also allowed
  * @param schemaVersion exactly 1; no migration exists
  * @param revision same bounded token grammar, author-maintained and not automatically unique

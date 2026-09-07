@@ -29,7 +29,6 @@ public final class EnchantEffects {
 
     /**
      * No implicit Gravity balance or Dragon Hunter alias. Empty table means deferred.
-     * <p>
      * @param revision nonblank author-maintained table identity
      * @param airborneFractions copied map of levels 1–6 to finite nonnegative additive fractions
      * @param legacyAlias whether dragon_hunter may supply a level when Gravity is absent

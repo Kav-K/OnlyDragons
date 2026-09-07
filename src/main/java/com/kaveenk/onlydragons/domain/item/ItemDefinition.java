@@ -5,7 +5,6 @@ import java.util.Set;
 
 /**
  * Presentation and allowed roll IDs around the stable T00 offensive definition.
- * <p>
  * @param weapon nonnull offensive definition with strict item ID and bounded revision syntax
  * @param displayName nonblank generated presentation, never decoded as authority
  * @param material exactly BOW in this bounded catalog

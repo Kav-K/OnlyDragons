@@ -6,7 +6,6 @@ import java.util.UUID;
 
 /**
  * Immutable firing session and tracing provenance, including the original group's grace origin.
- * <p>
  * @param shot nonnull immutable arrow snapshot
  * @param sessionToken nonnull captured lifecycle token, matched separately from owner UUID
  * @param tracerProfile nonnull trusted immutable steering calibration selected at admission

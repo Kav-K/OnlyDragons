@@ -7,7 +7,6 @@ import java.util.Optional;
 /**
  * One terminal delivery after physical registry retirement, including rejection. Consumers use this
  * immutable value and current session lookup; accounting uses settlementTick, never collisionTick.
- * <p>
  * @param projectile nonnull immutable captured ownership/session/profile
  * @param impact nonnull candidate with settlement tick and matching projectile/owner/generation
  * @param collisionTick nonnegative original native observation tick

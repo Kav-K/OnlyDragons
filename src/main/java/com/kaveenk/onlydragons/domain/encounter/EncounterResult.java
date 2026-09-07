@@ -30,7 +30,6 @@ public record EncounterResult(UUID completionId, UUID encounterId, String varian
                               Optional<DragonCatalog.Selection> selection) {
     /**
      * Ordinals start at one and include accepted zero/rounded-away contributions.
-     * <p>
      * @param tick nonnegative receiver game tick
      * @param ordinal positive encounter-global accepted commit sequence
      */

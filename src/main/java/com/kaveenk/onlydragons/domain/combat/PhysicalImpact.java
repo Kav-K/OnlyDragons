@@ -9,7 +9,6 @@ import java.util.UUID;
 /**
  * Physical collision data supplied by the Paper adapter. A record alone is not proof of a hit:
  * the adapter must settle cancellation and resolve a dragon part to the owned parent first.
- * <p>
  * @param key nonnull generation/projectile/target/ordinal identity
  * @param ownerId nonnull captured shooter UUID
  * @param tick nonnegative evaluation tick; {@link com.kaveenk.onlydragons.domain.projectile.SettledHit} retains collision time separately
@@ -19,7 +18,6 @@ import java.util.UUID;
 public record PhysicalImpact(Key key, UUID ownerId, long tick, Vector3 position, Optional<String> targetPart) {
     /**
      * Idempotency identity, distinct even when multiple arrows arrive in the same tick.
-     * <p>
      * @param encounterId nonnull generation UUID
      * @param projectileId nonnull real arrow UUID
      * @param targetId nonnull managed parent target UUID

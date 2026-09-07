@@ -40,7 +40,6 @@ public record WeaponDefinition(String id, int schemaVersion, String revision, Fi
 
     /**
      * The trusted registry determines kind and legal levels; item input cannot self-classify.
-     * <p>
      * @param id nonblank effect ID; strict syntax/existence is checked by the registry
      * @param level positive selected level; supported maxima belong to the trusted descriptor
      * @param kind nonnull trusted category, never accepted from untrusted PDC as authority

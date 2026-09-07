@@ -10,7 +10,6 @@ import java.util.Objects;
 public final class DragonCatalog {
     /**
      * A trusted item definition reference, not an item instance, grant plan or loot outcome.
-     * <p>
      * @param catalogRevision valid exact item-catalog label resolved by the loader
      * @param identity nonnull reference matching the weapon ID/schema/revision exactly
      * @param definition nonnull full trusted item definition retained even after catalog replacement
@@ -33,7 +32,6 @@ public final class DragonCatalog {
 
     /**
      * No probabilities, rank locks, quantities, currency, XP or grant switches exist in this schema.
-     * <p>
      * @param catalogIdentity nonnull parent table-catalog identity
      * @param identity nonnull table identity
      * @param items nonempty immutable copy of ordered trusted bindings, with no grant quantities

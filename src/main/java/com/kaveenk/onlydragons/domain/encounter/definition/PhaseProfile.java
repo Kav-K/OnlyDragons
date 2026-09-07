@@ -6,7 +6,6 @@ import java.util.Set;
 
 /**
  * Inert compatibility contract; does not implement movement or authorize native phase admission.
- * <p>
  * @param mechanic nonnull phase-contract identity
  * @param compatibleCombatProfiles nonempty immutable copy of permitted exact combat revision labels
  */

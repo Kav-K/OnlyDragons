@@ -8,7 +8,6 @@ import java.util.Objects;
 
 /**
  * Arithmetic explanation captured alongside the stable T00 snapshot, without live service references.
- * <p>
  * @param snapshot nonnull complete numeric snapshot
  * @param profileRevision nonblank label of the resolving policy, separate from equipment revision
  * @param explanations complete copied map for all stats; immutable entries retain no live services

@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 /**
  * Trusted level table. Item input supplies an ID/level, never a kind or stat amount.
- * <p>
  * @param id lowercase item-key syntax, 1–64 characters
  * @param displayName nonblank generated label
  * @param kind nonnull trusted ordinary/ultimate category

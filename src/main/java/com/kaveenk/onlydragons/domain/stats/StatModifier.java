@@ -8,7 +8,6 @@ import java.util.Objects;
  * A single contribution from a stable source. A source may supply several ordered modifiers.
  * Replacing equipment replaces its entire source collection; this record is not a map key.
  * ADDITIVE_PERCENT amount uses percentage points; MULTIPLIER amount is a nonnegative factor.
- * <p>
  * @param sourceId nonblank replacement/provenance identity, compared case-sensitively
  * @param key nonnull stat receiving this contribution
  * @param operation nonnull arithmetic layer
