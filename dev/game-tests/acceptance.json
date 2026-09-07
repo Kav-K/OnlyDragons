@@ -2127,6 +2127,17 @@
     ],
     "T06c": [
       "quiver-flame-integration"
+    ],
+    "MAINT-82": [
+      "item-codec",
+      "equipment-service",
+      "expanded-bow-enchantments",
+      "firing-input",
+      "quiver-flame-integration",
+      "managed-dragon-development",
+      "suite-baseline",
+      "checkpoint-unit-checks",
+      "bridge-unit-checks"
     ]
   },
   "paperCases": {

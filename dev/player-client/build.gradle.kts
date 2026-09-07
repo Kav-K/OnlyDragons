@@ -24,7 +24,7 @@ dependencies {
     implementation(projectPins.getProperty("testPlayerProtocolLib"))
     implementation("com.google.code.gson:gson:2.11.0")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.9")
-    testImplementation(platform("org.junit:junit-bom:6.1.3"))
+    testImplementation(platform("org.junit:junit-bom:${projectPins.getProperty("junitVersion")}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

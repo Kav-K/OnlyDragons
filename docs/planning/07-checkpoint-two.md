@@ -1,6 +1,6 @@
 # Checkpoint 2: combat feedback, volleys and enchant books
 
-**6 September 2026 — T05b and combined T03b/T08d/T08e accepted; T06c is In review after focused proof. T06b/T02c and human outcomes remain pending.**
+**6 September 2026 — T05b and combined T03b/T08d/T08e accepted; T06c accepted through PR81. T06b/T02c and human outcomes remain pending.**
 
 The first managed dragon/ranking slice is integrated on main `36b420c`.
 The user now prioritizes a persistent dragon health bar, smoother bounded flight,
@@ -32,12 +32,10 @@ complete through combined [PR #76](https://github.com/Kav-K/OnlyDragons/pull/76)
 [lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308). Original PR74/75/79 focused evidence and
 failed iterations retain their original identities and scope.
 
-T06c/#70 is In review with T03b integrated; its clean runtime and six focused
-Paper passes are recorded in document 03 and the linked evidence archive. T06b/#68 and T02c/#69 remain planned
-pending T06c. These three tasks retain empty completed requirements/evidence,
-and `quiver-flame-integration`, `held-shortbow-loadouts` and `enchant-books-anvil`
-remain unaccepted. T06c implements the remaining effects before T06b/T02c expose
-the complete experience; v3 IQ/Flame-unavailable controls remain preserved.
+T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort).
+T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 implementation hold. The lead must resume both after this single maintenance PR is accepted and merged; their existing prerequisites and feature gates remain unchanged.
+Held-fire and book requirements retain empty completion/evidence and remain
+unaccepted. V3 IQ/Flame-unavailable controls remain preserved.
 
 T10 retains every prior dependency and additionally consumes T08d, T08e, T05b
 and T06b. T06b brings T03b/T06c transitively. Anvil application is independent of
@@ -84,8 +82,8 @@ T08c remains undispatched pending lead sequencing; this is not loot implementati
   strikes at 3/6% of captured accepted physical credit, bounded per-owner-session
   burns and stronger refresh, and Duplex's nonstacking fire-vulnerability policy.
   Preserve the exact limits/source/expiry rules in that contract; DOT never rolls
-  Ferocity or builds/refreshes Tempo. Recorded values still require implementation
-  and independent actual-Paper validation.
+  Ferocity or builds/refreshes Tempo. The scoped implementation and independent actual-Paper validation are
+  accepted through PR81; this does not accept later held-fire/books or human gates.
 
 One ultimate per bow remains settled: Duplex and Fatal Tempo belong on separate
 bows, and swapping is supported. The ten requested IDs are Dragon Tracer, Duplex,
@@ -93,7 +91,7 @@ Fatal Tempo, Power, Vicious, Snipe, Overload, Gravity, Infinite Quiver and Flame
 No new armor application, reward items, acquisition economy or extra dragon types
 are implied. The recorded issue contracts supply the calibration decisions for
 implementation. T05b/T03b/T08d/T08e have only the scoped acceptance above;
-Infinite Quiver/Flame, held-fire kits and books/anvils still require their gates.
+T06c has the scoped PR81 acceptance above; held-fire kits and books/anvils still require their gates.
 
 ## Shared ownership and feature evidence
 

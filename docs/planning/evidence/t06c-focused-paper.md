@@ -1,6 +1,6 @@
 # T06c focused Paper evidence
 
-Draft review: [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81).
+Historical focused review: [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81).
 
 Runtime revision: `016bd69d66f27921051ae31d4a4aea6844cb6f02` (clean for every final run).
 Main integrated: `e95447ae2d41f249a732edd0193e16dd46b3f0b3`; fetch and ordinary
@@ -153,3 +153,21 @@ acceptance as a separate gate. Current CI, lead combined cohort/replay/task
 checkpoint/merge, Windows smoke, authenticated multiplayer and visual/feel
 checks remain pending. No milestone or `quiver-flame-integration` completion
 is claimed. Next consumers are T06b/#68 and T02c/#69 after integration.
+
+## Accepted hosted cohort
+
+T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](#accepted-hosted-cohort).
+[Lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/81#issuecomment-5564735724) establishes the following historical PR81 facts;
+MAINT-82 does not reuse them for changed inputs.
+
+- Reviewed head `70aec961e00bddd8c579a80f982d90e43b700ece`; gameplay runtime `016bd69d66f27921051ae31d4a4aea6844cb6f02`; base `e95447ae2d41f249a732edd0193e16dd46b3f0b3`.
+- CI [34078229542](https://github.com/Kav-K/OnlyDragons/actions/runs/34078229542) and fresh [34078306930 attempt 1](https://github.com/Kav-K/OnlyDragons/actions/runs/34078306930/attempts/1) passed.
+- Suite `1b59fa4475a14d7993cbbe847f1e794b`, artifact `10003473684`; receipt SHA256 `324bc1851227d3b27fa5c4d63c0673b0c1dfe513853677e6d09c70124c34e140`.
+- ZIP SHA256 `b7de95f671ac8c8439ffcf1feda5724e8ef411a04e97a774a50943d4eb253458`; source-input SHA256 `38cedbb9c481c1457a176a11b65b1cf64ec80bcad66199a61cc910e68213a695`.
+- 42 cases / 33 positive / 9 controls / 48 boots / 1,386 rows (1,376 passing plus 10 intended-negative). Java 299/6/33, zero failures/errors/skips. Quiver 22 and Flame 61 assertions passed.
+- Strict original replay, automated T06c checkpoint and independent source/raw review passed; cleanup clean/unforced.
+
+The preceding pending statements describe the original worker handoff. Original
+34074476010 remains **failed** with the unchanged artifact identity above.
+Human/full-client/Windows-final-deployment/M1–M5 remain unaccepted; rewards disabled.
+T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 implementation hold. The lead must resume both after this single maintenance PR is accepted and merged; their existing prerequisites and feature gates remain unchanged.

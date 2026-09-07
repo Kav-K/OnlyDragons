@@ -11,7 +11,8 @@ with scoped changes and record material decisions under the
 The user's next scoped work is [checkpoint 2](07-checkpoint-two.md): dragon health
 UI/motion, Tracer volleys, revised Tempo ghost policy, held shortbows and ten-enchant
 XP-cost books. T05b and the scoped T03b/T08d/T08e behavior are accepted as recorded
-in the delivery ledger; Quiver/Flame, held-fire kits and books/anvils remain pending.
+in the delivery ledger; T06c Quiver/Flame is accepted through PR #81 at
+`53164f85a0ba3f36d16f242429f3a0a7c5a403a7`. Held-fire kits and books/anvils remain pending.
 Preserve the accepted older profiles below. Armor effects and real rewards remain
 disabled/deferred.
 
@@ -761,6 +762,9 @@ This supersedes the deferred Overload/Gravity implementation statements above
 only for the explicit expanded profile; legacy calibration remains available.
 
 ### T06c ammunition and owned fire contract (GH-70)
+
+Exactly `quiver-flame-integration` is accepted through PR #81 at
+`53164f85a0ba3f36d16f242429f3a0a7c5a403a7`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort).
 
 `quiver-flame/v1` implements the owner-selected OnlyDragons calibration, not
 upstream parity. `CalibrationLoadouts.fireRegistry()` adds the concrete

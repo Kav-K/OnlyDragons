@@ -4,10 +4,10 @@
 accepted through PR #73; T03b/T08d/T08e are now complete through combined
 [PR #76](https://github.com/Kav-K/OnlyDragons/pull/76) at `a7329e18b886d4766d14d9128eeb256a904161a0`, for
 exactly their five named requirements; [evidence](evidence/checkpoint2-ui-flight.md)
-and [lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308). T06c/#70 is lead-assigned and ready,
-awaiting its Symphony label after this context PR merges. T06b/#68 and T02c/#69
-remain planned pending T06c. The dependency graph and all milestone gates remain
-unchanged; this does not accept human outcomes or the complete ten-effect/book flow.
+and [lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308). T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort).
+T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 implementation hold. The lead must resume both after this single maintenance PR is accepted and merged; their existing prerequisites and feature gates remain unchanged.
+[MAINT-82](evidence/maintenance-82.md) owns only the bounded cleanup; no human
+outcome, complete book flow or milestone is accepted by maintenance.
 
 T08a is accepted through [PR #60](https://github.com/Kav-K/OnlyDragons/pull/60) at `889a3db`; [full evidence](evidence/t08a-suite.md).
 T08b/#40 is accepted through [PR #62](https://github.com/Kav-K/OnlyDragons/pull/62) at `1149169`; [full ranking evidence](evidence/t08b-suite.md). The user has reported first-checkpoint feedback, which now drives checkpoint 2. T08c remains planned and undispatched pending lead sequencing; no M3 or other milestone is accepted by that feedback.

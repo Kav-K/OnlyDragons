@@ -496,19 +496,34 @@
       "status": "planned",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged. Temporary lead implementation hold during MAINT-82; lead must resume after cleanup acceptance and merge. No prerequisite or evidence is removed."
     },
     "T02c": {
       "status": "planned",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged. Temporary lead implementation hold during MAINT-82; lead must resume after cleanup acceptance and merge. No prerequisite or evidence is removed."
     },
     "T06c": {
+      "status": "complete",
+      "completedRequirements": [
+        "quiver-flame-integration"
+      ],
+      "evidence": {
+        "quiver-flame-integration": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/81#issuecomment-5564735724",
+          "revision": "70aec961e00bddd8c579a80f982d90e43b700ece"
+        }
+      },
+      "mergedRevision": "53164f85a0ba3f36d16f242429f3a0a7c5a403a7",
+      "reviewedRevision": "70aec961e00bddd8c579a80f982d90e43b700ece",
+      "notice": "Exactly T06c accepted after PR81 fresh 42-case cohort, strict replay, independent review, task checkpoint and current CI. See docs/planning/evidence/t06c-focused-paper.md#accepted-hosted-cohort. Failed run34074476010 remains failed. Human/full-client/Windows-final-deployment/M1-M5 remain unaccepted; rewards disabled."
+    },
+    "MAINT-82": {
       "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "In review in draft PR #81 on symphony/gh-70. Clean runtime 016bd69 includes main e95447ae; 299/6/33 Java tests and six focused Paper scenarios pass with clean cleanup. Lead independent source/raw review is clear. Evidence: docs/planning/evidence/t06c-focused-paper.md. Full cohort receipt/replay/task acceptance checkpoint/current CI and human gates remain pending; no requirement is marked complete. T06b/T02c await integration."
+      "notice": "In review: draft PR83 https://github.com/Kav-K/OnlyDragons/pull/83 from accepted main53164f85. Clean inputs7ae38e3 pass worker builds303/6/33, Python288/bridge25, static/no-weakening, focused Paper25/115/61 and strict focused replay. Lead complete final-head hosted cohort/replay/review/current CI and acceptance pending. No completed requirements claimed. See docs/planning/evidence/maintenance-82.md."
     }
   },
   "milestones": {
