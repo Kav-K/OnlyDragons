@@ -19,7 +19,9 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.Clientbound
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.player.ClientboundPlayerPositionPacket;
 import org.junit.jupiter.api.Test;
 
+/** Legacy actor regression tests for concurrent disconnect, bounded text and the pinned codec; no real server is started. */
 class ProtocolPlayerTest {
+    /** Requires the complete calibration sequence to close while an independent I/O callback acquires actor state. */
     @Test void ordinaryQuitCanWaitForConcurrentIoCallbackWithoutLockCycle() throws Exception {
         var actor = new ProtocolPlayer("a".repeat(32), "calibrate");
         try (var wire = new CallbackWire(actor)) {
@@ -35,6 +37,7 @@ class ProtocolPlayerTest {
         }
     }
 
+    /** Checks deliberate early exit remains a failed, disconnected receipt without a monitor/I/O deadlock. */
     @Test void earlyExitCanWaitForConcurrentIoCallbackWithoutLockCycle() throws Exception {
         var actor = new ProtocolPlayer("a".repeat(32), "early-exit");
         try (var wire = new CallbackWire(actor)) {
@@ -48,6 +51,7 @@ class ProtocolPlayerTest {
         }
     }
 
+    /** Exercises the same concurrent cleanup path for an out-of-order control marker. */
     @Test void invalidControlDisconnectAlsoAllowsConcurrentIoCallback() throws Exception {
         var actor = new ProtocolPlayer("a".repeat(32), "calibrate");
         try (var wire = new CallbackWire(actor)) {
@@ -58,6 +62,7 @@ class ProtocolPlayerTest {
         }
     }
 
+    /** Creates a synthetic offline survival login for the fixed calibration sequence. */
     private static ClientboundLoginPacket offlineLogin() {
         var world = Key.key("minecraft:overworld");
         return new ClientboundLoginPacket(1, false, new Key[] {world}, 1, 2, 2, false, true, false,
@@ -71,6 +76,7 @@ class ProtocolPlayerTest {
         final Session session;
         int completedCallbacks;
 
+        /** Creates a proxy whose blocking disconnect requires another thread to finish an actor callback. */
         CallbackWire(ProtocolPlayer actor) {
             session = (Session) Proxy.newProxyInstance(Session.class.getClassLoader(), new Class<?>[] {Session.class}, (proxy, method, args) -> {
                 if (method.getName().equals("send")) {
@@ -94,12 +100,14 @@ class ProtocolPlayerTest {
             });
         }
 
+        /** Stops the test-owned I/O executor and fails if concurrent callbacks cannot terminate within the bound. */
         @Override public void close() throws Exception {
             io.shutdownNow();
             assertTrue(io.awaitTermination(5, TimeUnit.SECONDS));
         }
     }
 
+    /** Keeps ordinary nested text separate from control markers/overlays and returns an immutable capture. */
     @Test void capturesReceivedNestedTextButExcludesControlsAndOverlays() {
         var actor = new ProtocolPlayer("a".repeat(32), "calibrate");
         assertNull(actor.captureChat(Component.text("ferocity: ").append(Component.text("raw=3.0 effective=3.0")), false));
@@ -110,6 +118,7 @@ class ProtocolPlayerTest {
         assertThrows(UnsupportedOperationException.class, () -> actor.capturedMessages().add("forged"));
     }
 
+    /** Rejects excess messages and nested text overflow instead of silently truncating evidence. */
     @Test void captureFailsClosedOnCountAndNestedLengthOverflow() {
         var actor = new ProtocolPlayer("a".repeat(32), "calibrate");
         for (int i = 0; i < ProtocolPlayer.MAX_MESSAGES; i++) actor.captureChat(Component.text("message " + i), false);
@@ -119,11 +128,13 @@ class ProtocolPlayerTest {
                 .append(Component.text("overflow")), false));
         assertEquals(List.of(), bounded.capturedMessages());
     }
+    /** Checks the resolved codec against generated build pins rather than assuming a dependency name establishes compatibility. */
     @Test void dependencyReallyProvidesPinnedProtocol() {
         assertEquals(ProtocolPlayer.EXPECTED_PROTOCOL, MinecraftCodec.CODEC.getProtocolVersion());
         assertEquals(ProtocolPlayer.EXPECTED_MINECRAFT, MinecraftCodec.CODEC.getMinecraftVersion());
     }
 
+    /** Checks exact run-derived naming and rejects strings that are not admitted lowercase run IDs. */
     @Test void syntheticNameFitsMinecraftAndCannotContainUserSuppliedHostOrAccount() {
         assertEquals("od_0123456789abc", ProtocolPlayer.username("0123456789abcdef0123456789abcdef"));
         for (String invalid : new String[] {"Kav-K", "../account", "a".repeat(31), "A".repeat(32)}) {

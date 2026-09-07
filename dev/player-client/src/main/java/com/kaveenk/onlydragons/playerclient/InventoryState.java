@@ -14,8 +14,19 @@ import org.geysermc.mcprotocollib.protocol.data.game.item.ItemStack;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.inventory.*;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.ServerboundContainerClickPacket;
 
-/** Server-authoritative inventory view; never synthesizes component prediction hashes. */
+/**
+ * Connection-local, server-authoritative view of the 46-slot player inventory.
+ * The owning {@link ActionSession} serializes access under its monitor. Each click
+ * consumes a fresh full snapshot; only a later full snapshot settles that click.
+ * Unchanged-slot confirmations may advance a ready snapshot's observed state ID,
+ * but cannot restore invalidated authority. No component prediction hashes are invented.
+ */
 final class InventoryState {
+    /**
+     * A real click request and the received state that authorized its construction.
+     * @param packet container-0 packet with absent optimistic item predictions
+     * @param evidence immutable snapshot/confirmation identity for independent receipt replay
+     */
     record Click(ServerboundContainerClickPacket packet, Map<String, Object> evidence) {}
     private final List<Map<String, Object>> snapshots = new ArrayList<>();
     private final List<Map<String, Object>> confirmations = new ArrayList<>();
@@ -27,6 +38,11 @@ final class InventoryState {
     private boolean ready, pending;
     private String unavailable = "No full player-inventory snapshot received";
 
+    /**
+     * Consumes full snapshots or invalidates authority on changed/stateless deltas and menu transitions.
+     * A ready snapshot accepts only byte-identical slot confirmations at equal or next state
+     * ID modulo 32768. Histories preserve original packet/item hashes for replay.
+     */
     void receive(Packet packet) {
         if (packet instanceof ClientboundContainerSetContentPacket contents && contents.getContainerId() == 0) {
             ActionSession.check(contents.getItems().length == 46, "Expected full 46-slot player inventory");
@@ -71,6 +87,11 @@ final class InventoryState {
         }
     }
 
+    /**
+     * Consumes one ready full snapshot for an admitted equipment/storage slot 5-45.
+     * Uses the latest confirmed received state ID with empty changed-slot and cursor
+     * predictions. Paper owns the transaction; a companion event/state assertion proves it.
+     */
     Click click(ActionPlan.Step step) {
         ActionSession.check(ready && !pending && items != null && openContainer == 0,
                 "Inventory click requires a fresh full player-inventory snapshot: " + unavailable);
@@ -88,20 +109,28 @@ final class InventoryState {
                 "inventorySnapshotReceivedAtEpochMs", snapshot.get("receivedAtEpochMs"),
                 "inventorySnapshotSha256", snapshot.get("sha256"), "inventoryConfirmationSequence", confirmationSequence));
     }
+    /** Clears world-specific inventory authority, refusing to hide an outstanding click; evidence history remains. */
     void reset() {
         ActionSession.check(!pending, "World changed before inventory resynchronization");
         items = null; itemDigests = null; cursorDigest = null; openContainer = 0;
         invalidate("World changed before a new full player-inventory snapshot");
     }
+    /** Rejects terminal disconnect/reconnect while a submitted click still awaits a full snapshot. */
     void requireSettled() { ActionSession.check(!pending, "Inventory click has not received a full server resynchronization"); }
+    /** Records a client-side menu close and invalidates player-window authority until a fresh full snapshot. */
     void clientClosedContainer() {
         ActionSession.check(openContainer > 0 && !pending, "No settled container to close");
         openContainer = 0; invalidate("Client close awaits full player-inventory resynchronization");
     }
+    /** Returns an immutable list of full-snapshot receipt rows in connection receive order. */
     List<Map<String, Object>> snapshots() { return List.copyOf(snapshots); }
+    /** Returns immutable unchanged-slot confirmation rows without rewriting their parent snapshots. */
     List<Map<String, Object>> confirmations() { return List.copyOf(confirmations); }
+    /** Removes click readiness while preserving the diagnostic and any outstanding resynchronization obligation. */
     private void invalidate(String reason) { ready = false; unavailable = reason; }
+    /** Hashes the same pinned item serialization for full-snapshot slots, cursor and slot-confirmation comparisons. */
     private static String itemDigest(ItemStack item) { return digest(new ClientboundSetCursorItemPacket(item)); }
+    /** Hashes serialized packet-body bytes with SHA-256 and releases the temporary Netty buffer on every path. */
     private static String digest(MinecraftPacket packet) {
         ByteBuf buffer = Unpooled.buffer();
         try {

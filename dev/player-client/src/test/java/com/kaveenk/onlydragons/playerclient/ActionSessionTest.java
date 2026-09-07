@@ -22,25 +22,36 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.play
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.*;
 import org.junit.jupiter.api.Test;
 
+/** Pure protocol-state tests using the pinned packet codec and a synthetic wire; Paper-side effects require separate scenarios. */
 class ActionSessionTest {
     static final String RUN = "a".repeat(32);
+    /** Provides a synthetic offline survival login for protocol-state tests. */
     static ClientboundLoginPacket login() {
         var world = Key.key("minecraft:overworld");
         return new ClientboundLoginPacket(1, false, new Key[]{world}, 4, 2, 2, false, true, false,
                 new PlayerSpawnInfo(0, world, 0, GameMode.SURVIVAL, GameMode.SURVIVAL, false, true, null, 0, 63), false, false);
     }
+    /** Provides the initial teleport whose acknowledgement establishes loaded fixture state. */
     static ClientboundPlayerPositionPacket position() { return new ClientboundPlayerPositionPacket(1, .5, 100, .5, 0, 0, 0, 0, 0); }
+    /** Builds a control marker bound to this test run, exact plan digest, actor, session and step. */
     static String marker(ActionPlan plan, String actor, String session, String step) { return "OD_ACTION:" + RUN + ":" + plan.sha256() + ":" + actor + ":" + session + ":" + step; }
+    /** Wraps text as ordinary system chat rather than an action-bar overlay. */
     static ClientboundSystemChatPacket chat(String text) { return new ClientboundSystemChatPacket(Component.text(text), false); }
+    /** Creates the first test connection with inert lifecycle callbacks; tests inspect session state directly. */
     static ActionSession session(ActionPlan plan) {
         return new ActionSession(RUN, "alpha", "calibrate", plan, plan.actors().getFirst().sessions().getFirst(), new ActionSession.Owner() {
-            public void ended(ActionSession ignored) {} public void failed(String ignored) {}
+            /** No-op owner: the test reads terminal state without starting cohort lifecycle work. */
+            public void ended(ActionSession ignored) {}
+            /** No-op owner: failure remains visible on the session under test. */
+            public void failed(String ignored) {}
         });
     }
+    /** Captures outgoing packets and makes disconnect await a concurrent callback to expose monitor/I/O lock cycles. */
     static final class Wire implements AutoCloseable {
         final List<Packet> packets = new ArrayList<>();
         final ExecutorService io = Executors.newSingleThreadExecutor();
         final Session session;
+        /** Creates a socket-free transport proxy that rejects network operations under the actor monitor. */
         Wire(ActionSession actor) {
             session = (Session) Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[]{Session.class}, (proxy, method, args) -> {
                 assertFalse(Thread.holdsLock(actor), "Network calls must occur outside actor monitor");
@@ -55,10 +66,13 @@ class ActionSessionTest {
                 throw new AssertionError(method.getName());
             });
         }
+        /** Delivers login and teleport through the actual session callback entry point. */
         void load(ActionSession actor) { actor.packetReceived(session, login()); actor.packetReceived(session, position()); }
+        /** Stops and joins the test I/O executor so a deadlocked callback cannot silently escape the test. */
         public void close() throws Exception { io.shutdownNow(); assertTrue(io.awaitTermination(3, TimeUnit.SECONDS)); }
     }
 
+    /** Exercises each declared primitive through marker handling and round-trips outgoing packets with the pinned codec. */
     @Test void actualPinnedPacketFieldsAndWireBytesMatchDeclaredPrimitives() throws Exception {
         String actions = String.join(",",
                 step("select", "selectSlot", "{\"slot\":2}"),
@@ -104,6 +118,7 @@ class ActionSessionTest {
         }
     }
 
+    /** Prevents attacks when binding, observed spawn or still-live network identity is missing. */
     @Test void targetMustBeBoundObservedAndNotRemoved() throws Exception {
         for (int mode = 0; mode < 3; mode++) {
             var plan = parse(plan(step("attack", "attackEntity", "{\"targetRef\":\"target\"}") + "," + exit()));
@@ -121,6 +136,7 @@ class ActionSessionTest {
             }
         }
     }
+    /** Separates ignored foreign markers from rejected current-actor duplicates and stale-session requests. */
     @Test void markerOrderingAndCrossActorRunSessionIsolationFailClosed() throws Exception {
         var plan = parse(plan(step("select", "selectSlot", "{\"slot\":1}") + "," + exit()));
         var actor = session(plan);
@@ -139,6 +155,7 @@ class ActionSessionTest {
             assertFalse(stale.successful()); assertEquals(List.of(), stale.report().get("steps"));
         }
     }
+    /** Rejects actions before loading, respawn before death and movement beyond the per-action displacement bound. */
     @Test void loadingRespawnAndMovementGuardsPreventUnsupportedActions() throws Exception {
         for (String step : List.of(step("action", "respawn", "{}"), step("action", "move", "{\"x\":100,\"y\":100,\"z\":0,\"onGround\":false}"))) {
             var plan = parse(plan(step + "," + exit())); var actor = session(plan);

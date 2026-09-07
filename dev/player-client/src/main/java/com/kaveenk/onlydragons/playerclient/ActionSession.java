@@ -20,10 +20,30 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.*;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.level.*;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.*;
 
-/** State for precisely one connection. A reconnect creates a new instance. */
+/**
+ * Tracks one action-plan connection; reconnect always creates a new instance.
+ * Packet handling is ordered by the actor's callback executor. State reads and mutations
+ * share this object's monitor because disconnect/cleanup can arrive independently.
+ * Network sends, disconnects and owner callbacks occur outside that monitor.
+ * Submitted-step receipts do not prove Paper accepted the requested behavior.
+ */
 final class ActionSession extends SessionAdapter {
-    interface Owner { void ended(ActionSession session); void failed(String error); }
+    /** Lifecycle notifications; implementations must transfer work out of packet callbacks without holding session state. */
+    interface Owner {
+        /** Receives actual disconnect completion after the session monitor is released. */
+        void ended(ActionSession session);
+        /** Receives a protocol failure that must retire the owning cohort. */
+        void failed(String error);
+    }
+    /**
+     * Prepared effects detached from the state monitor for ordered network submission.
+     * @param packets outgoing packets, sent before the step receipt is appended
+     * @param step declared action being submitted, or null for passive protocol acknowledgements
+     * @param disconnectReason requested transport closure, or null to keep the connection
+     * @param evidence observed target/container provenance attached to this submission
+     */
     private record Effects(List<Packet> packets, ActionPlan.Step step, String disconnectReason, Map<String, Object> evidence) {
+        /** Creates acknowledgement or terminal effects without action-specific provenance fields. */
         Effects(List<Packet> packets, ActionPlan.Step step, String disconnectReason) { this(packets, step, disconnectReason, Map.of()); }
     }
     private final String runId, actorId, behavior;
@@ -51,6 +71,11 @@ final class ActionSession extends SessionAdapter {
     private float yaw, pitch;
     private boolean onGround;
 
+    /**
+     * Creates fresh connection state and enables UI capture only for declared UI-plan prefixes.
+     * Entity motion and inventory observers belong to this connection; no state is borrowed
+     * from a prior reconnect.
+     */
     ActionSession(String runId, String actorId, String behavior, ActionPlan plan,
                   ActionPlan.SessionPlan definition, Owner owner) {
         this.runId = runId; this.actorId = actorId; this.behavior = behavior;
@@ -58,6 +83,13 @@ final class ActionSession extends SessionAdapter {
         this.plan = plan; this.definition = definition; this.owner = owner;
     }
 
+    /**
+     * Processes one ordered callback, submits prepared packets outside the state monitor,
+     * then records the step only after every {@code send} call returns. A protocol/runtime
+     * failure marks this session and notifies its owner to retire the cohort.
+     * @param session transport owning the received packet
+     * @param packet decoded packet from the pinned codec
+     */
     @Override public void packetReceived(Session session, Packet packet) {
         try {
             Effects effect = receive(packet);
@@ -81,6 +113,11 @@ final class ActionSession extends SessionAdapter {
         }
     }
 
+    /**
+     * Updates bounded observations and prepares acknowledgements/actions under the state lock.
+     * Respawn clears network IDs and container authority but retains UUID bindings and
+     * receipt history. Terminal or failed state ignores later incoming packets.
+     */
     private synchronized Effects receive(Packet packet) {
         if (!error.isEmpty() || disconnected || requestedDisconnect) return new Effects(List.of(), null, null);
         inventory.receive(packet);
@@ -143,6 +180,12 @@ final class ActionSession extends SessionAdapter {
         return new Effects(List.copyOf(outgoing), null, null);
     }
 
+    /**
+     * Accepts one immutable UUID binding per declared target reference and connection.
+     * Foreign-run markers are ignored; current-run malformed, stale or duplicate bindings
+     * fail. A binding alone cannot authorize attack until an entity spawn is also observed.
+     * Called under the session monitor.
+     */
     private void bind(String value) {
         String[] pieces = value.split(":", -1);
         if (pieces.length >= 2 && !pieces[1].equals(runId)) return;
@@ -155,6 +198,11 @@ final class ActionSession extends SessionAdapter {
         bindings.add(Map.of("targetRef", pieces[3], "uuid", uuid.toString(), "receivedAtEpochMs", System.currentTimeMillis()));
     }
 
+    /**
+     * Checks run/hash/actor/session identity and exact next-step order before preparing input.
+     * Arguments come only from the validated plan. Terminal actions require settled container
+     * transactions; their disconnect callbacks must still arrive before success. Called locked.
+     */
     private Effects trigger(String value) {
         String[] pieces = value.split(":", -1);
         if (pieces.length >= 2 && !pieces[1].equals(runId)) return new Effects(List.of(), null, null);
@@ -181,6 +229,11 @@ final class ActionSession extends SessionAdapter {
         return new Effects(packets, step, disconnect, evidence);
     }
 
+    /**
+     * Encodes admitted primitives using current connection position and observed UUID-to-ID bindings.
+     * Movement is limited to eight blocks per axis per action; respawn requires observed
+     * zero health. These outgoing packets are requests, not synthetic server events.
+     */
     private List<Packet> packets(ActionPlan.Step step) {
         return switch (step.action()) {
             case "selectSlot" -> List.of(new ServerboundSetCarriedItemPacket(step.integer("slot")));
@@ -218,15 +271,24 @@ final class ActionSession extends SessionAdapter {
             default -> throw new IllegalStateException("Unvalidated action");
         };
     }
+    /** Allocates the next connection-local sequence for a fixed player-action packet. */
     private Packet playerAction(PlayerAction action) { return new ServerboundPlayerActionPacket(action, Vector3i.ZERO, Direction.DOWN, ++sequence); }
+    /** Maps a schema-validated hand choice to the pinned protocol enum. */
     private static Hand hand(ActionPlan.Step step) { return step.text("hand").equals("main") ? Hand.MAIN_HAND : Hand.OFF_HAND; }
+    /** Flattens received component text with a 2,048-character fail-closed bound; never truncates evidence. */
     static String flatten(Component component) {
         var text = new StringBuilder();
         ComponentFlattener.basic().flatten(component, value -> { check(text.length() + value.length() <= 2048, "Player message exceeded capture bound"); text.append(value); });
         return text.toString();
     }
+    /** Rejects an invalid protocol transition or exceeded evidence bound with a specific failure. */
     static void check(boolean condition, String message) { if (!condition) throw new IllegalStateException(message); }
 
+    /**
+     * Records the first actual disconnect, classifies unexpected closure as failure, then
+     * notifies the owner after releasing the state monitor. Repeated callbacks are ignored.
+     * @param event transport disconnect reason and optional underlying cause
+     */
     @Override public void disconnected(DisconnectedEvent event) {
         synchronized (this) {
             if (disconnected) return;
@@ -236,10 +298,19 @@ final class ActionSession extends SessionAdapter {
         }
         owner.ended(this);
     }
+    /** Retains the first session error so cleanup cannot replace the original failure cause. */
     synchronized void failed(String reason) { if (error.isEmpty()) error = reason; }
+    /** Requires loading, teleport ACK preparation, every submitted step and an observed declared disconnect without error. */
     synchronized boolean successful() { return error.isEmpty() && login && loaded && teleports > 0 && requestedDisconnect && disconnected && steps.size() == definition.steps().size(); }
+    /** Allows reconnect only after this session has successfully completed its declared terminal step. */
     synchronized boolean wantsReconnect() { return successful() && definition.steps().getLast().action().equals("reconnect"); }
+    /** Reads the validated terminal reconnect delay; callers first establish that reconnect is required. */
     synchronized int reconnectDelay() { return definition.steps().getLast().integer("delayMillis"); }
+    /**
+     * Copies bounded protocol receipts under the state lock, including container histories
+     * and optional UI observations. The {@code passed} field describes client completion;
+     * independent companion observations must prove actual effects.
+     */
     synchronized Map<String, Object> report() {
         var result = new LinkedHashMap<String, Object>();
         result.put("id", definition.id()); result.put("startedAtEpochMs", started); result.put("completedAtEpochMs", completed);

@@ -15,21 +15,26 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.inventory.*
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.ServerboundContainerClickPacket;
 import org.junit.jupiter.api.Test;
 
+/** Pure player-window resynchronization and codec-provenance tests; native clicks and component conservation are checked separately on Paper. */
 class InventoryStateTest {
+    /** Parses a real inventoryClick step so helper callers exercise schema bounds as well as state handling. */
     static ActionPlan.Step click(int slot, String button) throws Exception {
         return parse(plan(step("click", "inventoryClick", "{\"slot\":" + slot + ",\"button\":\"" + button + "\"}") + "," + exit()))
                 .actors().getFirst().sessions().getFirst().steps().getFirst();
     }
+    /** Builds protocol item components with distinct fixture identity bytes for digest comparisons. */
     static ItemStack tagged(String identity) {
         var data = new DataComponents(new HashMap<>());
         data.put(DataComponentTypes.CUSTOM_DATA, NbtMap.builder().putString("onlydragons:item", identity).build());
         return new ItemStack(100, 1, data);
     }
+    /** Creates a complete player-window snapshot with one populated slot and an explicit cursor/state ID. */
     static ClientboundContainerSetContentPacket snapshot(int state, int slot, ItemStack item, ItemStack cursor) {
         var items = new ItemStack[46]; items[slot] = item;
         return new ClientboundContainerSetContentPacket(0, state, items, cursor);
     }
 
+    /** Verifies actual click wire fields and that different custom item bytes change snapshot provenance. */
     @Test void taggedItemsUseExactObservedStateWithNoInventedComponentPrediction() throws Exception {
         var view = new InventoryState(); var item = tagged("instance-one");
         view.receive(snapshot(17, 37, item, null));
@@ -46,6 +51,7 @@ class InventoryStateTest {
         assertNotEquals(view.snapshots().getFirst().get("sha256"), different.snapshots().getFirst().get("sha256"),
                 "Received item component bytes must affect snapshot provenance");
     }
+    /** Keeps an outgoing click unsettled through partial deltas until a later complete server snapshot arrives. */
     @Test void eachClickNeedsNewFullSnapshotAndCannotCloseWhileUnsettled() throws Exception {
         var view = new InventoryState(); var item = tagged("one");
         view.receive(snapshot(17, 37, item, null)); view.click(click(37, "left"));
@@ -59,6 +65,7 @@ class InventoryStateTest {
         assertEquals(2, second.evidence().get("inventorySnapshotSequence"));
         assertEquals(19, second.packet().getStateId()); assertEquals(ClickItemAction.RIGHT_CLICK, second.packet().getParam());
     }
+    /** Models the pinned redundant offhand confirmation without allowing that delta to acknowledge an outgoing click. */
     @Test void paperFullRefreshThenUnchangedOffhandConfirmsLatestStateWithoutReplacingSnapshot() throws Exception {
         var view = new InventoryState();
         var item = tagged("managed-bow");
@@ -90,6 +97,7 @@ class InventoryStateTest {
         view.receive(snapshot(55, 37, null, item));
         assertEquals(0, view.click(click(40, "left")).evidence().get("inventoryConfirmationSequence"));
     }
+    /** Distinguishes byte-identical confirmations from changed identity/count/emptiness, including a misleading later restoration. */
     @Test void onlyIdenticalItemBytesCanConfirmAndChangedThenRestoredDeltaStaysInvalid() throws Exception {
         var original = tagged("one");
         var view = new InventoryState(); view.receive(snapshot(10, 37, original, null));
@@ -105,6 +113,7 @@ class InventoryStateTest {
             assertTrue(error.getMessage().contains("changed slot 37"));
         }
     }
+    /** Checks state-ID wrap, rejects skipped/backward IDs and enforces the separate confirmation history bound. */
     @Test void confirmationSequenceIsBoundedValidAndWrapsOnlyAtProtocolBoundary() throws Exception {
         var item = tagged("one");
         var wrapped = new InventoryState(); wrapped.receive(snapshot(32767, 37, item, null));
@@ -120,6 +129,7 @@ class InventoryStateTest {
         for (int state = 1; state <= 512; state++) bounded.receive(new ClientboundContainerSetSlotPacket(0, state, 45, null));
         assertThrows(IllegalStateException.class, () -> bounded.receive(new ClientboundContainerSetSlotPacket(0, 513, 45, null)));
     }
+    /** Rejects absent, wrong-shaped or foreign-window authority and requires a refresh after close. */
     @Test void missingMalformedOrOtherWindowStateCannotDrivePlayerClicks() throws Exception {
         var view = new InventoryState();
         assertThrows(IllegalStateException.class, () -> view.click(click(37, "left")));
@@ -130,6 +140,7 @@ class InventoryStateTest {
         view.receive(new ClientboundContainerClosePacket(0));
         assertThrows(IllegalStateException.class, () -> view.click(click(37, "left")));
     }
+    /** Shows world changes cannot hide unsettled clicks and fresh snapshots can carry a wrapped state ID directly. */
     @Test void deltaAndWorldChangeInvalidateStateButWrappedIdsNeedNoGuessing() throws Exception {
         var view = new InventoryState(); var item = tagged("one");
         view.receive(snapshot(32767, 37, item, null));
@@ -141,6 +152,7 @@ class InventoryStateTest {
         view.receive(snapshot(1, 37, null, item)); view.reset();
         assertThrows(IllegalStateException.class, () -> view.click(click(40, "left")));
     }
+    /** Rejects unsupported slots, gestures and caller-supplied state IDs through the real plan parser. */
     @Test void slotButtonTypesAndUnsupportedCraftingSlotsReject() {
         for (String args : new String[]{"{\"slot\":4,\"button\":\"left\"}", "{\"slot\":46,\"button\":\"left\"}",
                 "{\"slot\":true,\"button\":\"left\"}", "{\"slot\":37.0,\"button\":\"left\"}",
