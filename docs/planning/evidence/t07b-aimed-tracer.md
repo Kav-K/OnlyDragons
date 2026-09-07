@@ -1,6 +1,7 @@
 # T07b aimed Dragon Tracer — GH-90
 
-Branch `symphony/gh-90` starts from integrated main
+[Draft PR #92](https://github.com/Kav-K/OnlyDragons/pull/92),
+branch `symphony/gh-90`, starts from integrated main
 `b2f025416fac5291b62f905365e55070d25498f8`. The owner dispatched the profile/rules/
 continuity seam, then clarified that the six current v4 definitions also select
 v3, including book-enchanted drawn bows. The seven held-kit definitions and six

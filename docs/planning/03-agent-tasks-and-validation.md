@@ -224,7 +224,7 @@ authenticated-client visuals/input feel, Windows smoke and milestones remain pen
 
 T06d is not dispatched. T07b was dispatched from main `b2f0254` in the
 [owner assignment](https://github.com/Kav-K/OnlyDragons/issues/90#issuecomment-5575533461).
-The `symphony/gh-90` candidate adds `tracer-aimed/v3` at the existing captured
+[Draft PR #92](https://github.com/Kav-K/OnlyDragons/pull/92), `symphony/gh-90`, adds `tracer-aimed/v3` at the existing captured
 profile/rules/continuity seam. Build passes 329 production tests with no failures,
 errors or skips. Clean runtime `e6ac40f` passes aimed-tracer (36 assertions) and
 held-combat (23 assertions), with both owned JVMs cleaned up. The lead requested
