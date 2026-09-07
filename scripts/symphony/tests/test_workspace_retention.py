@@ -18,7 +18,13 @@ spec.loader.exec_module(retention)
 
 
 class RetentionTests(unittest.TestCase):
+    """Prove whole-clone retention preserves bytes/history/evidence and rejects redirected ownership.
+
+    Only disposable directories are moved. Tests prevent copy/delete fallbacks and
+    check post-rename metadata failure without touching actual Symphony workspaces.
+    """
     def setUp(self):
+        """Create a temporary issue tree containing Git, dirty/untracked source and ignored evidence."""
         self.temp = tempfile.TemporaryDirectory(prefix='symphony-retention-')
         self.addCleanup(self.temp.cleanup)
         self.source = Path(self.temp.name).resolve()
@@ -39,9 +45,11 @@ class RetentionTests(unittest.TestCase):
             file.write_bytes(contents)
 
     def retained(self):
+        """Invoke the actual retention rename with the test-owned source and issue directory."""
         return retention.retain_workspace(self.source, self.workspace)
 
     def assert_preserved(self, path):
+        """Compare the retained tree's entire file set and bytes against the original fixture."""
         self.assertEqual({p.relative_to(path).as_posix(): p.read_bytes()
                           for p in path.rglob('*') if p.is_file()}, self.files)
 

@@ -13,10 +13,12 @@ spec.loader.exec_module(actions)
 
 
 def step(identifier, action, **args):
+    """Construct a concise action-plan step for test data without performing it."""
     return {'id': identifier, 'action': action, 'args': args}
 
 
 def fixture_plan():
+    """Return the bounded multi-actor primitive/reconnect plan used for schema and evidence mutations."""
     return {'schemaVersion': 1, 'planId': 'primitives-v1', 'targets': ['dummy'], 'actors': [
         {'id': 'alpha', 'sessions': [
             {'id': 'first', 'steps': [
@@ -35,7 +37,13 @@ def fixture_plan():
 
 
 class ActionContractTests(unittest.TestCase):
+    """Test exact plan, client receipt, inventory and server-journal boundaries with synthetic data.
+
+    Keep independently checked lifecycle/binding order visible. No socket, player or
+    Minecraft server is created; actual gameplay effects belong to Paper scenarios.
+    """
     def setUp(self):
+        """Create a fresh plan, byte hash and matching synthetic client/server evidence for each test."""
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.project = Path(self.temp.name)
@@ -50,6 +58,7 @@ class ActionContractTests(unittest.TestCase):
         self.scenario = self.make_journal()
 
     def make_report(self):
+        """Construct planned packet submissions and receive timestamps without sending any packet."""
         actors = []
         for actor, identity in zip(self.plan['actors'], actions.identities(self.run, self.plan)):
             sessions = []; begin = 1100
@@ -77,6 +86,7 @@ class ActionContractTests(unittest.TestCase):
                 'completedAtEpochMs': 3000, 'actors': actors, 'passed': True, 'error': ''}
 
     def make_journal(self):
+        """Construct explicit setup, binding, request and join/quit rows in monotonically ordered ticks."""
         journal = []
         for actor, client in zip(self.plan['actors'], self.report['actors']):
             for ordinal, session in enumerate(actor['sessions'], 1):
@@ -91,10 +101,12 @@ class ActionContractTests(unittest.TestCase):
         return {'runId': self.run, 'observations': {'playerFixture': journal}}
 
     def verify(self, report=None):
+        """Run the real completed-client validator in a fixed enclosing epoch-millisecond window."""
         return actions.validate_report(self.report if report is None else report, self.plan, self.sha,
                                        self.run, self.pins, 900, 3100)
 
     def journal(self, scenario=None):
+        """Cross-check the current synthetic server journal against its plan and client receipt."""
         return actions.validate_server_journal(self.scenario if scenario is None else scenario, self.report, self.plan)
 
     def test_all_declared_operations_parse_and_complete_evidence_replays(self):

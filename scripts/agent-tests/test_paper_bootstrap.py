@@ -17,11 +17,18 @@ spec.loader.exec_module(bootstrap)
 
 
 def digest(value):
+    """Hash synthetic byte inputs independently of the bootstrap helper under test."""
     return hashlib.sha256(value).hexdigest()
 
 
 class BootstrapTests(unittest.TestCase):
+    """Test authenticated launcher metadata and isolated Mojang staging using tiny synthetic ZIPs.
+
+    No Java/network is involved. Mutations cover digest/path/schema boundaries and
+    copy ownership; symlink tests explicitly skip only when the host cannot create them.
+    """
     def setUp(self):
+        """Create separate disposable operator/issue/cache paths and a hash-matched fake launcher."""
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
@@ -37,6 +44,7 @@ class BootstrapTests(unittest.TestCase):
         self.make_launcher(self.raw)
 
     def make_launcher(self, raw, duplicate=False):
+        """Write bounded test download-context metadata, optionally duplicating its ZIP entry."""
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', UserWarning)
             with zipfile.ZipFile(self.paper, 'w') as archive:
@@ -47,20 +55,24 @@ class BootstrapTests(unittest.TestCase):
         return self.pin
 
     def metadata(self):
+        """Read the current synthetic launcher through the production metadata validator."""
         return bootstrap.inspect_launcher(self.paper, self.pin)
 
     def profile(self):
+        """Create a new test profile and stage only its synthetic launcher."""
         result = self.project / 'run/agent-tests/fresh'
         result.mkdir(parents=True)
         shutil.copyfile(self.paper, result / 'server.jar')
         return result
 
     def copy_cache(self, path, data=None):
+        """Write a named test cache candidate, optionally corrupting its expected bytes."""
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(self.mojang.read_bytes() if data is None else data)
         return path
 
     def link(self, target, path, directory=False):
+        """Create a test symlink or explicitly skip if the host lacks symlink capability."""
         try:
             path.symlink_to(target, target_is_directory=directory)
         except (OSError, NotImplementedError) as error:

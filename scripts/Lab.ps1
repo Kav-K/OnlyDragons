@@ -1,3 +1,63 @@
+<#
+.SYNOPSIS
+Manages version-isolated Windows development profiles and smoke checks.
+.DESCRIPTION
+Routes human preparation, start, Play, restart, console, status and smoke/matrix work.
+Defaults to project version pins. New profiles receive loopback authenticated server
+properties; existing worlds/configuration remain in their version/profile directory.
+Play/restart serialize startup and stop all discovered managed development servers
+across projects. Start/run exclude their own profile and may reuse it without rebuilding.
+Smoke uses a separate default profile/port, runs sequential console assertions and
+records protocol status, plugin checks and clean shutdown. It does not log in a player.
+Smoke reports replace the prior report for that version/profile, so preserve evidence
+before another invocation when its original identity matters.
+.PARAMETER Action
+Operation to perform. Run follows logs after startup; closing that caller does not stop the detached server. New delegates project creation.
+.PARAMETER Version
+Numeric server version; empty uses versions.properties. The explicit latest value resolves a stable release through the public API.
+.PARAMETER Profile
+Letters, digits, underscore or hyphen profile name; defaults to smoke for smoke/matrix and dev otherwise.
+.PARAMETER PluginPath
+Plugin JAR or directory. Empty or project selects the wrapper-produced artifact; supplying a path builds only the lab harness unless SkipBuild is set.
+.PARAMETER DependencyPath
+Additional JAR or directory staged as dependencies after duplicate-name and compatibility checks.
+.PARAMETER Checks
+JSON console commands and expected regexes for smoke. The project check plan is selected automatically only for project smoke without an override.
+.PARAMETER ServerJar
+Explicit custom server JAR whose hash becomes the profile pin; no Spigot or older-version compatibility is inferred merely from preparation.
+.PARAMETER JavaVersion
+Server JDK major override; zero uses the version-to-major mapping. Build JDK selection remains based on project pins.
+.PARAMETER Port
+Loopback game port; defaults to 25565, or 25566 for smoke/matrix unless explicitly supplied.
+.PARAMETER DebugPort
+Loopback JDWP port when DebugServer is enabled.
+.PARAMETER MemoryMb
+Maximum server heap in MiB, admitted from 512 through 16384; it is not a host memory reservation.
+.PARAMETER TimeoutSeconds
+Startup deadline in seconds; individual command waits and graceful shutdown use their own bounds.
+.PARAMETER DebugServer
+Enable loopback debugging for newly prepared sessions; reusing a session requires a matching debug port.
+.PARAMETER SkipBuild
+Reuse existing build artifacts without compiling or rerunning tests. JAR metadata and profile pin checks still run.
+.PARAMETER UpdateServer
+Explicitly replace a profile's pinned server selection; does not make an existing world safe to downgrade.
+.PARAMETER Command
+One nonempty console command for console, without embedded newlines; a leading slash is stripped.
+.PARAMETER Versions
+Comma-separated distinct target versions for sequential matrix smoke invocations.
+.PARAMETER Name
+Project name passed to New-Project only for new.
+.PARAMETER Directory
+New project destination only; normal lab profiles are derived from Version and Profile.
+.PARAMETER BasePackage
+Optional Java package override for new.
+.PARAMETER NoOpen
+Suppress opening Cursor after new project creation.
+.EXAMPLE
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Lab.ps1 smoke
+.NOTES
+These human-profile commands may affect existing managed sessions. Unattended Symphony workers use scripts/agent-tests/paper_test.py with its isolated profiles and shared lease. This script never records new EULA acceptance.
+#>
 param(
     [Parameter(Position=0)][ValidateSet('help','new','versions','prepare','start','run','stop','restart','play','join','smoke','matrix','console','logs','status','debug-test')][string]$Action='help',
     [string]$Version='', [string]$Profile='', [string]$PluginPath='', [string]$DependencyPath='',

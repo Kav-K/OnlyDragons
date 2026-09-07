@@ -30,16 +30,25 @@ JDK_RELEASE = {'JAVA_VERSION': JDK_VERSION, 'JAVA_RUNTIME_VERSION': JDK_RUNTIME 
 
 
 class Response(io.BytesIO):
+    """In-memory HTTPS response substitute exposing bytes and a redirect URL without network access."""
     def __init__(self, data, url='https://piston-data.mojang.com/file'):
+        """Initialize response bytes and the final URL inspected by download provenance checks."""
         super().__init__(data)
         self.url = url
 
     def geturl(self):
+        """Return the configured final URL so redirect-policy tests use the real downloader branch."""
         return self.url
 
 
 class HostedPaperTests(unittest.TestCase):
+    """Verify hosted guards, JDK/archive provenance and failure export with no real downloads or Paper.
+
+    Tiny synthetic archives exercise extraction boundaries; orchestration tests replace
+    clone/provision/child execution explicitly and inspect their call order/results.
+    """
     def setUp(self):
+        """Create an isolated source/output root removed after each test."""
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name).resolve()
@@ -47,6 +56,7 @@ class HostedPaperTests(unittest.TestCase):
         self.project.mkdir()
 
     def put(self, relative, data=b'evidence', root=None):
+        """Write explicit synthetic bytes under the selected temporary fixture root."""
         path = (root or self.project) / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
@@ -70,6 +80,7 @@ class HostedPaperTests(unittest.TestCase):
                 ci.java_version(self.project)
 
     def jdk_archive(self, identity=None, extra=None, tool_mode=0o755):
+        """Construct a tiny fake JDK tar with controlled release metadata, modes and optional bad entry."""
         release = '\n'.join(f'{key}="{value}"' for key, value in (identity or JDK_RELEASE).items()) + '\n'
         stream = io.BytesIO()
         with tarfile.open(fileobj=stream, mode='w:gz') as archive:
@@ -307,6 +318,12 @@ class HostedPaperTests(unittest.TestCase):
 
     def run_mocked(self, suite_exit=0, replay_exit=0, consent=True, existing=False, interrupt=False,
                    provision_error=None):
+        """Run the real hosted orchestrator with controlled clone, download, suite and replay seams.
+
+        Parameters inject consent, preexisting paths, exit failures, interruption or JDK
+        errors. Return status/manifest/calls so tests can require failure preservation and
+        full-suite-before-replay order without starting a JVM.
+        """
         runtime = self.root / 'runtime'
         if existing:
             runtime.mkdir()

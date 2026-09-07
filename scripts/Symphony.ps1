@@ -1,3 +1,21 @@
+<#
+.SYNOPSIS
+Bridges Windows operator actions to the project's WSL Symphony runtime.
+.DESCRIPTION
+Creates the ignored .symphony state directory and resolves this checkout through
+wslpath in the named distribution before invoking scripts/symphony/run.sh.
+Set-token prompts without echo, writes a local credential and restricts its ACL to
+the current user and SYSTEM; it does not pass that token on a command line.
+Login may copy the existing Codex auth file into the isolated project state with the
+same restricted ACL before delegating login. It does not copy machine-specific settings.
+Other actions and native exit status are delegated to the existing WSL launcher.
+.PARAMETER Action
+install, check, login, set-token, start, stop or status; defaults to check. Only set-token returns before WSL delegation.
+.PARAMETER Distribution
+Existing WSL distribution used for path conversion and runtime commands; defaults to Ubuntu-24.04.
+.NOTES
+Operator setup entry point. Token/auth files remain private ignored state and must not be printed or committed. Start/stop target the configured Symphony runtime, not arbitrary services.
+#>
 param(
     [ValidateSet('install','check','login','set-token','start','stop','status')]
     [string]$Action = 'check',

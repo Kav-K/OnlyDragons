@@ -1,3 +1,9 @@
+/**
+ * Build two isolated lab source sets against a nontransitive legacy Bukkit API.
+ * Java 8 bytecode keeps the harness/probe usable across the lab's supported server
+ * range while the build itself uses the shared pinned JDK. Neither source set joins
+ * the production IDE classpath. Explicit Jar tasks emit artifacts into root build.
+ */
 import java.util.Properties
 
 plugins { java }

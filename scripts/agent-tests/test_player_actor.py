@@ -14,7 +14,13 @@ spec.loader.exec_module(runner)
 
 
 class PlayerActorContractTests(unittest.TestCase):
+    """Verify explicit offline admission, exact protocol pins and legacy client failure policies.
+
+    Reports are synthetic validator inputs. Any owned process checks use disposable
+    children; authenticated login and actual Paper input remain separate runtime gates.
+    """
     def setUp(self):
+        """Create a current-window synthetic report using the repository's declared protocol metadata."""
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
@@ -31,6 +37,7 @@ class PlayerActorContractTests(unittest.TestCase):
                        'passed': True, 'error': ''}
 
     def validate(self, report):
+        """Write the selected synthetic report and validate it against the issued run/window."""
         path = self.root / 'player.json'
         runner.atomic_json(path, report)
         return runner.validate_player_report(path, self.run_id, self.now, 60, self.pins)

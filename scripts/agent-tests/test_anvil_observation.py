@@ -1,10 +1,17 @@
+"""Mutation tests for received anvil identity, settlement and native transaction evidence.
+
+All reports are synthetic; actual result extraction and XP behavior require the
+real-Paper anvil scenarios. Window-0 inventory restrictions remain independent.
+"""
 import copy
 import unittest
 import anvil_observation as anvil
 from player_actions import ActionValidationError, validate_arguments
 
 class AnvilReplayTest(unittest.TestCase):
+    """Exercise stale window/state rejection and preview/input/output/XP evidence reconciliation."""
     def session(self):
+        """Build a positive-window synthetic extraction with a fresh post-click snapshot before quit."""
         snap={'openSequence':1,'containerId':3,'stateId':5,'slotCount':39,'slotSha256':['a'*64]*39,'cursorSha256':'b'*64,'amounts':[0]*39,'cursorAmount':0,'receivedAtEpochMs':120,'sha256':'c'*64}
         step={'id':'collect','action':'anvilClick','args':{'slot':2,'button':'left'},'submittedAtEpochMs':130,'anvilOpenSequence':1,'containerId':3,'stateId':5,'anvilSnapshotSequence':1,'anvilSnapshotSha256':'c'*64}
         session={'steps':[step,{'id':'quit','action':'disconnect','args':{},'submittedAtEpochMs':150}],'anvil':{'opens':[{'openSequence':1,'containerId':3,'menuType':'ANVIL','receivedAtEpochMs':110,'sha256':'a'*64}],'snapshots':[snap,dict(snap,receivedAtEpochMs=140)],'costs':[],'xp':[],'closes':[]}}

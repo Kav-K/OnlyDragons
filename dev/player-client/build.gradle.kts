@@ -1,3 +1,10 @@
+/**
+ * Standalone headless protocol client, never a production plugin dependency.
+ * installDist stages the executable client and its strictly locked transitive graph;
+ * the runner additionally verifies the exact timestamped protocol module's SHA-256.
+ * Resource metadata carries the artifact/Minecraft/protocol identity into receipts.
+ * No client credentials or human Minecraft profile are needed for disposable tests.
+ */
 import org.gradle.api.artifacts.dsl.LockMode
 import java.util.Properties
 

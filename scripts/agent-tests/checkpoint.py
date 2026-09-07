@@ -19,15 +19,18 @@ import time
 
 
 class CheckpointError(RuntimeError):
+    """A plan, requirement, dependency or acceptance-evidence contract is invalid."""
     pass
 
 
 def require(condition, message):
+    """Raise CheckpointError with a precise diagnostic when a checkpoint condition fails."""
     if not condition:
         raise CheckpointError(message)
 
 
 def sibling_module(name):
+    """Load a repository sibling by explicit path under a private module name for test isolation."""
     path = Path(__file__).with_name(name + '.py')
     require(path.is_file(), 'Required checkpoint dependency is missing: ' + name)
     directory = str(path.parent)
@@ -41,6 +44,7 @@ def sibling_module(name):
 
 
 def load_json(path):
+    """Read bounded duplicate-safe finite JSON and translate validation errors to checkpoint errors."""
     try:
         return sibling_module('paper_test').strict_json(Path(path))
     except (ValueError, RuntimeError, OSError) as error:
@@ -48,6 +52,7 @@ def load_json(path):
 
 
 def names(value, label, nonempty=False):
+    """Validate unique string identifiers and return a set, optionally rejecting an empty list."""
     require(isinstance(value, list) and all(isinstance(x, str) and x for x in value), label + ' must be a string list')
     require(len(set(value)) == len(value), 'Duplicate ' + label)
     require(not nonempty or value, 'Missing ' + label)
@@ -55,11 +60,13 @@ def names(value, label, nonempty=False):
 
 
 def versioned(value, label):
+    """Require an object with integer schemaVersion 1; booleans do not count as versions."""
     require(isinstance(value, dict) and type(value.get('schemaVersion')) is int
             and value['schemaVersion'] == 1, 'Unsupported ' + label + ' schema')
 
 
 def acyclic(graph, label):
+    """Reject unknown dependency IDs and cycles using a read-only depth-first traversal."""
     done = set()
     def visit(node, path):
         require(node not in path, label + ' dependency cycle: ' + ' -> '.join(path + [node]))
@@ -74,6 +81,7 @@ def acyclic(graph, label):
 
 
 def evidence_reference(value, label):
+    """Validate the shape of an HTTPS evidence URL and Git revision, without fetching proof."""
     require(isinstance(value, dict), 'Missing evidence reference: ' + label)
     require(isinstance(value.get('url'), str) and value['url'].startswith('https://'),
             'Evidence must have a durable HTTPS reference: ' + label)
@@ -82,6 +90,7 @@ def evidence_reference(value, label):
 
 
 def validate_task_gates(key, tasks, progress, dependencies, milestone_gates):
+    """Require a task's dependencies, named manual gate and prerequisite milestones to be complete."""
     missing = sorted(dep for dep in dependencies[key] if progress['tasks'][dep]['status'] != 'complete')
     require(not missing, 'Unsatisfied task prerequisites for ' + key + ': ' + ', '.join(missing))
     if tasks[key].get('manualGate'):
@@ -91,6 +100,13 @@ def validate_task_gates(key, tasks, progress, dependencies, milestone_gates):
 
 
 def validate_plan(project, snapshot=None, now_ms=None):
+    """Cross-check the backlog, requirements, progress, fixture catalogs and Java registrations.
+
+    Enforce consistent IDs, acyclic combined dependencies, honest deferred/external
+    requirements, scenario bindings and recorded completion evidence. Optional sanitized
+    live issue state must also agree. Return validated data plus planValid metadata;
+    structural consistency never implies automatedReady or human acceptance.
+    """
     project = Path(project)
     backlog = load_json(project / 'docs/planning/backlog.json')
     mapping = load_json(project / 'docs/planning/github-issues.json')
@@ -257,6 +273,7 @@ def validate_live_snapshot(snapshot, mapping, progress, dependencies, now_ms=Non
 
 
 def base_document(project, revision, path):
+    """Read a JSON document from a Git revision, returning None only when that path is absent."""
     exists = subprocess.run(['git', 'cat-file', '-e', revision + ':' + path], cwd=project,
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if exists.returncode:
@@ -364,6 +381,13 @@ def validate_no_weakening(project, base, validated):
 
 
 def validate_acceptance(project, receipt_path, base, task_ids=(), suite_module=None):
+    """Replay current clean-source evidence and derive the selected tasks' automated readiness.
+
+    Recompute affected cases from the real Git diff, enforce additive/no-weakening
+    contracts and all task bindings, and reject deferred implementations. External gates
+    remain pending even after machine checks pass. Recheck source at the end; this
+    function never promotes a milestone or edits the plan.
+    """
     validated = validate_plan(project)
     selected_tasks = names(list(task_ids), 'requested tasks')
     require(selected_tasks <= set(validated['plan']['tasks']), 'Unknown requested task')
@@ -407,6 +431,11 @@ def validate_acceptance(project, receipt_path, base, task_ids=(), suite_module=N
 
 
 def main(argv=None):
+    """Return 0 for valid plans or explicitly automated readiness, 2 for pending external gates.
+
+    Invalid input/evidence returns 1. These exit meanings distinguish machine validation
+    from full acceptance; none of the modes launches Minecraft or writes project state.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['plan', 'acceptance'])
     parser.add_argument('--project', type=Path, default=Path.cwd())

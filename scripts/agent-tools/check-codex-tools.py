@@ -18,6 +18,13 @@ import time
 
 
 def main():
+    """Probe repository skills and reviewed MCP navigation tools through an isolated app-server.
+
+    Require the prepared issue clone/operator runtime, create unauthenticated scratch
+    CODEX_HOME and save local tool receipts. Verify actual Context7 documentation and
+    Serena lifecycle-symbol responses. No model turn, GitHub write or Minecraft launch
+    is requested. Always close the owned app-server, with bounded TERM fallback.
+    """
     root = Path(os.environ['ONLYDRAGONS_SOURCE']).resolve(strict=True)
     workspace = Path.cwd().resolve(strict=True)
     spec = importlib.util.spec_from_file_location('bridge', root / 'scripts/symphony/codex-app-server.py')
@@ -39,6 +46,7 @@ def main():
     )
 
     def receive():
+        """Queue decoded protocol responses/notifications and an EOF sentinel from the owned child."""
         try:
             for line in proc.stdout:
                 messages.put(json.loads(line))
@@ -49,6 +57,11 @@ def main():
     counter = 0
 
     def request(method, params, timeout=210):
+        """Send one numbered RPC and wait up to timeout seconds for its matching response.
+
+        Persist notifications separately, reject unexpected approval requests and surface
+        server errors. This helper does not approve or answer interactive server requests.
+        """
         nonlocal counter
         counter += 1
         proc.stdin.write(json.dumps({'id': counter, 'method': method, 'params': params}) + '\n')

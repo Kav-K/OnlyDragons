@@ -20,11 +20,19 @@ import paper_suite as suite
 
 
 class ReceiptFixture:
+    """Create a self-contained synthetic Git tree and raw evidence cohort for replay mutation tests.
+
+    Tiny JAR/ZIP/XML/report files are deliberately fabricated validator inputs, never
+    runtime acceptance evidence. refresh updates hashes so tests can distinguish
+    semantic replay failures from simple digest mismatch. validate mocks only the live
+    process-cleanup probe; other suite checks run against actual temporary file bytes.
+    """
     COMPANION_XML = ('<testsuite tests="2" failures="0" errors="0" skipped="0">'
                      '<testcase classname="Diagnostics" name="location"/>'
                      '<testcase classname="Diagnostics" name="boundedCauses"/></testsuite>')
 
     def __init__(self, root):
+        """Build a clean temporary source history, staged artifacts and internally consistent receipt."""
         self.root = root
         self.run_id, self.suite_id = 'a' * 32, 'b' * 32
         self.write('.gitignore', 'build/\nrun/\n*.ignored\n')
@@ -101,21 +109,29 @@ class ReceiptFixture:
         self.refresh()
 
     def write(self, path, data):
+        """Write text/bytes beneath the test root, creating required fixture parents."""
         path = self.root / path
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data if isinstance(data, bytes) else data.encode())
 
     def json(self, path, value):
+        """Serialize synthetic evidence through the fixture's owned file writer."""
         self.write(path, json.dumps(value))
 
     def git(self, *args):
+        """Run real local Git with automatic maintenance disabled to avoid detached cleanup races."""
         return subprocess.check_output(['git', '-c', 'maintenance.auto=false', *args], cwd=self.root, stderr=subprocess.DEVNULL)
 
     def commit(self):
+        """Commit current fixture inputs so source-identity checks inspect an actual clean history."""
         self.git('add', '.')
         self.git('commit', '-qm', 'Fixture inputs')
 
     def refresh(self):
+        """Rewrite synthetic raw records and recalculate their hashes/summary after a test mutation.
+
+        This is test data construction only; production replay must never repair evidence.
+        """
         self.json(self.reports / 'scenario.json', self.scenario)
         self.json(self.reports / 'result.json', self.result)
         for key, filename in [('scenario', 'scenario.json'), ('result', 'result.json'), ('serverLog', 'server.log'), ('buildLog', 'build.log')]:
@@ -128,17 +144,20 @@ class ReceiptFixture:
         self.json(self.path, self.receipt)
 
     def validate(self):
+        """Run strict suite replay while replacing the live process/port observation only."""
         with patch.object(suite, 'process_cleanup'):
             return suite.validate_suite_receipt(self.root, self.path)
 
 
 class EvidenceTests(unittest.TestCase):
+    """Mutate source identity, paths, raw reports, artifacts and JUnit to reject false suite passes."""
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.fixture = ReceiptFixture(Path(self.temp.name))
 
     def rejected(self, mutation, refresh=True):
+        """Apply a mutation, optionally refresh synthetic hashes, and require strict replay failure."""
         mutation()
         if refresh:
             self.fixture.refresh()
@@ -389,6 +408,7 @@ class EvidenceTests(unittest.TestCase):
 
 
 class CapturedTests(unittest.TestCase):
+    """Verify archived JUnit categories preserve exact prior bytes after later builds overwrite reports."""
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -425,6 +445,10 @@ class CapturedTests(unittest.TestCase):
 
 
 class SelectionTests(unittest.TestCase):
+    """Exercise committed catalog coverage, transitive affected areas and unknown-path rejection.
+
+    Copy real catalog/plan/seed inputs into disposable storage; no selected case is run.
+    """
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -539,6 +563,11 @@ class SelectionTests(unittest.TestCase):
 
 
 class NegativePolicyTests(unittest.TestCase):
+    """Ensure only exact named controls can satisfy expected-failure policy.
+
+    Synthetic failure reports must retain required setup/cleanup observations; a
+    different exception, action prefix or observed value must remain a failure.
+    """
     def setUp(self):
         self.now = int(time.time() * 1000)
         self.pins = {'minecraftVersion': '26.2', 'paperBuild': '121',
@@ -547,6 +576,7 @@ class NegativePolicyTests(unittest.TestCase):
         self.run_id = 'a' * 32
 
     def scenario(self, expectation):
+        """Construct an explicit deliberate-failure report with clean synthetic resource assertions."""
         rows = [{'id': key, 'expected': 0, 'observed': 0, 'passed': True} for key in suite.CLEANUP]
         rows.append({'id': 'deliberate_failure', 'expected': 1, 'observed': 0, 'passed': False})
         return {'schemaVersion': 1, 'runId': self.run_id, 'scenarioId': 'deliberate-failure',
@@ -567,6 +597,7 @@ class NegativePolicyTests(unittest.TestCase):
                     suite.verify_scenario(candidate, case, descriptor, self.run_id, self.pins, self.now - 2000, self.now)
 
     def player(self):
+        """Construct the precise early-exit client prefix used by negative-policy mutation tests."""
         return {'schemaVersion': 1, 'runId': self.run_id, 'username': 'od_' + self.run_id[:13],
                 'authentication': 'offline-disposable-loopback', 'artifact': self.pins['testPlayerProtocolLib'],
                 'minecraftVersion': '26.2', 'protocolVersion': 776, 'loginReceived': True,
@@ -642,6 +673,11 @@ class NegativePolicyTests(unittest.TestCase):
 
 
 class ChildOwnershipTests(unittest.TestCase):
+    """Test prelaunch failure reporting and platform-specific ownership of disposable runner children.
+
+    Linux signal tests keep an unrelated child alive to detect broad termination; no
+    Paper or human process is used. Windows exercises unsupported-platform rejection.
+    """
     def test_prestart_resource_and_build_failures_preserve_real_error_in_failed_receipt(self):
         for busy, reason, exit_code in ((True, 'Busy: Cannot verify Windows host memory: probe exceeded 2s; resource wait expired', 75),
                                         (False, 'Player Gradle build or dependency verification failed; see build.log', 1)):

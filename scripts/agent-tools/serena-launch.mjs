@@ -1,5 +1,18 @@
 #!/usr/bin/env node
 // Project-scoped Serena launcher. Generated settings never overwrite .serena/project.yml.
+/**
+ * Launch the pinned Serena navigation server against one explicit OnlyDragons clone.
+ *
+ * Resolves the project's Java major and reviewed tool installations, validates the
+ * installed Serena version, and writes per-process generated settings under the
+ * clone's ignored .serena/runtime. Tracked project.yml remains the source config.
+ * --check reports resolved dependencies without launching Serena; normal mode owns
+ * one stdio child and forwards termination. Generated runtime files are retained.
+ *
+ * Tool exposure is navigation-only; edits, shell execution and shared context use
+ * the agent's native tools. Environment overrides select installation paths, not
+ * permission to expand navigationTools or use a mismatched JDK.
+ */
 import { spawn, spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
@@ -13,9 +26,13 @@ const navigationTools = [
   'search_for_pattern', 'get_symbols_overview', 'find_symbol', 'find_referencing_symbols',
 ];
 
+/** Raise a startup error for the outer diagnostic/exit handler. @param {string} message */
 function fail(message) { throw new Error(message); }
+/** Test an optional candidate path without opening its contents. @param {string} file */
 function exists(file) { return Boolean(file) && fs.existsSync(file); }
+/** Read a required UTF-8 config/release file; filesystem errors propagate. @param {string} file */
 function read(file) { return fs.readFileSync(file, 'utf8'); }
+/** Write JSON's YAML-compatible subset to an owned generated settings file. */
 function jsonYaml(file, object) { fs.writeFileSync(file, JSON.stringify(object, null, 2) + '\n'); }
 
 try {
@@ -43,6 +60,8 @@ try {
   const python = path.resolve(process.env.ONLYDRAGONS_SERENA_PYTHON || defaultPython);
   if (!exists(bin) || !exists(python)) fail('Serena is not installed. Linux: bash scripts/agent-tools/install-serena.sh. Windows: install serena-agent==1.7.0, or configure ONLYDRAGONS_SERENA_BIN and ONLYDRAGONS_SERENA_PYTHON.');
 
+  // Prefer explicit environment selections, then the shared runtime and Windows
+  // installations. Inspect release metadata instead of guessing from folder names.
   const javaCandidates = [process.env.ONLYDRAGONS_JAVA_HOME, process.env.JAVA_HOME, path.join(runtime, 'java')];
   if (win) {
     const adoptium = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Eclipse Adoptium');
@@ -94,6 +113,8 @@ try {
       base_modes: [mode], default_modes: [], fixed_tools: navigationTools,
       tool_timeout: 240,
     });
+    // Inherit stdio for MCP framing and hide native windows. Exit/error events set
+    // this wrapper's status; no global language-server/JVM search or shutdown occurs.
     const child = spawn(bin, ['start-mcp-server', '--project', project, '--context', 'codex', '--enable-web-dashboard=false', '--open-web-dashboard=false', '--enable-gui-log-window=false'], {
       cwd: project, stdio: 'inherit', windowsHide: true,
       env: { ...process.env, SERENA_HOME: state, JAVA_HOME: path.resolve(javaHome) },

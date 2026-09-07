@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+Reports a stable Paper/MockBukkit upgrade candidate without adopting it.
+.DESCRIPTION
+Reads versions.properties and queries the public Paper release API plus Maven Central.
+Prints the current and discovered versions. With WriteCandidate, writes only
+build/update-candidate.properties; it never replaces the project pins or server.
+Candidate generation requires a matching MockBukkit release and does not validate
+Java requirements, plugin compatibility, protocol-client pins or gameplay.
+.PARAMETER WriteCandidate
+Write a reviewable candidate file after discovery; otherwise only report availability.
+.EXAMPLE
+powershell -NoProfile -File scripts/Check-Updates.ps1 -WriteCandidate
+.NOTES
+Network requests are bounded. Adoption still requires review of related pins, backups and the appropriate build/runtime checks.
+#>
 param([switch]$WriteCandidate)
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'

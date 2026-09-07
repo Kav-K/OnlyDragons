@@ -1,3 +1,27 @@
+<#
+.SYNOPSIS
+Creates a separate renamed project from the maintained template entries.
+.DESCRIPTION
+Validates project/package names and rejects an existing destination or one within
+the template. Copies the explicit scaffold entries with the existing generated-file
+exclusions, replaces template package/name text, and preserves shared skill bytes and
+JARs. Initializes a fresh main Git branch and optionally opens its workspace in Cursor.
+Existing EULA acceptance is copied only when the source file already declares it.
+An error after creation can leave a partial new directory; the script does not roll
+back or overwrite the source project or retry into an existing destination.
+.PARAMETER Name
+Capitalized 2-32 character alphanumeric project name.
+.PARAMETER Directory
+New destination outside the template; empty selects a sibling directory named Name.
+.PARAMETER BasePackage
+Lowercase dotted Java package without the checked keyword segments; empty derives com.kaveenk plus the lowercase project name.
+.PARAMETER NoOpen
+Create files and initialize Git without opening the resulting workspace in Cursor.
+.EXAMPLE
+powershell -NoProfile -File scripts/New-Project.ps1 -Name SkyTools -NoOpen
+.NOTES
+Copies only the scaffold list, not the template's Git history. Review project-specific content before using the new project.
+#>
 param(
     [Parameter(Mandatory=$true)][ValidatePattern('^[A-Z][A-Za-z0-9]{1,31}$')][string]$Name,
     [string]$Directory='', [string]$BasePackage='', [switch]$NoOpen

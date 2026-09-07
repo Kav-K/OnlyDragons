@@ -16,6 +16,7 @@ import tempfile
 
 
 def real_directory(path):
+    """Require a canonical existing absolute directory with no traversal or redirection."""
     path = Path(path)
     if (not path.is_absolute() or '..' in path.parts or path.is_symlink()
             or not path.is_dir() or path.resolve(strict=True) != path):
@@ -24,6 +25,7 @@ def real_directory(path):
 
 
 def child_directory(parent, name):
+    """Create a missing named retention directory, rejecting existing or broken symlink aliases."""
     path = parent / name
     # lexists also detects broken symlinks; never replace or follow them.
     if not os.path.lexists(path):
@@ -32,6 +34,14 @@ def child_directory(parent, name):
 
 
 def retain_workspace(source, workspace):
+    """Rename one stopped direct issue clone into a unique same-filesystem retention archive.
+
+    Validate source/state/workspace/destination anchors before moving; preserve ignored
+    files, Git history and raw evidence without copying or recursively deleting. Leave
+    the old cleanup path absent. If manifest writing fails after the rename, report the
+    retained path and preserve its contents. Caller must stop the worker first; upstream
+    hook failure handling still determines whether an unmoved workspace survives.
+    """
     source = real_directory(source)
     state = real_directory(source / '.symphony')
     workspace_root = real_directory(state / 'workspaces')
@@ -79,6 +89,7 @@ def retain_workspace(source, workspace):
 
 
 def main():
+    """Resolve explicit/operator source inputs and report retained path or failure without deleting data."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', default=os.environ.get('ONLYDRAGONS_SOURCE'))
     parser.add_argument('--workspace', default=str(Path.cwd()))

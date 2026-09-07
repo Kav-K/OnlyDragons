@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# Symphony after_create hook, run inside a newly allocated issue workspace.
+# Clone public main into that directory, configure local author/push policy and
+# install the repository-scoped credential protocol helper. No global Git settings
+# or human-server profile are changed. Existing nonempty clones fail Git clone;
+# this hook does not reset a partially prepared worker or discard its changes.
 set -euo pipefail
 : "${ONLYDRAGONS_SOURCE:?Start through Symphony.cmd}"
 workspace=$(pwd -P)

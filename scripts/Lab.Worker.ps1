@@ -1,3 +1,21 @@
+<#
+.SYNOPSIS
+Owns one prepared profile lock, child JVM, command inbox and UTF-8 log.
+.DESCRIPTION
+Internal detached worker started by Start-LabServer. Reads the trusted local
+session.json, obtains exclusive session.lock and publishes state with the same run ID.
+Launches Java directly with run/directory ownership tags, redirected pipes and explicit
+UTF-8 stdout/stderr encodings. The single loop drains both streams, strips terminal
+escape codes, dispatches completed command files and marks readiness from the native
+Done line. This worker does not perform gameplay acceptance checks.
+On failure/finalization it attempts stop, waits 30 seconds, then can terminate only
+the child process represented by its own Process object. Final state is written
+before releasing the profile lock; stdout/stderr are drained on ordinary exit.
+.PARAMETER Directory
+Existing prepared local profile containing session.json and commands. This is trusted lab metadata, not a generic command-execution API.
+.NOTES
+The worker outlives a console/log follower. Use the lab stop path to save worlds. Its cleanup is not authority to terminate unrelated Java processes.
+#>
 param([Parameter(Mandatory=$true)][string]$Directory)
 . "$PSScriptRoot\Lab.Common.ps1"
 $lockHandle = $null

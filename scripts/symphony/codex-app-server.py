@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Bind worker tools and permit issue Git/skill metadata plus the shared test lease."""
+"""Bridge Symphony's line-delimited app-server protocol into one issue-local Codex child.
+
+Reviewed MCP configuration comes from the operator checkout; project/tool paths bind
+to the issue clone. Only workspaceWrite turn roots are extended, and only for that
+clone's Git/skill metadata and the shared test-coordination directory. Other policy
+messages pass through unchanged. This is not a general permission-escalation proxy.
+
+Linux signals/EOF stop the owned process group; stdout remains protocol-only and
+diagnostics avoid request bodies, response bodies and credential values.
+"""
 import copy
 import json
 import os
@@ -26,6 +35,12 @@ def toml_value(value):
 def codex_command(workspace, source):
     # Use the operator's reviewed tool configuration, not an issue branch's
     # arbitrary MCP commands or its local trust state. Paths bind to this clone.
+    """Construct the child command from operator-reviewed MCP settings with issue-local paths.
+
+    Bind Serena navigation to this clone and explicitly pass its shared runtime path.
+    Disable remote-plugin syncing only for this child to avoid shared mutable-cache
+    races. Do not read arbitrary MCP commands or trust settings from the issue branch.
+    """
     source = Path(source).resolve(strict=True)
     with (source / '.codex/config.toml').open('rb') as config_file:
         servers = tomllib.load(config_file)['mcp_servers']
@@ -51,6 +66,11 @@ def codex_command(workspace, source):
 
 
 def validate_workspace(workspace, source):
+    """Resolve and require a descendant issue checkout with real local Git and skill directories.
+
+    The workspace root itself is not a worker. Return its canonical path; subsequent
+    turn validation rechecks metadata anchors against replacement/redirection.
+    """
     workspace = Path(workspace).resolve(strict=True)
     expected = (Path(source).resolve(strict=True) / '.symphony/workspaces').resolve(strict=True)
     if workspace == expected or not workspace.is_relative_to(expected):
@@ -68,6 +88,12 @@ def validate_agents(workspace):
     # Keep the original anchor so replacing the checkout between turns cannot
     # redirect this grant to another clone. Missing skills are an invalid worker
     # preparation, not permission to create or follow a replacement directory.
+    """Require the original absolute checkout's real .agents directory and return its path.
+
+    The sandbox grant must cover .agents itself because a nested-only skill grant leaves
+    a protected read-only ancestor. Missing or symlinked skill metadata is an error, not
+    an instruction to create or follow a replacement.
+    """
     workspace = Path(workspace)
     agents_dir = workspace / '.agents'
     if (not workspace.is_absolute() or workspace.resolve(strict=True) != workspace
@@ -78,6 +104,7 @@ def validate_agents(workspace):
 
 
 def validate_coordination(source):
+    """Require the operator's real shared Paper lease directory without resolving a symlink grant."""
     expected = Path(source).resolve(strict=True) / '.symphony/test-coordination'
     if expected.is_symlink() or not expected.is_dir() or expected.resolve(strict=True) != expected:
         raise ValueError('Invalid shared Paper-test coordination directory.')
@@ -85,7 +112,12 @@ def validate_coordination(source):
 
 
 def transform_message(message, workspace, coordination=None):
-    """Change only a workspaceWrite turn's roots; leave every other message intact."""
+    """Copy only eligible workspaceWrite turn messages that need the three reviewed writable roots.
+
+    Revalidate cwd/Git/skill/coordination anchors. Preserve all existing roots and other
+    policy fields; non-turn, other-policy and already-complete messages retain object
+    identity and original wire bytes. Invalid eligible inputs raise ValueError.
+    """
     if not isinstance(message, dict) or message.get('method') != 'turn/start':
         return message
     params = message.get('params')
@@ -120,6 +152,12 @@ def transform_message(message, workspace, coordination=None):
 
 
 def main():
+    """Validate ownership, proxy protocol lines and reap the single child process group on exit.
+
+    A reader thread forwards stdout while the main thread transforms incoming lines.
+    EOF and INT/TERM/HUP request shutdown; the finally path sends group TERM, waits five
+    seconds, then KILL if needed. Return the child failure unless stopping was requested.
+    """
     source = os.environ.get('ONLYDRAGONS_SOURCE')
     if not source:
         raise ValueError('Start workers through Symphony.cmd.')
@@ -135,6 +173,7 @@ def main():
     )
 
     def copy_stdout():
+        """Forward child protocol bytes unchanged; broken output requests coordinated shutdown."""
         try:
             while chunk := child.stdout.read1(65536):
                 sys.stdout.buffer.write(chunk)
@@ -143,6 +182,7 @@ def main():
             stopping.set()
 
     def send_line(line):
+        """Forward malformed JSON unchanged or narrowly transform a parsed turn, then flush."""
         try:
             original = json.loads(line)
         except (ValueError, UnicodeDecodeError):

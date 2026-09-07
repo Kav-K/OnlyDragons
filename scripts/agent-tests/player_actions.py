@@ -1,4 +1,14 @@
-"""Strict, bounded contracts for real protocol-player action fixtures."""
+"""Validate bounded protocol-player plans and independently cross-check client/server receipts.
+
+Plans describe packet intent. Client receipts establish actual submission and
+received inventory/messages; server journals establish joins, requests and target
+bindings. Scenario assertions must separately prove gameplay effects. Never infer
+damage acceptance from an action request or a successful socket write.
+
+Schema 2 receipts use epoch milliseconds, while server journals use monotonically
+ordered Paper ticks. Offline identities exist only in disposable loopback profiles.
+All validators reject unknown fields rather than silently accepting schema drift.
+"""
 from __future__ import annotations
 
 import entity_motion
@@ -13,36 +23,43 @@ import uuid
 
 
 class ActionValidationError(RuntimeError):
+    """The planned action or its observed evidence violates a bounded fixture contract."""
     pass
 
 
 def require(condition, message):
+    """Raise ActionValidationError with a diagnostic when a fixture requirement fails."""
     if not condition:
         raise ActionValidationError(message)
 
 
 def _object(value, *keys):
+    """Require an object with exactly the named fields and return it without mutation."""
     require(isinstance(value, dict) and set(value) == set(keys),
             'Unknown or missing object fields; expected: ' + ', '.join(keys))
     return value
 
 
 def _array(value, low, high):
+    """Require a list whose size falls within inclusive bounds and return it."""
     require(isinstance(value, list) and low <= len(value) <= high, 'Array size outside bounds')
     return value
 
 
 def _id(value):
+    """Require a lowercase bounded fixture identifier; return the original string."""
     require(isinstance(value, str) and re.fullmatch(r'[a-z][a-z0-9-]{0,31}', value), 'Invalid identifier')
     return value
 
 
 def _integer(value, low, high):
+    """Require an actual integer in inclusive bounds, rejecting booleans, and return it."""
     require(type(value) is int and low <= value <= high, 'Integer outside bounds or wrong type')
     return value
 
 
 def _number(value, low, high):
+    """Require a finite real value in inclusive bounds, rejecting booleans and overflow."""
     try:
         finite = type(value) in (int, float) and math.isfinite(value)
     except OverflowError:
@@ -53,16 +70,23 @@ def _number(value, low, high):
 
 
 def _boolean(value):
+    """Require a JSON boolean rather than a truthy substitute and return it."""
     require(type(value) is bool, 'Expected boolean')
     return value
 
 
 def _choice(value, choices):
+    """Require an exact string member of a closed action-value set and return it."""
     require(isinstance(value, str) and value in choices, 'Invalid enum value')
     return value
 
 
 def _bounded_tree(value, depth=0, count=None):
+    """Reject nulls, excessive nesting/node counts and unsupported/nonfinite JSON values.
+
+    The shared count list bounds the entire tree, not each branch independently. This
+    preflight precedes the action-specific schema checks.
+    """
     count = [0] if count is None else count
     count[0] += 1
     require(depth <= 12 and count[0] <= 4096, 'JSON nesting/node limit')
@@ -80,6 +104,7 @@ def _bounded_tree(value, depth=0, count=None):
 
 
 def _pairs(pairs):
+    """Build a JSON object while rejecting duplicate keys before later values can hide earlier ones."""
     result = {}
     for key, value in pairs:
         require(key not in result, 'Duplicate JSON key: ' + key)
@@ -88,6 +113,7 @@ def _pairs(pairs):
 
 
 def parse_plan(raw):
+    """Decode at most 64 KiB of UTF-8 plan bytes with duplicate/nonfinite rejection, then validate."""
     require(isinstance(raw, bytes) and 0 < len(raw) <= 65536, 'Plan exceeds byte limit')
     try:
         value = json.loads(raw.decode('utf-8'), object_pairs_hook=_pairs,
@@ -99,6 +125,13 @@ def parse_plan(raw):
 
 
 def validate_arguments(action, args):
+    """Enforce the exact argument schema and bounds for one supported packet action.
+
+    Coordinates use blocks, look uses degrees, reconnect delay uses milliseconds and
+    inventory slots use their declared container's numbering. Commands are bounded
+    OnlyDragons commands without a slash/control characters. Return args unchanged;
+    this validates intent and does not send a packet or authorize server behavior.
+    """
     if action == 'selectSlot':
         _object(args, 'slot'); _integer(args['slot'], 0, 8)
     elif action == 'look':
@@ -150,6 +183,12 @@ def validate_arguments(action, args):
 
 
 def validate_plan(plan):
+    """Require bounded unique targets, actors, sessions and an ordered total of at most 64 steps.
+
+    Each session ends with exactly one terminal action: reconnect before another session
+    and disconnect for the last. Attack references must be declared targets. Return
+    the input plan after validation; no actors are created here.
+    """
     _bounded_tree(plan)
     _object(plan, 'schemaVersion', 'planId', 'targets', 'actors')
     _integer(plan['schemaVersion'], 1, 1); _id(plan['planId'])
@@ -182,6 +221,11 @@ def validate_plan(plan):
 
 
 def load_plan(project, descriptor):
+    """Read one contained nonsymlink catalog plan and return its path, raw SHA-256 and parsed data.
+
+    Only bounded JSON under dev/game-tests/player-plans is admitted. The byte digest
+    binds runner and client to identical input, including formatting.
+    """
     require(isinstance(descriptor, dict), 'Missing scenario descriptor')
     value = descriptor.get('playerActionPlan')
     require(isinstance(value, str), 'Scenario requires an explicit playerActionPlan')
@@ -203,6 +247,11 @@ def load_plan(project, descriptor):
 
 
 def identities(run_id, plan):
+    """Derive run-scoped actor names and Minecraft offline UUIDs in plan order.
+
+    This mirrors OfflinePlayer name-based UUID bytes for disposable whitelists, not
+    Mojang authentication or a persistent human identity.
+    """
     require(isinstance(run_id, str) and re.fullmatch(r'[a-f0-9]{32}', run_id), 'Invalid action run ID')
     validate_plan(plan)
     result = []
@@ -237,6 +286,7 @@ PACKETS = {
 
 
 def _uuid(value):
+    """Require canonical lowercase hyphenated UUID text and return it."""
     require(isinstance(value, str)
             and re.fullmatch(r'[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}', value),
             'Invalid canonical UUID')
@@ -244,12 +294,17 @@ def _uuid(value):
 
 
 def _times(record, start, end):
+    """Require a nested ordered epoch-millisecond interval and return its endpoints."""
     begin = _integer(record.get('startedAtEpochMs'), start, end)
     finish = _integer(record.get('completedAtEpochMs'), begin, end)
     return begin, finish
 
 
 def _messages(messages):
+    """Validate bounded ordinary received chat, excluding fixture coordination markers.
+
+    Measure message size in UTF-16 code units to match the Java client boundary.
+    """
     for message in _array(messages, 0, 128):
         require(isinstance(message, str) and message, 'Missing/malformed received player message')
         try:
@@ -261,6 +316,11 @@ def _messages(messages):
 
 
 def _inventory_snapshots(snapshots, start, end):
+    """Validate ordered full window-0 inventory receipts with 46 per-slot byte hashes.
+
+    Require integer state IDs and receive times inside the session; return snapshots
+    without predicting server contents or deriving freshness from state ID alone.
+    """
     values = _array(snapshots, 0, 128)
     previous_time = start
     for sequence, snapshot in enumerate(values, 1):
@@ -278,6 +338,12 @@ def _inventory_snapshots(snapshots, start, end):
 
 
 def _inventory_confirmations(confirmations, snapshots, start, end):
+    """Validate unchanged-item slot confirmations against their current full inventory snapshot.
+
+    Reject confirmations for obsolete snapshots or skipped/reversed state IDs. State
+    may stay equal or increment modulo 32768; item bytes must stay identical. Return
+    validated rows so click checks can use the latest observed effective state.
+    """
     values = _array(confirmations, 0, 512)
     previous_time = start
     previous_snapshot = 1
@@ -309,6 +375,11 @@ def _inventory_confirmations(confirmations, snapshots, start, end):
 
 
 def _report_header(report, plan, plan_sha256, run_id, pins, start, end, passed, error):
+    """Bind a schema-2 report to the exact run, plan hash, protocol pins and expected outcome.
+
+    Require the disposable offline authentication mode and return its nested execution
+    window. Success and the named abort error are separate explicit caller policies.
+    """
     validate_plan(plan)
     require(isinstance(plan_sha256, str) and re.fullmatch(r'[a-f0-9]{64}', plan_sha256), 'Invalid plan digest')
     _integer(start, 1, 2**63 - 1); _integer(end, start, 2**63 - 1)
@@ -327,6 +398,11 @@ def _report_header(report, plan, plan_sha256, run_id, pins, start, end, passed, 
 
 
 def _ui_session_fields(session, plan):
+    """Admit UI receipt fields only for the bounded presentation/restart plan families.
+
+    Return a filtered copy for core session-schema validation; this does not validate
+    boss-bar contents, which bossbar_observation independently replays.
+    """
     require(isinstance(session, dict), 'Missing client session')
     fields = {'bossBars', 'styledMessages'}
     enabled = plan['planId'].startswith(('dragon-presentation-', 'dragon-restart-'))
@@ -336,7 +412,14 @@ def _ui_session_fields(session, plan):
 
 
 def validate_report(report, plan, plan_sha256, run_id, pins, start, end):
-    """Verify completed client submission evidence; server behavior is checked separately."""
+    """Verify completed client submissions and received session state against the pinned plan.
+
+    Require every actor/session/action in order, real login/load/teleport acknowledgments,
+    prior target bindings and fresh inventory snapshots for clicks. Reconcile unchanged
+    slot confirmations, wait for post-click resynchronization and validate optional
+    anvil/motion observations. Return the report. Server journals and feature assertions
+    remain separate requirements; submitted attack packets do not establish damage.
+    """
     begin, finish = _report_header(report, plan, plan_sha256, run_id, pins, start, end, True, '')
     expected_identities = identities(run_id, plan)
     actors = _array(report['actors'], len(plan['actors']), len(plan['actors']))
@@ -547,6 +630,7 @@ def _server_journal(scenario_report, player_report, plan, aborted=False):
 
 
 def validate_server_journal(scenario_report, player_report, plan):
+    """Require exact completed server/client actor lifecycles, requests and target bindings."""
     return _server_journal(scenario_report, player_report, plan)
 
 
@@ -554,6 +638,7 @@ ABORT_ERROR = 'Runner cleanup before action completion'
 
 
 def _abort_plan(plan):
+    """Restrict the cleanup-abort control to two single-session actors doing status then disconnect."""
     validate_plan(plan)
     require(plan['targets'] == [] and len(plan['actors']) == 2,
             'Cleanup-abort requires exactly two actors and no targets')
@@ -608,11 +693,17 @@ def validate_abort_report(report, plan, plan_sha256, run_id, pins, start, end):
 
 
 def validate_abort_journal(scenario_report, player_report, plan):
+    """Validate only the named abort journal prefix; normal completion rules remain separate."""
     return _server_journal(scenario_report, player_report, plan, aborted=True)
 
 
 def validate_messages(player_report, descriptor):
-    """Require catalog text in the exact actor/session's received ordinary chat."""
+    """Require catalog text in each exact actor/session's ordinary received chat.
+
+    Exact matches compare whole messages; containsAll requires every fragment within
+    one message. Matcher IDs are unique and bounded. Also validate required received
+    entity motion. Returns matcher definitions, not synthesized player output.
+    """
     require(isinstance(player_report, dict) and isinstance(descriptor, dict), 'Malformed actor message evidence/catalog')
     messages_by_session = {}
     actor_ids = set()

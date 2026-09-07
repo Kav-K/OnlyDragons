@@ -1,3 +1,17 @@
+<#
+.SYNOPSIS
+Updates this checkout's Cursor Java and terminal settings.
+.DESCRIPTION
+Resolves the supplied directory and requires bin/javac.exe, then rewrites the Java
+settings in .vscode/settings.json and OnlyDragons.code-workspace as UTF-8 JSON.
+The configured runtime label comes from versions.properties; this script does not
+execute Java to verify that the supplied installation has that version. Other
+top-level settings are retained while the named Java/terminal setting values are replaced.
+.PARAMETER JdkHome
+Existing Windows JDK directory to use for the language server, Gradle import and new integrated terminals.
+.NOTES
+Does not install a JDK or change persistent user/system environment variables. Reload the editor window to apply.
+#>
 param([Parameter(Mandatory=$true)][string]$JdkHome)
 $ErrorActionPreference = 'Stop'
 $resolvedJdk = (Resolve-Path -LiteralPath $JdkHome).Path

@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 # Install only the Linux Serena/JDTLS runtime. Does not start Minecraft or alter global tools.
+# Runtime root precedence: positional argument, ONLYDRAGONS_AGENT_RUNTIME, then
+# this checkout's .symphony/runtime. Requires existing supported system Python;
+# UV_PYTHON_DOWNLOADS=never prevents an implicit interpreter installation. Direct
+# artifacts are hash-pinned; uv resolves the Serena wheel's dependencies separately.
+# Extract only the language-server/lombok VSIX subtrees and leave project settings
+# to serena-launch.mjs. This installer does not authenticate or start an MCP client.
 set -euo pipefail
 project_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd -P)
 runtime_root=$(realpath -m "${1:-${ONLYDRAGONS_AGENT_RUNTIME:-$project_root/.symphony/runtime}}")
@@ -11,6 +17,8 @@ downloads="$runtime_root/agent-downloads"
 export UV_CACHE_DIR="$runtime_root/uv-cache"
 export UV_PYTHON_DOWNLOADS=never
 
+# Arguments: source URL, cache destination, SHA-256. Reuse verified cache bytes or
+# download to .part and rename after validation; no unverified file is published.
 fetch_verified() {
   local url=$1 output=$2 digest=$3
   if [[ -f "$output" ]] && printf '%s  %s\n' "$digest" "$output" | sha256sum -c --status; then return; fi
@@ -33,6 +41,8 @@ fi
 
 fetch_verified 'https://github.com/redhat-developer/vscode-java/releases/download/v1.56.0/java-linux-x64-1.56.0-1066.vsix' \
   "$downloads/java-linux-x64-1.56.0-1066.vsix" '3365249637a81705690ea7e4dc4c8533bfad36b65e754ebb1c839524e208ad41'
+# The authenticated VSIX is data: filter the two required subtrees and reject
+# traversal before writing into the designated runtime language-server directory.
 python3 - "$downloads/java-linux-x64-1.56.0-1066.vsix" "$runtime_root/jdtls-vscode-java-1.56.0" <<'PY'
 import pathlib, shutil, sys, zipfile
 target = pathlib.Path(sys.argv[2])

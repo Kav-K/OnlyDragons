@@ -1,3 +1,11 @@
+/**
+ * Isolated real-Paper companion build. Build the production root first: its artifact
+ * receipt selects the exact plugin JAR used at compile time. Production and Paper
+ * remain compile-only so the companion cannot package competing implementations.
+ *
+ * The runner separately verifies JAR hashes, scenario reports and process cleanup.
+ * Passing this project's JUnit tests or javadoc does not establish Minecraft behavior.
+ */
 import java.util.Properties
 
 plugins { java }

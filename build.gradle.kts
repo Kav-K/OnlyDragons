@@ -1,3 +1,12 @@
+/**
+ * Production plugin build and Windows lab entry points. versions.properties owns
+ * the Java/Paper/tool pins. Paper is compile-only at runtime; MockBukkit supplies
+ * unit boundaries and never substitutes for real-Paper scenario acceptance.
+ *
+ * build emits the production JAR path receipt and separate compatibility tools;
+ * check rejects competing Bukkit APIs. javadoc generates API documentation only.
+ * Minecraft Exec tasks use the same owned lab pipeline as Cursor's Run target.
+ */
 import java.util.Properties
 import java.util.zip.ZipFile
 
@@ -10,6 +19,7 @@ group = "com.kaveenk.onlydragons"
 version = "0.1.0-SNAPSHOT"
 
 val pins = Properties().apply { file("versions.properties").inputStream().use { load(it) } }
+/** Read a required shared pin, failing configuration rather than choosing a fallback version. */
 fun pin(name: String): String = requireNotNull(pins.getProperty(name)) { "Missing version: $name" }
 
 repositories {
@@ -37,6 +47,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:unchecked"))
 }
 
+// Expand only declared plugin metadata and register values as incremental inputs.
 tasks.processResources {
     val values = mapOf("version" to project.version, "apiVersion" to pin("minecraftVersion"))
     inputs.properties(values)
@@ -82,6 +93,8 @@ for (toolName in listOf("labHarness", "labFixture")) {
     }
 }
 
+// Inspect the union of source-set compile classpaths because the IDE merges them.
+// A second provider can break editor resolution even when javac itself succeeds.
 val verifyApiIsolation = tasks.register("verifyApiIsolation") {
     group = "verification"
     description = "Reject competing Bukkit APIs in the plugin's merged IDE classpath."

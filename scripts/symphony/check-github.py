@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Read-only GitHub readiness checks. Never print credentials or response bodies."""
+"""Check repository, published main and issue read access with the configured worker token.
+
+This script runs at import/CLI entry and exits on a missing token, network error or
+HTTP failure. It makes GET requests only and prints neither credentials nor response
+bodies. Successful reads do not prove write permission; token settings remain the
+authority for issue and pull-request mutations.
+"""
 import json
 import os
 import sys

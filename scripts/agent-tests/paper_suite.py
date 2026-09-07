@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Plan or run shared Paper suites; completed receipts revalidate their raw evidence."""
+"""Select, execute and independently replay catalog-bound Paper evidence cohorts.
+
+The suite binds every run to clean source bytes, pinned artifacts, archived JUnit,
+real companion/client observations and clean owned-process shutdown. A receipt's
+passed field is an index into raw evidence, never a substitute for replay. Plan mode
+performs no build or Minecraft launch. checkpoint adds task and milestone gates.
+
+Documentation outside source directories is excluded from runtime identity; Java
+Javadoc still changes source inputs and must not inherit an older receipt's hash.
+"""
 from __future__ import annotations
 
 import argparse
@@ -34,21 +43,33 @@ PLAYER_SETUP = ('server_thread', 'production_enabled', 'disposable_protocol_mode
 
 
 def git(project, *args):
+    """Run a checked Git command in project and return stdout bytes; failures propagate."""
     return subprocess.check_output(['git', *args], cwd=project)
 
 
 def digest_json(value):
+    """Hash finite JSON in canonical sorted-key compact ASCII form for stable manifests."""
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'),
                                      ensure_ascii=True, allow_nan=False).encode('utf-8')).hexdigest()
 
 
 def documentation(path):
+    """Identify non-source Markdown/docs paths exempt from runtime-input identity.
+
+    Files beneath any src directory are inputs even when their extension is Markdown;
+    this predicate is an explicit evidence policy, not a guess from a change's purpose.
+    """
     if path.startswith('src/') or '/src/' in path:
         return False  # Markdown resources are packaged into JARs too.
     return path.endswith('.md') or path.startswith('docs/')
 
 
 def tree_inputs(project, revision):
+    """List sorted regular-file Git blobs and modes at revision, excluding documentation.
+
+    Returns a committed tree manifest; source_identity separately hashes actual working
+    files and rejects untracked/hidden changes before claiming executable provenance.
+    """
     entries = []
     for row in git(project, 'ls-tree', '-rz', '--full-tree', revision).split(b'\0'):
         if not row:
@@ -93,6 +114,11 @@ def source_identity(project):
 
 
 def safe_path(project, relative):
+    """Resolve one relative POSIX evidence path inside project, rejecting traversal and symlinks.
+
+    Absolute paths, colons, backslashes and escaping ancestors are invalid. Return a
+    Path without creating it; callers still validate existence, type, size and bytes.
+    """
     require(isinstance(relative, str) and relative and '\\' not in relative,
             'Evidence paths must be repository-relative POSIX paths')
     path = PurePosixPath(relative)
@@ -121,12 +147,19 @@ def resolved_evidence_path(project, value):
 
 
 def names(value, description):
+    """Validate and return an ordered list of unique nonempty strings."""
     require(isinstance(value, list) and all(isinstance(item, str) and item for item in value)
             and len(value) == len(set(value)), 'Invalid/duplicate ' + description)
     return value
 
 
 def load_catalog(project):
+    """Cross-validate scenarios, positive/control cases, suites and affected-area mappings.
+
+    Require explicit actor admission, supported failure meanings, cleanup assertions
+    and full classifications for mandatory suites. Return catalog data; this structural
+    check neither executes the scenarios nor proves their assertions are sufficient.
+    """
     catalog = runner.strict_json(Path(project) / 'dev/game-tests/suites.json')
     scenarios = runner.strict_json(Path(project) / 'dev/game-tests/scenarios.json')
     require(type(catalog.get('schemaVersion')) is int and catalog['schemaVersion'] == 1,
@@ -192,7 +225,11 @@ def load_catalog(project):
 
 
 def required_cases(project, changed_paths):
-    """Return deterministic transitive scenario cases, failing closed on unmapped inputs."""
+    """Expand changed paths through transitive affected areas into catalog-ordered case IDs.
+
+    Documentation and explicit ignores may require no case; any other unmapped path
+    fails rather than silently selecting an empty validation set.
+    """
     catalog, _ = load_catalog(project)
     areas = catalog['areas']
     selected = set()
@@ -215,6 +252,7 @@ def required_cases(project, changed_paths):
 
 
 def changed_paths(project, base, head='HEAD'):
+    """Resolve a comparison commit and return its sorted no-rename diff paths against HEAD."""
     require(isinstance(base, str) and base and not base.startswith('-'), 'Invalid changed base')
     revision = git(project, 'rev-parse', '--verify', base + '^{commit}').decode().strip()
     paths = git(project, 'diff', '--no-renames', '--name-only', '-z', revision, head).decode().split('\0')
@@ -222,6 +260,11 @@ def changed_paths(project, base, head='HEAD'):
 
 
 def selection(project, suite_ids=None, base=None, revision='HEAD'):
+    """Derive a deterministic suite or changed-base selection; default to the complete suite.
+
+    Return selection metadata and ordered case IDs. This records why cases were chosen
+    so replay can independently reconstruct the same decision.
+    """
     catalog, _ = load_catalog(project)
     require(not (suite_ids and base), 'Choose suites or --changed-since')
     if base:
@@ -236,6 +279,7 @@ def selection(project, suite_ids=None, base=None, revision='HEAD'):
 
 
 def validate_selection(project, selected, revision='HEAD'):
+    """Recompute and require the receipt's exact nonempty selection from source and catalog."""
     require(isinstance(selected, dict), 'Missing suite selection')
     if selected.get('mode') == 'changed':
         expected = selection(project, base=selected.get('baseRevision'), revision=revision)
@@ -247,6 +291,11 @@ def validate_selection(project, selected, revision='HEAD'):
 
 
 def timestamps(report, start, end, label):
+    """Require an integer epoch-millisecond interval nested in its enclosing evidence window.
+
+    Reject booleans, reversed windows and completion over one second in the future;
+    return the validated start/end pair. Execution timeouts use separate monotonic clocks.
+    """
     first, last = report.get('startedAtEpochMs'), report.get('completedAtEpochMs')
     require(type(first) is int and type(last) is int and start <= first <= last <= end,
             'Missing/stale timestamps: ' + label)
@@ -255,6 +304,12 @@ def timestamps(report, start, end, label):
 
 
 def verify_scenario(report, case, descriptor, run_id, pins, start, end):
+    """Replay companion assertions, identity, Paper pin and cleanup against one catalog case.
+
+    Positive cases require every assertion to pass. A control may fail only its precise
+    declared assertion with the expected observed value; arbitrary exceptions or absent
+    cleanup never become successes. Return the number of verified assertion rows.
+    """
     expected = {'schemaVersion': 1, 'runId': run_id, 'scenarioId': case['scenarioId'],
                 'mechanicRevision': descriptor['mechanicRevision'], 'state': 'complete', 'syntheticActors': True}
     for key, value in expected.items():
@@ -312,6 +367,11 @@ def verify_scenario(report, case, descriptor, run_id, pins, start, end):
 
 
 def verify_player(report, case, run_id, pins, start, end):
+    """Replay legacy single-actor calibration metadata, actions, messages and exit policy.
+
+    Bind evidence to the run's epoch-millisecond window. Multi-actor action plans use
+    player_actions instead; a deliberate negative exit is accepted only for its control.
+    """
     pinned = runner.player_pins(pins)
     negative = case['expectation'] != 'positive'
     expected = {'schemaVersion': 1, 'runId': run_id, 'username': 'od_' + run_id[:13],
@@ -338,6 +398,11 @@ def verify_player(report, case, run_id, pins, start, end):
 
 
 def junit_counts(files):
+    """Independently count bounded JUnit testcase elements and reconcile declared summaries.
+
+    Reject entities, duplicate class/name identities across files, failures, errors,
+    skips and zero executed tests. Return counts without trusting build exit status alone.
+    """
     counts = dict.fromkeys(('tests', 'failures', 'errors', 'skipped'), 0)
     identities = set()
     require(files, 'Missing JUnit XML evidence')
@@ -367,6 +432,11 @@ def junit_counts(files):
 
 
 def process_cleanup(profile, port):
+    """Read Linux process ownership and the loopback port to require no remaining run process.
+
+    This replay check never terminates anything; execution must already have reaped its
+    children. A matching live working directory or open port invalidates cleanup.
+    """
     require(sys.platform == 'linux' and Path('/proc').is_dir(), 'Acceptance cleanup verification requires Linux/WSL')
     for entry in Path('/proc').iterdir():
         if entry.name.isdecimal():
@@ -380,6 +450,7 @@ def process_cleanup(profile, port):
 
 
 def checked_file(project, record, path_key, hash_key, exact=None):
+    """Resolve an evidence path and verify its current SHA-256, optionally requiring an exact path."""
     path = safe_path(project, record.get(path_key))
     if exact is not None:
         require(path == exact, 'Evidence path does not belong to this run: ' + path_key)
@@ -398,6 +469,14 @@ def reject_unstarted_run(result, record, result_path):
 
 
 def verify_case(project, record, case, descriptor, source, suite_root, restart_context=None):
+    """Reconstruct one case's result from original reports, logs, binaries and archived tests.
+
+    Bind run/source/catalog identity, strict timestamps, resource admission, profile
+    isolation, native shutdown and required observations. Rehash staged artifacts and
+    JUnit; for player cases also verify the exact action plan, locked client dependency,
+    received-message report and server journal. Return a derived summary, not an
+    acceptance decision. Restart cases delegate continuity checks to paper_restart.
+    """
     if descriptor.get("catalogMode") == "same-profile-restart-v1":
         import paper_restart
         return paper_restart.verify_case(sys.modules[__name__], project, record, case, descriptor, source, suite_root)
@@ -561,7 +640,13 @@ def verify_case(project, record, case, descriptor, source, suite_root, restart_c
 
 
 def validate_suite_receipt(project, receipt_path):
-    """Replay raw evidence; return the verified receipt, never trusting its pass flags."""
+    """Strictly replay a complete passed receipt against current clean source and raw evidence.
+
+    Require exact input/tree identity, selection order, unique sequential runs and one
+    consistent artifact cohort. Recompute every stored case summary and recheck source
+    after replay. Returns the original receipt only on success; no data is repaired and
+    no human or project milestone is accepted.
+    """
     project = Path(project).resolve()
     path = resolved_evidence_path(project, receipt_path)
     receipt = runner.strict_json(path, max_bytes=MAX_SUITE_RECEIPT_BYTES, artifact='suite receipt')
@@ -604,6 +689,7 @@ def validate_suite_receipt(project, receipt_path):
 
 
 def capture_tests(project, suite_root, case_id, actor):
+    """Archive current JUnit XML and hashes before the next case's build can overwrite them."""
     result = []
     roots = {'production': project / 'build/test-results/test',
              'companion': project / 'dev/game-tests/build/test-results/test'}
@@ -622,6 +708,11 @@ def capture_tests(project, suite_root, case_id, actor):
 
 
 def capture_run_files(project, reports, record, actor, build_root=None):
+    """Attach original result/report/log paths and digests to one suite record.
+
+    Keep restart phase roots explicit and report prelaunch resource failures before
+    trying to read nonexistent runtime evidence. Never synthesize a missing report.
+    """
     for kind in ('result', 'scenario', *(['player'] if actor else [])):
         report = reports / (kind + '.json')
         require(report.is_file(), 'Runner evidence is missing: ' + str(report))
@@ -637,7 +728,12 @@ def capture_run_files(project, reports, record, actor, build_root=None):
 
 
 def run_child(command, project, log_path):
-    """Forward cancellation to the owned runner; it retains its lease until JVM cleanup."""
+    """Run one suite child in its own Linux session while capturing its combined log.
+
+    On cancellation signal the runner PID and wait for its finally cleanup; do not kill
+    the descendant JVMs behind the runner or release its shared lease prematurely. This
+    helper has no independent global timeout; scenario/process owners bound their work.
+    """
     require(sys.platform == 'linux', 'Owned Paper runner processes require Linux/WSL')
     process = None
     with log_path.open('w', encoding='utf-8') as log:
@@ -664,6 +760,13 @@ def run_child(command, project, log_path):
 
 
 def execute(args):
+    """Plan without execution, or run the selected cases sequentially into a fresh receipt.
+
+    Execution requires Linux and clean source, snapshots each case's raw/JUnit evidence,
+    replays it immediately and checks source before/after. Publish receipt updates
+    atomically; preserve failedCase and failure state on errors. Return zero only after
+    final complete-cohort replay. No server is shared between unrelated cases.
+    """
     project = args.project.resolve()
     selected = selection(project, args.suite, args.changed_since)
     if args.plan:
@@ -733,6 +836,7 @@ def execute(args):
 
 
 def main():
+    """Parse plan/run/replay modes and turn termination into the owned cleanup path."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--project', type=Path, default=Path.cwd())
     parser.add_argument('--suite', action='append', choices=['all', 'regression', 'harness-controls'])

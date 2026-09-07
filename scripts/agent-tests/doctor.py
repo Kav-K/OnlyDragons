@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Check this worker's fixture access without building or starting Minecraft."""
+"""Read-only preflight for the isolated Paper runner; no build or Minecraft launch.
+
+Reports ready, waiting (retryable resource contention), or unavailable. A ready
+environment is permission to attempt a test, not proof that the plugin works.
+"""
 import argparse
 import json
 import os
@@ -13,6 +17,13 @@ import paper_test as runner
 
 
 def inspect(project, java_home, eula_file, lease_directory, paper_jar=None, memory_mib=1536):
+    """Collect independent input, JDK, EULA, lease, Paper-hash and combined-memory checks.
+
+    Probe shared-directory writability with a temporary file and acquire/release its
+    lease without waiting. memory_mib is the Paper heap; Linux admission includes a
+    256-MiB client. Preserve all diagnostics: errors outrank busy state. Never create
+    EULA consent, download artifacts or stop processes to make the probe succeed.
+    """
     checks, errors, waiting = {}, [], []
 
     def check(name, action):
@@ -83,6 +94,7 @@ def inspect(project, java_home, eula_file, lease_directory, paper_jar=None, memo
 
 
 def main():
+    """Print preflight JSON and return ready=0, waiting=75 or unavailable=1."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--project', type=Path, default=Path.cwd())
     parser.add_argument('--java-home', type=Path, default=os.environ.get('JAVA_HOME'))
