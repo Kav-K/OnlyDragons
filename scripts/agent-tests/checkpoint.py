@@ -290,9 +290,26 @@ def validate_no_weakening(project, base, validated):
         require(set(previous) <= set(current_scenarios), 'Previously registered scenario removed')
         for key, value in previous.items():
             if 'phases' in value or 'catalogMode' in value:
-                require(value.get('catalogMode') == current_scenarios[key].get('catalogMode')
-                        and value.get('phases') == current_scenarios[key].get('phases'),
-                        'Previously bound restart phases changed: ' + key)
+                updated = current_scenarios[key]
+                label = 'Previously bound restart phases changed: ' + key
+                require(('catalogMode' in value) == ('catalogMode' in updated)
+                        and value.get('catalogMode') == updated.get('catalogMode'), label)
+                old_phases, new_phases = value.get('phases'), updated.get('phases')
+                require(isinstance(old_phases, list) and isinstance(new_phases, list)
+                        and len(old_phases) == len(new_phases), label)
+                for position, (old_phase, new_phase) in enumerate(zip(old_phases, new_phases)):
+                    phase_label = label + '/' + str(position + 1)
+                    require(isinstance(old_phase, dict) and isinstance(new_phase, dict)
+                            and set(old_phase) == set(new_phase)
+                            and 'requiredAssertions' in old_phase, phase_label)
+                    # Preserve every other field, list order and JSON scalar type.
+                    metadata = lambda phase: json.dumps(
+                        {field: item for field, item in phase.items() if field != 'requiredAssertions'},
+                        sort_keys=True, allow_nan=False)
+                    require(metadata(old_phase) == metadata(new_phase), phase_label)
+                    require(names(old_phase['requiredAssertions'], phase_label, nonempty=True)
+                            <= names(new_phase['requiredAssertions'], phase_label, nonempty=True),
+                            phase_label + '/requiredAssertions')
             require(set(value['requiredAssertions']) <= set(current_scenarios[key]['requiredAssertions']),
                     'Previously required scenario assertion removed: ' + key)
             messages = {item['id']: item for item in current_scenarios[key].get('requiredPlayerMessages', [])}

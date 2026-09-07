@@ -21,7 +21,7 @@ public final class EnchantEffects {
             DomainChecks.text(revision, "gravity revision");
             airborneFractions = Map.copyOf(airborneFractions);
             airborneFractions.forEach((level, fraction) -> {
-                requireLevel(level, 5);
+                requireLevel(level, 6);
                 if (level == 0) throw new IllegalArgumentException("Gravity table levels start at 1");
                 DomainChecks.nonNegative(fraction, "gravity fraction");
             });
@@ -53,6 +53,18 @@ public final class EnchantEffects {
         });
     }
 
+    /** Expanded production attack profile. Overload is applied after ordinary crit by DamageCalculator. */
+    public static EnchantEffects checkpointTwo() {
+        return new EnchantEffects(new GravityProfile(OverloadCapture.REVISION,
+                Map.of(1, .05, 2, .10, 3, .15, 4, .20, 5, .30, 6, .40), false), new OverloadPolicy() {
+            public String revision() { return OverloadCapture.REVISION; }
+            public DamageModifiers modifiers(ShotContext shot, int level) {
+                if (shot.overload().level() != level) throw new IllegalArgumentException("Missing Overload capture");
+                return new DamageModifiers(Map.of(), Map.of());
+            }
+        });
+    }
+
     public DamageModifiers modifiers(ShotContext shot, Vector3 impactPosition, boolean airborneTarget) {
         var bonuses = new TreeMap<String, Double>();
         var multipliers = new TreeMap<String, Double>();
@@ -60,7 +72,7 @@ public final class EnchantEffects {
         int snipe = level(shot.enchantments(), "snipe", 4);
         if (power > 0) bonuses.put("enchant:power", POWER[power]);
         if (snipe > 0) bonuses.put("enchant:snipe", snipeFraction(snipe, shot.launchPosition(), impactPosition));
-        int gravityLevel = level(shot.enchantments(), "gravity", 5);
+        int gravityLevel = level(shot.enchantments(), "gravity", 6);
         int legacy = level(shot.enchantments(), "dragon_hunter", 5);
         if (legacy > 0 && (!gravity.legacyAlias() || gravityLevel > 0)) {
             throw new IllegalArgumentException("Dragon Hunter alias disabled or conflicts with Gravity");

@@ -261,6 +261,46 @@ implementation narrows to float before native assignment. T05b's fixture therefo
 compares the exact float-rounded normalized native projection separately from
 full-precision domain HP/credit. This does not change damage or ranking policy.
 [Source and failed iteration](evidence/t05b-ghost.md#first-physical-iteration-not-accepted).
+### T08d received plugin health bar (Paper 121)
+
+**Observed on pinned Paper, 6 September 2026:** clean runtime `03e8af7` sent
+one Adventure bar UUID to two protocol actors, preserved its identity through
+HP updates/reconnect and world return, retained zero HP through native animation,
+and removed it on actual retirement/reset/close. A labelled score-only fixture
+credited 200 with 100 HP removed; the received bar stayed at domain HP 900/1,000.
+The same checks passed again at clean `ae795386` with strict between-snapshot
+packet replay; fresh and death-animation two-boot UI checks also passed.
+[Exact artifact/run evidence and remaining combined integration gates](evidence/t08d-presentation.md).
+This is received protocol/state evidence, not full-client appearance, human feel
+or a researched Hypixel mechanic. Existing combat/phase policy is unchanged.
+### T08e bounded motion experiment (Paper 121)
+
+**Observed, 6 September 2026, iteration evidence:** AI-enabled HOVER ignores
+assigned velocity (zero displacement over ten ticks). Small public position/rotation
+steps update actual multipart geometry: the 500-step non-origin radius16 experiment
+measured parent step ≤0.15924, part step ≤0.33661 and part-corner offset ≤9.43167
+blocks. The production candidate subsequently stayed bounded at arena radii16/24/48,
+with maximum parent step0.20614 and yaw delta2.86481 degrees. These are separate
+server observations, not received-client smoothness, native-positive collision,
+or final acceptance. Clean candidate `eab1c01` then independently established
+native-positive damage, owned suppression/accounting and returning collisions
+against the moving parts. Received bound-dragon packets measured50.9842 blocks
+across87 updates (maximum received step0.604612, aggregating server ticks).
+These packet observations still do not establish rendered-client smoothness.
+[Exact iteration identities and remaining gates](evidence/t08e-motion-tracer.md).
+[The pinned public API](https://jd.papermc.io/paper/26.2/org/bukkit/entity/Entity.html)
+supplies the position adapter; no NMS/reflection is used by production or fixtures.
+
+### T03b declared expanded calibration
+
+The owner selected explicit Overload/Gravity tables on 6 September 2026 before
+implementation in [GH-67](https://github.com/Kav-K/OnlyDragons/issues/67#issuecomment-5561931960).
+These are **OnlyDragons decisions**, with no new claim about upstream internals.
+The [implementation contract](02-foundation-plan.md#t03b-expanded-bow-contract-gh-67)
+resolves our formerly deferred probability, multiplier order, Gravity VI and
+AIRBORNE classification. Earlier T05 evidence retains its original limited scope.
+[Focused Paper evidence](evidence/t03b-focused-paper.md) verifies the declared
+physical controls; final combined acceptance remains pending in T03b's ledger.
 
 ## Decisions still open
 

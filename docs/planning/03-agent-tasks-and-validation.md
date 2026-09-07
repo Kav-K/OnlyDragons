@@ -9,9 +9,11 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 [Checkpoint 2](07-checkpoint-two.md): T05b/#66 is complete through merged
 [PR #73](https://github.com/Kav-K/OnlyDragons/pull/73) at `29f0cf3`, accepting exactly
 `fatal-tempo-ghost-scaling`, P08 and P09 after the verified 34-case hosted cohort;
-[full evidence](evidence/t05b-suite.md). T03b/#67 is active and lead-assigned with
-its prerequisites integrated; Symphony dispatch follows the lead's label.
+[full evidence](evidence/t05b-suite.md). T03b/#67 is In review in [PR #79](https://github.com/Kav-K/OnlyDragons/pull/79),
+with focused evidence and final combined acceptance pending.
 T08d/#64 and T08e/#65 are In review pending their combined current-input cohort.
+Their [combined integration evidence](evidence/checkpoint2-ui-flight.md) records
+the focused pass and the first complete-cohort failure; no acceptance is implied.
 T06c/#70, T06b/#68 and T02c/#69 remain planned; T08c/#41 remains planned and
 undispatched. Other requirements, prior evidence and milestone states are unchanged.
 
@@ -106,6 +108,27 @@ T03b/#67 is active and lead-assigned with T05b/T06 integrated; the lead applies
 its Symphony label after this context is reconciled. T08d/T08e remain In review
 pending their combined cohort, and T06c/T06b/T02c remain planned. Human appearance,
 authenticated compatibility, balance/feel and M1–M5 remain unaccepted.
+
+### T03b — Expanded bow enchants (GH-67)
+
+**In review**, [PR #79](https://github.com/Kav-K/OnlyDragons/pull/79), branch
+`symphony/gh-67`. Clean runtime `5bdb0ee` includes main `a1070cc`; T05b/T06
+prerequisites are integrated. The [contract](02-foundation-plan.md#t03b-expanded-bow-contract-gh-67)
+preserves old items/shots and ten descriptors; IQ/Flame remain unavailable for T06c.
+
+[Focused evidence and failed iterations](evidence/t03b-focused-paper.md): 275
+production / six companion / 28 client tests; expanded-bow 49, equipment 25,
+catalog 30 assertions and the exact 15-row catalog-abort control, with clean owned
+JVM/resource cleanup. Real releases/collisions, fixture-controlled profiles/paused
+swap arrows and injected positive native damage remain explicitly distinguished.
+Static plan and changed-area selection pass. The lead combined this history with
+PR76's presentation/flight branch, preserving both immutable Overload capture and
+the projectile's captured Tracer profile. Equipment coverage now requires all 21
+explicit IDs, including legacy-only returning Tracer. The lead owns one final
+40-case hosted cohort/replay and T03b/T08d/T08e checkpoints; no duplicate
+local cohort or automated/milestone acceptance is claimed. Independent review/CI,
+Windows smoke, authenticated-client visuals/feel and performance remain separate.
+Next dependency: T06c consumes descriptors and the existing firing authority.
 
 ## Shared context update protocol
 
@@ -580,6 +603,47 @@ sequences, and 231 production/6 companion/28 client tests. The later complete
 checkpoint and current CI passed; [accepted evidence](evidence/t08b-suite.md).
 No prior fixture/gate is removed. The first human checkpoint is next; T08c remains
 planned and undispatched until that checkpoint and lead assignment.
+
+### T08d — Persistent dragon health and combat presentation
+
+**In review in [draft PR #74](https://github.com/Kav-K/OnlyDragons/pull/74),
+`symphony/gh-64`, [#64](https://github.com/Kav-K/OnlyDragons/issues/64).**
+Dependencies T08a/T08b and current main `7a38040` are integrated. The branch adds
+the read-only health UI, shared formatter, focused two-actor packet fixture and
+additive restart UI checks under `dragon-bossbar` / `combat-presentation`.
+[Focused clean-source evidence and failed iteration](evidence/t08d-presentation.md)
+record 235 production/six companion/30 client/273 Python tests and 18 Paper
+assertion rows plus 28 received-bar samples, including fresh final candidate
+`ae795386` with the newest validator. Fresh and death-animation two-boot UI runs
+also pass. Per [lead coordination](https://github.com/Kav-K/OnlyDragons/issues/64#issuecomment-5562281339),
+the lead will combine #64/#65 after #66 integration and owns the pending complete
+cohort/replay and both task checkpoints; the worker must not duplicate that suite.
+The evidence archive records exact inputs and additive integration notes.
+Human appearance/readability, authenticated-client compatibility, independent
+review/current CI and milestone acceptance remain separate. T02c/T06b consume
+the formatter boundary in document 02 after integration.
+### T08e — Bounded flight and returning Tracer (GH-65)
+
+**In review:** [PR #75](https://github.com/Kav-K/OnlyDragons/pull/75), based on main
+`7a38040`. Runtime candidate `eab1c01` passed clean pinned-Paper moving Tracer25,
+bounded flight18 and preserved-v1 Tracer58 assertions, moving restart18/13 phase
+assertions, and the intended abort cleanup control. Builds passed238 production,
+6 companion and31 client tests; Python274 and Windows/Linux CI passed.
+[Exact artifacts, failed iterations and focused evidence](evidence/t08e-motion-tracer.md).
+Final code candidate `778b425` gives moving restart its own registration/flag and
+preserves the original stationary fresh case. Clean moving restart0221c074 passed
+18/13 phase assertions; stationary fresh07e04373 passed17/13. Both boots in both
+runs exited cleanly. Production/client bytes match `eab1c01`; the companion changed
+only for the explicit restart variant/registration. Windows/Linux CI passes at
+`778b425`. The final follow-up commit records evidence only.
+
+Per the [lead's integration assignment](https://github.com/Kav-K/OnlyDragons/issues/65#issuecomment-5562281395),
+the lead combines #64/#65 histories after #66 and owns the complete combined-main
+cohort, strict receipt replay, both task checkpoints and final CI/independent review.
+No duplicate full cohort or milestone acceptance is claimed by this worker.
+Human full-client smoothness, aiming/return visibility and authenticated clients
+remain unrun. T08d consumes immutable views; T06b/T10 consume this backend/profile
+only after lead integration. The trusted new preset preserves the old nine/v1.
 
 ### T08c — Personal placement-based loot simulation
 

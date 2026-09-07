@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "planId": "dragon-presentation-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "kit",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev kit ordinary"
+              }
+            },
+            {
+              "id": "stats",
+              "action": "command",
+              "args": {
+                "command": "onlydragons stats"
+              }
+            },
+            {
+              "id": "setup",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon setup minecraft:overworld 0 100 0 32 test_dragon"
+              }
+            },
+            {
+              "id": "spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn calibration stationary"
+              }
+            },
+            {
+              "id": "veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "hit-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "hit-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "last",
+              "action": "command",
+              "args": {
+                "command": "onlydragons combat last"
+              }
+            },
+            {
+              "id": "again",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn calibration stationary"
+              }
+            },
+            {
+              "id": "reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "ghost-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "ghost-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "standard-spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn"
+              }
+            },
+            {
+              "id": "standard-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "training-spawn",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon spawn training"
+              }
+            },
+            {
+              "id": "training-reset",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev dragon reset"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "reconnect",
+              "action": "reconnect",
+              "args": {
+                "delayMillis": 1000
+              }
+            }
+          ]
+        },
+        {
+          "id": "s2",
+          "steps": [
+            {
+              "id": "lethal-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

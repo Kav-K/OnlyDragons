@@ -509,6 +509,42 @@ native death keeps diagnostic completion, never retries lethal damage, and remai
 protected until explicit reset. Reset/abort/disable do not mint results or rewards.
 The backend supplies T10's future target projection, not countdown/prefire or M3.
 
+### T08e candidate motion and returning Tracer contract
+
+GH-65 adopts the owner-declared `dragon-orbit/v1` candidate through the public
+AI-enabled HOVER position adapter. A smooth160-tick radial entry reaches horizontal
+radius8 with bob±1 and nominal0.20 blocks/tick. A conservative12-block part/stopping
+envelope reduces radius to4 in the smallest radius16 arena; parent step≤0.25 and
+yaw delta≤3 degrees are checked. Actual parent/eight-part boxes must retain a
+0.5-block arena margin. Unexpected movement, changed AI/phase, rejected/redirected
+teleport or unsafe geometry fails visibly through the existing combat retirement
+path. Native first-tick part initialization precedes route advancement.
+
+`DragonBackend` owns `DragonFlight`, advances it once per server tick through the
+existing combat synchronization, stops before managed lethal, and retains the
+route-center neighbourhood ticket demands through native removal. Reset/disable
+retires the backend and all demands. No new scheduler or damage authority is added.
+`DevelopmentDragonService.motion()` returns an immutable diagnostic view for T08d
+and later consumers. Human `dev dragon spawn [orbit|stationary]` defaults to orbit;
+the legacy no-argument service method explicitly retains stationary calibration.
+Existing deterministic command plans request `spawn stationary`.
+
+`tracer-return/v2` is frozen in `OwnedProjectile` from the trusted named
+`tracer_return_v2` definition (`tracer-return-v2`), with the original group's launch
+tick inherited by Duplex. Its candidate acquisition radii are8/16/24/32/40, retention
+is acquisition+8 for the same eligible target, and maximum turn is18 degrees/tick.
+First three original-group ticks are ballistic without vetoing genuine collisions.
+Closest visible current parts supply aim; obstruction, phase/generation loss and
+arena exit release eligibility. Native speed/drag/gravity and arrow UUID remain
+unchanged. The named development drawn bow supplies Tracer V and Duplex V, damage100,
+zero extra crit/ferocity and T01's total crit damage50. Old nine definitions and
+`tracer-continuity/v1` remain unchanged. There is no editable profile PDC field.
+
+These are review candidates in [PR #75](https://github.com/Kav-K/OnlyDragons/pull/75), with clean focused Paper evidence. [Evidence and gates](evidence/t08e-motion-tracer.md)
+separate server geometry, collisions, received motion and human feel. Targetless
+T07 admission/late attachment remains a scoped pre-spawn control; T10 owns future
+managed prepare/attach and countdown/hatch. No M3, attack, type or reward expansion.
+
 ### T08b frozen ranking and presentation
 
 Accepted through PR #62 at `1149169` after the complete 33-case hosted cohort,
@@ -539,6 +575,43 @@ Online participants receive plain Adventure chat; offline UUIDs remain ranked an
 use UUID labels when no live name is available. No offline queue or persistent
 history is added. Diagnostic cancelled/admin/reset/abort paths publish no board.
 Result inspection still exposes separate HP and credit; no rewards are enabled.
+
+### T08d health UI and shared formatter (GH-64, In review in PR #74)
+
+`application.PresentationFormatter` is the reusable display-only Adventure boundary:
+`number(double)` supplies locale-independent grouping and up to two decimals;
+`credit(double)` retains two displayed decimals; `label(String)`, `heading(String)`,
+`value(String,double)` and `healthTitle(String,double,double)` serve command,
+health and later item/book consumers. Trusted metadata remains authoritative;
+never parse presentation back into stats or ranking. Full-precision ranking,
+UUID fallback names, top ten and personal placement scope remain unchanged.
+`stats` is compact; `stats explain`, combat explanations and dragon status retain
+machine diagnostics. Result headings/numbers/colors use the same formatter.
+
+`paper.encounter.presentation.DragonHealthPresenter` owns one synchronous tick
+loop and reads the selected development generation, configured world and domain
+TargetState. `ManagedCombatService.ownsEntity` distinguishes retained ownership
+from historical defeated Views without relying on native liveness. One
+`application.DragonHealthBar` instance keeps one Adventure bar per generation,
+updates domain HP/max/percentage, and reconciles online world viewers by UUID
+and exact current Audience session. Zero HP retains the bar through native death
+animation; actual ownership retirement/reset removes it by the next tick. Close
+cancels the loop and removes all viewers before dragon/combat shutdown. Failed
+viewer delivery is counted, warned once, and cannot skip another viewer's cleanup.
+No bossbar sky/music/fog flags, native battle effects, rewards or competing damage
+path are introduced. Motion/backend/tickets remain T08e-owned.
+
+The focused packet fixture separately observes native player-owned collisions and
+production accounting, then samples actual received bar identity/title/percent/
+flags and message components for two actors. A named fixture-only score-only
+catalog uses the same deployed combat and UI adapters to distinguish 100 HP from
+200 credit. It is not a production balance selection. Existing restart fixtures
+add received empty/new/reset UI checks to their real two-boot evidence.
+[Final focused presentation and both restart variants](evidence/t08d-presentation.md)
+passed. Per lead coordination, combined #64/#65 integration after #66, the full
+cohort and both task checkpoints remain lead-owned and pending. Received ordinary
+chat evidence excludes overlay action-bar delivery; human appearance/authentication
+and milestone acceptance remain separate.
 
 ### Managed health
 
@@ -642,6 +715,33 @@ An absent table value, conflicting alias, or deferred Overload use fails explici
 crit chance; no probability or mega-crit formula is adopted. Enchant tables and
 trusted loadouts remain T02/lead-owned and unchanged. These compiled calibration
 rules are not a hot-reload system; a later balance change must carry a new revision.
+
+### T03b expanded bow contract (GH-67)
+
+Adopted within the owner-published scope: `enchant-checkpoint2-v2` selects
+Overload I–V +1/2/3/4/5 raw CC and CD, once through trusted item modifiers;
+mega probability `clamp((rawCC - 100)/100, 0, 1)` and factors
+1.10/1.20/1.30/1.40/1.50. Preserve the ordinary draw, then consume one extra
+sample only when Overload is equipped, including probability zero/one. The
+existing capture-before-final-veto lifecycle remains. `ShotContext.overload`
+is immutable and copied by Duplex; Ferocity retains parent diagnostics and
+already-mitigated basis, never rerolling or applying mega twice. Mega follows
+ordinary critical offense and precedes mitigation/cap.
+
+Gravity I–VI adds 5/10/15/20/30/40% alongside Power/Snipe only for the explicit
+AIRBORNE backend descriptor (dragon true, default dummy false). Height and
+phase do not change classification or widen native collision admission.
+These are OnlyDragons calibrations, not measured upstream parity. The
+[versioned tables and ten descriptors](../../src/main/resources/enchants/README.md)
+record max levels, compatibility and unavailable IQ/Flame consumers for T06c.
+
+`CalibrationLoadouts.compatibleRegistry()` routes exact v2/v3 histories.
+Legacy bows keep identity/selections and six-enchant rules; new distinct v3
+presets enable expanded effects. No automatic migration is defined. Inert
+catalog bindings use `ItemRegistry.catalog(revision)` before resolving IDs;
+old retained selections remain valid. [Catalog compatibility](../../src/main/resources/items/README.md#expanded-catalog-and-legacy-compatibility-t03b).
+This supersedes the deferred Overload/Gravity implementation statements above
+only for the explicit expanded profile; legacy calibration remains available.
 
 ### T05b level-based ghost policy (GH-66)
 

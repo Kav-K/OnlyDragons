@@ -416,13 +416,13 @@
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 issue #64 is In review, pending lead-coordinated integration and the combined current-input cohort, independent replay/review and acceptance. No completed requirements or evidence claimed; preserve T05b and earlier accepted behavior. Human outcomes and milestone gates remain separate."
+      "notice": "Combined PR #76 preserves the focused histories of #74/#75 and includes accepted Tempo. Clean integrated runtime 92a6f08 passed dragon-presentation with standard/training orbit and received UI checks. Full combined cohort, independent replay/review, both task checkpoints and current CI remain pending; no completed requirements or milestone acceptance. See the original feature evidence archives; human appearance/feel remain separate."
     },
     "T08e": {
       "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 issue #65 is In review, pending lead-coordinated integration and the combined current-input cohort, independent replay/review and acceptance. No completed requirements or evidence claimed; preserve T05b and earlier accepted behavior. Human outcomes and milestone gates remain separate."
+      "notice": "Combined PR #76 preserves the focused histories of #74/#75 and includes accepted Tempo. Clean integrated runtime 92a6f08 passed dragon-presentation with standard/training orbit and received UI checks. Full combined cohort, independent replay/review, both task checkpoints and current CI remain pending; no completed requirements or milestone acceptance. See the original feature evidence archives; human appearance/feel remain separate."
     },
     "T05b": {
       "status": "complete",
@@ -450,10 +450,10 @@
       "mergedRevision": "29f0cf3969e7d256b2f678a54f846d836ca6db9f"
     },
     "T03b": {
-      "status": "active",
+      "status": "in-review",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Lead-assigned T03b/#67 with T05b and T06 integrated; Symphony dispatch follows the lead label after accepted-context reconciliation. Own expanded-bow-enchantments under the recorded v2 contract; no implementation or completed evidence claimed. T06c/T06b/T02c remain downstream; rewards and milestone gates are unchanged."
+      "notice": "Draft PR79 history is combined in PR76 with health UI/flight. Focused clean 5bdb0ee passes 49 feature, 25 equipment, 30 catalog checks and exact abort control; see docs/planning/evidence/t03b-focused-paper.md. Captured Overload and Tracer profiles are both retained; exact 21-ID equipment oracle preserves all legacy/v3 definitions. Lead-owned final combined 40-case cohort/replay and three task checkpoints remain pending; no completed requirements or milestone acceptance."
     },
     "T06b": {
       "status": "planned",

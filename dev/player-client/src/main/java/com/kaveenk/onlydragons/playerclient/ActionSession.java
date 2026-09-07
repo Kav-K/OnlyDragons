@@ -28,6 +28,7 @@ final class ActionSession extends SessionAdapter {
     }
     private final String runId, actorId, behavior;
     private final ActionPlan plan;
+    private final boolean observeUi;
     final ActionPlan.SessionPlan definition;
     private final Owner owner;
     private final long started = System.currentTimeMillis();
@@ -35,8 +36,11 @@ final class ActionSession extends SessionAdapter {
     private final List<String> messages = new ArrayList<>();
     private final Map<String, UUID> targets = new LinkedHashMap<>();
     private final List<Map<String, Object>> bindings = new ArrayList<>();
+    private final EntityMotionObservation entityMotion = new EntityMotionObservation();
     private final Map<UUID, Integer> entities = new HashMap<>();
     private final Map<Integer, UUID> entityIds = new HashMap<>();
+    private final BossBarObservation bossBars = new BossBarObservation();
+    private final List<Map<String,Object>> styledMessages = new ArrayList<>();
     private final InventoryState inventory = new InventoryState();
     private boolean login, loaded, requestedDisconnect, disconnected, dead;
     private int next, sequence, teleports;
@@ -49,6 +53,7 @@ final class ActionSession extends SessionAdapter {
     ActionSession(String runId, String actorId, String behavior, ActionPlan plan,
                   ActionPlan.SessionPlan definition, Owner owner) {
         this.runId = runId; this.actorId = actorId; this.behavior = behavior;
+        this.observeUi = plan.planId().startsWith("dragon-presentation-") || plan.planId().startsWith("dragon-restart-");
         this.plan = plan; this.definition = definition; this.owner = owner;
     }
 
@@ -78,6 +83,8 @@ final class ActionSession extends SessionAdapter {
     private synchronized Effects receive(Packet packet) {
         if (!error.isEmpty() || disconnected || requestedDisconnect) return new Effects(List.of(), null, null);
         inventory.receive(packet);
+        if (observeUi && packet instanceof org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundBossEventPacket boss) bossBars.receive(boss);
+        entityMotion.receive(packet);
         var outgoing = new ArrayList<Packet>();
         if (packet instanceof ClientboundLoginPacket joined) {
             check(!joined.isOnlineMode(), "Action fixture requires disposable offline profile");
@@ -116,10 +123,19 @@ final class ActionSession extends SessionAdapter {
             }
         } else if (packet instanceof ClientboundSystemChatPacket chat && !chat.isOverlay()) {
             String value = flatten(chat.getContent());
+            if (observeUi && value.startsWith("OD_UI_CHECK:" + runId + ":")) {
+                bossBars.sample(value.substring(("OD_UI_CHECK:" + runId + ":").length()));
+                return new Effects(List.of(), null, null);
+            }
             if (value.startsWith("OD_BIND:")) { bind(value); return new Effects(List.of(), null, null); }
             if (value.startsWith("OD_ACTION:")) return trigger(value);
             if (value.startsWith("OD_PLAYER:")) return new Effects(List.of(), null, null);
-            if (!value.isEmpty()) { check(messages.size() < 128, "Player message count exceeded capture bound"); messages.add(value); }
+            if (!value.isEmpty()) { check(messages.size() < 128, "Player message count exceeded capture bound"); messages.add(value);
+                if (observeUi) {
+                String json=net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serialize(chat.getContent());
+                check(json.length()<=16384,"Styled message bound exceeded");
+                styledMessages.add(Map.of("text",value,"json",json));
+                } }
         }
         return new Effects(List.copyOf(outgoing), null, null);
     }
@@ -198,7 +214,7 @@ final class ActionSession extends SessionAdapter {
     }
     private Packet playerAction(PlayerAction action) { return new ServerboundPlayerActionPacket(action, Vector3i.ZERO, Direction.DOWN, ++sequence); }
     private static Hand hand(ActionPlan.Step step) { return step.text("hand").equals("main") ? Hand.MAIN_HAND : Hand.OFF_HAND; }
-    private static String flatten(Component component) {
+    static String flatten(Component component) {
         var text = new StringBuilder();
         ComponentFlattener.basic().flatten(component, value -> { check(text.length() + value.length() <= 2048, "Player message exceeded capture bound"); text.append(value); });
         return text.toString();
@@ -223,6 +239,8 @@ final class ActionSession extends SessionAdapter {
         result.put("id", definition.id()); result.put("startedAtEpochMs", started); result.put("completedAtEpochMs", completed);
         result.put("loginReceived", login); result.put("playerLoadedSent", loaded); result.put("teleportsAcknowledged", teleports);
         result.put("steps", List.copyOf(steps)); result.put("messages", List.copyOf(messages)); result.put("bindings", List.copyOf(bindings));
+        if (bossBars.sampled()) { result.put("bossBars",bossBars.report()); result.put("styledMessages",List.copyOf(styledMessages)); }
+        result.put("entityMotion", entityMotion.report());
         result.put("inventorySnapshots", inventory.snapshots());
         result.put("inventoryConfirmations", inventory.confirmations());
         result.put("disconnected", disconnected); result.put("passed", successful()); result.put("error", error);

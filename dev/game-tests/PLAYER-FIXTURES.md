@@ -49,6 +49,10 @@ staged launcher and Mojang bytes again.
    Advance after observing a real event or state change with a bounded
    `players.await(...)`. A fixed delay is appropriate for a known cooldown, not
    as a substitute for checking whether an event occurred.
+   For bow draws, start the hold timer only after the actor's native hand-raised
+   state is observed. A use request may wait behind chunk/teleport packets; two
+   requests six server ticks apart do not prove six ticks of native bow use.
+   Keep the real release-event/force and physical collision assertions separate.
 4. Bind an entity's actual UUID with `players.bind(targetRef, entityUuid)` before
    an attack. The client must have independently received that entity's network
    ID. Never target the nearest entity or manufacture a Bukkit callback.
@@ -57,12 +61,18 @@ staged launcher and Mojang bytes again.
    settled/final damage, cancellation and health. Its next-tick health records
    group every event on the same target/tick: a shared health delta must not be
    attributed independently to each of several hits.
+   Call `watch(target)` for each target before the trial. Restrict a trial's
+   evidence to its player/projectile/target identities and event/tick window;
+   a matching event from an earlier trial cannot satisfy it.
 6. Assert your deployed production API's expected result separately. For the
    stats system, query `context.production().equipment()` after actual equipment
    input and compare exact expected values. Combat consumers must assert their
    actual accepted `ShotContext`/`DamageResult`, deduplication, HP, contribution,
    procs and frozen result using independently calculated golden values. See
    `combat/CombatAccountingScenario.java` for existing deployed domain vectors.
+   Canonicalize unordered sets to sorted lists before recording expected and
+   observed values. Java set equality can pass while the serialized JSON arrays
+   differ in order; the independent report validator must still reject that row.
 7. Register the scenario, required assertions, case and changed-area mapping in
    `scenarios.json`, `suites.json` and `acceptance.json`. Add
    `testPlayerMode: protocol-actions-v1` and the repository-relative
@@ -138,3 +148,24 @@ The framework does not reset production encounters; #39 must establish its own
 disable/start absence/idle/new-spawn behavior. Starter greeting persistence is
 only the generic calibration. The suite replays each phase through the ordinary
 strict validator plus config/artifact/world/process continuity and lease checks.
+
+## Received dragon UI observations (T08d)
+
+The bounded `dragon-presentation-*` and `dragon-restart-*` plans enable
+`BossBarObservation` in the existing client. A run-bound `OD_UI_CHECK` marker
+samples the client's current state after preceding received bossbar packets.
+The receipt retains full UUID/title component/plain title/percent/style/flags,
+ordered add/update/remove events and samples; it also retains received chat
+component JSON alongside the existing plain messages. No packet creates damage
+or changes production UI. The separate `bossbar_observation.py` replay binds all
+required lifecycle samples to independently specified server HP oracles, checks
+stable per-generation identity across viewers/reconnect, and rejects duplicate
+or unobserved changes. Other plans retain their original receipt schema.
+
+The presentation scenario's score-only catalog is labelled fixture setup and
+uses the production public constructors with the single live combat authority;
+it does not change the normal catalog or select a new player-facing balance.
+Native collisions, deployed HP/credit and received bars remain separate evidence.
+Restart observations augment the existing two-boot fixture; disconnected players
+cannot establish receipt of shutdown packets. Connected adapter-close removal and
+actual process restart/empty next boot are reported as distinct lifecycle checks.

@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "planId": "expanded-bow-v2",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "legacy-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "legacy-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "gravity-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "gravity-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "zero-chance-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "zero-chance-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "swap-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "swap-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "swap-slot",
+              "action": "selectSlot",
+              "args": {
+                "slot": 1
+              }
+            },
+            {
+              "id": "return-slot",
+              "action": "selectSlot",
+              "args": {
+                "slot": 0
+              }
+            },
+            {
+              "id": "veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "native-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "native-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "grounded-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "grounded-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "cap-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "cap-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "lethal-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reset-flight-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "reset-flight-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

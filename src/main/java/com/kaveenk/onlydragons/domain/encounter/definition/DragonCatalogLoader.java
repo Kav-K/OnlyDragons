@@ -49,7 +49,7 @@ public final class DragonCatalogLoader {
         var tableData = new Fields(tableInput);
         var tableCatalog = tableData.identity("");
         String itemCatalog = tableData.get("itemCatalogRevision");
-        if (!items.revision().equals(itemCatalog)) throw new IllegalArgumentException("Item catalog revision mismatch");
+        var selectedItems = items.catalog(itemCatalog);
         var tables = new HashMap<String, DragonCatalog.SampleTable>();
         for (String id : tableData.ids("tables")) {
             String prefix = "table." + id + ".";
@@ -58,7 +58,7 @@ public final class DragonCatalogLoader {
             var bindings = new ArrayList<DragonCatalog.ItemBinding>();
             for (String itemId : tableData.ids(prefix + "items")) {
                 var reference = tableData.identity(prefix + "item." + itemId + ".");
-                var definition = items.definitions().get(itemId);
+                var definition = selectedItems.definitions().get(itemId);
                 if (!itemId.equals(reference.id()) || definition == null) throw new IllegalArgumentException("Unknown/mismatched item reference");
                 bindings.add(new DragonCatalog.ItemBinding(itemCatalog, reference, definition));
             }

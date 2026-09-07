@@ -184,3 +184,20 @@ Native damage and protocol calibration do not accept the future production
 firing/combat/loot adapters; each task still supplies feature-specific assertions
 against its actual deployed artifact. Authenticated clients and visuals remain
 separate evidence.
+
+## Received dragon motion
+
+`ActionSession` adds an optional `entityMotion` array to schema2 session reports.
+`EntityMotionObservation` records only received dragon spawns and position packets:
+up to128 UUID segments, each with packet count (at most10000), first/last XYZ,
+receive timestamps, path length and maximum received step. Removal, world change
+and network-ID reuse separate live tracking; no rendered-client smoothness is inferred.
+
+A catalog `requiredEntityMotion` matcher names an actor/session, a declared
+`targetRef`, minimum packet count/path and maximum received step. The production
+fixture binds the real dragon UUID with `PlayerFixture.bind`; `entity_motion.py`
+requires that exact UUID and fresh, finite, bounded evidence. Missing, stale,
+wrong-UUID and insufficient-motion controls fail. The moving-Tracer scenario also
+checks actual server multipart geometry and native collisions separately. Received
+updates may aggregate multiple server ticks; their maximum step is not the
+controller's per-tick limit. This helper composes with the separate UI observers.

@@ -16,10 +16,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.ofEntries(
+            Map.entry("moving-tracer", new com.kaveenk.onlydragons.gametests.encounter.MovingTracerScenario()),
+            Map.entry("dragon-flight", new com.kaveenk.onlydragons.gametests.encounter.DragonFlightScenario()),
+            Map.entry("dragon-motion-experiment", new com.kaveenk.onlydragons.gametests.encounter.DragonMotionExperiment()),
             Map.entry("dragon-restart-animation", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false, true)),
+            Map.entry("expanded-bow", new com.kaveenk.onlydragons.gametests.enchant.ExpandedBowScenario()),
             Map.entry("tempo-ghost", new com.kaveenk.onlydragons.gametests.enchant.TempoGhostScenario()),
+            Map.entry("dragon-presentation", new com.kaveenk.onlydragons.gametests.encounter.DragonPresentationScenario()),
             Map.entry("dragon-ranking", new com.kaveenk.onlydragons.gametests.encounter.DragonRankingScenario()),
             Map.entry("dragon-combat", new com.kaveenk.onlydragons.gametests.encounter.DragonCombatScenario()),
+            Map.entry("dragon-restart-moving", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false, false, true)),
             Map.entry("dragon-restart-fresh", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false)),
             Map.entry("dragon-restart-legacy", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(true)),
             Map.entry("practice-lifecycle", new com.kaveenk.onlydragons.gametests.combat.PracticeLifecycleScenario()),

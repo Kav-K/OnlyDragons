@@ -67,14 +67,17 @@ public final class DevelopmentDragonService implements AutoCloseable {
     }
     public enum SpawnMode { STANDARD, TRAINING, CALIBRATION }
     public UUID spawn() { return spawn(SpawnMode.STANDARD); }
-    public UUID spawn(SpawnMode mode) {
-        Objects.requireNonNull(mode);
+    /** Existing API consumers retain stationary targeting; commands select motion explicitly. */
+    public UUID spawn(SpawnMode mode) { return spawn(mode, DragonFlight.Mode.STATIONARY); }
+    public Optional<DragonFlight.View> motion() { thread(); return Optional.ofNullable(backend).map(DragonBackend::motion); }
+    public UUID spawn(SpawnMode mode, DragonFlight.Mode motion) {
+        Objects.requireNonNull(mode); Objects.requireNonNull(motion);
         check(); if (active()) throw new IllegalArgumentException("Dragon already active; reset its generation first.");
         var config = arena.current().orElseThrow(() -> new IllegalArgumentException(arena.problem()));
         var validated = config.validate(definitions.snapshot());
         var selected = mode == SpawnMode.CALIBRATION ? validated
                 : com.kaveenk.onlydragons.domain.encounter.definition.TrainingDragonSelection.select(validated, mode == SpawnMode.TRAINING);
-        DragonBackend candidate = new DragonBackend(config.location(), tickets, this::completed, value -> { if (backend == value) retirePresentation(); });
+        DragonBackend candidate = new DragonBackend(config.location(), config.bounds(), motion, tickets, this::completed, value -> { if (backend == value) retirePresentation(); });
         try {
             UUID id = combat.open(owner, candidate, config.bounds(), selected.maxHealth(), selected.defense(),
                     selected.identity().id(), selected.combatProfile(), Optional.of(selected), Math::random);
@@ -107,6 +110,7 @@ public final class DevelopmentDragonService implements AutoCloseable {
         double credit = v.contributions().values().stream().mapToDouble(c -> c.contributionDamage()).sum();
         return config + " | mode=" + spawnMode.name().toLowerCase(Locale.ROOT) + " generation=" + generation + " native=" + v.entityId() + " state=" + v.state()
                 + " nativePresent=" + !backend.released() + " nativeHP=" + backend.entity().getHealth()
+                + " motion=" + backend.motion()
                 + " animation=" + backend.entity().getDeathAnimationTicks() + " nativeOutcome=" + backend.outcome()
                 + " | definition=" + selection.identity() + " catalog=" + selection.catalogIdentity()
                 + " combat=" + selection.combatProfile().mechanic() + " phase=" + selection.phaseProfile().mechanic()

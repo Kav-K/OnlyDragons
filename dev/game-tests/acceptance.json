@@ -123,6 +123,7 @@
         "server_thread",
         "production_enabled",
         "codec_loaded_from_production",
+        "all_loadout_ids",
         "all_loadouts_roundtrip",
         "calibration_no_crit_bonus",
         "distinct_instance_ids",
@@ -1018,7 +1019,8 @@
         "level_2_real_target_moved",
         "level_3_real_target_moved",
         "level_4_real_target_moved",
-        "level_5_real_target_moved"
+        "level_5_real_target_moved",
+        "v1_trace_profile_preserved"
       ],
       "caseIds": [
         "tracer-continuity"
@@ -1110,7 +1112,9 @@
         "owned_listeners_removed",
         "owned_entities_removed",
         "owned_tasks_cancelled",
-        "owned_chunk_tickets_removed"
+        "owned_chunk_tickets_removed",
+        "restart_ui_initially_empty",
+        "restart_ui_active"
       ],
       "caseIds": [
         "dragon-restart-fresh"
@@ -1128,7 +1132,9 @@
         "owned_entities_removed",
         "owned_tasks_cancelled",
         "owned_chunk_tickets_removed",
-        "legacy_extra_preserved"
+        "legacy_extra_preserved",
+        "restart_ui_initially_empty",
+        "restart_ui_active"
       ],
       "caseIds": [
         "dragon-restart-legacy"
@@ -1145,7 +1151,9 @@
         "owned_listeners_removed",
         "owned_entities_removed",
         "owned_tasks_cancelled",
-        "owned_chunk_tickets_removed"
+        "owned_chunk_tickets_removed",
+        "restart_ui_initially_empty",
+        "restart_ui_active"
       ],
       "caseIds": [
         "dragon-restart-animation"
@@ -1222,6 +1230,196 @@
         "tempo-ghost"
       ],
       "scope": "Actual native bow and physical Duplex impacts, captured FT swap, global buff/expiry, full credit and level V HP, training/default/calibration selections and frozen result/reset. Other levels and queue/lifecycle boundaries have production JUnit controls."
+    },
+    "dragon-presentation": {
+      "assertions": [
+        "distinct_connected_viewers",
+        "world_viewers_ignore_aim",
+        "veto_no_hp_or_credit",
+        "physical_hp_and_credit",
+        "quit_viewer_released",
+        "lethal_domain_and_native",
+        "bar_retained_in_native_animation",
+        "actual_retirement_clears_bar",
+        "reset_clears_bar",
+        "ghost_credit_without_hp",
+        "ui_close_releases_viewers",
+        "no_rewards_or_native_loot",
+        "native_physical_observations",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "standard_mode_selection",
+        "standard_mode_orbit",
+        "standard_mode_reset_ui",
+        "training_mode_selection",
+        "training_mode_orbit",
+        "training_mode_reset_ui"
+      ],
+      "caseIds": [
+        "dragon-presentation"
+      ],
+      "scope": "Two received UI identities with actual owned-arrow HP, ghost-only proc credit, native death/removal, reconnect/world transfer/reset/close and formatted commands/results."
+    },
+    "dragon-motion-experiment": {
+      "assertions": [
+        "public_moves_succeeded",
+        "parent_step_bounded",
+        "real_parts_follow",
+        "admitted_hover_retained",
+        "actual_parts_within_small_arena",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-motion-experiment"
+      ],
+      "scope": "Bounded public dragon motion feasibility; no gameplay or client acceptance."
+    },
+    "dragon-flight": {
+      "assertions": [
+        "radius_16_sustained_geometry",
+        "radius_16_step_yaw_phase",
+        "radius_16_reset_cleanup",
+        "radius_24_sustained_geometry",
+        "radius_24_step_yaw_phase",
+        "radius_24_reset_cleanup",
+        "radius_48_sustained_geometry",
+        "radius_48_step_yaw_phase",
+        "radius_48_reset_cleanup",
+        "stationary_calibration_no_drift",
+        "cancelled_motion_retires_without_drift",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "redirected_yaw_retires",
+        "lost_ai_retires"
+      ],
+      "caseIds": [
+        "dragon-flight"
+      ],
+      "scope": "Production bounded route and stationary/reset/cancel cleanup; collision and received motion remain separate."
+    },
+    "moving-tracer": {
+      "assertions": [
+        "returning_volley_real_collisions",
+        "moving_volley_exact_health_credit",
+        "dragon_moved_during_volley",
+        "upward_arrow_curves_down_same_uuid",
+        "v2_turn_speed_and_grace",
+        "duplex_captured_v2_origin",
+        "moving_owned_native_suppression",
+        "v2_trace_profile",
+        "unenchanted_miss_honest",
+        "blocked_arrow_real_block_collision",
+        "out_of_range_exit_honest",
+        "targetless_v2_initial_ballistic",
+        "original_prefire_arrow_acquires_and_collides",
+        "parent_projectile_tickets_released",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed",
+        "moving_native_positive_control",
+        "moving_lethal_freezes_exact_result",
+        "animation_retains_parent_tickets_motion_stopped",
+        "native_death_releases_all_tickets_no_rewards",
+        "native_velocity_curves_to_current_part",
+        "real_collision_during_ballistic_grace",
+        "return_confirmed_draw",
+        "plain_confirmed_draw",
+        "blocked_confirmed_draw",
+        "range_confirmed_draw",
+        "prefire_confirmed_draw",
+        "grace_confirmed_draw",
+        "lethal_confirmed_draw"
+      ],
+      "caseIds": [
+        "moving-tracer"
+      ],
+      "scope": "Production moving dragon volleys and honest controls, separate targetless T07 admission and original-arrow collision."
+    },
+    "dragon-restart-moving": {
+      "assertions": [
+        "production_idle_on_boot",
+        "legacy_settings_preserved",
+        "loaded_arena_before_setup",
+        "production_real_dragon_active",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "dragon-restart-moving"
+      ],
+      "scope": "Production orbit active before shutdown (mandatory phase1 moving_at_first_shutdown), removed across real process restart, with saved config and fresh-generation controls; no authenticated or visual acceptance."
+    },
+    "expanded-bow": {
+      "assertions": [
+        "expanded_all_preset_ids",
+        "expanded_all_native_snapshots",
+        "legacy_no_mega",
+        "overload_zero_probability_capture",
+        "legacy_native_identity",
+        "expanded_native_identity",
+        "overload_stats_once",
+        "cross_catalog_forgery_rejected",
+        "primary_and_duplex_single_capture",
+        "mega_descendant_provenance",
+        "veto_no_damage_or_procs",
+        "native_positive_damage_suppressed",
+        "descriptor_not_height",
+        "cap_parent_and_proc_once",
+        "terminal_full_credit_no_late_children",
+        "reset_retires_expanded_group",
+        "new_generation_preserves_old_capture",
+        "expanded_resource_cleanup",
+        "infinite_quiver_unavailable_pdc",
+        "flame_unavailable_pdc",
+        "legacy_exact_accounting",
+        "legacy_physical_identity",
+        "legacy_native_projection",
+        "gravity_exact_accounting",
+        "gravity_physical_identity",
+        "gravity_native_projection",
+        "zero-chance_exact_accounting",
+        "zero-chance_physical_identity",
+        "zero-chance_native_projection",
+        "swap_exact_accounting",
+        "swap_physical_identity",
+        "swap_native_projection",
+        "native_exact_accounting",
+        "native_physical_identity",
+        "native_native_projection",
+        "grounded_exact_accounting",
+        "grounded_physical_identity",
+        "grounded_native_projection",
+        "cap_exact_accounting",
+        "cap_physical_identity",
+        "cap_native_projection",
+        "lethal_exact_accounting",
+        "lethal_physical_identity",
+        "lethal_native_projection",
+        "owned_resources_released",
+        "owned_listeners_removed",
+        "owned_entities_removed",
+        "owned_tasks_cancelled",
+        "owned_chunk_tickets_removed"
+      ],
+      "caseIds": [
+        "expanded-bow"
+      ],
+      "scope": "Real native bow releases and physical Dragon/Dummy targets through production Overload capture, Gravity descriptors, Duplex/Ferocity accounting, native suppression, swapped gear, cap/HP/full credit, PDC routing, terminal/reset. Pure tests cover levels/random boundaries and malformed capture inputs."
     }
   },
   "requirements": {
@@ -1332,7 +1530,11 @@
         "equipment-player",
         "protocol-player-soak",
         "projectile-player-feasibility",
-        "enchants-procs"
+        "enchants-procs",
+        "dragon-motion-experiment",
+        "dragon-flight",
+        "moving-tracer",
+        "dragon-restart-moving"
       ]
     },
     "equipment-service": {
@@ -1623,27 +1825,42 @@
     },
     "dragon-bossbar": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Authoritative domain HP/max/percent in one owned received boss bar per managed dragon generation, with two-player visibility and all lifecycle cleanup; credited/ghost damage never drives bar health.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-presentation",
+        "dragon-restart-fresh",
+        "dragon-restart-animation",
+        "dragon-restart-moving"
+      ]
     },
     "combat-presentation": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Readable shared stat/combat/leaderboard formatting with exact numerical/recipient/permission semantics and machine diagnostics preserved; actual received output plus component-style checks.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-presentation"
+      ]
     },
     "bounded-dragon-flight": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Versioned public-API native dragon motion and actual multipart containment within explicit arena margins, supported phases and lifecycle/ticket cleanup; stationary calibration remains available.",
-      "fixtures": []
+      "fixtures": [
+        "dragon-flight",
+        "moving-tracer",
+        "dragon-restart-moving"
+      ]
     },
     "moving-dragon-tracer": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Real moving-target Tracer flight, native physical collision and original pre-spawn projectile identity under a separately reviewed v2 profile; unenchanted/blocked/out-of-range controls and received motion evidence.",
-      "fixtures": []
+      "fixtures": [
+        "moving-tracer",
+        "tracer-continuity",
+        "tracer-cleanup-abort"
+      ]
     },
     "fatal-tempo-ghost-scaling": {
       "kind": "automated",
@@ -1655,9 +1872,11 @@
     },
     "expanded-bow-enchantments": {
       "kind": "automated",
-      "availability": "deferred",
+      "availability": "implemented",
       "description": "Named Overload and Gravity profiles, trusted levels/compatibility and captured/inherited decisions; deterministic boundaries and actual managed physical HP/credit/provenance with no unresolved effect advertised as active.",
-      "fixtures": []
+      "fixtures": [
+        "expanded-bow"
+      ]
     },
     "held-shortbow-loadouts": {
       "kind": "automated",

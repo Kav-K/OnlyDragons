@@ -24,9 +24,9 @@ T11/T12 gates, and it accepts no M1–M5 milestone or unobserved human outcome.
 
 T05b is complete after PR #73 merged at `29f0cf3969e7d256b2f678a54f846d836ca6db9f`;
 [its 34-case hosted evidence](evidence/t05b-suite.md) accepts exactly
-`fatal-tempo-ghost-scaling`, P08 and P09. T03b/#67 is active and lead-assigned:
-T05b and T06 are integrated, with the Symphony label applied by the lead after
-context reconciliation. T08d/#64 and T08e/#65 remain In review pending their
+`fatal-tempo-ghost-scaling`, P08 and P09. T03b/#67 is In review in [PR #79](https://github.com/Kav-K/OnlyDragons/pull/79):
+T05b/T06 are integrated and [focused worker checks](evidence/t03b-focused-paper.md)
+pass; final current-input combined acceptance remains lead-owned and pending. T08d/#64 and T08e/#65 remain In review pending their
 combined current-input cohort. T06c/#70, T06b/#68 and T02c/#69 remain planned.
 These six unfinished tasks retain empty completed requirements/evidence; the
 eight other new automated requirements remain unaccepted. T03b then T06c

@@ -14,16 +14,22 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 public final class DragonRestartScenario implements Scenario, Listener {
     private final boolean legacy;
     private final boolean animation;
+    private final boolean motion;
     private ScenarioContext c;
     private PlayerFixture players;
     private DevelopmentDragonService dragons;
     private int commands;
+    private final java.util.List<java.util.Map<String,Object>> uiChecks = new java.util.ArrayList<>();
     private byte[] initial;
     private RestartPhase phase;
     public DragonRestartScenario(boolean legacy) { this(legacy, false); }
-    public DragonRestartScenario(boolean legacy, boolean animation) { this.legacy = legacy; this.animation = animation; }
+    public DragonRestartScenario(boolean legacy, boolean animation) { this(legacy, animation, false); }
+    public DragonRestartScenario(boolean legacy, boolean animation, boolean motion) {
+        if(motion&&(legacy||animation))throw new IllegalArgumentException("Moving restart is a separate variant");
+        this.legacy = legacy; this.animation = animation; this.motion = motion;
+    }
     public void start(ScenarioContext context) throws Exception {
-        c = context; c.mechanicRevision("dragon-restart-v1"); dragons = c.production().dragons();
+        c = context; c.mechanicRevision(motion ? "dragon-restart-motion-v1" : "dragon-restart-v1"); dragons = c.production().dragons();
         phase = Objects.requireNonNull(c.restartPhase()); var world = Bukkit.getWorlds().getFirst();
         c.observe("restart", Map.of("parentRunId", phase.parentRunId(), "index", phase.index(), "nonce", phase.nonce()));
         c.observe("restartWorld", Map.of("uuid", world.getUID().toString(), "name", world.getName()));
@@ -52,6 +58,8 @@ public final class DragonRestartScenario implements Scenario, Listener {
     }
     private Path config() { return c.production().getDataFolder().toPath().resolve("config.yml"); }
     private void setup() {
+        uiSample("restart-idle", false);
+        c.check("restart_ui_initially_empty", true, c.production().dragonHealth().generation().isEmpty() && c.production().dragonHealth().viewerCount()==0);
         var world = players.player("alpha").getWorld();
         players.setupPosition("alpha", new Location(world, 0, 100, -16));
         if (phase.index() == 1) {
@@ -91,6 +99,8 @@ public final class DragonRestartScenario implements Scenario, Listener {
         } catch(Exception failure) { throw new IllegalStateException(failure); }
     }
     private void active() {
+        uiSample("restart-active", true);
+        c.check("restart_ui_active", 1, c.production().dragonHealth().viewerCount());
         var v = dragons.view().orElseThrow();
         var nativeDragon = (EnderDragon) Bukkit.getEntity(v.entityId());
         c.check("production_real_dragon_active", true, nativeDragon != null && nativeDragon.isValid() && nativeDragon.getDragonBattle() == null
@@ -103,12 +113,18 @@ public final class DragonRestartScenario implements Scenario, Listener {
                 c.check("duplicate_preserves_generation", v.encounterId().toString(), dragons.generation().orElseThrow().toString());
                 // Do not own/reset the production dragon in fixture cleanup. onDisable must remove it.
                 c.check("active_at_first_shutdown", true, nativeDragon.isValid() && c.production().combat().activeCount() == 1);
-                if(animation) prepareAnimationShutdown(nativeDragon); else quit();
+                if(animation) prepareAnimationShutdown(nativeDragon);
+                else if(motion) c.later(40,()->{
+                    c.check("moving_at_first_shutdown",true,dragons.motion().orElseThrow().state().equals("MOVING")
+                            &&dragons.motion().orElseThrow().steps()>20&&nativeDragon.getLocation().distance(dragons.arena().orElseThrow().location())>.1);
+                    quit();
+                });
+                else quit();
             }));
         } else command("reset", () -> {
             c.check("restart_new_spawn_reset_cleanup", true, Bukkit.getEntity(nativeDragon.getUniqueId()) == null && c.production().combat().activeCount() == 0
                     && c.production().bows().continuity().tickets().demandCount() == 0 && c.production().bows().continuity().tickets().reservedCount() == 0);
-            command("repeat", () -> { c.check("repeat_reset_no_result", true, c.production().combat().completions().isEmpty()); quit(); });
+            command("repeat", () -> { uiSample("restart-reset", false); c.check("restart_ui_reset_empty", true, c.production().dragonHealth().generation().isEmpty() && c.production().dragonHealth().viewerCount()==0); c.check("repeat_reset_no_result", true, c.production().combat().completions().isEmpty()); quit(); });
         });
     }
     private void prepareAnimationShutdown(EnderDragon dragon) {
@@ -128,6 +144,11 @@ public final class DragonRestartScenario implements Scenario, Listener {
                 });
             }));
         });
+    }
+    private void uiSample(String marker, boolean visible) {
+        uiChecks.add(Map.of("actor","alpha","session","s1","marker",marker,"generation",visible?"restart-current":"", "title",visible?"Test Dragon (Calibration)  |  1,000 / 1,000 HP  (100%)":"", "percent",visible?1.0:0.0));
+        c.observe("bossBarChecks",java.util.List.copyOf(uiChecks));
+        players.player("alpha").sendMessage(net.kyori.adventure.text.Component.text("OD_UI_CHECK:"+c.harness().runId()+":"+marker));
     }
     private void quit() { players.request("alpha", "quit"); players.await("actual quit", 100, () -> players.quits("alpha") == 1, () -> { c.observe("playerActions", players.journal()); c.finish(); }); }
     private void command(String step, Runnable next) { int before = commands; players.request("alpha", step); players.await("command " + step, 80, () -> commands > before, () -> c.later(2, next::run)); }

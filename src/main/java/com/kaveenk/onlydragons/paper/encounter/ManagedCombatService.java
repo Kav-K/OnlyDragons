@@ -61,7 +61,7 @@ public final class ManagedCombatService implements AutoCloseable {
     private final List<Consumer<SettledHit>> observers = new ArrayList<>();
     private final java.util.function.Predicate<UUID> protection = this::ownsEntity;
     private final Consumer<SettledHit> receiver = this::receive;
-    private final EnchantEffects effects = EnchantEffects.calibration();
+    private final EnchantEffects effects = EnchantEffects.checkpointTwo();
     private BukkitTask task;
     private boolean closed, notifying;
     private final ArrayDeque<String> diagnostics = new ArrayDeque<>();
@@ -224,7 +224,8 @@ public final class ManagedCombatService implements AutoCloseable {
         putBounded(last, damage.ownerId(), explanation, 128);
         Player player = Bukkit.getPlayer(damage.ownerId());
         if (player != null && f.contains(player)) {
-            player.sendMessage(Component.text(explanation.summary())); player.sendActionBar(Component.text(explanation.summary()));
+            player.sendMessage(com.kaveenk.onlydragons.application.PresentationFormatter.message(explanation.summary()));
+            player.sendActionBar(com.kaveenk.onlydragons.application.PresentationFormatter.combat(damage, explanation.healthRemaining()));
         }
     }
     private void synchronize(Fight f) {

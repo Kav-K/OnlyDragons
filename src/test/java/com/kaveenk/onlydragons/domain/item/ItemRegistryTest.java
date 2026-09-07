@@ -29,7 +29,7 @@ class ItemRegistryTest {
 
     @Test void calibrationContributionsAreExplicitAndEffectsRemainData() {
         var expectedFerocity = Map.of("ordinary", 0.0, "crit", 0.0, "ferocity_25", 25.0, "ferocity_100", 100.0,
-                "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0, "shortbow_v1", 0.0);
+                "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0, "shortbow_v1", 0.0, "tracer_return_v2", 0.0);
         assertEquals(expectedFerocity.keySet(), registry.definitions().keySet(),
                 "Every calibration definition needs explicit numeric expectations");
         assertEquals(WeaponDefinition.FiringMode.SHORTBOW, registry.definitions().get("shortbow_v1").weapon().firingMode());

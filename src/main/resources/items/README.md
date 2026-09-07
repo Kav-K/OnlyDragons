@@ -68,3 +68,23 @@ read valid data independently of renamed presentation and reject Invalid items
 without silently upgrading or granting them. Native firing/damage suppression
 and terminal physical claims belong to T06; T01b supplies permissions, grants
 and equipment events. Combat accounting and runtime catalog adoption are separate.
+
+## Expanded catalog and legacy compatibility (T03b)
+
+Production now uses `CalibrationLoadouts.compatibleRegistry()`, an exact router
+between retained `registry()` (`calibration-items-v2`) and `expandedRegistry()`
+(`calibration-items-v3`). The old schema, UUIDs, definition revisions and selections
+remain readable and editable under the original six-enchant rules. Existing bows
+are not relabeled or silently upgraded; grant a distinct v3 bow to use expanded
+effects. Unknown revisions and cross-catalog definition labels reject. The router's
+`catalog(revision)` scopes inert dragon-table bindings to that exact catalog, so
+the existing v2 ordinary-bow binding and retained Selection values stay unchanged.
+
+The nine presets listed above also have distinct `<id>_v3` counterparts, including
+`shortbow_v1_v3`, with the same defaults and resolved totals. Two additional drawn
+presets are `overload_v3` (Overload V, 100 damage / 200 raw CC / 55 CD / 0 Ferocity)
+and `gravity_v3` (Gravity VI, 100 damage / 0 CC / 50 CD / 0 Ferocity). Definition
+revision is `calibration-items-v3`; schema remains 1. The expanded catalog supports
+eight effects and exposes all ten [descriptors](../enchants/README.md). Infinite
+Quiver/Flame stay visibly unavailable at every selection boundary until T06c.
+Old immutable equipment/shot snapshots do not change after an edit or grant.

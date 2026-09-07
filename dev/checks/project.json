@@ -38,7 +38,19 @@
     },
     {
       "command": "onlydragons dev dragon spawn invalid",
-      "expect": "Usage: .*spawn \\[training\\|calibration\\]"
+      "expect": "Dragon request rejected: Mode must be standard, training or calibration\\."
+    },
+    {
+      "command": "onlydragons dev dragon status",
+      "expect": "Dragon . Idle"
+    },
+    {
+      "command": "onlydragons dev dragon spawn standard invalid",
+      "expect": "Dragon request rejected: Motion must be orbit or stationary\\."
+    },
+    {
+      "command": "onlydragons dev dragon spawn standard orbit extra",
+      "expect": "Usage: .*spawn \\[standard\\|training\\|calibration\\] \\[orbit\\|stationary\\]"
     }
   ]
 }

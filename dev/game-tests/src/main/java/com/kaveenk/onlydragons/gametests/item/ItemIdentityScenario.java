@@ -42,7 +42,14 @@ public final class ItemIdentityScenario implements Scenario {
         int roundtrips = 0;
         int calibratedSnapshots = 0;
         var expectedFerocity = Map.of("ordinary", 0.0, "crit", 0.0, "ferocity_25", 25.0,
-                "ferocity_100", 100.0, "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0, "shortbow_v1", 0.0);
+                "ferocity_100", 100.0, "ferocity_500", 500.0, "tracer", 0.0, "duplex", 0.0, "fatal_tempo", 25.0, "shortbow_v1", 0.0, "tracer_return_v2", 0.0);
+        var expectedIds = new java.util.TreeSet<>(expectedFerocity.keySet());
+        var actualIds = new java.util.TreeSet<>(registry.definitions().keySet());
+        context.check("all_loadout_ids", List.copyOf(expectedIds), List.copyOf(actualIds));
+        if (!expectedIds.equals(actualIds)) {
+            throw new IllegalStateException("Calibration loadout oracle mismatch: expected "
+                    + expectedIds + ", actual " + actualIds);
+        }
         for (String id : registry.definitions().keySet()) {
             ItemInstance instance = registry.create(id);
             var result = codec.decode(bytes(codec.encode(instance)));
@@ -56,8 +63,8 @@ public final class ItemIdentityScenario implements Scenario {
                         && snapshot.effective(StatKey.FEROCITY) == expectedFerocity.get(id)) calibratedSnapshots++;
             }
         }
-        context.check("all_loadouts_roundtrip", 9, roundtrips);
-        context.check("all_loadouts_production_snapshots", 9, calibratedSnapshots);
+        context.check("all_loadouts_roundtrip", expectedFerocity.size(), roundtrips);
+        context.check("all_loadouts_production_snapshots", expectedFerocity.size(), calibratedSnapshots);
         context.check("calibration_no_crit_bonus", true, registry.definitions().keySet().stream()
                 .map(id -> registry.resolve(registry.create(id)).resolvedWeapon())
                 .allMatch(weapon -> weapon.statModifiers().stream().noneMatch(modifier -> modifier.key() == StatKey.CRIT_DAMAGE)));

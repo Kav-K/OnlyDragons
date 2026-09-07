@@ -107,6 +107,7 @@
       "server_thread",
       "production_enabled",
       "codec_loaded_from_production",
+      "all_loadout_ids",
       "all_loadouts_roundtrip",
       "calibration_no_crit_bonus",
       "distinct_instance_ids",
@@ -1444,7 +1445,8 @@
       "level_2_real_target_moved",
       "level_3_real_target_moved",
       "level_4_real_target_moved",
-      "level_5_real_target_moved"
+      "level_5_real_target_moved",
+      "v1_trace_profile_preserved"
     ]
   },
   "tracer-cleanup-abort": {
@@ -1475,7 +1477,9 @@
       "owned_listeners_removed",
       "owned_entities_removed",
       "owned_tasks_cancelled",
-      "owned_chunk_tickets_removed"
+      "owned_chunk_tickets_removed",
+      "restart_ui_initially_empty",
+      "restart_ui_active"
     ],
     "phases": [
       {
@@ -1499,7 +1503,9 @@
           "duplicate_preserves_generation",
           "active_at_first_shutdown",
           "failed_read_keeps_loaded_arena",
-          "failed_read_fixture_restores_saved_bytes"
+          "failed_read_fixture_restores_saved_bytes",
+          "restart_ui_initially_empty",
+          "restart_ui_active"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-1-v1.json",
         "requiredActorMessages": [
@@ -1570,7 +1576,10 @@
           "old_native_absent_after_chunk_load",
           "selected_definition_readback",
           "restart_new_spawn_reset_cleanup",
-          "repeat_reset_no_result"
+          "repeat_reset_no_result",
+          "restart_ui_initially_empty",
+          "restart_ui_active",
+          "restart_ui_reset_empty"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
         "requiredActorMessages": [
@@ -1624,7 +1633,9 @@
       "owned_entities_removed",
       "owned_tasks_cancelled",
       "owned_chunk_tickets_removed",
-      "legacy_extra_preserved"
+      "legacy_extra_preserved",
+      "restart_ui_initially_empty",
+      "restart_ui_active"
     ],
     "phases": [
       {
@@ -1649,7 +1660,9 @@
           "duplicate_preserves_generation",
           "active_at_first_shutdown",
           "failed_read_keeps_loaded_arena",
-          "failed_read_fixture_restores_saved_bytes"
+          "failed_read_fixture_restores_saved_bytes",
+          "restart_ui_initially_empty",
+          "restart_ui_active"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-1-v1.json",
         "requiredActorMessages": [
@@ -1721,7 +1734,10 @@
           "old_native_absent_after_chunk_load",
           "selected_definition_readback",
           "restart_new_spawn_reset_cleanup",
-          "repeat_reset_no_result"
+          "repeat_reset_no_result",
+          "restart_ui_initially_empty",
+          "restart_ui_active",
+          "restart_ui_reset_empty"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
         "requiredActorMessages": [
@@ -1868,7 +1884,9 @@
       "owned_listeners_removed",
       "owned_entities_removed",
       "owned_tasks_cancelled",
-      "owned_chunk_tickets_removed"
+      "owned_chunk_tickets_removed",
+      "restart_ui_initially_empty",
+      "restart_ui_active"
     ],
     "phases": [
       {
@@ -1893,7 +1911,9 @@
           "active_at_first_shutdown",
           "failed_read_keeps_loaded_arena",
           "failed_read_fixture_restores_saved_bytes",
-          "animation_owned_at_shutdown"
+          "animation_owned_at_shutdown",
+          "restart_ui_initially_empty",
+          "restart_ui_active"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-animation-v1.json",
         "requiredActorMessages": [
@@ -1964,7 +1984,10 @@
           "old_native_absent_after_chunk_load",
           "selected_definition_readback",
           "restart_new_spawn_reset_cleanup",
-          "repeat_reset_no_result"
+          "repeat_reset_no_result",
+          "restart_ui_initially_empty",
+          "restart_ui_active",
+          "restart_ui_reset_empty"
         ],
         "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-2-v1.json",
         "requiredActorMessages": [
@@ -2040,7 +2063,7 @@
         "actor": "alpha",
         "session": "s2",
         "containsAll": [
-          "Dragon defeated! Damage leaderboard (credited damage)"
+          "Dragon defeated! Credited damage"
         ]
       },
       {
@@ -2066,7 +2089,7 @@
         "session": "s2",
         "containsAll": [
           "#1 ",
-          "_0 - 1200.00 credited damage"
+          "_0 - 1,200.00 credited damage"
         ]
       },
       {
@@ -2074,7 +2097,7 @@
         "actor": "alpha",
         "session": "s2",
         "containsAll": [
-          "Your placement: #1 - 1200.00 credited damage"
+          "Your placement: #1 - 1,200.00 credited damage"
         ]
       },
       {
@@ -2082,7 +2105,7 @@
         "actor": "beta",
         "session": "s1",
         "containsAll": [
-          "Dragon defeated! Damage leaderboard (credited damage)"
+          "Dragon defeated! Credited damage"
         ]
       },
       {
@@ -2108,7 +2131,7 @@
         "session": "s1",
         "containsAll": [
           "#1 ",
-          "_0 - 1200.00 credited damage"
+          "_0 - 1,200.00 credited damage"
         ]
       },
       {
@@ -2178,5 +2201,361 @@
         ]
       }
     ]
+  },
+  "dragon-presentation": {
+    "mechanicRevision": "dragon-presentation-v1",
+    "requiredAssertions": [
+      "distinct_connected_viewers",
+      "world_viewers_ignore_aim",
+      "veto_no_hp_or_credit",
+      "physical_hp_and_credit",
+      "quit_viewer_released",
+      "lethal_domain_and_native",
+      "bar_retained_in_native_animation",
+      "actual_retirement_clears_bar",
+      "reset_clears_bar",
+      "ghost_credit_without_hp",
+      "ui_close_releases_viewers",
+      "no_rewards_or_native_loot",
+      "native_physical_observations",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "standard_mode_selection",
+      "standard_mode_orbit",
+      "standard_mode_reset_ui",
+      "training_mode_selection",
+      "training_mode_orbit",
+      "training_mode_reset_ui"
+    ],
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/dragon-presentation-v1.json",
+    "requiredActorMessages": [
+      {
+        "id": "ui-stats",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Weapon Damage: 100"
+        ]
+      },
+      {
+        "id": "ui-combat",
+        "actor": "alpha",
+        "session": "s1",
+        "containsAll": [
+          "Health removed: 100",
+          "Credited damage: 100"
+        ]
+      },
+      {
+        "id": "ui-result",
+        "actor": "beta",
+        "session": "s2",
+        "containsAll": [
+          "Your placement: #1 - 1,000.00 credited damage"
+        ]
+      }
+    ]
+  },
+  "dragon-motion-experiment": {
+    "mechanicRevision": "dragon-motion-experiment-v1",
+    "requiredAssertions": [
+      "public_moves_succeeded",
+      "parent_step_bounded",
+      "real_parts_follow",
+      "admitted_hover_retained",
+      "actual_parts_within_small_arena",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ]
+  },
+  "dragon-flight": {
+    "mechanicRevision": "dragon-flight-v1",
+    "requiredAssertions": [
+      "radius_16_sustained_geometry",
+      "radius_16_step_yaw_phase",
+      "radius_16_reset_cleanup",
+      "radius_24_sustained_geometry",
+      "radius_24_step_yaw_phase",
+      "radius_24_reset_cleanup",
+      "radius_48_sustained_geometry",
+      "radius_48_step_yaw_phase",
+      "radius_48_reset_cleanup",
+      "stationary_calibration_no_drift",
+      "cancelled_motion_retires_without_drift",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "redirected_yaw_retires",
+      "lost_ai_retires"
+    ]
+  },
+  "moving-tracer": {
+    "mechanicRevision": "moving-tracer-v2",
+    "requiredAssertions": [
+      "returning_volley_real_collisions",
+      "moving_volley_exact_health_credit",
+      "dragon_moved_during_volley",
+      "upward_arrow_curves_down_same_uuid",
+      "v2_turn_speed_and_grace",
+      "duplex_captured_v2_origin",
+      "moving_owned_native_suppression",
+      "v2_trace_profile",
+      "unenchanted_miss_honest",
+      "blocked_arrow_real_block_collision",
+      "out_of_range_exit_honest",
+      "targetless_v2_initial_ballistic",
+      "original_prefire_arrow_acquires_and_collides",
+      "parent_projectile_tickets_released",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed",
+      "moving_native_positive_control",
+      "moving_lethal_freezes_exact_result",
+      "animation_retains_parent_tickets_motion_stopped",
+      "native_death_releases_all_tickets_no_rewards",
+      "native_velocity_curves_to_current_part",
+      "real_collision_during_ballistic_grace",
+      "return_confirmed_draw",
+      "plain_confirmed_draw",
+      "blocked_confirmed_draw",
+      "range_confirmed_draw",
+      "prefire_confirmed_draw",
+      "grace_confirmed_draw",
+      "lethal_confirmed_draw"
+    ],
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/moving-tracer-v2.json",
+    "requiredEntityMotion": [
+      {
+        "id": "moving-dragon-received",
+        "actor": "alpha",
+        "session": "first",
+        "targetRef": "moving-dragon",
+        "minPackets": 30,
+        "minPath": 5,
+        "maxStep": 1
+      }
+    ]
+  },
+  "dragon-restart-moving": {
+    "catalogMode": "same-profile-restart-v1",
+    "testPlayerMode": "protocol-actions-v1",
+    "mechanicRevision": "dragon-restart-motion-v1",
+    "requiredAssertions": [
+      "production_idle_on_boot",
+      "legacy_settings_preserved",
+      "loaded_arena_before_setup",
+      "production_real_dragon_active",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ],
+    "phases": [
+      {
+        "index": 1,
+        "expectation": "positive",
+        "mechanicRevision": "dragon-restart-motion-v1",
+        "requiredAssertions": [
+          "production_idle_on_boot",
+          "legacy_settings_preserved",
+          "loaded_arena_before_setup",
+          "production_real_dragon_active",
+          "owned_resources_released",
+          "owned_listeners_removed",
+          "owned_entities_removed",
+          "owned_tasks_cancelled",
+          "owned_chunk_tickets_removed",
+          "denial_no_config_or_memory_change",
+          "unconfigured_spawn_rejected",
+          "production_setup_saved",
+          "invalid_keeps_previous",
+          "duplicate_preserves_generation",
+          "active_at_first_shutdown",
+          "failed_read_keeps_loaded_arena",
+          "failed_read_fixture_restores_saved_bytes",
+          "moving_at_first_shutdown",
+          "restart_ui_initially_empty",
+          "restart_ui_active"
+        ],
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-motion-1-v1.json",
+        "requiredActorMessages": [
+          {
+            "id": "message-0",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon spawned."
+            ]
+          },
+          {
+            "id": "message-1",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "rewards disabled"
+            ]
+          },
+          {
+            "id": "message-2",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "You do not have permission to use dragon controls."
+            ]
+          },
+          {
+            "id": "message-3",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon arena saved."
+            ]
+          },
+          {
+            "id": "message-4",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon request rejected:"
+            ]
+          },
+          {
+            "id": "save-fails",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon arena save failed; previous arena retained:"
+            ]
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "expectation": "positive",
+        "mechanicRevision": "dragon-restart-motion-v1",
+        "requiredAssertions": [
+          "production_idle_on_boot",
+          "legacy_settings_preserved",
+          "loaded_arena_before_setup",
+          "production_real_dragon_active",
+          "owned_resources_released",
+          "owned_listeners_removed",
+          "owned_entities_removed",
+          "owned_tasks_cancelled",
+          "owned_chunk_tickets_removed",
+          "old_native_absent_after_chunk_load",
+          "selected_definition_readback",
+          "restart_new_spawn_reset_cleanup",
+          "repeat_reset_no_result",
+          "restart_ui_initially_empty",
+          "restart_ui_active",
+          "restart_ui_reset_empty"
+        ],
+        "playerActionPlan": "dev/game-tests/player-plans/dragon-restart-motion-2-v1.json",
+        "requiredActorMessages": [
+          {
+            "id": "message-0",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon spawned."
+            ]
+          },
+          {
+            "id": "message-1",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "rewards disabled"
+            ]
+          },
+          {
+            "id": "message-2",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "Dragon reset."
+            ]
+          },
+          {
+            "id": "message-3",
+            "actor": "alpha",
+            "session": "s1",
+            "containsAll": [
+              "already retired"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expanded-bow": {
+    "mechanicRevision": "expanded-bow-v2",
+    "requiredAssertions": [
+      "expanded_all_preset_ids",
+      "expanded_all_native_snapshots",
+      "legacy_no_mega",
+      "overload_zero_probability_capture",
+      "legacy_native_identity",
+      "expanded_native_identity",
+      "overload_stats_once",
+      "cross_catalog_forgery_rejected",
+      "primary_and_duplex_single_capture",
+      "mega_descendant_provenance",
+      "veto_no_damage_or_procs",
+      "native_positive_damage_suppressed",
+      "descriptor_not_height",
+      "cap_parent_and_proc_once",
+      "terminal_full_credit_no_late_children",
+      "reset_retires_expanded_group",
+      "new_generation_preserves_old_capture",
+      "expanded_resource_cleanup",
+      "infinite_quiver_unavailable_pdc",
+      "flame_unavailable_pdc",
+      "legacy_exact_accounting",
+      "legacy_physical_identity",
+      "legacy_native_projection",
+      "gravity_exact_accounting",
+      "gravity_physical_identity",
+      "gravity_native_projection",
+      "zero-chance_exact_accounting",
+      "zero-chance_physical_identity",
+      "zero-chance_native_projection",
+      "swap_exact_accounting",
+      "swap_physical_identity",
+      "swap_native_projection",
+      "native_exact_accounting",
+      "native_physical_identity",
+      "native_native_projection",
+      "grounded_exact_accounting",
+      "grounded_physical_identity",
+      "grounded_native_projection",
+      "cap_exact_accounting",
+      "cap_physical_identity",
+      "cap_native_projection",
+      "lethal_exact_accounting",
+      "lethal_physical_identity",
+      "lethal_native_projection",
+      "owned_resources_released",
+      "owned_listeners_removed",
+      "owned_entities_removed",
+      "owned_tasks_cancelled",
+      "owned_chunk_tickets_removed"
+    ],
+    "testPlayerMode": "protocol-actions-v1",
+    "playerActionPlan": "dev/game-tests/player-plans/expanded-bow-v2.json"
   }
 }
