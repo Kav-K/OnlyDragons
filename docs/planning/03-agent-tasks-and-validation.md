@@ -24,6 +24,11 @@ zero failures/errors/skips; [exact evidence and limitations](evidence/checkpoint
 T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort). MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; T06b/#68 and T02c/#69 were subsequently accepted through [PR #86](https://github.com/Kav-K/OnlyDragons/pull/86); [combined acceptance evidence](evidence/checkpoint2-held-books.md). T08c/#41 remains planned and undispatched. Other requirements, prior
 evidence and milestone states are unchanged; human outcomes remain separate.
 
+The separate [Windows operator record](evidence/checkpoint2-windows.md) covers
+the 321-test build, repaired UTF-8 lab logging and all 17 command smoke checks.
+It retains the original gameplay cohort's identity. Final Play deployment and
+authenticated-client visual/input observations are separate from these checks.
+
 Baseline reconciled **6 September 2026** after PR #62 merged at
 `114916905c68f5574b2ee437b8db5bd2a187e390`: T08b's frozen ranking and received
 presentation are accepted through exactly `frozen-damage-ranking`; [full evidence](evidence/t08b-suite.md).
