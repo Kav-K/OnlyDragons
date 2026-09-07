@@ -234,7 +234,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
     }
     /**
      * Samples continuity once per frame tick and compares current-tick applied
-     * velocity with the native arrow. Aim UUID/boxes must match live Bukkit parts;
+     * velocity with the native arrow. Counts matching live Bukkit part UUID/box witnesses;
      * distance samples come from independent nearest-box geometry after grace.
      * Only the obstruction stage mutates blocks, after a lock is observed.
      */
