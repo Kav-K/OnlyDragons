@@ -9,7 +9,17 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Domain reservation/terminal-claim and captured-Duplex contracts, including separate owner
+ * sessions, tick/cadence boundaries and creating-thread rejection. The trusted Duplex fixture
+ * launches at tick 20 with draw 0.5 and speed 3; direct DTO emission creates no real arrow.
+ * Actual Paper input, spawning, ammunition and collision remain adapter scenarios.
+ */
 class FiringBoundaryTest {
+    /**
+     * Uses the trusted v2 Duplex preset with launch tick 20, draw 0.5, initial velocity (0,0,3)
+     * and an explicit critical outcome; UUIDs distinguish reservation and capture ownership.
+     */
     private ShotContext shot(UUID group, UUID owner) {
         var item = CalibrationLoadouts.registry().resolve(CalibrationLoadouts.registry().create("duplex"));
         var stats = new StatSnapshotFactory(StatProfile.calibration()).create("captured", item.resolvedWeapon(), ModifierSources.empty()).snapshot();

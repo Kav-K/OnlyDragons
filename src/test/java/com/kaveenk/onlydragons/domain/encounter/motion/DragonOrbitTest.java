@@ -4,6 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.kaveenk.onlydragons.domain.projectile.homing.TracerRules;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Pure route-envelope regression over 4,000 ticks at arena radii 16/24/48. Verifies smoothstep
+ * entry, per-step displacement/yaw and the declared 12-block margin, plus invalid inputs.
+ * This mathematical envelope does not establish actual multipart bounds or rendered smoothness.
+ */
 class DragonOrbitTest {
     @Test void smallestNormalAndLargestArenasFitSweptEnvelopeAndSmoothEntry() {
         for (double arena : new double[]{16,24,48}) {
