@@ -13,6 +13,12 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.*;
 import static com.kaveenk.onlydragons.application.proc.ProcCoordinator.Admission.*;
 
+/**
+ * Bounded queue/session oracles using zero-valued fractional draws and two-tick spacing.
+ * The standard critical fixture resolves 100×1.5/2 defense = 75, with Duplex basis 15.
+ * Tests whole-group capacity, same-tick drain budget, pre-hit Tempo, exact tokens, terminal
+ * rejection and partial overflow drains; no scheduler sleeps or Paper callbacks are manufactured.
+ */
 class ProcCoordinatorTest {
     private final UUID encounterId = UUID.randomUUID(), owner = UUID.randomUUID(), target = UUID.randomUUID();
     private final ProcCoordinator.Session session = new ProcCoordinator.Session(owner, UUID.randomUUID());
