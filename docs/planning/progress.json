@@ -508,7 +508,7 @@
       "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Dispatched and In progress on symphony/gh-70 with T03b integrated. Infinite Quiver and owned Flame v1 implemented; 299 production tests and focused dirty-source iterations pass. Strengthened clean-commit proof, lead combined cohort/review/current CI and all human gates remain pending. See document 03. No accepted requirement claimed; T06b/T02c remain planned pending integration."
+      "notice": "In review on symphony/gh-70. Clean runtime 016bd69 includes main e95447ae; 299/6/33 Java tests and six focused Paper scenarios pass with clean cleanup. Lead independent source/raw review is clear. Evidence: docs/planning/evidence/t06c-focused-paper.md. Full cohort receipt/replay/task acceptance checkpoint/current CI and human gates remain pending; no requirement is marked complete. T06b/T02c await integration."
     }
   },
   "milestones": {

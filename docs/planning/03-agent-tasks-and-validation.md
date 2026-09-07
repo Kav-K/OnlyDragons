@@ -21,7 +21,7 @@ source/raw review, strict replay, all three task checkpoints and current CI.
 It includes 286 production, six companion and 33 applicable client tests with
 zero failures/errors/skips; [exact evidence and limitations](evidence/checkpoint2-ui-flight.md).
 
-T06c/#70 is In progress on `symphony/gh-70` from `e95447ae`, with prerequisites integrated and dispatch confirmed. The v4 ammo/fire implementation and 299-test build pass; focused iterations passed, with strengthened clean-commit proof pending. T06b/#68 and T02c/#69 remain planned
+T06c/#70 is In review on `symphony/gh-70`: clean runtime `016bd69` passes 299/6/33 Java tests and six focused Paper scenarios; [evidence](evidence/t06c-focused-paper.md). Lead combined-cohort acceptance remains pending. T06b/#68 and T02c/#69 remain planned
 pending T06c. T08c/#41 remains planned and undispatched. Other requirements, prior
 evidence and milestone states are unchanged; human outcomes remain separate.
 
@@ -113,7 +113,7 @@ expiry and frozen training overkill credit; [exact acceptance evidence](evidence
 identities and dispositions; their earlier pending statements describe that history.
 
 T03b/T08d/T08e are now separately accepted through [PR #76](evidence/checkpoint2-ui-flight.md).
-T06c/#70 is dispatched and In progress on `symphony/gh-70`; T06b/#68 and T02c/#69 remain planned pending T06c. Human appearance,
+T06c/#70 is In review on `symphony/gh-70`; T06b/#68 and T02c/#69 remain planned pending T06c. Human appearance,
 authenticated compatibility, balance/feel and M1–M5 remain unaccepted.
 
 ### T03b — Expanded bow enchants (GH-67)
@@ -143,24 +143,19 @@ Next dependency: T06c consumes the descriptors and existing firing authority;
 
 ### T06c — Infinite Quiver and owned Flame (GH-70)
 
-In progress on `symphony/gh-70`, main `e95447ae`. The owner-published
-[ammo/fire contract](02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70)
+In review on `symphony/gh-70`, clean runtime `016bd69`, main `e95447ae` integrated.
+The [owner-published profile](02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70)
 adds explicit v4 descriptors, conserved trigger ammo and bounded owned fire via
-existing firing/combat authorities. Interface IDs were published in
-[GH-70](https://github.com/Kav-K/OnlyDragons/issues/70#issuecomment-5563465666).
+existing firing/combat authorities. [Focused evidence](evidence/t06c-focused-paper.md)
+records six passing Paper scenarios (61 Flame, 22 ammo, 115 firing, 49 expanded,
+31 Tempo, 25 equipment assertions), 299/6/33 Java tests with zero skips, exact
+artifacts and clean JVM cleanup, preserved iterations, and independent lead
+source/raw review. Static checkpoint and 42-case selection pass.
 
-The wrapper build passes 299 production tests with zero failures/errors/skips.
-Earlier iterations exposed the combined-registry availability assertion and
-MockBukkit's unsupported live-arrow `isInBlock`; v3 rejection controls are
-preserved, unit tests use supported reservation/session boundaries, and actual
-emission belongs to the focused protocol fixture. `quiver-ammo` and `owned-flame`
-are registered with their existing player/observation helpers. Iteration ammo (22 assertions) and Flame (53 assertions) passed with clean JVM exits.
-The first Flame run failed the client death/respawn ordering precondition; that
-report is preserved. Lead-requested live-state cleanup, stock IQ, live-session
-Flame swap and delayed native reward assertions now await clean-commit proof. The startup doctor and static checkpoint passed; neither is
-Paper acceptance. The lead owns the combined final cohort, independent review,
-current CI and merge. Windows smoke, authenticated clients, visuals/feel and
-milestones remain pending. Next consumers: T06b/#68 and T02c/#69 after acceptance.
+The lead owns the full cohort receipt/replay, task acceptance checkpoint, current
+CI and merge. Windows smoke, authenticated clients, visuals/feel and milestones
+remain pending; no completed requirement is claimed. Next consumers: T06b/#68
+and T02c/#69 after integration.
 
 ## Shared context update protocol
 

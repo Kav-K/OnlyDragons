@@ -317,7 +317,8 @@ establish whether a native Infinity ordinary-arrow draw charged inventory.
 T06c separately tracks actual refundable debit and adds real survival controls;
 the dirty-source iteration `dafb472d02bd4f9681701efd2adfcdfe` observed both
 accepted native Infinity and veto paths retain exactly 20 arrows, with no refund
-created from a non-debit. Clean-commit confirmation remains pending.
+created from a non-debit. Clean runtime `016bd69` confirmed the same controls in
+`d00b9b3af2e044e1bb067aa08fc0aa1f`; [focused evidence](evidence/t06c-focused-paper.md).
 [Pinned source](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/patches/sources/net/minecraft/world/item/ProjectileWeaponItem.java.patch).
 The [quiver-fire profile](02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70)
 is owner-selected OnlyDragons balance, with no new upstream mechanic claim.
