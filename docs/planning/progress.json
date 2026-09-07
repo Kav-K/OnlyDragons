@@ -496,7 +496,7 @@
       "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "MAINT-82 accepted and merged at2158a515; lead released and dispatched this task. Implementation is not requirement acceptance. Existing prerequisites and gates remain; rewards disabled. T06b owns common status reconciliation and quickstart; T02c owns shared lore/books/anvil/client changes."
+      "notice": "In review: draft PR84 https://github.com/Kav-K/OnlyDragons/pull/84. Runtime571cdb35 integrates main2158a515. Build313/6/33 tests, five focused Paper cases264 assertions and strict per-case raw/JUnit/artifact/cleanup replay pass; static/no-weakening pass. Records build/reports/gh68-focused-replay; durable docs/planning/evidence/t06b-held-shortbows.md. No complete suite receipt or held-shortbow-loadouts acceptance: lead owns combined lore/Roman formatting, native+received anvil interaction, full regression/current CI/task acceptance. Human/Windows gates pending; rewards disabled."
     },
     "T02c": {
       "status": "active",

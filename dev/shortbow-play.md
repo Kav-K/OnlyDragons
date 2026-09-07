@@ -48,7 +48,8 @@ Each trigger launches **one primary**. Duplex adds exactly **one real child** on
 the next tick at 20% physical damage, with no second ammo charge: nominally
 10 primary + 10 child arrows/s for the Duplex tier. Capacity, cancellation and
 available ammo still apply. Infinite Quiver X saves the trigger's arrow with 50%
-probability; it requires an ordinary arrow to admit the trigger. Flame II uses
+probability in Survival; Survival requires an ordinary arrow to admit the trigger.
+Creative retains the existing ammo exemption and cannot demonstrate ammo saving. Flame II uses
 its established owned-fire policy. One ultimate is allowed per item; swapping
 preserves the airborne shot's captured enchant/profile identity.
 

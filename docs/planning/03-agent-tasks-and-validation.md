@@ -164,7 +164,7 @@ acceptance advances no gameplay, human or milestone gate.
 
 ### T06b — Held shortbow tiers and combined loadouts
 
-**In progress**, [GH-68](https://github.com/Kav-K/OnlyDragons/issues/68),
+**In review**, [draft PR #84](https://github.com/Kav-K/OnlyDragons/pull/84), [GH-68](https://github.com/Kav-K/OnlyDragons/issues/68),
 `symphony/gh-68` from accepted main2158a515. Additive seven named v4 presets,
 `dev shortbow help/list/kit`, shared-input invalidation and native held-state
 checks reuse the existing firing authority. [Contract](02-foundation-plan.md#t06b-held-shortbow-calibration-gh-68),
@@ -172,7 +172,10 @@ checks reuse the existing firing authority. [Contract](02-foundation-plan.md#t06
 T03b/T08e/T06c are integrated. GH69 owns shared lore/book/anvil/client edits;
 the lead owns final combined new-tier→real-anvil opening with native view and
 received ANVIL packet, complete regression, current CI and acceptance. Worker
-focused evidence is separate. No `held-shortbow-loadouts` completion yet;
+focused evidence passes313 production tests and five Paper cases/264 assertions
+on clean571cdb35 with strict raw/JUnit/artifact/cleanup replay. Static/no-weakening
+checks pass; the44-case combined receipt and task acceptance remain pending.
+No `held-shortbow-loadouts` completion yet;
 authenticated-client visuals/input feel, Windows smoke and milestones remain pending.
 
 ## Shared context update protocol
