@@ -23,7 +23,7 @@ class ShortbowLoadoutsTest {
             assertEquals(List.of(100d, 0d, 50d), List.of(stats.raw(StatKey.WEAPON_DAMAGE), stats.raw(StatKey.CRIT_CHANCE), stats.raw(StatKey.CRIT_DAMAGE)));
             assertEquals(row.getValue(), List.of(stats.effective(StatKey.ATTACK_SPEED), stats.effective(StatKey.FEROCITY), (double) FiringRules.cooldown(stats.effective(StatKey.ATTACK_SPEED))));
             assertEquals(row.getKey().equals("drawn_training_v4") ? WeaponDefinition.FiringMode.DRAWN_BOW : WeaponDefinition.FiringMode.SHORTBOW, item.resolvedWeapon().firingMode());
-            assertEquals(TracerProfile.RETURN_V2, TracerProfile.forDefinition(item.definition().weapon()));
+            assertEquals(TracerProfile.AIMED_V3, TracerProfile.forDefinition(item.definition().weapon()));
             assertEquals("calibration-items-v4", item.instance().registryRevision());
         }
     }
@@ -51,7 +51,7 @@ class ShortbowLoadoutsTest {
         var edited = registry.edit(original, Map.of("dragon_tracer", 5, "vicious", 5), List.of());
         assertEquals(original.identity(), edited.identity());
         var resolved = registry.resolve(edited);
-        assertEquals(TracerProfile.RETURN_V2, TracerProfile.forDefinition(resolved.definition().weapon()));
+        assertEquals(TracerProfile.AIMED_V3, TracerProfile.forDefinition(resolved.definition().weapon()));
         assertEquals(5, new StatSnapshotFactory(StatProfile.calibration()).create("edited", resolved.resolvedWeapon(), ModifierSources.empty()).snapshot().raw(StatKey.FEROCITY));
         var definition = resolved.definition().weapon();
         assertEquals(TracerProfile.CALIBRATION_V1, TracerProfile.forDefinition(new WeaponDefinition(definition.id(), 1, "fake", definition.firingMode(), 100, List.of(), List.of())));

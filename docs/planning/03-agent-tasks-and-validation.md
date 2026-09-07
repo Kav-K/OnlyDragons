@@ -7,9 +7,8 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 ## Current delivery status
 
 **7 September feedback follow-ups:** T07b/#90 (`aimed-dragon-tracer`) is the
-next single **planned** feature. T06d/#89 (`shortbow-no-draw`) is **blocked** by
-the user's decision to keep vanilla bows and defer the animation fix. Both
-requirements remain deferred, with no completion evidence. [Small task contracts](#checkpoint-feedback-tasks)
+single **In progress** dispatched feature. T06d/#89 (`shortbow-no-draw`) is **blocked** by
+the user's decision to keep vanilla bows and defer the animation fix. T07b automated verification is pending; T06d remains deferred. [Small task contracts](#checkpoint-feedback-tasks)
 follow the user's visual/aiming observations; existing acceptance and M1–M5 are
 unchanged. Prefer these distinct chunks over a broad follow-up change.
 
@@ -223,8 +222,12 @@ authenticated-client visuals/input feel, Windows smoke and milestones remain pen
 | T06d / [#89](https://github.com/Kav-K/OnlyDragons/issues/89) | T06b, T02c; user must reopen | **Blocked/deferred:** keep vanilla bows and working native held input; `shortbow-no-draw` remains unimplemented. |
 | T07b / [#90](https://github.com/Kav-K/OnlyDragons/issues/90) | T08e, T06b | `aimed-dragon-tracer`: captured-direction gate, aimed assistance versus physical misses, legacy profile/identity and cleanup preservation. |
 
-T06d is not dispatched; T07b is next, pending lead dispatch after registration
-integrates. The [design contract](02-foundation-plan.md#checkpoint-feedback-contracts)
+T06d is not dispatched. T07b was dispatched from main `b2f0254` in the
+[owner assignment](https://github.com/Kav-K/OnlyDragons/issues/90#issuecomment-5575533461).
+The `symphony/gh-90` candidate adds `tracer-aimed/v3` at the existing captured
+profile/rules/continuity seam. Build passes 327 production tests with no failures,
+errors or skips. Focused Paper, regression receipt, review and current CI remain
+pending; human aiming/visuals are separate. No firing/damage ownership changes. The [design contract](02-foundation-plan.md#checkpoint-feedback-contracts)
 records the exact first calibration and API constraints; do not substitute broad
 engine, dependency or fixture work. Shared loadout/presentation/profile edits are
 lead-coordinated, and each small PR retains independent review/current CI/runtime

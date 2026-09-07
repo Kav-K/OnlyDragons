@@ -7,7 +7,8 @@ import java.util.Objects;
 /** Trusted, immutable OnlyDragons calibration. No item-supplied profile field is decoded. */
 public enum TracerProfile {
     CALIBRATION_V1("tracer-continuity/v1", 2, 0, 6, 0),
-    RETURN_V2("tracer-return/v2", 8, 8, 18, 3);
+    RETURN_V2("tracer-return/v2", 8, 8, 18, 3),
+    AIMED_V3("tracer-aimed/v3", 4, 4, 6, 3);
 
     private final String revision;
     private final double perLevel, retention, turn;
@@ -23,6 +24,9 @@ public enum TracerProfile {
     }
     public double retentionRadius(int level) { return level == 0 ? radius(level) : radius(level) + retention; }
     public double turnRadians() { return turn; }
+    public boolean requiresLaunchAim() { return this == AIMED_V3; }
+    public double aimHalfAngleRadians() { return requiresLaunchAim() ? Math.toRadians(30) : Math.PI; }
+    public boolean requiresWholePartBounds() { return this != CALIBRATION_V1; }
     public boolean ballistic(long tick, long groupLaunchTick) {
         if (groupLaunchTick < 0 || tick < groupLaunchTick) throw new IllegalArgumentException("Invalid launch age");
         return tick - groupLaunchTick < grace;
@@ -30,8 +34,8 @@ public enum TracerProfile {
     /** Call only with the registry-resolved definition, never raw PDC identity. */
     public static TracerProfile forDefinition(WeaponDefinition trusted) {
         Objects.requireNonNull(trusted);
+        if (ShortbowLoadouts.returningTracer(trusted)) return AIMED_V3;
         return (trusted.id().equals("tracer_return_v2") && trusted.revision().equals("tracer-return-v2"))
-                || ShortbowLoadouts.returningTracer(trusted)
                 ? RETURN_V2 : CALIBRATION_V1;
     }
 }

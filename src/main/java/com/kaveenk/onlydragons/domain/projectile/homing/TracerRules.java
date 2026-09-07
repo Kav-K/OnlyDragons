@@ -39,14 +39,39 @@ public final class TracerRules {
     /** Retain only an eligible visible current part of the same target; otherwise reacquire honestly. */
     public static Optional<Aim> acquire(Vector3 position, int level, Collection<Part> parts, Predicate<Aim> visible,
                                         TracerProfile profile, Optional<UUID> lock) {
+        if (profile.requiresLaunchAim()) throw new IllegalArgumentException("Captured launch aim required");
+        return acquireEligible(position, level, parts, visible, profile, lock);
+    }
+    /** Range is current arrow-to-part distance; the cone always originates at the captured launch. */
+    public static Optional<Aim> acquire(Vector3 position, int level, Collection<Part> parts, Predicate<Aim> visible,
+                                        TracerProfile profile, Optional<UUID> lock,
+                                        Vector3 launchPosition, Vector3 initialVelocity) {
+        Objects.requireNonNull(launchPosition); Objects.requireNonNull(initialVelocity);
+        Predicate<Aim> eligible = profile.requiresLaunchAim()
+                ? aim -> withinLaunchCone(initialVelocity, subtract(aim.point(), launchPosition), profile.aimHalfAngleRadians())
+                        && visible.test(aim)
+                : visible;
+        return acquireEligible(position, level, parts, eligible, profile, lock);
+    }
+    private static Optional<Aim> acquireEligible(Vector3 position, int level, Collection<Part> parts, Predicate<Aim> eligible,
+                                                TracerProfile profile, Optional<UUID> lock) {
         double radius = profile.radius(level);
         if (level == 0) return Optional.empty();
-        if (profile == TracerProfile.RETURN_V2 && lock.isPresent()) {
+        if (profile.retentionRadius(level) > radius && lock.isPresent()) {
             var retained = acquireWithin(position, profile.retentionRadius(level),
-                    parts.stream().filter(p -> p.targetId().equals(lock.get())).toList(), visible);
+                    parts.stream().filter(p -> p.targetId().equals(lock.get())).toList(), eligible);
             if (retained.isPresent()) return retained;
         }
-        return acquireWithin(position, radius, parts, visible);
+        return acquireWithin(position, radius, parts, eligible);
+    }
+    /** Inclusive angle. Zero launch/aim vectors cannot authorize guidance; non-finite magnitudes reject. */
+    public static boolean withinLaunchCone(Vector3 initialVelocity, Vector3 launchToAim, double halfAngle) {
+        if (!Double.isFinite(halfAngle) || halfAngle < 0 || halfAngle > Math.PI)
+            throw new IllegalArgumentException("Invalid cone angle");
+        double speed = length(initialVelocity), distance = length(launchToAim);
+        if (!Double.isFinite(speed) || !Double.isFinite(distance)) throw new IllegalArgumentException("Vector magnitude overflow");
+        if (speed == 0 || distance == 0) return false;
+        return dot(divide(initialVelocity, speed), divide(launchToAim, distance)) >= Math.cos(halfAngle);
     }
     private static Optional<Aim> acquireWithin(Vector3 position, double radius, Collection<Part> parts, Predicate<Aim> visible) {
         return parts.stream().map(part -> {

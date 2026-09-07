@@ -373,8 +373,8 @@ formal human-input, authenticated-multiplayer or M3 prefire acceptance.
 [T07b/#90](https://github.com/Kav-K/OnlyDragons/issues/90) record two small follow-ups.
 The user then chose **keep vanilla bows; defer the animation fix**. T06d is blocked
 and undispatched; [the recorded API finding](https://github.com/Kav-K/OnlyDragons/issues/89#issuecomment-5575451702)
-need not be researched again. T07b is the next single planned feature; its aimed
-profile has no implementation evidence yet;
+need not be researched again. T07b is the single dispatched feature. Its branch adds a captured aimed
+profile; automated runtime evidence is pending;
 [the design contract](02-foundation-plan.md#checkpoint-feedback-contracts) separates
 the user's goals from the lead's first numeric calibration. Wider motion is feedback
 for later scoped work, not a change to accepted bounds.
