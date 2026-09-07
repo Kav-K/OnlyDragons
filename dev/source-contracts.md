@@ -19,7 +19,8 @@ otherwise. Matching root tests are under `src/test/java/` with the same packages
 | Weapon identity, valid enchant combinations or captured calibration | `domain.item.ItemRegistry`, `ItemInstance`, `WeaponDefinition` | `CalibrationLoadouts`, `ShortbowLoadouts`; `paper.item.codec.WeaponItemCodec` |
 | Physical damage, criticals, HP versus leaderboard credit | `domain.combat.DamageCalculator`, `DamageResult`, `ProcHealthSnapshot` | `domain.encounter.CombatEncounter`; `paper.encounter.ManagedCombatService` |
 | Ferocity, Fatal Tempo, secondary procs | `domain.enchant.Ferocity`, `TempoState`, `EnchantEffects` | `application.proc.ProcCoordinator`; settled-hit and session/generation checks |
-| Held shortbow fire and cooldown ownership | `application.fire.OwnedFireCoordinator`, `domain.projectile.FiringRules` | `paper.projectile.OwnedBowListener`, `OwnedBowService`; item-use and cancellation listeners |
+| Held shortbow fire and cooldown ownership | `paper.projectile.OwnedBowService`, `OwnedBowListener` | `domain.projectile.FiringRules`; held-input sessions, item-use and cancellation listeners |
+| Owned Flame burns and target vulnerability | `application.fire.OwnedFireCoordinator` | `domain.enchant.QuiverFlameProfile`; `paper.encounter.ManagedCombatService` and target/session cleanup |
 | What an arrow retains after a weapon swap | `domain.projectile.ShotContext`, `OwnedProjectile`, `ArrowRegistry` | Projectile registration, accepted physical hit and delayed proc paths |
 | Aimed Tracer acquisition/retention and arrow continuity | `domain.projectile.homing.TracerProfile`, `TracerRules` | `paper.projectile.OwnedBowService`, `homing.ArrowContinuity`, `ArenaTickets` |
 | Managed dragon, arena, movement and encounter generation | `paper.encounter.DevelopmentDragonService`, `DevelopmentArena`, `DragonFlight` | `DragonBackend`, `TargetBackend`; `domain.encounter.motion.DragonOrbit` |
