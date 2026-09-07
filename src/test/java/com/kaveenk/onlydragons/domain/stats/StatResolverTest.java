@@ -13,12 +13,22 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Golden arithmetic and immutable-source regression suite for the bundled calibration resolver.
+ * Asserts intermediate 101/151.5/75.75/151.5 steps, order independence, whole-source replacement,
+ * range/cap separation and overflow rejection before a later cap can hide it. Uses production
+ * profile resources and weapon projections; no Paper equipment or live session is simulated.
+ */
 class StatResolverTest {
     private final StatProfile profile = StatProfile.calibration();
     private final StatResolver resolver = new StatResolver(profile);
     private StatModifier modifier(String source, StatKey key, ModifierOperation op, double amount, int order) {
         return new StatModifier(source, key, op, amount, order);
     }
+    /**
+     * Groups supplied modifiers by exact source before resolving one overridden base; repeated
+     * modifiers within a source remain present so ordering/replacement tests have meaningful inputs.
+     */
     private ExplainedStatSnapshot resolve(StatKey key, double base, StatModifier... modifiers) {
         var sources = ModifierSources.empty();
         for (var m : modifiers) {
