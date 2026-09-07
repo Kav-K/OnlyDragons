@@ -1,5 +1,9 @@
 # T07b aimed Dragon Tracer — GH-90
 
+Current status: exactly `aimed-dragon-tracer` is accepted in the
+[final hosted record](#accepted-hosted-cohort) below. The following worker
+iterations and then-pending handoff retain their original identities and scope.
+
 [Draft PR #92](https://github.com/Kav-K/OnlyDragons/pull/92),
 branch `symphony/gh-90`, starts from integrated main
 `b2f025416fac5291b62f905365e55070d25498f8`. The owner dispatched the profile/rules/
@@ -111,3 +115,47 @@ published clean head, raw replay, full receipt, acceptance and current CI.
 Those gates remain pending; the focused passes do not substitute for them.
 Windows smoke, authenticated clients and human appearance/aiming feel remain
 separate pending gates. T07b is In review; no milestone is accepted.
+
+
+## Accepted hosted cohort
+
+[PR #92](https://github.com/Kav-K/OnlyDragons/pull/92) merged at
+`c3fc8f305b2f23a556deccd4b7724bf8f0f5b9f2` after [lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/92#issuecomment-5576314511).
+Exactly `aimed-dragon-tracer` is complete; all other requirements/milestones retain
+their prior disposition. Original failed/focused runs above remain historical.
+
+- Tested/reviewed head: `8ce67877a4ea28c2074c033eb3b0e49009fdc131`; comparison base
+  `b2f025416fac5291b62f905365e55070d25498f8`. [Hosted run 34164498855](https://github.com/Kav-K/OnlyDragons/actions/runs/34164498855), attempt1,
+  passes all48 cases (39 positive,9 intended controls),54 clean Paper boots and
+  1625 assertion rows (1615 true,10 intended control-false); aggregate audit found
+  no anomalies. JUnit329 production/6 companion/37 client, zero failures/errors/skips.
+- Original suite `526ea475729d4c4b80c553d1687c8cba`; receipt SHA256
+  `a3ae08ac226ad67015fb51d85182047c653e9e687a11ccc3d9731d80e377a901`. Fresh strict original replay and task checkpoint passed;
+  independent raw/source review is separate from the hosted pass.
+- ZIP SHA256 `5e705a64be826de41829787ef938b53ac0db488c35ea802de24b1796508344fd`; source-input SHA256
+  `f57fa419e136db023c5dee8c89dd20a3266d357fb76b9ae55492b124aa8e8e22`;342 inputs, tree digest
+  `5a5155dd1d64298fe11662bea92b609437411ae4c33289c4c866ce81a2f39607`. Elapsed cohort time2338.803 seconds.
+- Production JAR `522358c28a5163eeaaaa2156114ec5be30355f4dab64e91eaf2ebda47e886813`; companion JAR
+  `dc4f4510cf4101d3c0a82f7237c3e8bba7d9e9c59a28a3ffb1f04c252531c61e`; player JAR `1b45ec1542e3940973ad2ff7f4ed6406b4e983e48d919e9b71a90358c4c1e61c`.
+- The hosted aimed-tracer case `768fff329a8c465bbff0ead35f146d27` passes36 assertions;
+  the original held, combat, book, legacy-profile, restart and negative controls
+  remain in the same complete cohort. No new human or load-envelope claim follows.
+
+### Separate Windows operator validation
+
+Smoke run `ff705bfb2f2f4db8897b9de50837c665` on the separate `tracer-review` profile
+passes both plugin-enable checks and all17 command checks on pinned Paper26.2.
+Windows production JAR `a93c8740b375ebf1531549366546f5157b0e25e55984ed48bbe5c5363e905f87` differs from the Linux ZIP bytes:
+all201 class entries match byte-for-byte; the only three differing entries are
+properties files whose contents match after LF normalization. This is not a claim
+of identical complete JAR hashes or a human aiming pass.
+
+Normal Windows `mcdev play` then built and started clean main `c3fc8f3` in the
+preserved human profile, run `9334a8ef11dc4824b10357547527819e`. Built and installed
+JAR hashes match the Windows artifact above. Authenticated loopback port25565,
+the saved safe platform and a moving100,000-HP training dragon were verified.
+This establishes playable deployment, not a completed human aiming observation.
+
+Human aiming/appearance and M1–M5 remain pending. T06d/#89 remains user-deferred;
+vanilla held input is preserved. Only the test dragon is implemented, with real
+rewards and armor effects disabled. Human observations remain separately recorded.
