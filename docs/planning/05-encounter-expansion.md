@@ -10,7 +10,7 @@ Read this linked detail when working on those encounter/result/content tasks; th
 
 | Topic | Confirmed decision | Still open |
 | --- | --- | --- |
-| Initial dragon | Start with one test dragon and preserve an extension path for later dragon types. | The shipped test definition is accepted; later roster, abilities, balance and selection probabilities remain open. |
+| Initial dragon | The shipped test definition remains the only implemented type; Old/Young/Armored/Master are selected for later content. | Qualitative roles are recorded below; numeric balance, abilities and selection probabilities remain open. |
 | Post-kill ranking | Rank by credited damage including reduced/zero-health proc credit and lethal overkill; exclude impacts after finalized death. Preserve actual HP removed separately. Every ranked player has a unique placement; the user delegates damage-time tie-breaks to the lead. | Later display preferences and retention; the initial view is per encounter, not a persistent global board. |
 | Loot direction | Each eligible player receives a personal roll. Better leaderboard placement improves chances and also controls hard item-eligibility locks. Build the system with actual rewards disabled. | Production participant eligibility, rank bands, real items, probabilities, draw counts, delivery and acquisition rules. Explicit test policies are calibration, not approved production balance. |
 
@@ -18,6 +18,24 @@ These decisions do not choose an altar interaction or acquisition economy. Exist
 M3, real-content and economy gates remain in force. Actual inventory, world-drop
 and currency reward grants remain disabled; resolving a sample table only produces
 a diagnostic result or immutable plan.
+
+### Selected later roster
+
+**User decision, 7 September 2026:** later content uses these four roles. They
+are not additional implemented dragons or permission to bypass T11/T12 gates.
+
+| Dragon | Selected qualitative role |
+| --- | --- |
+| Old | Slow. |
+| Young | Fastest. |
+| Armored | More HP; medium speed. |
+| Master | More HP; faster than medium but slower than Young; higher damage to nearby players. |
+
+Exact HP/speed/damage numbers, abilities, selection probabilities, loot and
+acquisition remain open. No additional comparison between Armored and Master HP
+is inferred. Armored is a dragon role; armor gear/effects remain separate. The
+current test dragon and historical sample tables stay unchanged. Implement later
+content as small assigned chunks after the retained ritual/design gates.
 
 ### Lead-selected damage-time tie-break
 
@@ -131,7 +149,7 @@ Keep these under the existing development permission boundary. T08a adopts one e
 
 ### D4 — Dragon-type and loot-definition foundation
 
-**Purpose:** support the confirmed single test dragon with an extension path for later types and personal rank-based loot, without selecting the later roster, probabilities, drop contents or economy.
+**Purpose:** support the confirmed single test dragon with an extension path for later types and personal rank-based loot, without implementing the selected later roster or choosing probabilities, drop contents or economy.
 
 **Owner:** definition/configuration owner, with the lead reviewing shared contracts. Type/loot definitions must not own Paper listeners, combat arithmetic or item grants.
 
@@ -143,7 +161,7 @@ The proposed reward boundary is `frozen result + type/table revision + validated
 
 **Automated acceptance:** distinct test types resolve to distinct intended definitions/table references; duplicate/missing references, invalid numbers and incomplete candidates reject atomically; an active encounter/result retains its selected definition after a later configuration change; no cross-type table leakage. Seeded selection is tested only after a probability model is selected. For explicitly labeled sample policies, test rank-threshold boundaries, exclusion of rank-locked items for every random outcome, and independent per-player resolution; these fixtures do not approve real reward values. A table definition alone never grants an item, consumes an eye or completes progression.
 
-**Human/design gates:** the initial scope is one test dragon and personal rank-based simulation with real grants disabled. Later roster, production selection probabilities, names/abilities/balance, table contents, participant eligibility, rank thresholds and reward delivery remain decisions. Use labeled sample tables to verify behavior without choosing those production values. Visual type identity requires client review when actual content exists.
+**Human/design gates:** the initial scope is one test dragon and personal rank-based simulation with real grants disabled. The selected later roster has only the qualitative roles above; production selection probabilities, abilities/balance, table contents, participant eligibility, rank thresholds and reward delivery remain decisions. Use labeled sample tables to verify behavior without choosing those production values. Visual type identity requires client review when actual content exists.
 
 ### Existing #12/T10 — Integrated hatch/prefire and load
 
@@ -171,7 +189,7 @@ Retain the existing dependency chain through T04/T05/T06/T07/T08 and the added T
 
 **Automated acceptance:** seeded deterministic personal resolution under the chosen rules; type-table isolation; approved leaderboard-rank boundaries, better-placement chance behavior and hard item exclusion; damage/eye/participation eligibility boundaries; missing/old definition revisions; duplicate completion delivery; crash/restart around record/write/grant acknowledgement; offline players and full inventories under the selected delivery policy; retries cannot duplicate items or silently lose the recorded grant. Test-only completion and aborted encounters cannot enter real eligibility accidentally. Earned eyes use the same validated altar path as developer-granted eyes.
 
-**Human/design gates:** one initial test dragon and personal placement-based rolls are confirmed. Actual rewards remain disabled. Later actual roster/drop tables, reward visibility/delivery policy, participant qualification, exact rank thresholds, rates, balance and legitimate acquisition remain unselected; enabling real grants requires separately reviewed work under those gates. Persistence technology follows the required recovery semantics rather than being chosen by this draft.
+**Human/design gates:** one initial test dragon and personal placement-based rolls are confirmed. Actual rewards remain disabled. The later roster roles above are selected; actual drop tables, reward visibility/delivery policy, participant qualification, exact rank thresholds, rates, balance and legitimate acquisition remain unselected; enabling real grants requires separately reviewed work under those gates. Persistence technology follows the required recovery semantics rather than being chosen by this draft.
 
 ## Integration and validation order
 
@@ -194,7 +212,7 @@ For each dispatched component, add explicit implemented/deferred/external requir
 
 - Later refinements to the accepted bounded development controls; optional administrative test completion remains omitted, and future production arenas are separate scope.
 - Optional refinements to the documented lead-selected display default and retention; ghost damage and unique damage-time ties are settled above. Persistent cross-encounter history is separate scope.
-- Additional playable types and production balance remain later scope; the one test-dragon definition and retained versioned selection are accepted.
+- Old/Young/Armored/Master roles are selected for later scope; their numeric balance/abilities remain open. Only the test-dragon definition and retained versioned selection are implemented and accepted.
 - Production participant qualification, rank-based chance thresholds and hard item locks for personal rolls, plus eventual delivery behavior. Real grants remain disabled; sample policies do not select production drop rates or contents.
 - Eye placement/removal/charging/refund/recovery rules and whether initial eyes remain development-only or have an explicitly scoped acquisition path.
 

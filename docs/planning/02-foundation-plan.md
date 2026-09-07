@@ -14,8 +14,9 @@ XP-cost books. T05b and the scoped T03b/T08d/T08e behavior are accepted as recor
 in the delivery ledger; T06c Quiver/Flame is accepted through PR #81 at
 `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`. T06b held-fire kits and T02c books/anvils
 are accepted through PR #86 for their two named requirements; [combined acceptance evidence](evidence/checkpoint2-held-books.md).
-Human outcomes remain separate.
-Preserve the accepted older profiles below. Armor effects and real rewards remain
+The [7 September feedback](01-research.md#checkpoint-feedback--7-september-2026)
+motivates T07b; T06d is deferred by the user's vanilla-bow decision. Earlier automated acceptance remains intact.
+Human milestone outcomes remain separate. Preserve the accepted older profiles below. Armor effects and real rewards remain
 disabled/deferred.
 
 The first playable milestone is a reliable stats-and-bow combat sandbox. A player can equip a test bow, inspect their stats, shoot a target, and see an explanation of critical hits, ferocity, boss-health damage, and contribution. The next milestone adds real dragon tracing and prefire. The eight-eye ritual, complete dragon roster, loot, and progression follow those proofs.
@@ -942,6 +943,36 @@ End eligibility on a real impact, arena exit, explicit encounter reset, or plugi
 
 Infinite accumulation is avoided at **shot admission**, not by deleting accepted airborne volleys: reserve capacity for the entire primary/Duplex group, reject additional triggers with visible feedback when capacity is exhausted, and expose counters. Production caps require a measured concurrency target. The first load-test envelope is proposed at 10 players, 2,000 live arrows, and 500 ferocity; it is a test target, not a throughput guarantee.
 
+## Checkpoint feedback contracts
+
+These are separate small changes after the accepted checkpoint, registered as
+[T06d/#89](https://github.com/Kav-K/OnlyDragons/issues/89) and
+[T07b/#90](https://github.com/Kav-K/OnlyDragons/issues/90). Registration is not
+implementation or dispatch. Preserve legacy calibration profiles and their evidence.
+
+- **T06d — deferred by the user:** keep vanilla bows and their working native
+  held input; do not dispatch the animation fix or repeat the
+  [recorded API feasibility investigation](https://github.com/Kav-K/OnlyDragons/issues/89#issuecomment-5575451702).
+  It stays blocked unless the user reopens it. No material, presentation
+  dependency or held-input change is authorized by this registration.
+- **T07b — aimed Tracer, first lead calibration:** a new immutable profile uses a
+  **30-degree half-angle** about captured launch direction, from captured launch
+  position toward a real target-part aim point, for **both acquisition and
+  retention**. Radii I–V are **4/8/12/16/20 blocks**, retention adds **4 blocks**,
+  steering is at most **6 degrees/tick**, with the existing **3-tick ballistic
+  grace**. Finite/zero-vector and exact-boundary cases require explicit handling.
+  Turning the player later or looping an arrow nearby cannot authorize a shot
+  originally aimed away. Preserve velocity magnitude, gravity, drag, collisions,
+  line of sight, bounds and target generation/UUID; no snapping or guaranteed hits.
+  Route the current seven held-shortbow definitions to the new captured profile;
+  existing arrows and explicit legacy fixtures retain their original profiles.
+  This is the lead's initial calibration, not user-selected final balance.
+
+Reuse focused physical/protocol checks and preserve all damage, Ferocity, Tempo,
+Duplex, Flame and ammo rules. The issue contracts own exact acceptance; no new
+infrastructure, broad refactor or combined mechanic PR is implied. Motion looked
+fine but too bounded to the user; a larger route has no selected numeric policy.
+
 ## 10. Prefire before the altar exists
 
 Implement a developer-only hatch rehearsal before building the full ritual. It starts an encounter generation, exposes a stable marker and countdown, then creates a real dragon at a configured position and phase. During the countdown all accepted arrows remain normal physical entities in that generation.
@@ -955,7 +986,9 @@ The rehearsal is complete only when UUID traces demonstrate that pre-spawn arrow
 The [6 September encounter expansion proposal](05-encounter-expansion.md) scopes
 development spawn controls, result presentation, type/loot definitions and eye
 placement. It records unresolved product choices separately; its proposed work
-packages do not choose a roster/economy or waive the M3 ritual prerequisite.
+packages do not implement later content/economy or waive the M3 ritual prerequisite.
+The user has since selected the [four later dragon roles](05-encounter-expansion.md#selected-later-roster);
+only the test dragon exists until separately scoped T12 work passes its gates.
 
 Model the later altar as `IDLE → CHARGING → HATCHING → ACTIVE → DEFEATED → RESETTING`, plus an explicit failure/abort path. Eight distinct slots hold eye-placement records with player UUID and transaction ID. Validate tagged eyes, inventory quantity, arena state, and offhand duplication on the server thread. The eighth accepted placement transitions state exactly once.
 

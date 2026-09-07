@@ -6,6 +6,13 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
+**7 September feedback follow-ups:** T07b/#90 (`aimed-dragon-tracer`) is the
+next single **planned** feature. T06d/#89 (`shortbow-no-draw`) is **blocked** by
+the user's decision to keep vanilla bows and defer the animation fix. Both
+requirements remain deferred, with no completion evidence. [Small task contracts](#checkpoint-feedback-tasks)
+follow the user's visual/aiming observations; existing acceptance and M1–M5 are
+unchanged. Prefer these distinct chunks over a broad follow-up change.
+
 [Checkpoint 2](07-checkpoint-two.md): T05b/#66 is complete through merged
 [PR #73](https://github.com/Kav-K/OnlyDragons/pull/73) at `29f0cf3`, accepting exactly
 `fatal-tempo-ghost-scaling`, P08 and P09 after the verified 34-case hosted cohort;
@@ -208,6 +215,21 @@ on clean571cdb35 with strict raw/JUnit/artifact/cleanup replay. Static/no-weaken
 checks passed at that worker handoff. The [final combined interaction and receipt](evidence/checkpoint2-held-books.md)
 subsequently establishes exactly `held-shortbow-loadouts`;
 authenticated-client visuals/input feel, Windows smoke and milestones remain pending.
+
+### Checkpoint feedback tasks
+
+| Task / issue | Integrated prerequisites | Bounded acceptance |
+| --- | --- | --- |
+| T06d / [#89](https://github.com/Kav-K/OnlyDragons/issues/89) | T06b, T02c; user must reopen | **Blocked/deferred:** keep vanilla bows and working native held input; `shortbow-no-draw` remains unimplemented. |
+| T07b / [#90](https://github.com/Kav-K/OnlyDragons/issues/90) | T08e, T06b | `aimed-dragon-tracer`: captured-direction gate, aimed assistance versus physical misses, legacy profile/identity and cleanup preservation. |
+
+T06d is not dispatched; T07b is next, pending lead dispatch after registration
+integrates. The [design contract](02-foundation-plan.md#checkpoint-feedback-contracts)
+records the exact first calibration and API constraints; do not substitute broad
+engine, dependency or fixture work. Shared loadout/presentation/profile edits are
+lead-coordinated, and each small PR retains independent review/current CI/runtime
+evidence. The [qualitative feedback](01-research.md#checkpoint-feedback--7-september-2026)
+does not accept human milestone gates.
 
 ## Shared context update protocol
 
@@ -857,6 +879,9 @@ Implement all eight slots, item consumption/provenance, a single transition on t
 ### T12 — Variants, abilities, rewards, and progression, later
 
 **Owner:** split into bounded encounter/content and progression tasks at M4 planning. **Dependencies:** T11 and agreed roster/reward rules.
+Old/Young/Armored/Master and their [qualitative roles](05-encounter-expansion.md#selected-later-roster)
+are now selected; numbers, abilities, selection/loot/acquisition and the remaining
+design gates are unresolved. This does not dispatch or implement T12.
 
 Implement a selected variant registry, abilities and healing, player survivability, frozen result consumption, personal reward eligibility, and durable grant IDs. Then connect legitimate eye and equipment sources to existing item/grant interfaces. Revisit exact current Hypixel references at implementation time.
 

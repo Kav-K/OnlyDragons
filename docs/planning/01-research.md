@@ -38,7 +38,7 @@ The ordinary encounter uses eight Summoning Eyes and an egg-hatching sequence. T
 
 Their defense, movement, and attacks differ. Loot is personal and depends on contribution and eyes placed; variant-specific armor/fragments and rare rewards have separate eligibility and chance rules. The listed Primal Dragon is alpha content, not an eighth regular selection. **Documented community reference:** [Ender Dragon](https://hypixelskyblock.minecraft.wiki/w/Ender_Dragon).
 
-**OnlyDragons decision:** use a configurable variant registry. A five-variant launch roster remains possible; select the subset and rebalance its probabilities later. Do not bake an array of five bosses into the combat foundation. Defer exact loot tables and the full attack roster until combat and spawning are reliable.
+**OnlyDragons decision, updated 7 September 2026:** keep the configurable registry. The user selected Old, Young, Armored and Master for later content, with qualitative roles in the [roster contract](05-encounter-expansion.md#selected-later-roster). Only the existing test dragon is implemented. Numeric balance, abilities, selection probabilities, loot and acquisition remain open; do not import the reference game's roster or numbers automatically.
 
 ## 2. Enchantments and offensive stats
 
@@ -345,7 +345,7 @@ Repeated use packets alone do not establish a human hold. Ordinary client
 inventory opening is not necessarily a server InventoryOpenEvent; real server
 anvil opening requires separate event/view and received-screen evidence. The
 combined GH68/GH69 automated check is accepted through PR86;
-[combined acceptance evidence](evidence/checkpoint2-held-books.md). Full-client input feel remains unobserved. [T06b evidence](evidence/t06b-held-shortbows.md)
+[combined acceptance evidence](evidence/checkpoint2-held-books.md). Full-client acceptance remains separate from the [later qualitative feedback](#checkpoint-feedback--7-september-2026). [T06b evidence](evidence/t06b-held-shortbows.md)
 records actual server tests separately from this client inspection.
 
 ## T02c native anvil API inspection
@@ -363,10 +363,26 @@ The clean T02c focused runs now corroborate native extraction, received costs/XP
 conservation and collected-bow effects; [original bounded focused evidence](evidence/t02c-enchant-anvil.md).
 PR86 subsequently accepts the combined current-input cohort; human outcomes remain separate.
 
+## Checkpoint feedback — 7 September 2026
+
+The user observed unwanted shortbow pullback and overly strong Tracer attraction
+that did not require aiming. Dragon motion looked fine but too bounded; other
+tested experience was reported good. These are qualitative observations, not a
+formal human-input, authenticated-multiplayer or M3 prefire acceptance.
+[T06d/#89](https://github.com/Kav-K/OnlyDragons/issues/89) and
+[T07b/#90](https://github.com/Kav-K/OnlyDragons/issues/90) record two small follow-ups.
+The user then chose **keep vanilla bows; defer the animation fix**. T06d is blocked
+and undispatched; [the recorded API finding](https://github.com/Kav-K/OnlyDragons/issues/89#issuecomment-5575451702)
+need not be researched again. T07b is the next single planned feature; its aimed
+profile has no implementation evidence yet;
+[the design contract](02-foundation-plan.md#checkpoint-feedback-contracts) separates
+the user's goals from the lead's first numeric calibration. Wider motion is feedback
+for later scoped work, not a change to accepted bounds.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.
 2. The user selected the T05b level-based OnlyDragons playtest policy: no active Tempo 100% proc HP, active I–V 90/80/70/60/50%, with full credit. These coefficients are not researched Hypixel constants; qualitative balance remains a human check. [Implementation contract](02-foundation-plan.md#t05b-level-based-ghost-policy-gh-66).
-3. Which five variants, if five remains the desired launch scope? This does not block the stats foundation.
+3. Old/Young/Armored/Master are selected for later content; their [qualitative roles](05-encounter-expansion.md#selected-later-roster) do not settle numeric balance, abilities, selection probabilities, loot or acquisition.
 4. Confirm encounter-long arrow continuity versus literal persistence through shutdown and world reload.
 5. Choose current versus historical naming/balance where Hypixel has changed. The recommended default is current documented descriptions, with explicit exceptions for the desired dragon experience.

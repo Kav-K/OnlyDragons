@@ -48,6 +48,11 @@ is supplemented by T08a's separate managed-encounter recovery evidence.
 | Initial playable encounter completion | M4, T11 plus T02b/T08a/T08b | Existing eye gate plus definition catalog, managed dragon and frozen ranking evidence; one ritual uses the same backend/result boundary | Confirmed initial scope is one test dragon. Extra variants and abilities remain gated future content |
 | Expanded types/abilities, personal real rewards, acquisition and progression | T12 / #14 decomposed below | Chosen content, durable grant and acquisition fixtures supplement `durable-progression` and `roster-acquisition-scope` before completion | Unselected content/economy rules and durable recovery; M5 is not accepted by a loot preview |
 
+The [7 September feedback tasks](03-agent-tasks-and-validation.md#checkpoint-feedback-tasks)
+add two deferred requirements: T06d `shortbow-no-draw` is blocked by the user's
+vanilla-bow/defer decision; T07b `aimed-dragon-tracer` is planned next. They preserve the accepted
+held-fire and legacy Tracer evidence above; qualitative feedback accepts no M3 gate.
+
 ## T09d: one reusable fixture infrastructure task
 
 [Issue #43](https://github.com/Kav-K/OnlyDragons/issues/43) owns T09d. It depends
@@ -178,7 +183,7 @@ Retain every existing M4/M5 gate; a written decomposition is not implementation.
 
 | Future component | Inputs and ownership | Required objective acceptance | Unselected product decisions |
 | --- | --- | --- | --- |
-| Chosen dragon content | T02b definitions and T08a/T11 lifecycle; isolated ability/phase configuration, healing and selected player-survivability rules | Seeded variant selection and invalid probabilities, deterministic ability clocks/targets, supported phases, crystal/healing accounting, incoming player damage and cleanup; actual Paper effects with no cross-encounter leakage | Later roster, names/abilities, HP/defense, movement, healing, selection rates and survivability balance |
+| Chosen dragon content | T02b definitions and T08a/T11 lifecycle; isolated ability/phase configuration, healing and selected player-survivability rules | Seeded variant selection and invalid probabilities, deterministic ability clocks/targets, supported phases, crystal/healing accounting, incoming player damage and cleanup; actual Paper effects with no cross-encounter leakage | [Old/Young/Armored/Master roles selected](05-encounter-expansion.md#selected-later-roster); exact HP/defense/speed/damage, abilities, healing, selection rates and survivability balance remain open |
 | Personal reward eligibility and rolls | Frozen T08b rankings, retained type/table revisions and T11 placement ledger including eligible eye-only placers | Rank/eye/damage/participation boundaries; hard locks, probability boundaries and seeded rolls; type isolation; reject missing/old revisions and test/abort completions | Real item tables, rank thresholds, probabilities, participant qualification and eye influence |
 | Durable real delivery and recovery | Immutable personal grant plans; one completion/player/reward idempotency boundary, asynchronous immutable persistence and server-thread inventory effects | Crash/restart before and after journal/grant acknowledgement; retries, offline/reconnect, full inventory and concurrent claims; no duplication or silent loss; stale callbacks cannot affect later sessions | Delivery/claim/overflow policy, storage/recovery guarantees and when real grants may be enabled |
 | Legitimate eye and gear acquisition | Explicitly chosen `EyeSource`/item-grant paths using existing validated item schemas and the same altar | Real item/PDC provenance, quantity/permission rejection, acquisition transactions, disconnect/restart recovery and earned-eye summoning | Which drops, shops, crafting or quests exist; costs/rates; no broad economy inferred |
