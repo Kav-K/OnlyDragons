@@ -1,6 +1,6 @@
 # Checkpoint 2: combat feedback, volleys and enchant books
 
-**6 September 2026 — T05b and combined T03b/T08d/T08e accepted; T06c accepted through PR81. T06b/T02c and human outcomes remain pending.**
+**Checkpoint 2 — all seven scoped tasks have their named automated acceptance; T06b/T02c accepted through PR86. Human outcomes remain separate.**
 
 The first managed dragon/ranking slice is integrated on main `36b420c`.
 The user now prioritizes a persistent dragon health bar, smoother bounded flight,
@@ -33,14 +33,12 @@ complete through combined [PR #76](https://github.com/Kav-K/OnlyDragons/pull/76)
 failed iterations retain their original identities and scope.
 
 T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort).
-MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; the lead released and dispatched T06b/#68 and T02c/#69. Their existing prerequisites and feature gates remain unchanged.
-Held-fire and book requirements retain empty completion/evidence and remain
-unaccepted. V3 IQ/Flame-unavailable controls remain preserved.
+MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; T06b/#68 and T02c/#69 are complete through [PR #86](https://github.com/Kav-K/OnlyDragons/pull/86), merged at `1a63ce5749e4debe4369cd154953ffea3e07e09a`, accepting exactly `held-shortbow-loadouts` and `enchant-books-anvil`; [combined acceptance evidence](evidence/checkpoint2-held-books.md). Their original prerequisites and all other feature gates remain unchanged. V3 IQ/Flame-unavailable controls remain preserved.
 
-The lead is combining the completed feature candidates and their independent
-focused evidence. The [combined validation record](evidence/checkpoint2-held-books.md)
-adds a real held-bow → anvil → edited-bow interaction to the existing fixture;
-the full 47-case cohort, current CI, acceptance and Windows deployment are pending.
+The [combined validation record](evidence/checkpoint2-held-books.md) preserves
+both worker histories and the accepted real held-bow → anvil → edited-bow
+interaction, final complete cohort, original replay and current CI. Current-profile
+Windows deployment and human observations remain separate, unrun gates.
 
 T10 retains every prior dependency and additionally consumes T08d, T08e, T05b
 and T06b. T06b brings T03b/T06c transitively. Anvil application is independent of
@@ -96,15 +94,16 @@ Fatal Tempo, Power, Vicious, Snipe, Overload, Gravity, Infinite Quiver and Flame
 No new armor application, reward items, acquisition economy or extra dragon types
 are implied. The recorded issue contracts supply the calibration decisions for
 implementation. T05b/T03b/T08d/T08e have only the scoped acceptance above;
-T06c has the scoped PR81 acceptance above; held-fire kits and books/anvils still require their gates.
+T06c has the scoped PR81 acceptance above; T06b/T02c have the scoped PR86 acceptance above.
+Human, milestone, armor-content and real-reward gates remain unchanged.
 
 ## Shared ownership and feature evidence
 
 T08d's formatter and T08e's immutable motion/phase/ticket interfaces are integrated
 for later consumers. Their shared dragon service/bootstrap edits remain
 lead-coordinated. T05b proc provenance and T03b trusted v2/v3 descriptors/captured
-decisions are integrated. T06c, then T06b, extend the existing firing authority
-serially; T02c consumes the supported effect catalog and formatter after T06c.
+decisions are integrated. T06c and T06b extend the same firing authority in the
+accepted serial integration; T02c consumes that supported catalog and formatter.
 
 Reuse the existing Paper/player fixtures. Add only missing boss-bar observations,
 actual held-input evidence and the bounded real-anvil container/rename/extraction

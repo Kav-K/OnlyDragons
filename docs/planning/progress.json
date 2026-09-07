@@ -493,16 +493,34 @@
       "reviewedRevision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
     },
     "T06b": {
-      "status": "active",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "In review: draft PR84 https://github.com/Kav-K/OnlyDragons/pull/84. Runtime571cdb35 integrates main2158a515. Build313/6/33 tests, five focused Paper cases264 assertions and strict per-case raw/JUnit/artifact/cleanup replay pass; static/no-weakening pass. Records build/reports/gh68-focused-replay; durable docs/planning/evidence/t06b-held-shortbows.md. No complete suite receipt or held-shortbow-loadouts acceptance: lead owns combined lore/Roman formatting, native+received anvil interaction, full regression/current CI/task acceptance. Human/Windows gates pending; rewards disabled."
+      "status": "complete",
+      "completedRequirements": [
+        "held-shortbow-loadouts"
+      ],
+      "evidence": {
+        "held-shortbow-loadouts": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/86#issuecomment-5566743965",
+          "revision": "79f64bdf2b3472dd083c1d62e6aead05d34aa85c"
+        }
+      },
+      "notice": "Exactly held-shortbow-loadouts accepted through combined PR86 after hosted run34091181168 attempt1, the complete 47-case/53-boot cohort, strict original replay, task checkpoint, independent review and current Windows/Linux CI. See evidence/checkpoint2-held-books.md. Worker focused and failed iterations retain their original scope. Human/Windows and M1-M5 gates remain separate; rewards and armor effects remain disabled.",
+      "mergedRevision": "1a63ce5749e4debe4369cd154953ffea3e07e09a",
+      "reviewedRevision": "79f64bdf2b3472dd083c1d62e6aead05d34aa85c"
     },
     "T02c": {
-      "status": "active",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "In review: draft PR85, clean runtime4ed3d2d integrated with main2158a51. Three focused Paper runs/132 assertions and original replays pass; see evidence/t02c-enchant-anvil.md. Final combined cohort/receipt/new-tier interaction/task acceptance/CI/review remain lead-owned under issue69 dispatch. No milestone or human gate accepted; rewards and armor disabled."
+      "status": "complete",
+      "completedRequirements": [
+        "enchant-books-anvil"
+      ],
+      "evidence": {
+        "enchant-books-anvil": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/86#issuecomment-5566743965",
+          "revision": "79f64bdf2b3472dd083c1d62e6aead05d34aa85c"
+        }
+      },
+      "notice": "Exactly enchant-books-anvil accepted through combined PR86 after hosted run34091181168 attempt1, the complete 47-case/53-boot cohort, strict original replay, task checkpoint, independent review and current Windows/Linux CI. See evidence/checkpoint2-held-books.md. Worker focused and failed iterations retain their original scope. Human/Windows and M1-M5 gates remain separate; rewards and armor effects remain disabled.",
+      "mergedRevision": "1a63ce5749e4debe4369cd154953ffea3e07e09a",
+      "reviewedRevision": "79f64bdf2b3472dd083c1d62e6aead05d34aa85c"
     },
     "T06c": {
       "status": "complete",
