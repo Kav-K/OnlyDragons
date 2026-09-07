@@ -17,7 +17,7 @@ post-kill ranking](dev/dragon-play.md). The next planned [checkpoint](docs/plann
 adds held-fire loadouts and ten-enchant XP-cost books. Bounded dragon flight,
 returning Tracer volleys, persistent health bars, shared combat/stat/result formatting,
 level-based Tempo proc HP and explicit standard/training/calibration spawn modes
-are implemented in this integration candidate. Remaining checkpoint additions
+are integrated on main, alongside Infinite Quiver and owned Flame. Remaining checkpoint additions
 and combined acceptance are pending. Armor effects and real rewards remain
 out of the current scope. See the
 [foundation plan](docs/planning/02-foundation-plan.md), [mechanic research](docs/planning/01-research.md)
@@ -214,7 +214,7 @@ The EULA was accepted for this local setup. Acceptance lives in `run/eula.txt` a
 
 Use public APIs and keep ordinary Java logic separate from server code. This reduces migration work; automatic compatibility across future releases is not promised.
 
-Gradle build/test uses the wrapper on Windows or `./gradlew` on Linux/macOS with a matching JDK. The Cursor tasks and local server lab are Windows scripts. The GitHub Actions workflow is prepared for Windows/Linux but has not run remotely. No separate Maven or system Gradle installation is required.
+Gradle build/test uses the wrapper on Windows or `./gradlew` on Linux/macOS with a matching JDK. The Cursor tasks and local server lab are Windows scripts. The GitHub Actions workflow runs Windows/Linux builds and a separately dispatched complete Paper cohort; exact accepted runs are recorded in the delivery ledger. No separate Maven or system Gradle installation is required.
 
 ## Troubleshooting
 

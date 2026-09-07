@@ -52,6 +52,17 @@ failure occurs and cleanup succeeds. An arbitrary exit 1 is not a successful
 negative test. Busy, missing, stale, skipped or incomplete evidence remains a
 failure or an outstanding check.
 
+## Artifact size boundaries
+
+Individual scenario, player, result and catalog JSON inputs retain the 1 MiB
+bound. Only aggregate suite receipts use the explicit 4 MiB limit. PR81's cohort
+grew through legitimate per-case provenance, not runaway Flame observations;
+[the original failed artifact and accepted repair](../docs/planning/evidence/t06c-focused-paper.md#hosted-receipt-failure-and-bounded-parser-remediation)
+retain their identities and dispositions. Keep observations bounded and partition
+logically independent large transaction cases when needed, preserving every
+required assertion and raw evidence. Do not truncate evidence or raise limits
+to hide a failed case.
+
 ## Adding coverage with a feature
 
 Use separate scenario classes and preserve existing registrations. Add the

@@ -232,6 +232,16 @@
       "scope": "Implement the user-requested Infinite Quiver and Flame against the trusted descriptors/profile contract published by T03b. Infinite Quiver uses one captured seeded/random chance through the existing authoritative ammo reservation/debit boundary for both drawn and short bows; preserve Duplex's no-extra-ammo rule, exact-once refunds on cancellation and unrelated inventories. Flame uses bounded captured-owner/source/target/generation damage-over-time through the existing health/credit/defeat authority. Publish an explicit versioned level/duration/damage/stack-or-refresh policy, including native fire immunity and the previously deferred Duplex fire-vulnerability interaction; no uncontrolled native fire or attribution via latest held item. Queued DOT must not roll recursive Ferocity or refresh Tempo without an explicitly agreed source rule. Actual real-client survival inventory plus physical collisions must establish ammo conservation/chance boundaries/denials, owned fire activation/refresh/expiry, multiple shooters, native suppression, lethal/late/reset/quit/disable and no reward effects. Reuse the existing fixture and only add feature-specific observations. Coordinate shared OwnedBowService and effect interfaces with T03b/T06b; no second combat listener or broad fixture refactor.",
       "acceptance": "Real survival ammo inventories with one captured Quiver chance and exact cancellation/refund/child rules; independently observed owned Flame activation, refresh/expiry, multiowner/source/generation identity, immunity/native suppression and lethal/late/reset/quit/disable outcomes. No recursive procs, unauthorized Tempo refresh or real rewards.",
       "coordination": "Issue #70. Wait for T03b descriptors. Own ammo/fire effect integration; coordinate OwnedBowService with T03b/T06b and proc-source contracts with T05b. Reuse the single physical/combat authority and feature-specific fixtures."
+    },
+    {
+      "id": "MAINT-82",
+      "title": "Simplify versioned catalog construction and combat lifecycle code",
+      "dependsOn": [
+        "T06c"
+      ],
+      "scope": "GH-82 runtime allowlist only: private catalog reuse, launch-veto predicate and local lifecycle/import readability; player JUnit property, stale README and accepted T06c context. Preserve public APIs, values, provenance, order and output.",
+      "acceptance": "Existing value/boundary tests and pinned builds; Python/bridge/static/no-weakening checks; worker clean-commit equipment-stats, owned-firing and owned-flame. Lead fresh complete hosted cohort, strict replay, independent review and current CI. No new gameplay milestone.",
+      "coordination": "Dispatched from accepted PR81 main 53164f85a0ba3f36d16f242429f3a0a7c5a403a7. Lead holds T06b/#68 and T02c/#69 temporarily and must resume both after this single cleanup PR acceptance/merge. See evidence/maintenance-82.md."
     }
   ]
 }
