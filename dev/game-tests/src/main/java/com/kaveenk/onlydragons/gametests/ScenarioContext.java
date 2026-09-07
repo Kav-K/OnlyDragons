@@ -27,7 +27,13 @@ public final class ScenarioContext {
      * A deferred server-thread stage whose checked failure is reported by {@link #later}.
      * Its body may schedule the next stage; it must not block waiting for Paper ticks.
      */
-    @FunctionalInterface public interface Step { void run() throws Exception; }
+    @FunctionalInterface public interface Step {
+        /**
+         * Performs one nonblocking scenario stage on the server thread.
+         * @throws Exception when the stage must fail through the context's reporting path
+         */
+        void run() throws Exception;
+    }
     private final GameTestsPlugin plugin;
     private final String id;
     private final long started = System.currentTimeMillis();

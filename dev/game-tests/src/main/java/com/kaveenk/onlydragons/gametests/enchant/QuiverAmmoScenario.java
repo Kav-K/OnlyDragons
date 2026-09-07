@@ -15,13 +15,23 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 
-/** Real survival input into the deployed OwnedBowService with its existing injected random port.
- * The stock service has no admitted arena here. No alternate firing or damage implementation. */
+/**
+ * Real Survival inputs into the production bow-service class with its injected random port.
+ * A fixture-owned instance supplies deterministic samples and admits the arena;
+ * the stock service has no arena here. Inventory deltas, random draws and group
+ * reservations are checked together, including native Infinity's no-debit path.
+ * This is ammo/admission evidence, not a collision or damage implementation.
+ */
 public final class QuiverAmmoScenario implements Scenario, Listener {
     ScenarioContext c; PlayerFixture players; OwnedBowService bows; UUID generation;
     double sample; int randomDraws,releases,inputs; boolean vetoBow,vetoLaunch,retain;
     final List<Map<String,Object>> trials=new ArrayList<>();
     final ItemRegistry catalog=CalibrationLoadouts.compatibleRegistry();
+    /**
+     * Owns a separate production service/listener pair before requesting the two real actors.
+     * @param context server-thread report/resource owner
+     * @throws Exception if actor-plan admission fails
+     */
     public void start(ScenarioContext context) throws Exception {
         c=context;c.mechanicRevision("quiver-ammo-v1");players=new PlayerFixture(c);
         bows=new OwnedBowService(c.production(),c.production().equipment(),100,()->{randomDraws++;return sample;});
@@ -29,6 +39,9 @@ public final class QuiverAmmoScenario implements Scenario, Listener {
         players.await("quiver actors",300,players::allOnline,this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY "+c.harness().runId());
     }
+    /**
+     * Prepares independent Survival inventories and runs exact Quiver probability-boundary and refund trials.
+     */
     void setup() {
         var world=players.player("alpha").getWorld();
         for(int x=-2;x<=2;x++)for(int z=-2;z<=2;z++)c.tickChunk(world.getChunkAt(x,z));
@@ -51,6 +64,9 @@ public final class QuiverAmmoScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Uses actual vanilla Infinity to prove a non-debited native group cannot receive a duplicate refund.
+     */
     void nativeInfinity() {
         kit(false,10,20);sample=0;
         players.player("alpha").getInventory().getItemInMainHand().addEnchantment(org.bukkit.enchantments.Enchantment.INFINITY,1);
@@ -60,6 +76,9 @@ public final class QuiverAmmoScenario implements Scenario, Listener {
             draw("native-infinity-veto",()->{vetoBow=false;check("native_non_debited_veto_no_refund",20,0,2);resetShots();shorts();});
         });
     }
+    /**
+     * Checks saved/charged shortbow groups, last/absent ammo, launch veto and permission denial.
+     */
     void shorts() {
         kit(true,10,20);sample=Math.nextDown(.5);
         click("short-save",()->{check("short_saved_duplex",20,2,2);resetShots();
@@ -75,6 +94,9 @@ public final class QuiverAmmoScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Checks real quit/session cleanup and that the unrelated actor's inventory was not altered.
+     */
     void quit() {
         kit(true,10,20);sample=0;click("quit-shot",()->{
             check("quit_shot_saved",20,2,2);players.request("alpha","quit");
@@ -90,6 +112,9 @@ public final class QuiverAmmoScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Stages one validated Quiver/Duplex bow and exact real-arrow count, resetting only the random-draw counter.
+     */
     void kit(boolean shortbow,int level,int ammo) {
         var item=catalog.edit(catalog.create(shortbow?"shortbow_v4":"ordinary_v4"),Map.of("infinite_quiver",level,"duplex",5),List.of());
         players.setupItem("alpha",0,new WeaponItemCodec(catalog).encode(item));
@@ -97,39 +122,67 @@ public final class QuiverAmmoScenario implements Scenario, Listener {
         players.setupItem("alpha",9,ammo==0?new ItemStack(Material.AIR):new ItemStack(Material.ARROW,ammo));
         players.player("alpha").updateInventory();randomDraws=0;
     }
+    /**
+     * Ends the previous generation before opening a fresh one so each ammo trial starts without old groups.
+     */
     void resetShots() {
         bows.endEncounter(generation);generation=UUID.randomUUID();
         bows.openEncounter(generation,players.player("alpha").getWorld(),new BoundingBox(-80,50,-80,80,300,80),new MechanicRevision("quiver-ammo","v1"));
     }
+    /**
+     * Compares literal ammo/projectile/random-draw counts after reservation settlement and records the trace.
+     */
     void check(String id,int ammo,int arrows,int draws) {
         int actual=players.player("alpha").getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum();
         c.check(id,true,actual==ammo&&bows.projectiles().size()==arrows&&randomDraws==draws&&bows.pendingGroups()==0&&bows.reservedCapacity()==0);
         trials.add(Map.of("id",id,"ammo",actual,"arrows",bows.projectiles().size(),"draws",randomDraws,"sample",sample,
                 "trace",bows.trace().stream().filter(t->t.kind().equals("ammo-settled")).map(Object::toString).toList()));
     }
+    /**
+     * Requests actual use/release after observed hand raise, then gives native debit/group settlement time to finish.
+     */
     void draw(String step,Runnable next) {
         int before=releases;var p=players.player("alpha");players.request("alpha",step+"-use");
         players.await("native hand raised "+step,80,p::isHandRaised,()->c.later(22,()->{
             players.request("alpha",step+"-release");players.await("native release "+step,80,()->releases>before,()->c.later(3,next::run));
         }));
     }
+    /**
+     * Waits for the real legacy shortbow interaction and its delayed group settlement before checking ammo.
+     */
     void click(String step,Runnable next) {
         int before=inputs;players.request("alpha",step);players.await("real shortbow input "+step,80,()->inputs>before,()->c.later(4,next::run));
     }
+    /**
+     * Counts the real release and injects only the deliberate final bow-veto trial.
+     * @param event native bow event for alpha
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void release(EntityShootBowEvent event) {
         if(event.getEntity() instanceof Player p&&p.getUniqueId().equals(players.identity("alpha"))) {
             releases++;if(vetoBow)event.setCancelled(true);
 
         }
     }
+    /**
+     * Clears the captured session during native use statistics to exercise retained-primary settlement.
+     * @param event native statistic callback, used only by the explicit retained trial
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void usedBow(PlayerStatisticIncrementEvent event) {
         if(retain&&event.getStatistic()==Statistic.USE_ITEM&&event.getMaterial()==Material.BOW
                 &&event.getPlayer().getUniqueId().equals(players.identity("alpha")))
             bows.currentSession(event.getPlayer().getUniqueId()).ifPresent(token->bows.clearSession(event.getPlayer().getUniqueId(),token,false));
     }
+    /**
+     * Counts alpha's actual left-click inputs for the legacy instant-bow primitive.
+     * @param event native interaction event
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void input(PlayerInteractEvent event) {
         if(event.getPlayer().getUniqueId().equals(players.identity("alpha"))&&event.getAction().isLeftClick())inputs++;
     }
+    /**
+     * Vetoes only the selected actor's actual arrow launch during the launch-failure control.
+     * @param event native launch event
+     */
     @EventHandler(priority=EventPriority.HIGHEST) public void launch(ProjectileLaunchEvent event) {
         if(vetoLaunch&&event.getEntity() instanceof Arrow arrow&&arrow.getShooter() instanceof Player p&&p.getUniqueId().equals(players.identity("alpha")))event.setCancelled(true);
     }

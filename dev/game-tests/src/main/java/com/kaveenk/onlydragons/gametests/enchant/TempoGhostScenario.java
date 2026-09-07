@@ -14,12 +14,23 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-/** Actual native releases and physical Duplex impacts through the deployed combat/proc authority. */
+/**
+ * Real bow/physical Duplex trials through the deployed dragon and proc authority.
+ * Independent totals distinguish full contribution from active-Tempo proc HP. An
+ * explicit pause of a real airborne arrow permits a slot swap without changing its
+ * identity or capture; release resumes native flight. Original eligible expiry is
+ * checked before/at its tick, so ineligible Duplex activity cannot silently refresh it.
+ */
 public final class TempoGhostScenario implements Scenario, Listener {
     ScenarioContext c; PlayerFixture players; DevelopmentDragonService dragons; EnderDragon dragon;
     int commands,releases; boolean veto,hold; Arrow held; Vector velocity;
     final List<com.kaveenk.onlydragons.domain.projectile.SettledHit> settled=new ArrayList<>();
     final Set<UUID> collisions=new HashSet<>(); final List<Map<String,Object>> trials=new ArrayList<>();
+    /**
+     * Owns the settled-hit subscription and generation reset before admitting the real actor.
+     * @param context server-thread report/resource owner
+     * @throws Exception if the staged actor plan cannot be admitted
+     */
     public void start(ScenarioContext context) throws Exception {
         c=context;c.mechanicRevision("tempo-ghost-v2");players=new PlayerFixture(c);dragons=c.production().dragons();c.listen(this);
         var observer=c.production().combat().observeSettled(settled::add);
@@ -28,6 +39,9 @@ public final class TempoGhostScenario implements Scenario, Listener {
         players.await("tempo actor",300,players::allOnline,this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY "+c.harness().runId());
     }
+    /**
+     * Uses real permission/setup/spawn/status commands, then stages the two separate ultimate bows.
+     */
     void setup() {
         var p=players.player("alpha");p.setGameMode(GameMode.SURVIVAL);p.setAllowFlight(true);p.setFlying(true);p.setInvulnerable(true);
         p.getInventory().clear();p.getInventory().setHeldItemSlot(0);
@@ -54,6 +68,9 @@ public final class TempoGhostScenario implements Scenario, Listener {
             }));
         });
     }
+    /**
+     * Requires vetoed native contacts to earn nothing before proving the unbuffed Duplex/Ferocity counts.
+     */
     void p08() {
         veto=true;draw("veto",()->players.await("veto physical arrows",100,()->collisions.size()>=2,()->{
             c.later(3,()->{
@@ -69,6 +86,9 @@ public final class TempoGhostScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Pauses the captured Tempo arrow for a real swap, resumes it, and checks the original expiry window.
+     */
     void tempo() {
         players.request("alpha","tempo-slot");players.await("selected FT",80,()->players.player("alpha").getInventory().getHeldItemSlot()==0,()->{
             c.production().equipment().bonus(players.player("alpha"),StatKey.FEROCITY,175);hold=true;
@@ -105,6 +125,11 @@ public final class TempoGhostScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Requires exact new impact count, HP delta, contribution delta and captured physical identities.
+     * Native HP is compared to the pinned public double-to-float projection, independently
+     * of the domain HP total.
+     */
     void trial(String step,int expectedCount,double hp,double score,double f,Runnable next) {
         long before=view().acceptedImpacts();double oldHp=view().target().currentHealth(),oldCredit=credit();
         draw(step,()->players.await(step+" expected procs",120,()->view().acceptedImpacts()>=before+expectedCount&&view().procs().queued()==0,()->{
@@ -118,6 +143,9 @@ public final class TempoGhostScenario implements Scenario, Listener {
             trials.add(Map.of("trial",step,"hp",oldHp-view().target().currentHealth(),"credit",credit()-oldCredit,"count",results.size(),"nativeHealth",dragon.getHealth(),"results",results.toString()));next.run();
         }));
     }
+    /**
+     * Checks one frozen training selection with full overkill credit and no late proc mutation.
+     */
     void lethal() {
         var selection=dragons.selection().orElseThrow();
         c.production().equipment().bonus(players.player("alpha"),StatKey.WEAPON_DAMAGE,99900);
@@ -129,6 +157,9 @@ public final class TempoGhostScenario implements Scenario, Listener {
             c.later(12,()->{c.check("training_late_procs_no_extra_credit",true,view().completion().orElseThrow().equals(result)&&view().procs().queued()==0);reset();});
         }));
     }
+    /**
+     * Checks reset cleanup and separates current standard/training policy from legacy calibration selection.
+     */
     void reset() {
         UUID old=dragon.getUniqueId();command("reset",()->{
             c.check("training_reset_cleanup",true,Bukkit.getEntity(old)==null&&c.production().combat().activeCount()==0&&view().completion().isPresent()
@@ -144,12 +175,24 @@ public final class TempoGhostScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Publishes trial/collision provenance and completes only after the real actor quits.
+     */
     void finish() {
                     c.observe("trials",trials);c.observe("physicalCollisions",collisions.stream().map(UUID::toString).toList());c.observe("playerActions",players.journal());
                     players.request("alpha","quit");players.await("quit",100,()->players.quits("alpha")==1,c::finish);
     }
+    /**
+     * Reads the immutable production view for the service's current generation.
+     */
     ManagedCombatService.View view(){return dragons.view().orElseThrow();}
+    /**
+     * Reads alpha's full contribution, using zero before first accepted participation.
+     */
     double credit(){var contribution=view().contributions().get(players.identity("alpha"));return contribution==null?0:contribution.contributionDamage();}
+    /**
+     * Positions setup relative to a measured real part box, then requests actual full draw and release.
+     */
     void draw(String step,Runnable next) {
         var p=players.player("alpha");var box=dragon.getParts().stream().max(Comparator.comparingDouble(part->part.getBoundingBox().getVolume())).orElseThrow().getBoundingBox();
         var origin=box.getCenter().add(new Vector(0,0,-12));players.setupPosition("alpha",new Location(p.getWorld(),origin.getX(),origin.getY()-p.getEyeHeight(),origin.getZ(),0,0));p.setVelocity(new Vector());
@@ -157,9 +200,28 @@ public final class TempoGhostScenario implements Scenario, Listener {
             players.request("alpha",step+"-release");players.await("release "+step,80,()->releases>before,next::run);
         }));
     }
+    /**
+     * Waits for native command dispatch and two settling ticks before reading production state.
+     */
     void command(String step,Runnable next){int before=commands;players.request("alpha",step);players.await("command "+step,80,()->commands>before,()->c.later(2,next::run));}
+    /**
+     * Counts native command callbacks in this isolated actor plan.
+     * @param e real command event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void command(PlayerCommandPreprocessEvent e){commands++;}
+    /**
+     * Counts actual player bow release callbacks, independently of action requests.
+     * @param e native bow release event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void release(EntityShootBowEvent e){if(e.getEntity() instanceof Player)releases++;}
+    /**
+     * Applies only the explicit airborne-pause setup, retaining the original velocity for resumption.
+     * @param e native projectile launch event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void launch(ProjectileLaunchEvent e){if(hold&&e.getEntity() instanceof Arrow arrow){held=arrow;velocity=arrow.getVelocity().clone();arrow.setGravity(false);arrow.setVelocity(new Vector());}}
+    /**
+     * Records real target/part collisions and applies the named trial veto when enabled.
+     * @param e native projectile hit event
+     */
     @EventHandler(priority=EventPriority.HIGHEST)public void hit(ProjectileHitEvent e){Entity parent=e.getHitEntity() instanceof EnderDragonPart part?part.getParent():e.getHitEntity();if(parent!=null&&dragon!=null&&parent.getUniqueId().equals(dragon.getUniqueId())){collisions.add(e.getEntity().getUniqueId());if(veto)e.setCancelled(true);}}
 }
