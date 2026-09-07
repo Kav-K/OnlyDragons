@@ -502,7 +502,7 @@
       "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "GH69 dispatched after integrated prerequisites at2158a51. Implementation and focused native/received-client validation in progress; no automated acceptance or human gate claimed. Final combined suite/replay/CI/review remains lead-owned under issue69 dispatch. Rewards and armor effects disabled."
+      "notice": "In review: draft PR85, clean runtime4ed3d2d integrated with main2158a51. Three focused Paper runs/132 assertions and original replays pass; see evidence/t02c-enchant-anvil.md. Final combined cohort/receipt/new-tier interaction/task acceptance/CI/review remain lead-owned under issue69 dispatch. No milestone or human gate accepted; rewards and armor disabled."
     },
     "T06c": {
       "status": "complete",
