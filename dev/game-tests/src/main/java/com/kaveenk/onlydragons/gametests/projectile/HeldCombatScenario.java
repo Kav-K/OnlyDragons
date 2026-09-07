@@ -83,8 +83,10 @@ public final class HeldCombatScenario implements Scenario, Listener {
         hold("tempo",4,()->{
             int ft=launched.size();players.request("alpha","duplex-slot");
             players.await("real ultimate swap",80,()->player().getInventory().getHeldItemSlot()==1,()->{
+                long nativeSwapObservedTick=Integer.toUnsignedLong(Bukkit.getCurrentTick());
+                c.observe("nativeSwap",Map.of("tick",nativeSwapObservedTick,"slot",player().getInventory().getHeldItemSlot()));
                 players.await("captured Tempo arrows finish after swap",100,()->settled.size()==ft,()->{
-                    c.check("tempo_captured_after_swap",true,ft>=4&&launched.stream().allMatch(p->p.shot().ordinal()==0&&p.shot().weapon().definitionId().equals("volley_tempo_v4"))
+                    c.check("tempo_captured_after_swap",true,collisions.values().stream().anyMatch(tick->tick>nativeSwapObservedTick)&&ft>=4&&launched.stream().allMatch(p->p.shot().ordinal()==0&&p.shot().weapon().definitionId().equals("volley_tempo_v4"))
                             &&settled.stream().allMatch(h->h.projectile().shot().enchantments().stream().anyMatch(e->e.id().equals("fatal_tempo")&&e.level()==5)));
                     c.check("tempo_shared_bonus_built",true,view().procs().tempoStates()==1&&view().impacts().stream().filter(r->r.kind()==DamageResult.Kind.PHYSICAL).map(DamageResult::effectiveFerocity).distinct().count()>=4);
                     long lastFt=view().impacts().stream().filter(r->r.kind()==DamageResult.Kind.PHYSICAL).mapToLong(DamageResult::tick).max().orElseThrow();
@@ -122,7 +124,7 @@ public final class HeldCombatScenario implements Scenario, Listener {
             int arrows=launched.size();players.await("all actual veto collisions",140,()->settled.size()==arrows,()->{
                 c.check("held_physical_veto_no_health_score_or_effects",true,collisions.size()==arrows&&vetoEvents>=arrows&&settled.stream().allMatch(h->h.rejection().orElseThrow()==SettledHit.Rejection.PHYSICAL_VETO)&&view().acceptedImpacts()==0&&view().target().currentHealth()==100000&&credit()==0
                         &&combat.fireMetrics(fight).burns()==0&&view().procs().tempoStates()==0);
-                c.observe("veto",Map.of("notifications",vetoEvents,"uniqueCollisions",collisions.size(),"settled",settled.size(),"hp",view().target().currentHealth(),"credit",credit()));
+                c.observe("veto",Map.of("notifications",vetoEvents,"uniqueCollisions",collisionRows(),"settled",settled.size(),"hp",view().target().currentHealth(),"credit",credit(),"accepted",view().acceptedImpacts(),"burns",combat.fireMetrics(fight).burns(),"tempoStates",view().procs().tempoStates()));
                 veto=false;combat.reset(players.identity("alpha"));
                 c.check("moving_held_reset_releases_resources",true,bows.capacityUsed()==0&&bows.pendingGroups()==0&&bows.continuity().tickets().reservedCount()==0&&combat.activeCount()==0);
                 c.observe("playerActions",players.journal());finished=true;players.request("alpha","end");
