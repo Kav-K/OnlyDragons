@@ -1,7 +1,11 @@
 # T08e motion and Tracer — GH-65
 
-In review in [PR #75](https://github.com/Kav-K/OnlyDragons/pull/75); no final acceptance or milestone claim. Branch `symphony/gh-65`
-includes main `7a380408e02fe59d1820163bd7cfa68169e85e4b`. Production/profile ownership
+Original focused handoff: [PR #75](https://github.com/Kav-K/OnlyDragons/pull/75).
+Current disposition: exactly `bounded-dragon-flight` and `moving-dragon-tracer`
+are accepted through combined PR #76 at `a7329e18b886d4766d14d9128eeb256a904161a0`;
+[final evidence](checkpoint2-ui-flight.md) and [lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308).
+The original iterations below retain their identities, outcomes and limits.
+Branch `symphony/gh-65` included main `7a380408e02fe59d1820163bd7cfa68169e85e4b`. Production/profile ownership
 is described in document02; owner comments5561944060/5561951211 declare calibration.
 
 ## Iteration evidence (6 September 2026)
@@ -121,11 +125,13 @@ it is not an accepted task checkpoint. Final fetch still resolved main `7a38040`
 merging it was a no-op. Later documentation-only commit(s) do not alter these inputs.
 
 [Owner comment5562281395](https://github.com/Kav-K/OnlyDragons/issues/65#issuecomment-5562281395)
-assigns the combined #64/#65/current-main cohort after #66 to the lead. The worker
-must not duplicate that full suite. Complete suite receipt/replay, both task
-checkpoints, combined-main/current-CI and independent integration review remain
-pending there. Human full-client smoothness, aiming/return visibility, Windows
-Play smoke and authenticated compatibility remain separate and unrun.
+assigned the combined #64/#65/current-main cohort after #66 to the lead; the worker
+was instructed not to duplicate that full suite. Complete receipt/replay, task
+checkpoints, current CI and independent integration review were pending at this
+focused handoff. Their later combined T03b/T08d/T08e disposition is recorded in
+[the final evidence](checkpoint2-ui-flight.md). Human full-client smoothness,
+aiming/return visibility, current-profile Windows Play smoke and authenticated
+compatibility remain separate and unrun.
 
 API ownership: `DragonBackend` owns route/phase/footprint-ticket lifetime; immutable
 `DevelopmentDragonService.motion()` is diagnostic only. `OwnedProjectile` captures

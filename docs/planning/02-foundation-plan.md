@@ -10,12 +10,14 @@ with scoped changes and record material decisions under the
 
 The user's next scoped work is [checkpoint 2](07-checkpoint-two.md): dragon health
 UI/motion, Tracer volleys, revised Tempo ghost policy, held shortbows and ten-enchant
-XP-cost books. Its recorded v2 contracts are planned implementation; preserve the
-accepted v1 profiles below. Armor effects and real rewards remain disabled/deferred.
+XP-cost books. T05b and the scoped T03b/T08d/T08e behavior are accepted as recorded
+in the delivery ledger; Quiver/Flame, held-fire kits and books/anvils remain pending.
+Preserve the accepted older profiles below. Armor effects and real rewards remain
+disabled/deferred.
 
 The first playable milestone is a reliable stats-and-bow combat sandbox. A player can equip a test bow, inspect their stats, shoot a target, and see an explanation of critical hits, ferocity, boss-health damage, and contribution. The next milestone adds real dragon tracing and prefire. The eight-eye ritual, complete dragon roster, loot, and progression follow those proofs.
 
-Companion documents: [research and sources](01-research.md), [agent work packages and test gates](03-agent-tasks-and-validation.md). Researched numbers live in the research document; all additional algorithm choices below are proposed OnlyDragons rules.
+Companion documents: [research and sources](01-research.md), [agent work packages and test gates](03-agent-tasks-and-validation.md). Researched numbers live in the research document; unconfirmed algorithm choices remain proposals. Scoped user decisions and accepted implementations are identified in their sections and the delivery ledger.
 
 ## 1. Scope and decisions
 
@@ -25,7 +27,7 @@ Companion documents: [research and sources](01-research.md), [agent work package
 | Namespace | Every Java package remains under `com.kaveenk.onlydragons`. |
 | Strength | Omit from the initial stat set and damage formula. Leave a modifier boundary for a future deliberate addition. |
 | Ultimate enchants | **User confirmed: one ultimate per bow.** Duplex and Fatal Tempo use separate bows; swapping is supported. |
-| Ghost damage | Separate health and contribution from the beginning. Reduced ferocity health damage is the proposed playtest profile; the preference and exact coefficient remain open. |
+| Ghost damage | Separate health and contribution. Accepted T05b standard/training policy gives Ferocity procs 100% HP without active Tempo, then 90/80/70/60/50% at active I–V, always with full credit; sample before impact and preserve queued policy. The legacy calibration selection keeps full HP. Human balance/feel remains open. |
 | Arrows | Real server entities with continuous identity, including before hatch. No teleporting arrows onto targets or retroactive hit assignment. |
 | First enemies | A tagged practice target, followed by a disposable real dragon for collision/prefire verification. |
 | Later content | Altar, launch animation, full boss behavior, eyes acquisition, gear economy, enchanting UI, loot tables. |
@@ -258,7 +260,9 @@ Per-definition allowlists gate named rolls; duplicate selections reject.
 This is a plugin data boundary, not a signature against privileged PDC writers
 or an anti-duplication ledger for cloned item UUIDs.
 
-`CalibrationLoadouts.registry()` supplies compiled `calibration-items-v2`
+The following records the original T02/T01b v2 item boundary; later firing and
+enchant consumers are specified separately below. `CalibrationLoadouts.registry()`
+supplies compiled `calibration-items-v2`
 development data to the production equipment service and permission-gated
 calibration commands. T01b wired it through `OnlyDragonsPlugin`; changes require
 a restart because the registry is not reloadable configuration. All eight
@@ -274,8 +278,9 @@ base profile; these are explicit calibration contributions, not a second stat
 resolver or final balance. Vicious I–V contributes +1 ferocity per level as an
 adopted calibration choice. Power I–VII, Snipe I–IV and Tracer/Duplex/Tempo I–V
 remain validated identifiers for later effect consumers; no effect engine is
-introduced. Overload and Gravity/Dragon Hunter remain unsupported pending
-their unresolved profile decisions. All current enchants accept drawn and
+introduced by that initial item work. Overload and Gravity are unavailable in
+this preserved v2 catalog; T03b's explicit v3 profile implements them below.
+Dragon Hunter remains outside the selected scope. These descriptors accept drawn and
 shortbows, with no conflict beyond the user-confirmed single ultimate.
 
 Display name/lore/glint are generated output, independent of decoding; no
@@ -509,9 +514,9 @@ native death keeps diagnostic completion, never retries lethal damage, and remai
 protected until explicit reset. Reset/abort/disable do not mint results or rewards.
 The backend supplies T10's future target projection, not countdown/prefire or M3.
 
-### T08e candidate motion and returning Tracer contract
+### T08e bounded motion and returning Tracer contract
 
-GH-65 adopts the owner-declared `dragon-orbit/v1` candidate through the public
+GH-65 implements the owner-declared `dragon-orbit/v1` profile through the public
 AI-enabled HOVER position adapter. A smooth160-tick radial entry reaches horizontal
 radius8 with bob±1 and nominal0.20 blocks/tick. A conservative12-block part/stopping
 envelope reduces radius to4 in the smallest radius16 arena; parent step≤0.25 and
@@ -531,7 +536,7 @@ Existing deterministic command plans request `spawn stationary`.
 
 `tracer-return/v2` is frozen in `OwnedProjectile` from the trusted named
 `tracer_return_v2` definition (`tracer-return-v2`), with the original group's launch
-tick inherited by Duplex. Its candidate acquisition radii are8/16/24/32/40, retention
+tick inherited by Duplex. Its acquisition radii are8/16/24/32/40, retention
 is acquisition+8 for the same eligible target, and maximum turn is18 degrees/tick.
 First three original-group ticks are ballistic without vetoing genuine collisions.
 Closest visible current parts supply aim; obstruction, phase/generation loss and
@@ -540,8 +545,12 @@ unchanged. The named development drawn bow supplies Tracer V and Duplex V, damag
 zero extra crit/ferocity and T01's total crit damage50. Old nine definitions and
 `tracer-continuity/v1` remain unchanged. There is no editable profile PDC field.
 
-These are review candidates in [PR #75](https://github.com/Kav-K/OnlyDragons/pull/75), with clean focused Paper evidence. [Evidence and gates](evidence/t08e-motion-tracer.md)
-separate server geometry, collisions, received motion and human feel. Targetless
+Exactly `bounded-dragon-flight` and `moving-dragon-tracer` are accepted through
+[PR #76](https://github.com/Kav-K/OnlyDragons/pull/76) at `a7329e18b886d4766d14d9128eeb256a904161a0`;
+[combined evidence](evidence/checkpoint2-ui-flight.md) and [lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308).
+The [original PR #75 evidence](evidence/t08e-motion-tracer.md) retains its separate
+server geometry, collision and received-motion observations. Human feel remains
+unaccepted. Targetless
 T07 admission/late attachment remains a scoped pre-spawn control; T10 owns future
 managed prepare/attach and countdown/hatch. No M3, attack, type or reward expansion.
 
@@ -576,7 +585,7 @@ use UUID labels when no live name is available. No offline queue or persistent
 history is added. Diagnostic cancelled/admin/reset/abort paths publish no board.
 Result inspection still exposes separate HP and credit; no rewards are enabled.
 
-### T08d health UI and shared formatter (GH-64, In review in PR #74)
+### T08d health UI and shared formatter (GH-64)
 
 `application.PresentationFormatter` is the reusable display-only Adventure boundary:
 `number(double)` supplies locale-independent grouping and up to two decimals;
@@ -607,11 +616,13 @@ flags and message components for two actors. A named fixture-only score-only
 catalog uses the same deployed combat and UI adapters to distinguish 100 HP from
 200 credit. It is not a production balance selection. Existing restart fixtures
 add received empty/new/reset UI checks to their real two-boot evidence.
-[Final focused presentation and both restart variants](evidence/t08d-presentation.md)
-passed. Per lead coordination, combined #64/#65 integration after #66, the full
-cohort and both task checkpoints remain lead-owned and pending. Received ordinary
-chat evidence excludes overlay action-bar delivery; human appearance/authentication
-and milestone acceptance remain separate.
+[Original focused presentation and restart evidence](evidence/t08d-presentation.md)
+retains its exact inputs. Exactly `dragon-bossbar` and `combat-presentation` are
+accepted through combined PR #76 at `a7329e18b886d4766d14d9128eeb256a904161a0` after the complete current-input
+cohort, independent replay/review, task checkpoints and current CI;
+[final evidence](evidence/checkpoint2-ui-flight.md). Received ordinary chat evidence
+excludes overlay action-bar delivery; human appearance/authentication and milestone
+acceptance remain separate.
 
 ### Managed health
 
@@ -717,6 +728,12 @@ trusted loadouts remain T02/lead-owned and unchanged. These compiled calibration
 rules are not a hot-reload system; a later balance change must carry a new revision.
 
 ### T03b expanded bow contract (GH-67)
+
+Exactly `expanded-bow-enchantments` is accepted through PR #76 at `a7329e18b886d4766d14d9128eeb256a904161a0`;
+[combined evidence](evidence/checkpoint2-ui-flight.md). The original
+[focused evidence and failures](evidence/t03b-focused-paper.md) remain distinct.
+IQ/Flame are still unavailable in v3 and require T06c; no full-ten-effect acceptance
+is implied.
 
 Adopted within the owner-published scope: `enchant-checkpoint2-v2` selects
 Overload I–V +1/2/3/4/5 raw CC and CD, once through trusted item modifiers;

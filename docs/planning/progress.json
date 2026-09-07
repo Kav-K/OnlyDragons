@@ -413,16 +413,44 @@
       "notice": "PR #50 merged at 7b8ff0f5eaa57800e8b7d1d08ea02e5aa79afe05 after the fresh 23-case hosted cohort, independent raw replay/review, T09e/T04/T02b/T05 checkpoints against actual main 3c35a85 and current Windows/Linux CI. Exact evidence: docs/planning/evidence/t09e-suite.md. Generic two-boot persisted starter configuration and connected commands only; managed-dragon recovery, T06 production firing and M1-M5 remain unaccepted. Earlier focused/cohort results retain their original identities and checkpoint disposition."
     },
     "T08d": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "Combined PR #76 preserves the focused histories of #74/#75 and includes accepted Tempo. Clean integrated runtime 92a6f08 passed dragon-presentation with standard/training orbit and received UI checks. Full combined cohort, independent replay/review, both task checkpoints and current CI remain pending; no completed requirements or milestone acceptance. See the original feature evidence archives; human appearance/feel remain separate."
+      "status": "complete",
+      "completedRequirements": [
+        "dragon-bossbar",
+        "combat-presentation"
+      ],
+      "evidence": {
+        "dragon-bossbar": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34067680961",
+          "revision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
+        },
+        "combat-presentation": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34067680961",
+          "revision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
+        }
+      },
+      "notice": "PR #76 merged at a7329e18b886d4766d14d9128eeb256a904161a0 after the full 40-case cohort, independent source/raw review, strict replay, all three task checkpoints and current CI. Acceptance: https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308. Exactly the listed requirements complete; evidence: docs/planning/evidence/checkpoint2-ui-flight.md. Prior failed/focused evidence retains its identity and disposition. Windows Play, authenticated-client appearance/feel and performance remain separate; real rewards and M1-M5 remain unaccepted.",
+      "mergedRevision": "a7329e18b886d4766d14d9128eeb256a904161a0",
+      "reviewedRevision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
     },
     "T08e": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "Combined PR #76 preserves the focused histories of #74/#75 and includes accepted Tempo. Clean integrated runtime 92a6f08 passed dragon-presentation with standard/training orbit and received UI checks. Full combined cohort, independent replay/review, both task checkpoints and current CI remain pending; no completed requirements or milestone acceptance. See the original feature evidence archives; human appearance/feel remain separate."
+      "status": "complete",
+      "completedRequirements": [
+        "bounded-dragon-flight",
+        "moving-dragon-tracer"
+      ],
+      "evidence": {
+        "bounded-dragon-flight": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34067680961",
+          "revision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
+        },
+        "moving-dragon-tracer": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34067680961",
+          "revision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
+        }
+      },
+      "notice": "PR #76 merged at a7329e18b886d4766d14d9128eeb256a904161a0 after the full 40-case cohort, independent source/raw review, strict replay, all three task checkpoints and current CI. Acceptance: https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308. Exactly the listed requirements complete; evidence: docs/planning/evidence/checkpoint2-ui-flight.md. Prior failed/focused evidence retains its identity and disposition. Windows Play, authenticated-client appearance/feel and performance remain separate; real rewards and M1-M5 remain unaccepted.",
+      "mergedRevision": "a7329e18b886d4766d14d9128eeb256a904161a0",
+      "reviewedRevision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
     },
     "T05b": {
       "status": "complete",
@@ -445,15 +473,24 @@
           "revision": "b63948cc4d372c3511fe1afb736980227c161f5f"
         }
       },
-      "notice": "PR #73 merged at 29f0cf3969e7d256b2f678a54f846d836ca6db9f after the complete 34-case hosted cohort, independent raw/source review, strict original and documentation-head replay, task checkpoint and current CI. Exactly fatal-tempo-ghost-scaling, P08 and P09 complete; evidence: docs/planning/evidence/t05b-suite.md. Focused/failed iterations retain their original identities. T03b is assigned next; rewards remain disabled and human observations/M1-M5 remain unaccepted.",
+      "notice": "PR #73 merged at 29f0cf3969e7d256b2f678a54f846d836ca6db9f after the complete 34-case hosted cohort, independent raw/source review, strict original and documentation-head replay, task checkpoint and current CI. Exactly fatal-tempo-ghost-scaling, P08 and P09 complete; evidence: docs/planning/evidence/t05b-suite.md. Focused/failed iterations retain their original identities. T03b subsequently integrated through PR #76; T06c is assigned next; rewards remain disabled and human observations/M1-M5 remain unaccepted.",
       "reviewedRevision": "06bd35ea88adda03726aa447e22d57d5c66ab12b",
       "mergedRevision": "29f0cf3969e7d256b2f678a54f846d836ca6db9f"
     },
     "T03b": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "Draft PR79 history is combined in PR76 with health UI/flight. Focused clean 5bdb0ee passes 49 feature, 25 equipment, 30 catalog checks and exact abort control; see docs/planning/evidence/t03b-focused-paper.md. Captured Overload and Tracer profiles are both retained; exact 21-ID equipment oracle preserves all legacy/v3 definitions. Lead-owned final combined 40-case cohort/replay and three task checkpoints remain pending; no completed requirements or milestone acceptance."
+      "status": "complete",
+      "completedRequirements": [
+        "expanded-bow-enchantments"
+      ],
+      "evidence": {
+        "expanded-bow-enchantments": {
+          "url": "https://github.com/Kav-K/OnlyDragons/actions/runs/34067680961",
+          "revision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
+        }
+      },
+      "notice": "PR #76 merged at a7329e18b886d4766d14d9128eeb256a904161a0 after the full 40-case cohort, independent source/raw review, strict replay, all three task checkpoints and current CI. Acceptance: https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308. Exactly the listed requirements complete; evidence: docs/planning/evidence/checkpoint2-ui-flight.md. Prior failed/focused evidence retains its identity and disposition. Windows Play, authenticated-client appearance/feel and performance remain separate; real rewards and M1-M5 remain unaccepted.",
+      "mergedRevision": "a7329e18b886d4766d14d9128eeb256a904161a0",
+      "reviewedRevision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
     },
     "T06b": {
       "status": "planned",
@@ -468,10 +505,10 @@
       "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
     },
     "T06c": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged."
+      "notice": "Lead-assigned and ready after T03b integrated through PR #76 at a7329e18b886d4766d14d9128eeb256a904161a0. Symphony dispatch label is pending this context merge. Implement Infinite Quiver and Flame against the existing firing/combat authorities and current issue owner contracts. No completed requirements or evidence yet; T06b/T02c remain planned pending T06c integration."
     }
   },
   "milestones": {
