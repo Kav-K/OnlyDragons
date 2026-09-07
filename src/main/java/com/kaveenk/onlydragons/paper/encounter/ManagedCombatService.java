@@ -98,7 +98,7 @@ public final class ManagedCombatService implements AutoCloseable {
      * @param completion frozen defeat result, empty for active/nondefeated termination
      * @param procs queue/session metrics
      * @param acceptedImpacts total accepted ordinal count, including accepted zero damage
-     * @param omittedImpacts accepted results outside the64-entry diagnostic window
+     * @param omittedImpacts accepted results outside the 64-entry diagnostic window
      * @param retainedParents physical source snapshots still required by queued procs
      */
     public record View(UUID encounterId, UUID ownerId, UUID entityId, State state, TargetState target,
@@ -140,7 +140,7 @@ public final class ManagedCombatService implements AutoCloseable {
          */
         boolean contains(Player player) { return player.getWorld().equals(backend.entity().getWorld()) && bounds.contains(player.getLocation().toVector()); }
         /**
-         * Builds detached domain/metric diagnostics with a64-result history window.
+         * Builds detached domain/metric diagnostics with a 64-result history window.
          * @return current immutable service projection without mutating accounting
          */
         View view() { return new View(id, owner, entityId, state, combat.target(), combat.contributions(),
