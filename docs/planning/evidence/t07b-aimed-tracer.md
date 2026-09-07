@@ -45,6 +45,13 @@ historical v1 and returning-v2 presets retain their profiles and original fixtur
   obstructed shot lost lock and collided with the wall. These observations retain
   their failed-run provenance and do not replace final clean acceptance.
 
+- Clean `1b5b5b9`, held-combat run `29578c9cd39540a0aa782b15835d38ca`, passed21/23
+  assertions, including exact damage/fire/HP/credit, ammo, Tempo, veto and cleanup.
+  Its near14-block/-10-degree pose hit too soon to show a downward leg or retain
+  an airborne Tempo shot through the actual slot swap. The fixture now starts at
+  z138 within the same radius24 arena and aims20 degrees upward; both failed
+  physical-path/swap assertions and every numeric oracle remain mandatory.
+
 ## Candidate and remaining verification
 
 The corrected candidate routes all thirteen current definitions, tests arbitrary-
@@ -53,7 +60,7 @@ uses `ordinary_v4` plus Tracer in the focused aimed-hit phase. Other phases use
 held-kit drawn training. Actual native release/collision, live part/velocity samples,
 post-shot client turns while airborne, exact production HP/credit and setup walls
 remain distinct observations. The current held-kit regression expectations select
-v3 and their combat pose changes from45 degrees upward to10 degrees upward;
+v3 and their combat pose changes from z146/45 degrees upward to z138/20 degrees upward;
 all existing collision/damage/proc/ammo assertions remain. Historical evidence is
 unchanged and retains its own original inputs.
 

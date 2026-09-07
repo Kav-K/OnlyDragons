@@ -47,7 +47,7 @@ public final class HeldCombatScenario implements Scenario, Listener {
         backend=new DragonBackend(center,bounds,DragonFlight.Mode.ORBIT,bows.continuity().tickets(),ignored->{},ignored->{});
         fight=combat.open(players.identity("alpha"),backend,bounds,100000,0,"test_dragon",CombatProfile.tempoDragon(),Optional.empty(),()->.99);
         probe.watch(backend.entity());player().clearActiveItem();
-        players.setupPosition("alpha",new Location(player().getWorld(),160,100-player().getEyeHeight(),146,0,-10));
+        players.setupPosition("alpha",new Location(player().getWorld(),160,100-player().getEyeHeight(),138,0,-20));
         players.setupItem("alpha",0,c.production().equipment().createLoadout(id));
         players.setupItem("alpha",1,c.production().equipment().createLoadout("volley_duplex_v4"));
         players.setupItem("alpha",9,new ItemStack(Material.ARROW,64));player().getInventory().setHeldItemSlot(0);
