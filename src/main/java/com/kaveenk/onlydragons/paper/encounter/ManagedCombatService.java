@@ -181,7 +181,7 @@ public final class ManagedCombatService implements AutoCloseable {
     /**
      * Registers one of at most eight read-only observers after production processing.
      * An observer cannot replace accounting or mutate shared controls. Failures are
-     * isolated and diagnosed; the returned handle removes only this registration.
+     * isolated and diagnosed; the returned handle removes the first equal consumer.
      * @param observer non-null recipient of the immutable physical claim/rejection
      * @return call-once removal handle; repeated closes may remove another equal registration
      * @throws IllegalStateException for capacity, thread, closed state or observer reentry
