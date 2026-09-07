@@ -598,10 +598,17 @@
       "notice": "User decision, 7 September 2026: keep vanilla bows and defer the animation fix. shortbow-no-draw remains deferred with no evidence. Preserve working native held input; do not research or dispatch this task unless the user reopens it. See issue #89 comment5575451702."
     },
     "T07b": {
-      "status": "in-review",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "In review from main b2f0254. Clean e6ac40f passes aimed-tracer 36/36 and held-combat 23/23; see evidence/t07b-aimed-tracer.md. Per owner comment5575912810, lead owns hosted 48-case receipt, replay, acceptance and CI on published head. Human checks and milestone gates retained."
+      "status": "complete",
+      "completedRequirements": ["aimed-dragon-tracer"],
+      "evidence": {
+        "aimed-dragon-tracer": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/92#issuecomment-5576314511",
+          "revision": "8ce67877a4ea28c2074c033eb3b0e49009fdc131"
+        }
+      },
+      "mergedRevision": "c3fc8f305b2f23a556deccd4b7724bf8f0f5b9f2",
+      "reviewedRevision": "8ce67877a4ea28c2074c033eb3b0e49009fdc131",
+      "notice": "Exactly aimed-dragon-tracer accepted through PR92 after hosted run34164498855 attempt1: all48 cases across54 clean Paper boots, original strict replay, T07b checkpoint, independent source/raw review and current Windows/Linux CI. Windows17-command smoke passed separately. See evidence/t07b-aimed-tracer.md. Earlier failed/focused runs retain their original identities. Human aiming/visuals and M1-M5 remain unaccepted; T06d stays user-deferred and rewards disabled."
     }
   },
   "milestones": {

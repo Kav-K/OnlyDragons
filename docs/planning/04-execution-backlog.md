@@ -1,5 +1,12 @@
 # Execution backlog and integration
 
+T07b is complete through PR #92 at `c3fc8f305b2f23a556deccd4b7724bf8f0f5b9f2` for
+exactly `aimed-dragon-tracer`; [accepted hosted evidence](evidence/t07b-aimed-tracer.md#accepted-hosted-cohort). T06d/#89 stays user-deferred,
+and human aiming/M1–M5 remain pending. After the accepted Tracer installation,
+the next user-requested maintenance is whole-code Javadoc for existing behavior,
+prepared in bounded chunks. No documentation implementation or new dispatch is
+claimed here; broader gameplay order and gates remain unchanged.
+
 [Checkpoint 2](07-checkpoint-two.md) retains seven tasks as #64–#70. T05b is
 accepted through PR #73; T03b/T08d/T08e are now complete through combined
 [PR #76](https://github.com/Kav-K/OnlyDragons/pull/76) at `a7329e18b886d4766d14d9128eeb256a904161a0`, for

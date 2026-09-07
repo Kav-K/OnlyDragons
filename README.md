@@ -16,7 +16,7 @@ Main includes [equipment stats and calibration gear](dev/stats-play.md), the
 post-kill ranking](dev/dragon-play.md), [held-fire loadouts](dev/shortbow-play.md)
 and [ten-enchant XP-cost books](dev/enchant-books-play.md). The scoped automated
 [checkpoint 2 work](docs/planning/07-checkpoint-two.md) is integrated. Bounded dragon flight,
-returning Tracer volleys, persistent health bars, shared combat/stat/result formatting,
+[aimed Tracer assistance](docs/planning/evidence/t07b-aimed-tracer.md#accepted-hosted-cohort), persistent health bars, shared combat/stat/result formatting,
 level-based Tempo proc HP and explicit standard/training/calibration spawn modes
 are integrated on main, alongside Infinite Quiver and owned Flame.
 [Combined held-fire/anvil acceptance](docs/planning/evidence/checkpoint2-held-books.md)

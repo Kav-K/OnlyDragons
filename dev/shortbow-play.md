@@ -73,6 +73,11 @@ use the integrated T02c presentation and anvil workflow. Actual anvil opening
 stops a new-tier hold, with matching received-screen and edited-bow evidence in
 the [accepted combined cohort](../docs/planning/evidence/checkpoint2-held-books.md).
 
+The aimed profile is accepted through [PR92's full hosted cohort](../docs/planning/evidence/t07b-aimed-tracer.md#accepted-hosted-cohort).
+The separate Windows tracer-review smoke passed; this does not establish human
+aiming preference or change the saved human arena/standing position. Vanilla
+bow presentation remains as requested; the no-draw change is deferred.
+
 ## Input and remaining human checks
 
 The pinned client starts use once, keeps native use active while right-click is

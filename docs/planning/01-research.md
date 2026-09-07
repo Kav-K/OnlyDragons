@@ -373,9 +373,10 @@ formal human-input, authenticated-multiplayer or M3 prefire acceptance.
 [T07b/#90](https://github.com/Kav-K/OnlyDragons/issues/90) record two small follow-ups.
 The user then chose **keep vanilla bows; defer the animation fix**. T06d is blocked
 and undispatched; [the recorded API finding](https://github.com/Kav-K/OnlyDragons/issues/89#issuecomment-5575451702)
-need not be researched again. T07b is the single dispatched feature. Its branch adds a captured aimed
-profile; [focused Paper evidence](evidence/t07b-aimed-tracer.md) proves aimed
-moving-target assistance and off-axis misses, with hosted regression acceptance pending;
+need not be researched again. T07b is accepted through PR #92 for exactly
+`aimed-dragon-tracer`; [accepted hosted evidence](evidence/t07b-aimed-tracer.md#accepted-hosted-cohort) records the complete cohort and
+preserved focused history. Aimed moving-target assistance and physical off-axis
+misses are verified; human aiming/visual preference remains pending;
 [the design contract](02-foundation-plan.md#checkpoint-feedback-contracts) separates
 the user's goals from the lead's first numeric calibration. Wider motion is feedback
 for later scoped work, not a change to accepted bounds.
