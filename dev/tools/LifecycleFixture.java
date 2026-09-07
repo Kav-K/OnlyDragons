@@ -10,6 +10,9 @@ class LifecycleFixture {
             String command = input.readLine();
             if (command == null) {
                 Thread.sleep(100);
+            } else if (command.equals("unicode")) {
+                System.out.println("fixture stdout: Dragon \u00b7 Idle \u2192 \u2713");
+                System.err.println("fixture stderr: Dragon \u00b7 Idle \u2192 \u2713");
             } else if (command.equals("stop") && !Boolean.getBoolean("fixture.ignoreStop")) {
                 System.out.println("Stopping server; fixture saved.");
                 return;

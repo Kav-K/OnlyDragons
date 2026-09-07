@@ -143,7 +143,7 @@ function Get-LabJarPaths([string]$Path) {
 }
 function Read-LabLog($Directory) {
     $log = Join-Path $Directory 'console.log'
-    if (Test-Path -LiteralPath $log) { return [string](Get-Content -LiteralPath $log -Raw) }
+    if (Test-Path -LiteralPath $log) { return [string](Get-Content -LiteralPath $log -Raw -Encoding UTF8) }
     return ''
 }
 function Wait-LabText($Directory, [string]$Pattern, [int]$Timeout = 30, [int]$Offset = 0) {
