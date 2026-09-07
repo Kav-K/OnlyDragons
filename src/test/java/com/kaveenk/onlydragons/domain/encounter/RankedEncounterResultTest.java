@@ -7,6 +7,12 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Frozen ranking oracles for full-precision credit, strict-increase stamps, zero participation,
+ * all input permutations and rejected/rounded/late hits. Reuses CombatProvenanceTest helpers by
+ * composition, so its tests are not inherited or rerun. Hand-built provenance deliberately tests
+ * invalid imported data; plain-message checks prove formatting, not client delivery.
+ */
 class RankedEncounterResultTest {
     // Reuse the established domain fixture inputs without inheriting/rerunning its tests.
     final CombatProvenanceTest fixture = new CombatProvenanceTest();
@@ -100,13 +106,25 @@ class RankedEncounterResultTest {
         var first=Optional.of(new EncounterResult.CommitStamp(1,1));var last=Optional.of(new EncounterResult.CommitStamp(2,1));
         assertThrows(IllegalArgumentException.class,()->new RankedEncounterResult(result(Map.of(a,new EncounterResult.Contribution(1,1,0,true,first,last)),2)));
     }
+    /**
+     * Creates a stamped row with shared first/last stamp for positive credit and no increase
+     * stamp for either signed zero; fixture callers can deliberately create cross-row conflicts.
+     */
     static EncounterResult.Contribution contribution(double hp,double credit,long tick,long ordinal) {
         var stamp=Optional.of(new EncounterResult.CommitStamp(tick,ordinal));
         return new EncounterResult.Contribution(hp,credit,0,true,stamp,credit>0?stamp:Optional.empty());
     }
+    /**
+     * Builds a DTO completed at the latest supplied participant tick and explicit terminal ordinal;
+     * used to test ranking validation separately from live combat.
+     */
     EncounterResult result(Map<UUID,EncounterResult.Contribution> participants,long ordinal) {
         return new EncounterResult(UUID.randomUUID(),generation,"dummy",profile.mechanic(),participants.values().stream().flatMap(c->java.util.stream.Stream.concat(c.firstParticipation().stream(),c.lastCreditIncrease().stream())).mapToLong(EncounterResult.CommitStamp::tick).max().orElse(0),participants,ordinal,Optional.empty());
     }
+    /**
+     * Enumerates every input ordering for the small fixed participant set, proving comparator
+     * independence rather than sampling random permutations.
+     */
     static <T> List<List<T>> permutations(List<T> values) {
         if(values.isEmpty())return List.of(List.of());var result=new ArrayList<List<T>>();
         for(int i=0;i<values.size();i++){var remaining=new ArrayList<>(values);var first=remaining.remove(i);for(var tail:permutations(remaining)){var row=new ArrayList<T>();row.add(first);row.addAll(tail);result.add(row);}}return result;

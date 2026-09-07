@@ -5,8 +5,17 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Legacy v1 homing math oracles: exact/next-representable surface radii, deterministic UUID
+ * string ties, predicate obstruction and speed-preserving bounded turns. Synthetic boxes and
+ * visibility predicates isolate geometry; they do not prove real ray visibility or collisions.
+ */
 class TracerRulesTest {
     private static final Vector3 ZERO = new Vector3(0, 0, 0);
+    /**
+     * Builds a one-block x extent with fixed numeric UUIDs and y/z span around zero, making
+     * the nearest surface exactly x and UUID-string tie order deterministic.
+     */
     private static TracerRules.Part part(long target, long id, double x) {
         return new TracerRules.Part(new UUID(0, target), new UUID(0, id),
                 new TracerRules.Box(new Vector3(x, -1, -1), new Vector3(x + 1, 1, 1)));

@@ -6,10 +6,24 @@ import net.kyori.adventure.bossbar.BossBar;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests one Adventure bar identity per generation, domain-zero retention, exact-session
+ * replacement and failure-isolated removal. In-memory Audience doubles record API calls and
+ * shared BossBar references; they are not packet receivers and cannot certify client appearance.
+ * Also checks locale-independent display rounding and clamped health progress.
+ */
 class DragonHealthBarTest {
+    /**
+     * In-memory delivery double retaining BossBar object references; updates are inspected on
+     * the same object, so this does not imitate packet snapshots.
+     */
     static final class Client implements Audience {
         final List<BossBar> adds = new ArrayList<>(), removes = new ArrayList<>();
+        /**
+         * Records the exact presented bar reference without emitting network traffic.
+         */
         public void showBossBar(BossBar bar) { adds.add(bar); }
+        /** Records the exact removal target for identity and idempotent-close assertions. */
         public void hideBossBar(BossBar bar) { removes.add(bar); }
     }
     @Test void identityHealthZeroAndRetirementAreIndependentOfCredit() {
@@ -45,7 +59,7 @@ class DragonHealthBarTest {
     }
     @Test void throwingAudienceCannotPreventOtherRemovalOrRetirement() {
         var ui=new DragonHealthBar();var healthy=new Client();
-        Audience broken=new Audience(){public void hideBossBar(BossBar bar){throw new IllegalStateException("fixture");}};
+        Audience broken=new Audience(){/** Throws on removal to prove one failed delivery cannot prevent other cleanup. */ public void hideBossBar(BossBar bar){throw new IllegalStateException("fixture");}};
         ui.reconcile(Optional.of(new DragonHealthBar.Display(UUID.randomUUID(),"Dragon",1,1)),List.of(new DragonHealthBar.Viewer(UUID.randomUUID(),broken),new DragonHealthBar.Viewer(UUID.randomUUID(),healthy)));
         ui.close();ui.close();
         assertEquals(healthy.adds,healthy.removes);assertEquals(1,ui.deliveryFailures());

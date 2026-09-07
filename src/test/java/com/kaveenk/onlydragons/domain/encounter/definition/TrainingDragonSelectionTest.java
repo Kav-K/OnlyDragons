@@ -7,6 +7,11 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Checks the explicit training projection retains the same sole type/table, changes HP and
+ * policy identity, and leaves the bundled calibration untouched. A mismatched full-health
+ * encounter must reject the retained selection; no native dragon is spawned.
+ */
 class TrainingDragonSelectionTest {
     @Test void trainingIsAnImmutableSelectionOfTheSameTypeWithoutMutatingCalibration() {
         var catalog=DragonCatalogLoader.calibration(CalibrationLoadouts.registry()).bundled();

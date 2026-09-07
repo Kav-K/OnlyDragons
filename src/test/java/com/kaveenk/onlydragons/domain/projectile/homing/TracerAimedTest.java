@@ -5,13 +5,27 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Aimed-v3 boundary oracles for every radius/retention level, launch-origin cone in 3D,
+ * arbitrary-axis roundoff, zero/extreme vectors and obstruction/lock loss. Point boxes isolate
+ * exact thresholds and fixed directions distinguish launch aim from current proximity. This
+ * suite proves pure guidance eligibility and vector math, not physical hits or human aiming feel.
+ */
 class TracerAimedTest {
     private static final Vector3 ZERO = new Vector3(0, 0, 0), FORWARD = new Vector3(1, 0, 0);
     private static final TracerProfile PROFILE = TracerProfile.AIMED_V3;
     private static final UUID TARGET = new UUID(0, 1);
+    /**
+     * Uses a zero-extent closed box so its nearest point is exact; Box.contains semantics are
+     * not used by these acquisition checks.
+     */
     private static TracerRules.Part point(Vector3 point) {
         return new TracerRules.Part(TARGET, new UUID(0, 2), new TracerRules.Box(point, point));
     }
+    /**
+     * Keeps launch origin fixed at zero while independently varying current position, direction
+     * and lock; visibility is always true to isolate cone/radius rules.
+     */
     private Optional<TracerRules.Aim> aim(Vector3 position, int level, Vector3 point, boolean locked, Vector3 direction) {
         return TracerRules.acquire(position, level, List.of(point(point)), a -> true, PROFILE,
                 locked ? Optional.of(TARGET) : Optional.empty(), ZERO, direction);

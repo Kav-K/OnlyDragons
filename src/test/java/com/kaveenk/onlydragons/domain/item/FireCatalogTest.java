@@ -4,6 +4,11 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Exact three-history router oracle: all standalone catalog resolutions must match routed
+ * resolution, only v4 enables Quiver/Flame, and duplicate/nested routers reject. Enumerated v4
+ * IDs make accidental calibration expansion visible; no native item or ammunition is created.
+ */
 class FireCatalogTest {
     @Test void flatRouterKeepsThreeExactHistoriesAndEnablesOnlyNewItems() {
         var router=CalibrationLoadouts.compatibleRegistry();

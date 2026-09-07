@@ -15,6 +15,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Expanded-profile oracles for raw-CC mega thresholds/draw counts, per-level CC/CD and Gravity,
+ * exact v2/v3 routing and scaled Duplex/Ferocity inheritance. The 476.625 offense and 8.0143125
+ * cap example binds full ordering without native events. Quiver/Flame unavailable controls refer
+ * to v3; their later v4 implementation is tested separately.
+ */
 class ExpandedEnchantTest {
     final ItemRegistry registry = CalibrationLoadouts.compatibleRegistry();
     final UUID encounter = UUID.randomUUID(), target = UUID.randomUUID(), owner = UUID.randomUUID();
@@ -148,6 +154,10 @@ class ExpandedEnchantTest {
         assertTrue(shot.overload().megaCritical());
     }
 
+    /**
+     * Resolves v3 trusted item modifiers plus separate fixture CC/Ferocity once; ordinary crit and
+     * Overload each use .99 before the immutable launch capture.
+     */
     ShotContext shot(Map<String,Integer> enchants,CombatProfile profile,double cc,double ferocity) {
         var resolved=registry.resolve(registry.edit(registry.create("ordinary_v3"),enchants,List.of()));
         var extra=ModifierSources.empty().replace("test",List.of(new StatModifier("test",StatKey.CRIT_CHANCE,ModifierOperation.FLAT,cc,0),new StatModifier("test",StatKey.FEROCITY,ModifierOperation.FLAT,ferocity,0)));
@@ -157,6 +167,10 @@ class ExpandedEnchantTest {
         return new ShotContext(encounter,UUID.randomUUID(),UUID.randomUUID(),0,Optional.empty(),owner,resolved.instance().identity(),stats,resolved.enchantments(),profile.mechanic(),0,new Vector3(0,0,0),new Vector3(1,0,0),crit,1,1,capture);
     }
     PhysicalImpact impact(ShotContext shot,long tick) {return new PhysicalImpact(new PhysicalImpact.Key(encounter,shot.projectileId(),target,0),owner,tick,shot.launchPosition(),Optional.empty());}
+    /**
+     * Uses an explicit AIRBORNE descriptor and zero displacement, isolating Gravity/Power and
+     * captured mega damage from Snipe or native phase inference.
+     */
     ProcCoordinator.PhysicalResult hit(ProcCoordinator q,ShotContext shot,ProcCoordinator.Session session,long tick) {
         return q.physical(shot,impact(shot,tick),EnchantEffects.checkpointTwo().modifiers(shot,shot.launchPosition(),true),session,Optional.empty());
     }

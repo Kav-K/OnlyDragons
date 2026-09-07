@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Checks complete immutable snapshots, enum-order values, raw/effective chance separation and
+ * modifier/range validation. Hand-built maps deliberately bypass the resolver to isolate DTO
+ * invariants; later caller mutations must not rewrite a captured snapshot.
+ */
 class StatContractsTest {
     @Test
     void snapshotRetainsRawCritAndDoesNotFollowCallerMutation() {
@@ -65,6 +70,10 @@ class StatContractsTest {
                 ModifierOperation.FLAT, Double.NaN, 0));
     }
 
+    /**
+     * Creates a complete zero-filled map with identical raw/effective chance so tests can mutate
+     * one boundary independently without depending on calibration defaults.
+     */
     private static EnumMap<StatKey, StatValue> values(double chance) {
         var values = new EnumMap<StatKey, StatValue>(StatKey.class);
         for (StatKey key : StatKey.values()) values.put(key, new StatValue(0, 0));
