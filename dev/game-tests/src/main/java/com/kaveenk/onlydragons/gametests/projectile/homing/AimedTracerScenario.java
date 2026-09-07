@@ -16,7 +16,14 @@ import org.bukkit.event.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-/** Actual native releases and current-part observations; server positioning/walls are explicit fixture setup. */
+/**
+ * Native aimed-v3 acquisition and rejection controls against a production moving
+ * dragon. Real use/release and post-launch turn packets are distinguished from
+ * server launch-pose, inventory and wall setup. Current Bukkit part boxes and
+ * native velocity are compared with captured continuity frames; the original
+ * launch direction, never the player's later view, defines aim eligibility.
+ * Creative mode isolates physics; this does not test Survival ammo or human feel.
+ */
 public final class AimedTracerScenario implements Scenario, Listener {
     private ScenarioContext c;
     private PlayerFixture players;
@@ -36,6 +43,12 @@ public final class AimedTracerScenario implements Scenario, Listener {
     private Location dragonAtRelease;
     private long turnTick;
 
+    /**
+     * Subscribes to production settlements and owns reset, observer and reversible
+     * wall cleanup before waiting for the real actor.
+     * @param context isolated scenario report and server-thread scheduler
+     * @throws Exception if setup cannot be initialized
+     */
     public void start(ScenarioContext context) throws Exception {
         c = context; c.mechanicRevision("aimed-tracer-v3"); players = new PlayerFixture(c);
         dragons = c.production().dragons(); c.listen(this);
@@ -47,7 +60,16 @@ public final class AimedTracerScenario implements Scenario, Listener {
         players.await("aimed tracer actor", 300, players::allOnline, this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY " + c.harness().runId());
     }
+    /**
+     * Resolves the declared actor's current live connection.
+     * @return alpha's Player
+     */
     private Player player() { return players.player("alpha"); }
+    /**
+     * Configures a disposable arena through the production setup API and equips a
+     * safe Creative actor. Sampling starts before the first fresh ORBIT trial.
+     * @throws Exception if persisted arena setup fails
+     */
     private void setup() throws Exception {
         player().setGameMode(GameMode.CREATIVE); player().setAllowFlight(true); player().setFlying(true);
         player().setInvulnerable(true); player().getInventory().clear(); player().getInventory().setHeldItemSlot(0);
@@ -55,6 +77,14 @@ public final class AimedTracerScenario implements Scenario, Listener {
         dragons.setup(new DevelopmentArena(player().getWorld().getKey().toString(), 160, 100, 160, 48, "test_dragon"));
         sample(); trial("aimed", 5, () -> shoot(this::aimed));
     }
+    /**
+     * Restores walls and resets the preceding generation before selecting the next
+     * native dragon and trusted bow. The 180-tick allowance settles its real orbit;
+     * each transition independently checks projectile/frame/ticket cleanup.
+     * @param name action namespace and positive/control selection
+     * @param level Tracer level; zero deliberately omits the enchantment
+     * @param next stage after native orbit preparation
+     */
     private void trial(String name, int level, ScenarioContext.Step next) {
         restoreWall();
         if (dragons.generation().isPresent()) dragons.reset(dragons.generation().orElseThrow());
@@ -71,6 +101,13 @@ public final class AimedTracerScenario implements Scenario, Listener {
         players.setupPosition("alpha", new Location(player().getWorld(), 160, 100-player().getEyeHeight(), 128, 0, -24));
         c.later(180, next);
     }
+    /**
+     * Draws through a real use packet, sets the labelled pre-release pose and then
+     * requests the real release. Side/behind controls remain within V range so radius
+     * alone cannot explain rejection. Captured identity, full draw and gravity must
+     * match the actual emitted arrow; no post-launch setup changes that arrow.
+     * @param next stage after native release and capture
+     */
     private void shoot(ScenarioContext.Step next) {
         latest = null; players.request("alpha", stage + "-use");
         players.await("native draw " + stage, 80, player()::isHandRaised, () -> c.later(25, () -> {
@@ -101,6 +138,12 @@ public final class AimedTracerScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Turns the player away after launch and proves the captured aimed shot still
+     * assists into a moving native part. Independent literal outcomes are 900 domain
+     * HP, 100 credit, one impact and 180 projected native HP, with bounded turning,
+     * speed preservation and the three-tick launch grace.
+     */
     private void aimed() {
         // Turning away after launch must not remove an already aimed shot's eligibility either.
         players.request("alpha", "aimed-turn");
@@ -121,6 +164,11 @@ public final class AimedTracerScenario implements Scenario, Listener {
             journal(); trial("plain", 0, () -> shoot(() -> miss(() -> trial("side", 5, () -> shoot(this::turnedMiss)))));
         }); });
     }
+    /**
+     * Turns a side/behind shot toward the target only after launch. Airborne proof
+     * and within-V-radius samples make the ballistic miss a captured-cone control,
+     * then advance to the next direction or level-I range control.
+     */
     private void turnedMiss() {
         players.request("alpha", stage + "-turn");
         players.await("post launch turn toward target", 60, () -> Math.abs(player().getYaw()) < .01, () -> { observeTurn(); miss(() -> {
@@ -132,12 +180,22 @@ public final class AimedTracerScenario implements Scenario, Listener {
             else trial("range", 1, () -> shoot(() -> miss(this::obstruction)));
         }); });
     }
+    /**
+     * Records the actual post-launch player view only while the original arrow is
+     * still live and owned, preventing a turn observed after retirement from passing.
+     */
     private void observeTurn() {
         turnTick = Integer.toUnsignedLong(Bukkit.getCurrentTick());
         c.check(stage + "_turn_while_airborne", true, latest.isValid()
                 && c.production().bows().projectile(captured.shot().projectileId()).isPresent());
         c.observe(stage + "Turn", Map.of("tick", turnTick, "yaw", player().getYaw(), "pitch", player().getPitch()));
     }
+    /**
+     * Requires a nonempty unsteered ballistic path, no settlement or HP/credit change,
+     * and eventual registry retirement. The level-I control independently samples
+     * current part distances beyond its four-block acquisition radius.
+     * @param next stage after the negative outcome window
+     */
     private void miss(ScenarioContext.Step next) {
         c.later(50, () -> {
             c.check(stage + "_ballistic_miss_no_damage", true, !path().isEmpty() && hit().isEmpty()
@@ -149,6 +207,11 @@ public final class AimedTracerScenario implements Scenario, Listener {
             journal(); next.run();
         });
     }
+    /**
+     * Installs the reversible wall only after a real lock, requiring later ballistic
+     * release and a native block collision without damage. Final reset checks actual
+     * entity removal and all owned projectile/ticket resources before real quit.
+     */
     private void obstruction() {
         trial("blocked", 5, () -> shoot(() -> {
             obstructOnLock = true;
@@ -169,6 +232,12 @@ public final class AimedTracerScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Samples continuity once per frame tick and compares current-tick applied
+     * velocity with the native arrow. Aim UUID/boxes must match live Bukkit parts;
+     * distance samples come from independent nearest-box geometry after grace.
+     * Only the obstruction stage mutates blocks, after a lock is observed.
+     */
     private void sample() {
         if (finished) return;
         for (var owned : c.production().bows().projectiles()) c.production().bows().continuity().frame(owned.shot().projectileId()).ifPresent(f -> {
@@ -188,23 +257,62 @@ public final class AimedTracerScenario implements Scenario, Listener {
         });
         c.later(1, this::sample);
     }
+    /**
+     * Places the bounded disposable stone wall ahead of the locked arrow, preserving
+     * every prior block value for cleanup. This is explicit obstruction setup, not
+     * native world generation or an arrow position change.
+     * @param frame observed lock frame used to locate the barrier
+     */
     private void installWall(ArrowContinuity.Frame frame) {
         int z = (int)Math.ceil(frame.position().z()+5);
         for (int x=112; x<=208; x++) for (int y=52; y<=148; y++) {
             var block = player().getWorld().getBlockAt(x,y,z); wall.put(block,block.getBlockData()); block.setType(Material.STONE,false);
         }
     }
+    /**
+     * Restores saved block data and clears wall ownership for both trial transition
+     * and failure cleanup.
+     */
     private void restoreWall() { wall.forEach((b,data) -> b.setBlockData(data,false)); wall.clear(); }
+    /**
+     * Selects only the current captured projectile's retained samples.
+     * @return its ordered frame observations, or an empty list
+     */
     private List<ArrowContinuity.Frame> path() { return paths.getOrDefault(captured.shot().projectileId(), List.of()); }
+    /**
+     * Finds the production physical settlement bound to the captured native UUID.
+     * @return its first settlement if one occurred
+     */
     private Optional<SettledHit> hit() { return hits.stream().filter(h -> h.projectile().shot().projectileId().equals(captured.shot().projectileId())).findFirst(); }
+    /**
+     * Reads production domain HP rather than using the native projection as oracle.
+     * @return current managed target health
+     */
     private double health() { return dragons.view().orElseThrow().target().currentHealth(); }
+    /**
+     * Reads the production contribution sum independently of native HP.
+     * @return total credited damage in this one-actor trial
+     */
     private double credit() { return dragons.view().orElseThrow().contributions().values().stream().mapToDouble(v -> v.contributionDamage()).sum(); }
+    /**
+     * Computes nearest distance by clamping to each actual Bukkit part box; it does
+     * not reuse the production target-selection result.
+     * @param p sampled arrow position
+     * @return minimum distance to the live multipart geometry
+     */
     private double distanceToParts(Vector3 p) {
         return dragon.getParts().stream().mapToDouble(part -> {
             var b=part.getBoundingBox(); return vector(p).distance(new Vector(Math.max(b.getMinX(),Math.min(b.getMaxX(),p.x())),
                     Math.max(b.getMinY(),Math.min(b.getMaxY(),p.y())),Math.max(b.getMinZ(),Math.min(b.getMaxZ(),p.z()))));
         }).min().orElseThrow();
     }
+    /**
+     * Checks literal six-degree turning, equal speed, three-tick grace and the pinned
+     * profile. An assisted frame must also lie in the captured launch's 30-degree cone
+     * and within V's 24-block retention bound.
+     * @param f observed continuity frame
+     * @return whether every applicable independent bound holds
+     */
     private boolean validFrame(ArrowContinuity.Frame f) {
         var before=vector(f.before()); var after=vector(f.after());
         if (Math.abs(before.length()-after.length()) > 1e-9 || (before.length()>0 && before.angle(after)>Math.toRadians(6)+1e-6)
@@ -212,6 +320,10 @@ public final class AimedTracerScenario implements Scenario, Listener {
         return f.aim().map(a -> vector(captured.shot().initialVelocity()).angle(vector(a.point()).subtract(vector(captured.shot().launchPosition()))) <= Math.toRadians(30)+1e-6
                 && a.distance()<=24).orElse(true);
     }
+    /**
+     * Publishes captured launch, collision, HP/credit and per-frame geometry under
+     * the current trial namespace, preserving raw evidence for offline review.
+     */
     private void journal() {
         c.observe(stage+"Flight", Map.of("projectile",captured.shot().projectileId().toString(),"launch",vec(captured.shot().launchPosition()),
                 "direction",vec(captured.shot().initialVelocity()),"health",health(),"credit",credit(),"collision",collisions.getOrDefault(captured.shot().projectileId(),"NONE"),
@@ -219,11 +331,30 @@ public final class AimedTracerScenario implements Scenario, Listener {
                 "frames",path().stream().map(f -> Map.of("age",f.groupLaunchAge(),"position",vec(f.position()),"before",vec(f.before()),"after",vec(f.after()),
                         "aim",f.aim().map(a -> Map.of("point",vec(a.point()),"distance",a.distance(),"part",a.part().partId().toString())).orElse(Map.of()))).toList()));
     }
+    /**
+     * Copies an immutable domain vector into Bukkit's mutable vector representation.
+     * @param v domain coordinates
+     * @return a fresh native vector for independent geometry arithmetic
+     */
     private static Vector vector(Vector3 v) { return new Vector(v.x(),v.y(),v.z()); }
+    /**
+     * Converts vector coordinates to report-compatible JSON values.
+     * @param v sampled domain vector
+     * @return ordered x, y and z components
+     */
     private static List<Double> vec(Vector3 v) { return List.of(v.x(),v.y(),v.z()); }
+    /**
+     * Captures the actor's actual Arrow from the native bow event; later stages
+     * require that UUID to exist in the production registry.
+     * @param e native bow release
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void release(EntityShootBowEvent e) {
         if (e.getEntity().getUniqueId().equals(players.identity("alpha")) && e.getProjectile() instanceof Arrow arrow) latest=arrow;
     }
+    /**
+     * Records physical dragon-part, block or other collision by native arrow UUID.
+     * @param e actual projectile-hit event, separate from domain settlement
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void collision(ProjectileHitEvent e) {
         if (e.getEntity() instanceof Arrow) collisions.put(e.getEntity().getUniqueId(), e.getHitEntity() instanceof EnderDragonPart ? "DRAGON" : e.getHitBlock()!=null ? "BLOCK" : "OTHER");
     }

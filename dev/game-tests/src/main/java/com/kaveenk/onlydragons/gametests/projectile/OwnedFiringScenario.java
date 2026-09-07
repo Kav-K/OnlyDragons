@@ -16,7 +16,14 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 
-/** Actual protocol input into the deployed producer; no manufactured events or test arrow adoption. */
+/**
+ * Real two-actor input into the deployed physical producer, with independent native witnesses.
+ * It checks captured primary/Duplex transforms, one group ammo settlement, veto/recovery,
+ * arena/session/death lifetimes and one terminal collision claim before receiver delivery.
+ * Native launch/part/event rows are distinct from immutable production settlements.
+ * This is physical-producer evidence; the registered targets do not imply holistic
+ * combat credit, rewards, natural dragon flight or human input feel.
+ */
 public final class OwnedFiringScenario implements Scenario, Listener {
     private ScenarioContext context;
     private PlayerFixture players;
@@ -48,6 +55,11 @@ public final class OwnedFiringScenario implements Scenario, Listener {
     private EnderDragon.Phase fixturePhase;
     private EnderDragon.Phase releasePhase;
     private final Map<UUID, Map<UUID, List<Double>>> partGeometry = new HashMap<>();
+    /**
+     * Owns the production settled-hit subscription and encounter cleanup before actor admission.
+     * @param context server-thread report/resource owner
+     * @throws Exception if the staged actor plan cannot be admitted
+     */
     @Override public void start(ScenarioContext context) throws Exception {
         this.context = context; context.mechanicRevision("owned-firing-v1");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
@@ -63,6 +75,9 @@ public final class OwnedFiringScenario implements Scenario, Listener {
         players.await("both production actors", 300, players::allOnline, this::setup);
         context.harness().getLogger().info("OD_PLAYER_READY " + context.harness().runId());
     }
+    /**
+     * Opens the fixture arena, then checks real primary/child capture and native delayed-child transform.
+     */
     private void setup() {
         World world = players.player("alpha").getWorld();
         for (int x = -2; x <= 2; x++) for (int z = -2; z <= 3; z++) context.tickChunk(world.getChunkAt(x, z));
@@ -107,6 +122,9 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             players.await("fresh alpha session", 150, () -> players.joins("alpha") == 2, this::reconnected);
         });
     }
+    /**
+     * Requires a fresh session token while retaining the old airborne primary, then tests final bow veto rollback.
+     */
     private void reconnected() {
         players.player("alpha").setGameMode(GameMode.SURVIVAL);
         players.player("alpha").setAllowFlight(true); players.player("alpha").setFlying(true); players.player("alpha").setInvulnerable(true);
@@ -125,6 +143,9 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             shortbows();
         });
     }
+    /**
+     * Measures held native use at the declared ten-tick cadence and one ammo debit per group.
+     */
     private void shortbows() {
         kit("beta", "shortbow_v1", 20);
         int before = owner("beta").size();
@@ -143,6 +164,9 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Checks left-click routing and shared cooldown against mixed held/left input duplication.
+     */
     private void clicks() {
         int before = owner("beta").size(); int interaction = interactions;
         players.request("beta", "click");
@@ -159,6 +183,9 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Checks absent ammo, observed native launch veto and offhand non-admission without reservation leaks.
+     */
     private void noAmmo() {
         players.player("beta").getInventory().setItem(9, null); int before = owner("beta").size();
         players.request("beta", "empty");
@@ -179,6 +206,10 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Requires affirmative veto/denial event evidence followed by a successful recovery shot.
+     * No-emission assertions alone could falsely pass if firing stayed permanently broken.
+     */
     private void inputControls() {
         int before = owner("beta").size(); cancelInput = true; int vetoBefore = inputVetoEvents;
         players.request("beta", "input-veto");
@@ -201,6 +232,11 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Separates direct arena transfer and post-release disconnect request from actual native quit ordering.
+     * Delayed child expectations depend on whether a group was still pending at the
+     * observed quit, not on when the client was asked to disconnect.
+     */
     private void transfer() {
         World world = players.player("beta").getWorld(); secondEncounter = UUID.randomUUID();
         bows.openEncounter(secondEncounter, world, new BoundingBox(200, 60, -100, 400, 300, 100), new MechanicRevision("combat-calibration", "v1"));
@@ -231,12 +267,20 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             }));
         });
     }
+    /**
+     * Creates another owner's live shot before exercising sessionless owner-death cleanup.
+     */
     private void deathAfterExit() {
         Player alpha = players.player("alpha");
         players.setupPosition("alpha", new Location(alpha.getWorld(), 0.5, 100, 0.5, 0, -70));
         kit("alpha", "ordinary", 10);
         draw("alpha", "death-isolation", this::deathWithOtherOwnerPresent);
     }
+    /**
+     * Requires retained arrows after arena exit, then real API-induced death and packet respawn.
+     * The other owner's registry/entities must survive, and the dead owner's old arrows
+     * must never be delivered later despite the already-cleared session token.
+     */
     private void deathWithOtherOwnerPresent() {
         Player beta = players.player("beta"); UUID owner = beta.getUniqueId();
         players.setupPosition("beta", new Location(beta.getWorld(), 500, 100, 0.5));
@@ -265,12 +309,20 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Compares a recorded native three-coordinate vector with captured launch data using an explicit tolerance.
+     */
     private static boolean vectorMatches(Object raw, Vector3 expected) {
         if (!(raw instanceof List<?> values) || values.size() != 3) return false;
         double[] target = {expected.x(), expected.y(), expected.z()};
         for (int i = 0; i < 3; i++) if (!(values.get(i) instanceof Number number) || Math.abs(number.doubleValue() - target[i]) > 1e-9) return false;
         return true;
     }
+    /**
+     * Runs six real part/phase/veto contacts and compares collision versus later settlement observations.
+     * Fixture phase holds and positioning are explicit setup; unsupported phases reject
+     * while every terminal projectile is retired before delivery.
+     */
     private void dragon(int index) {
         if (index == 6) { volley(); return; }
         var phase = switch (index) { case 2 -> EnderDragon.Phase.CIRCLING; case 3 -> EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET;
@@ -328,6 +380,9 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Requests two real releases together and requires distinct owners/projectiles with one shared collision tick.
+     */
     private void volley() {
         World world = players.player("alpha").getWorld();
         EnderDragon dragon = context.own(world.spawn(new Location(world, 0.5, 100, 12.5), EnderDragon.class,
@@ -360,9 +415,16 @@ public final class OwnedFiringScenario implements Scenario, Listener {
                     }));
         });
     }
+    /**
+     * Maps a new logical target ID to an actual living entity through the production registry.
+     */
     private void register(LivingEntity entity) {
         UUID target = UUID.randomUUID(); registeredTargets.put(target, entity.getUniqueId()); bows.registerTarget(encounter, target, entity);
     }
+    /**
+     * Creates a positive native-damage witness and applies an actual pre-suppression veto.
+     * Exact projectile/event/cohort bindings prove native HP was not applied.
+     */
     private void nativeVeto() {
         World world = players.player("alpha").getWorld();
         players.setupPosition("alpha", new Location(world, 0.5, 100, 0.5, 0, 0)); kit("alpha", "ordinary", 10);
@@ -383,6 +445,10 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             context.check("native_veto_preserves_hp", hp, cow.getHealth()); bows.unregisterTarget(cow.getUniqueId()); cow.remove(); finish();
         }));
     }
+    /**
+     * Cross-checks every production emission/claim against native launch/contact or final bow-veto provenance.
+     * Then ends both arenas and waits for real quits before shared cleanup completes.
+     */
     private void finish() {
         context.check("receiver_follows_terminal_retirement", true, retiredBeforeDelivery);
         context.check("all_native_launches_owned_by_actual_shooter", true, nativeLaunches.values().stream().allMatch(row -> Boolean.TRUE.equals(row.get("ownedAtLaunch"))));
@@ -421,6 +487,9 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             context.finish();
         });
     }
+    /**
+     * Requests real use/full draw/release and waits for native release plus settlement ticks.
+     */
     private void draw(String actor, String prefix, ScenarioContext.Step next) {
         long before = releases.getOrDefault(players.identity(actor), 0L);
         players.request(actor, prefix + "-use");
@@ -432,17 +501,38 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Replaces fixture arrows and installs one validated loadout as explicit server setup.
+     */
     private void kit(String actor, String id, int ammo) {
         players.player(actor).getInventory().all(Material.ARROW).keySet().forEach(slot -> players.player(actor).getInventory().setItem(slot, null));
         players.setupItem(actor, 0, context.production().equipment().createLoadout(id));
         players.setupItem(actor, 9, new ItemStack(Material.ARROW, ammo)); players.player(actor).updateInventory();
     }
+    /**
+     * Counts real inventory arrows independently of producer accounting traces.
+     */
     private int ammo(String actor) { return players.player(actor).getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum(); }
+    /**
+     * Retains one immutable capture per observed producer projectile for later history assertions.
+     */
     private void collect() { for (var a : bows.projectiles()) if (emissions.stream().noneMatch(old -> old.shot().projectileId().equals(a.shot().projectileId()))) emissions.add(a); }
+    /**
+     * Filters current production registry entries by the exact actor UUID.
+     */
     private List<OwnedProjectile> owner(String actor) { return bows.projectiles().stream().filter(a -> a.shot().ownerId().equals(players.identity(actor))).toList(); }
+    /**
+     * Applies the explicit pre-capture stat bonus to prove shot-time refresh ordering.
+     * @param event actual bow release event
+     */
     @EventHandler(priority = EventPriority.LOWEST) public void beforeBow(EntityShootBowEvent event) {
         if (swap && event.getEntity().getUniqueId().equals(players.identity("alpha"))) context.production().equipment().bonus((Player) event.getEntity(), StatKey.WEAPON_DAMAGE, 7);
     }
+    /**
+     * Captures final bow events and applies the declared swap/veto/transfer/phase setup controls.
+     * Retaining the event object allows final cancellation to be checked after dispatch.
+     * @param event native bow release event
+     */
     @EventHandler(priority = EventPriority.MONITOR) public void bow(EntityShootBowEvent event) {
         bowEvents.put(event.getProjectile().getUniqueId(), event);
         releases.merge(event.getEntity().getUniqueId(), 1L, Long::sum);
@@ -461,6 +551,10 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             fixturePhase = releasePhase; releasePhase = null; phaseTarget.setPhase(fixturePhase);
         }
     }
+    /**
+     * Requests reconnect at the actual use-statistic boundary and records its order independently of quit.
+     * @param event native statistic event
+     */
     @EventHandler(priority = EventPriority.MONITOR) public void usedBow(PlayerStatisticIncrementEvent event) {
         if (event.getStatistic() == Statistic.USE_ITEM && event.getMaterial() == Material.BOW
                 && event.getPlayer().getUniqueId().equals(players.identity("beta")) && immediateShot != null && players.joins("beta") == 1) {
@@ -471,6 +565,10 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             players.request("beta", "reconnect");
         }
     }
+    /**
+     * Records whether native kick dispatch occurred without assuming disconnect must be a kick.
+     * @param event native kick event
+     */
     @EventHandler(priority = EventPriority.MONITOR) public void kick(PlayerKickEvent event) {
         if (!event.getPlayer().getUniqueId().equals(players.identity("beta"))) return;
         kickObserved = true;
@@ -478,6 +576,10 @@ public final class OwnedFiringScenario implements Scenario, Listener {
                 "tick", Bukkit.getCurrentTick(), "cause", event.getCause().name(), "cancelled", event.isCancelled(),
                 "reason", net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(event.reason())));
     }
+    /**
+     * Captures actual quit order and pending-group state before production session cleanup.
+     * @param event native quit event
+     */
     @EventHandler(priority = EventPriority.LOWEST) public void quit(PlayerQuitEvent event) {
         if (event.getPlayer().getUniqueId().equals(players.identity("beta")) && immediateShot != null && players.joins("beta") == 1) {
             boolean validPrimary = bows.arrow(immediateShot.shot().projectileId()).map(Arrow::isValid).orElse(false);
@@ -486,6 +588,10 @@ public final class OwnedFiringScenario implements Scenario, Listener {
             context.observe("immediateQuit", Map.of("tick", quitTick, "sequence", quitOrder, "launchTick", immediateShot.shot().launchTick(), "pendingGroups", bows.pendingGroups(), "validPrimary", validPrimary));
         }
     }
+    /**
+     * Records affirmative native input-veto/permission-denial observations for the control trials.
+     * @param event native interaction event
+     */
     @EventHandler(priority = EventPriority.MONITOR) public void interact(PlayerInteractEvent event) {
         interactions++;
         if (!event.getPlayer().getUniqueId().equals(players.identity("beta")) || event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND) return;
@@ -502,6 +608,10 @@ public final class OwnedFiringScenario implements Scenario, Listener {
                     "permission", false));
         }
     }
+    /**
+     * Captures actual shooter, position, velocity and ownership at native launch; applies only selected probe controls.
+     * @param event native launch event
+     */
     @EventHandler(priority = EventPriority.MONITOR) public void launch(ProjectileLaunchEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow) || !(arrow.getShooter() instanceof Player shooter)) return;
         if (cancelLaunch) { event.setCancelled(true); if (shooter.getUniqueId().equals(players.identity("beta")) && bows.projectile(arrow.getUniqueId()).isPresent()) launchVetoEvents++; }
@@ -514,19 +624,39 @@ public final class OwnedFiringScenario implements Scenario, Listener {
         if (nativeGuard) context.later(2, () -> { if (arrow.isValid()) arrow.setDamage(2); });
         collect();
     }
+    /**
+     * Vetoes the selected real owned-arrow damage before production suppression for the native-veto control.
+     * @param event native damage event
+     */
     @EventHandler(priority = EventPriority.LOW) public void nativeDamage(EntityDamageByEntityEvent event) {
         if (nativeGuard && event.getDamager() instanceof Arrow arrow && bows.projectile(arrow.getUniqueId()).isPresent()) event.setCancelled(true);
     }
+    /**
+     * Counts beta's deliberate native death and removes fixture drop/XP side effects.
+     * @param event native death event
+     */
     @EventHandler(priority = EventPriority.HIGH) public void death(PlayerDeathEvent event) {
         if (event.getPlayer().getUniqueId().equals(players.identity("beta"))) { deaths++; event.getDrops().clear(); event.setDroppedExp(0); }
     }
+    /**
+     * Counts beta's real callback from the requested respawn packet.
+     * @param event native respawn event
+     */
     @EventHandler(priority = EventPriority.MONITOR) public void respawn(PlayerRespawnEvent event) {
         if (event.getPlayer().getUniqueId().equals(players.identity("beta"))) respawns++;
     }
+    /**
+     * Holds only the declared fixture dragon in its trial phase during native drawing/collision.
+     * @param event native phase transition event
+     */
     @EventHandler(priority = EventPriority.HIGHEST) public void phase(EnderDragonChangePhaseEvent event) {
         // Declared server setup keeps each isolated trial in its named phase during native drawing.
         if (event.getEntity().equals(phaseTarget) && event.getNewPhase() != fixturePhase) event.setCancelled(true);
     }
+    /**
+     * Captures actual part/parent geometry and cancellation, with the selected final physical-veto control.
+     * @param event native projectile-hit event
+     */
     @EventHandler(priority = EventPriority.MONITOR) public void hit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow) || !(arrow.getShooter() instanceof Player shooter)) return;
         Entity actual = event.getHitEntity();
