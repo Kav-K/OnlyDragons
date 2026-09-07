@@ -132,7 +132,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Dev.ps1 Build
 Smoke tests use their own profile and port **25566**, leaving the human test world's files separate. Smoke/matrix runs do not automatically stop the human server. Starting Play during a smoke run stops that managed test server as part of taking over. Reports are under `build/reports/lab/<version>-<profile>/result.json` and `server.log`. Matrix runs are sequential, with a summary in `build/reports/lab/matrix.json`. Each smoke run replaces that profile's previous report.
 
 
-Server shutdown regression tests can be run with `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/ServerLifecycle.Tests.ps1`. They use small Java fixtures to check graceful shutdown, forced shutdown, stale PID protection, orphan cleanup, and preservation of unrelated Java processes. Fixture output is saved under `build/tests/server-lifecycle-*`.
+Windows CI runs the lab regression tests; locally use `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/ServerLifecycle.Tests.ps1`. Small Java fixtures check Unicode stdout/stderr, graceful shutdown, forced shutdown, stale PID protection, orphan cleanup, and preservation of unrelated Java processes. Fixture output is saved under `build/tests/server-lifecycle-*`.
 ## Test an existing plugin on other versions
 
 Supply a compatible plugin JAR or a directory containing plugin JARs. Required companion plugins can be passed separately with `-DependencyPath`.
