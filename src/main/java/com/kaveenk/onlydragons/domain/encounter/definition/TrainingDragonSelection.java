@@ -8,10 +8,20 @@ import java.util.Set;
 public final class TrainingDragonSelection {
     private TrainingDragonSelection() {}
 
+    /**
+     * Returns the explicit 100,000-HP training selection by delegating to select(calibration,true);
+     * retains the original inert table without changing the calibration value.
+     */
     public static DragonCatalog.Selection from(DragonCatalog.Selection calibration) {
         return select(calibration, true);
     }
 
+    /**
+     * Requires the sole test_dragon type, then constructs explicit v2 identities, zero defense and
+     * {@link CombatProfile#tempoDragon()}. Training selects 100,000 HP; standard selects 1,000 HP.
+     * The original table is retained exactly; this pure projection neither mutates catalog state
+     * nor spawns an entity. Other type IDs reject with IllegalArgumentException.
+     */
     public static DragonCatalog.Selection select(DragonCatalog.Selection calibration, boolean training) {
         if (!calibration.identity().id().equals("test_dragon"))
             throw new IllegalArgumentException("Training requires test_dragon");

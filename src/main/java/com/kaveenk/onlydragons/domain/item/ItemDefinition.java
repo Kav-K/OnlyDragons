@@ -3,8 +3,19 @@ package com.kaveenk.onlydragons.domain.item;
 import java.util.Objects;
 import java.util.Set;
 
-/** Presentation and allowed roll IDs around the stable T00 offensive definition. */
+/**
+ * Presentation and allowed roll IDs around the stable T00 offensive definition.
+ * <p>
+ * @param weapon nonnull offensive definition with strict item ID and bounded revision syntax
+ * @param displayName nonblank generated presentation, never decoded as authority
+ * @param material exactly BOW in this bounded catalog
+ * @param allowedRolls copied set of valid named roll IDs; registry verifies they exist
+ */
 public record ItemDefinition(WeaponDefinition weapon, String displayName, String material, Set<String> allowedRolls) {
+    /**
+     * Rejects invalid presentation/reference syntax or unsupported material; freezes allowed roll IDs.
+     * Adding another material family requires an explicit compatibility contract.
+     */
     public ItemDefinition {
         Objects.requireNonNull(weapon);
         ItemValidationException.id(weapon.id());

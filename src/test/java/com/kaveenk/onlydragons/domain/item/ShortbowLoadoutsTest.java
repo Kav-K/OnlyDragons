@@ -8,6 +8,12 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Literal seven-tier calibration and current-profile routing oracles through the production
+ * registry/stat factory. Separates F25 strict probability from F100 guaranteed virtual hits,
+ * checks all six v4 book-edited bows and rejects forged revision/ID controls. Cadence results
+ * are pure tick formulas, not a claim about received native held-use input.
+ */
 class ShortbowLoadoutsTest {
     private final ItemRegistry registry = CalibrationLoadouts.compatibleRegistry();
 

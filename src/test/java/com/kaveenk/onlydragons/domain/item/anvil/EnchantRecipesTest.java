@@ -7,9 +7,18 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Pure preview oracles across every supported enchant level: XP-level costs, improving
+ * combinations, complete selection preservation, incompatible legacy/ultimate rejection and
+ * plain-name bounds. Does not simulate native anvil extraction, client GUI, inventory or XP debit.
+ */
 class EnchantRecipesTest {
     private final ItemRegistry registry = CalibrationLoadouts.compatibleRegistry();
     private final EnchantRecipes recipes = new EnchantRecipes(registry);
+    /**
+     * Uses v4 consumer-capable books; cross-catalog tests separately verify compatibility with
+     * the left item's original catalog.
+     */
     private EnchantBook book(String id, int level) { return new EnchantBook("calibration-items-v4", id, level); }
 
     @Test void everySupportedLevelAppliesAtDeclaredCostWithoutChangingIdentityOrSource() {
