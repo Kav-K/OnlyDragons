@@ -26,11 +26,20 @@ import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.util.Vector;
 
-/** Runtime consumer of production T00 contracts, not a substitute for a combat-engine scenario. */
+/**
+ * Loaded-production contract calibration with a real moving arrow and synthetic domain DTOs.
+ * It mutates source collections after capture to prove immutable shot provenance.
+ * The 210/52.5/20 damage values are independently constructed contract examples,
+ * not collision-driven combat or a claim about current production proc policy.
+ */
 public final class ContractScenario implements Scenario {
     private static final String REVISION = "contract-fixture-v1";
     private static final MechanicRevision PROFILE = new MechanicRevision("contract-calibration", REVISION);
 
+    /**
+     * Checks the production classloader boundary and acquires a ticking native-flight chunk.
+     * @param context current scenario's server-thread owner
+     */
     @Override public void start(ScenarioContext context) {
         context.mechanicRevision(REVISION);
         context.check("server_thread", true, Bukkit.isPrimaryThread());
@@ -50,6 +59,9 @@ public final class ContractScenario implements Scenario {
         context.later(1, () -> awaitTicking(context, start, 200));
     }
 
+    /**
+     * Waits for actual entity ticking before creating the arrow used by the capture example.
+     */
     private void awaitTicking(ScenarioContext context, Location start, int remaining) {
         if (start.getChunk().getLoadLevel() == Chunk.LoadLevel.ENTITY_TICKING) {
             context.observe("chunkReadinessWaitTicks", 200 - remaining);
@@ -61,6 +73,9 @@ public final class ContractScenario implements Scenario {
         }
     }
 
+    /**
+     * Captures immutable shot inputs, then deliberately changes the mutable source collections.
+     */
     private void capture(ScenarioContext context, Location start) {
         context.check("test_chunk_entity_ticking", "ENTITY_TICKING", start.getChunk().getLoadLevel().name());
         Arrow arrow = context.own(start.getWorld().spawn(start, Arrow.class));
@@ -98,6 +113,9 @@ public final class ContractScenario implements Scenario {
         context.later(8, () -> verify(context, start, arrow, launchTick, shot));
     }
 
+    /**
+     * Checks native UUID continuity and that captured stats/enchants survived later source mutation.
+     */
     private void verify(ScenarioContext context, Location start, Arrow arrow, int launchTick, ShotContext shot) {
         context.check("native_arrow_valid", true, arrow.isValid());
         context.check("native_arrow_uuid_captured", shot.projectileId().toString(), arrow.getUniqueId().toString());
@@ -125,6 +143,9 @@ public final class ContractScenario implements Scenario {
         context.finish();
     }
 
+    /**
+     * Constructs explicit DTO arithmetic and rejection examples without applying native damage.
+     */
     private void verifyDamageFixtures(ScenarioContext context, ShotContext shot) {
         // Explicit fixture math, not an implementation of the future production damage engine.
         double ordinary = shot.stats().effective(StatKey.WEAPON_DAMAGE) * 1.4
@@ -150,10 +171,16 @@ public final class ContractScenario implements Scenario {
         context.check("zero_hp_target_is_dead", false, completedTarget.alive());
     }
 
+    /**
+     * Requires UnsupportedOperationException specifically; another failure is not an immutability pass.
+     */
     private static boolean rejectsMutation(Runnable action) {
         try { action.run(); return false; } catch (UnsupportedOperationException expected) { return true; }
     }
 
+    /**
+     * Requires IllegalArgumentException specifically for the declared invalid domain input.
+     */
     private static boolean rejectsInvalid(Runnable action) {
         try { action.run(); return false; } catch (IllegalArgumentException expected) { return true; }
     }

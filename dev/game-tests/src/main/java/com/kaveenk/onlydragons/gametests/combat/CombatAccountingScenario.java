@@ -11,11 +11,20 @@ import com.kaveenk.onlydragons.gametests.ScenarioContext;
 import java.util.*;
 import org.bukkit.Bukkit;
 
-/** Synthetic combat inputs on the actual server, through production services; no physical adapter claim. */
+/**
+ * Production accounting calibration driven by synthetic domain impacts on real Paper.
+ * Literal cap boundaries, overkill credit and reduced/zero proc HP fractions are
+ * independent oracles. No packet firing, native collision or suppression is implied;
+ * those belong to connected gameplay scenarios.
+ */
 public final class CombatAccountingScenario implements Scenario {
     private static final UUID ENCOUNTER = new UUID(0, 1), OWNER = new UUID(0, 2), TARGET = new UUID(0, 3);
     private static final DamageModifiers POWER = new DamageModifiers(Map.of("power", 0.4), Map.of());
 
+    /**
+     * Checks atomic acceptance/rejection, inherited proc amounts and frozen completion.
+     * @param context current server-thread report owner
+     */
     @Override public void start(ScenarioContext context) {
         context.mechanicRevision("combat-accounting-calibration-v1");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
@@ -106,6 +115,9 @@ public final class CombatAccountingScenario implements Scenario {
         context.finish();
     }
 
+    /**
+     * Checks both sides of each historical piecewise cap boundary against explicit slopes.
+     */
     private static boolean capNeighbors(CombatProfile profile) {
         double[][] fixtures = {{4000, 4000, 1, 0.1}, {24000, 6000, 0.1, 0.01},
                 {224000, 8000, 0.01, 0.001}, {2224000, 10000, 0.001, 0}};
@@ -115,25 +127,43 @@ public final class CombatAccountingScenario implements Scenario {
         }
         return true;
     }
+    /**
+     * Resolves a synthetic calibrated weapon/chance pair through production stat code.
+     */
     private static StatSnapshot stats(double damage, double chance) {
         return new StatResolver(StatProfile.calibration()).resolve("fixture-v1",
                 Map.of(StatKey.WEAPON_DAMAGE, damage, StatKey.CRIT_CHANCE, chance), ModifierSources.empty()).snapshot();
     }
+    /**
+     * Creates a fresh isolated domain ledger with the declared HP/defense/profile.
+     */
     private static CombatEncounter encounter(double hp, double defense, CombatProfile profile) {
         return new CombatEncounter(new TargetState(ENCOUNTER, TARGET, hp, hp, defense), "practice", profile);
     }
+    /**
+     * Creates deterministic synthetic shot ancestry and captured launch values; no arrow is spawned.
+     */
     private static ShotContext shot(long id, double damage, CombatProfile profile, CritOutcome crit, double scale, Optional<UUID> parent) {
         return new ShotContext(ENCOUNTER, new UUID(1, id), new UUID(0, id), 0, parent, OWNER,
                 new WeaponIdentity(new UUID(2, id), "test-bow", 1, "v1"), stats(damage, 100), List.of(), profile.mechanic(),
                 10, new Vector3(0, 100, 0), new Vector3(0, 1, 0), crit, 1, scale);
     }
+    /**
+     * Builds a synthetic accepted-candidate key at the fixture's declared collision tick.
+     */
     private static PhysicalImpact impact(ShotContext shot) {
         return new PhysicalImpact(new PhysicalImpact.Key(shot.encounterId(), shot.projectileId(), TARGET, 0), OWNER, 20,
                 new Vector3(0, 110, 0), Optional.empty());
     }
+    /**
+     * Invokes the domain physical receiver directly, distinct from native event acceptance.
+     */
     private static DamageResult hit(CombatEncounter encounter, ShotContext shot, DamageModifiers modifiers) {
         return encounter.physical(shot, impact(shot), modifiers, 25, Optional.empty());
     }
+    /**
+     * Copies parent provenance and mitigated damage into a synthetic one-generation child.
+     */
     private static ProcCommand child(DamageResult parent, long id) {
         return new ProcCommand(new UUID(0, id), parent.impactId(), parent.origin(), parent.ownerId(), parent.shotId(), 22,
                 parent.amounts().mitigatedDamage(), parent.crit(), parent.mechanic(), 0);

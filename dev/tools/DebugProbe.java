@@ -5,8 +5,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-/** Attaches a real JDI debugger, hits a plugin breakpoint, resumes, and detaches. */
+/**
+ * Operator-only JDI smoke probe for the running lab's real plugin command breakpoint.
+ * It attaches exclusively to loopback, queues a status command through the lab inbox,
+ * resumes each event set and always resumes/detaches the VM in the finally path.
+ * This validates debugger wiring, not gameplay or permission behavior.
+ */
 class DebugProbe {
+    /**
+     * Attaches with a ten-second connection timeout and waits at most fifteen seconds for a hit.
+     * @param args debugger port followed by the existing lab command-inbox directory
+     * @throws Exception on attach, breakpoint lookup, inbox I/O or missing breakpoint hit
+     */
     public static void main(String[] args) throws Exception {
         var connector = Bootstrap.virtualMachineManager().attachingConnectors().stream()
                 .filter(c -> c.name().equals("com.sun.jdi.SocketAttach")).findFirst().orElseThrow();
