@@ -6,13 +6,14 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
-**Source documentation maintenance:** the user requested a whole-code contract
-pass after T07b completion. The integration lead owns combined review and the
-[source-first navigation map](../../dev/source-contracts.md); Symphony
-[#94](https://github.com/Kav-K/OnlyDragons/issues/94) owns domain/application docs,
-with disjoint Paper adapter, fixture and operational-script partitions. This
-maintenance is **In review** until the combined PR, source-preservation checks,
-Javadoc/build validation and current CI are accepted. It changes no gameplay
+**Source documentation maintenance:** [PR98](https://github.com/Kav-K/OnlyDragons/pull/98)
+delivers the user-requested whole-code contract pass after T07b completion:
+208 maintained Java files and 62 operational/build scripts, plus a consistent
+[source-first navigation map](../../dev/source-contracts.md). The
+[coverage and verification record](evidence/source-documentation.md) includes
+Symphony #94/PR95 and the disjoint adapter, fixture and script partitions.
+Acceptance requires that PR's merged state after independent review,
+source-preservation checks, Javadoc/build validation and current CI. It changes no gameplay
 requirements, numeric calibration, reward policy or milestone state. Existing
 Paper evidence keeps its original revision and source-byte identity.
 
@@ -248,11 +249,11 @@ lead-coordinated, and each small PR retains independent review/current CI/runtim
 evidence. The [qualitative feedback](01-research.md#checkpoint-feedback--7-september-2026)
 does not accept human milestone gates.
 
-### Upcoming documentation maintenance
+### Source documentation maintenance
 
 The user requested whole-code Javadoc after the accepted Tracer installation.
-That maintenance is now in combined review as described in the current delivery
-status and [source map](../../dev/source-contracts.md). It documents existing
+The combined delivery and acceptance are tracked by PR98 as described in the
+current delivery status and [source map](../../dev/source-contracts.md). It documents existing
 contracts in bounded reviewable chunks; no new gameplay, infrastructure or
 milestone scope is implied.
 
