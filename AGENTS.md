@@ -6,11 +6,16 @@ Paper build 121, and JDK 25. Treat versions.properties as the source of truth.
 
 ## Shared project context
 
-When this checkout contains `docs/planning/`, every agent must read these three
-files before choosing, delegating, or implementing a task. Read them in bounded
-sections so tool output is complete. After a main merge, inspect the context diff
-and reread affected sections; repeat the full read when changing tasks or resuming
-without the earlier context:
+When this checkout contains `docs/planning/`, use a source-first reading route.
+Start with the assigned issue and owner comments, the current delivery status in
+document 03, and [the source contract map](dev/source-contracts.md). Read the
+relevant types' Javadoc, their consumers/tests, and the affected design/research
+sections before editing. Routine bounded fixes and documentation maintenance do
+not require rereading unrelated planning sections or historical run transcripts.
+
+Read all three entry documents when choosing new product scope, changing a
+cross-cutting contract, resolving an ambiguous decision, or recovering missing
+design context. Their roles remain:
 
 1. `docs/planning/01-research.md`: researched mechanics, source confidence, and
    unresolved questions. A report about another game is not an implementation fact.
@@ -26,6 +31,13 @@ rewards, and progression come later. A backlog item or command example is not
 an instruction to execute unassigned work. Follow the current user's task and
 the active execution environment when applying the plan.
 
+Read in bounded sections with complete tool output. After integrating main,
+inspect the source/context diff and reread affected contracts. Javadoc describes
+implemented behavior; the planning documents retain intended scope, user decisions
+and acceptance gates. If they disagree, investigate the implementation, evidence
+and recorded decision before changing behavior. A source comment cannot authorize
+a new mechanic, infer a balance decision or declare a milestone accepted.
+
 - Each handoff/delegation includes the checkout and revision, these context paths,
   the assigned task ID or bounded scope, owned files, dependencies, acceptance
   gates, and relevant decisions/blockers. Subagents report discoveries to the
@@ -36,6 +48,12 @@ the active execution environment when applying the plan.
 - Research updates belong in 01, design/contract changes in 02, and task status,
   validation, and handoffs in 03. Update linked sections together when needed;
   do not duplicate the whole specification or append a transcript of the run.
+- Maintain source contracts in the same change: document units, ordering,
+  validation/rejection, mutable-state ownership, snapshot timing and cleanup at
+  the type/API that owns them. Link related contracts and tests instead of copying
+  formulas or implementation details across layers. Preserve diagnostic examples
+  as examples, not promises of current calibration. Generate affected Javadoc
+  when editing Java documentation; do not suppress doclint to hide broken comments.
 - Agents may correct evidence, record discoveries, and advance verified task
   status within the assigned scope. Do not silently overturn user-confirmed
   decisions, remove acceptance gates, or expand the project's scope.

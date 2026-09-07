@@ -6,6 +6,16 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
+**Source documentation maintenance:** the user requested a whole-code contract
+pass after T07b completion. The integration lead owns combined review and the
+[source-first navigation map](../../dev/source-contracts.md); Symphony
+[#94](https://github.com/Kav-K/OnlyDragons/issues/94) owns domain/application docs,
+with disjoint Paper adapter, fixture and operational-script partitions. This
+maintenance is **In review** until the combined PR, source-preservation checks,
+Javadoc/build validation and current CI are accepted. It changes no gameplay
+requirements, numeric calibration, reward policy or milestone state. Existing
+Paper evidence keeps its original revision and source-byte identity.
+
 **7 September feedback follow-ups:** T07b/#90 is **complete** through PR #92 at
 `c3fc8f305b2f23a556deccd4b7724bf8f0f5b9f2`, accepting exactly `aimed-dragon-tracer`.
 [accepted hosted evidence](evidence/t07b-aimed-tracer.md#accepted-hosted-cohort) records the 48-case cohort, strict replay and independent
@@ -240,15 +250,19 @@ does not accept human milestone gates.
 
 ### Upcoming documentation maintenance
 
-The user requested whole-code Javadoc after the accepted Tracer installation is
-finished. This is the next documentation-maintenance request, not an implementation
-or acceptance claim. Document existing contracts in bounded reviewable chunks;
-no new gameplay, infrastructure or milestone scope is implied.
+The user requested whole-code Javadoc after the accepted Tracer installation.
+That maintenance is now in combined review as described in the current delivery
+status and [source map](../../dev/source-contracts.md). It documents existing
+contracts in bounded reviewable chunks; no new gameplay, infrastructure or
+milestone scope is implied.
 
 ## Shared context update protocol
 
-Every agent reads all three planning files at task start under AGENTS.md.
-Maintain them as part of completing the assigned work; no separate permission
+Every agent follows AGENTS.md's source-first reading route: assigned issue,
+current delivery state, owning source contracts/tests and relevant design/research
+sections. Read all three planning entries for new scope, cross-cutting decisions
+or missing design context. Maintain affected source and planning contracts as
+part of completing assigned work; no separate permission
 is needed to record accurate progress, findings, or in-scope design refinements.
 This instruction does not authorize implementing unassigned work packages.
 

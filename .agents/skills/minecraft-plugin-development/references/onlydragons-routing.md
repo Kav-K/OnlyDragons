@@ -6,8 +6,11 @@ Other projects and generated starters use their own brief. The planning document
 describe intended behavior; inspect code and document 03's delivery ledger for
 what exists. A section or task name does not assign that work.
 
-Read the three documents under the shared-context contract in `AGENTS.md`, then
-return to these sections as the assigned implementation or review requires:
+Follow the source-first reading contract in `AGENTS.md`: start with
+`dev/source-contracts.md`, the assigned issue, current delivery status and relevant
+source Javadoc/tests. Use these design/evidence sections as the bounded task
+requires. Read all three entry documents for new scope, cross-cutting decisions
+or missing design context; unrelated history is not a mandatory routine read:
 
 | Concern | Design and evidence locations |
 | --- | --- |

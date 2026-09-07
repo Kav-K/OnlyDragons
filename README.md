@@ -32,6 +32,10 @@ for version-aware implementation, task-specific Minecraft skills, documentation
 lookups with Context7, and build/runtime validation through the existing scripts.
 New projects created with `mcdev new` inherit these files and the Cursor rule.
 Skills and MCP connections are configured separately in each client's user setup.
+Use [the source contract map](dev/source-contracts.md) to locate gameplay APIs,
+Paper ownership boundaries, fixtures and operational entry points. Source Javadoc
+and native script help describe implemented contracts; planning retains product
+decisions, delivery status and unaccepted gates.
 
 ## Create a new plugin
 
