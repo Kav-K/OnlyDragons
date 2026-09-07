@@ -15,7 +15,8 @@ in the delivery ledger; T06c Quiver/Flame is accepted through PR #81 at
 `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`. T06b held-fire kits and T02c books/anvils
 are accepted through PR #86 for their two named requirements; [combined acceptance evidence](evidence/checkpoint2-held-books.md).
 The [7 September feedback](01-research.md#checkpoint-feedback--7-september-2026)
-motivates T07b; T06d is deferred by the user's vanilla-bow decision. Earlier automated acceptance remains intact.
+is addressed by accepted T07b; T06d remains deferred by the user's vanilla-bow decision.
+[accepted hosted evidence](evidence/t07b-aimed-tracer.md#accepted-hosted-cohort) keeps this automated acceptance separate from human aiming preference.
 Human milestone outcomes remain separate. Preserve the accepted older profiles below. Armor effects and real rewards remain
 disabled/deferred.
 
@@ -947,8 +948,10 @@ Infinite accumulation is avoided at **shot admission**, not by deleting accepted
 
 These are separate small changes after the accepted checkpoint, registered as
 [T06d/#89](https://github.com/Kav-K/OnlyDragons/issues/89) and
-[T07b/#90](https://github.com/Kav-K/OnlyDragons/issues/90). Registration is not
-implementation or dispatch. Preserve legacy calibration profiles and their evidence.
+[T07b/#90](https://github.com/Kav-K/OnlyDragons/issues/90). PR #92 merged at
+`c3fc8f305b2f23a556deccd4b7724bf8f0f5b9f2`, accepting only `aimed-dragon-tracer`;
+[accepted hosted evidence](evidence/t07b-aimed-tracer.md#accepted-hosted-cohort). T06d remains deferred. Preserve legacy calibration
+profiles and their original evidence; no other feature or milestone is accepted here.
 
 - **T06d — deferred by the user:** keep vanilla bows and their working native
   held input; do not dispatch the animation fix or repeat the

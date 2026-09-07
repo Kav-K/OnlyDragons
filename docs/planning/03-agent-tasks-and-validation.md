@@ -6,9 +6,11 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
-**7 September feedback follow-ups:** T07b/#90 (`aimed-dragon-tracer`) is the
-single **In review** feature. T06d/#89 (`shortbow-no-draw`) is **blocked** by
-the user's decision to keep vanilla bows and defer the animation fix. T07b focused Paper checks pass; lead-owned hosted suite acceptance is pending; T06d remains deferred. [Small task contracts](#checkpoint-feedback-tasks)
+**7 September feedback follow-ups:** T07b/#90 is **complete** through PR #92 at
+`c3fc8f305b2f23a556deccd4b7724bf8f0f5b9f2`, accepting exactly `aimed-dragon-tracer`.
+[accepted hosted evidence](evidence/t07b-aimed-tracer.md#accepted-hosted-cohort) records the 48-case cohort, strict replay and independent
+review. T06d/#89 (`shortbow-no-draw`) remains **blocked** by the user's decision
+to keep vanilla bows and defer the animation fix. [Small task contracts](#checkpoint-feedback-tasks)
 follow the user's visual/aiming observations; existing acceptance and M1–M5 are
 unchanged. Prefer these distinct chunks over a broad follow-up change.
 
@@ -222,20 +224,26 @@ authenticated-client visuals/input feel, Windows smoke and milestones remain pen
 | T06d / [#89](https://github.com/Kav-K/OnlyDragons/issues/89) | T06b, T02c; user must reopen | **Blocked/deferred:** keep vanilla bows and working native held input; `shortbow-no-draw` remains unimplemented. |
 | T07b / [#90](https://github.com/Kav-K/OnlyDragons/issues/90) | T08e, T06b | `aimed-dragon-tracer`: captured-direction gate, aimed assistance versus physical misses, legacy profile/identity and cleanup preservation. |
 
-T06d is not dispatched. T07b was dispatched from main `b2f0254` in the
-[owner assignment](https://github.com/Kav-K/OnlyDragons/issues/90#issuecomment-5575533461).
-[Draft PR #92](https://github.com/Kav-K/OnlyDragons/pull/92), `symphony/gh-90`, adds `tracer-aimed/v3` at the existing captured
-profile/rules/continuity seam. Build passes 329 production tests with no failures,
-errors or skips. Clean runtime `e6ac40f` passes aimed-tracer (36 assertions) and
-held-combat (23 assertions), with both owned JVMs cleaned up. The lead requested
-draft handoff and owns the hosted 48-case receipt, independent replay, acceptance
-and current CI; human aiming/visuals are separate. No firing/damage ownership changes. The six current v4 bows also select v3
-under the owner clarification; [iteration evidence and remaining gates](evidence/t07b-aimed-tracer.md). The [design contract](02-foundation-plan.md#checkpoint-feedback-contracts)
+T06d is not dispatched. T07b completed through [PR #92](https://github.com/Kav-K/OnlyDragons/pull/92)
+at `c3fc8f305b2f23a556deccd4b7724bf8f0f5b9f2` after the full 48-case/54-boot hosted
+cohort, strict original replay and independent source/raw review. Tested head
+`8ce67877a4ea28c2074c033eb3b0e49009fdc131` retains the original focused `e6ac40f`
+runtime history. Exactly `aimed-dragon-tracer` is accepted; [accepted hosted evidence](evidence/t07b-aimed-tracer.md#accepted-hosted-cohort).
+All thirteen current bow definitions select v3 under the owner clarification;
+explicit legacy profiles and firing/damage ownership remain intact. Windows
+tracer-review smoke passes all 17 commands; human aiming/visuals remain pending. The [design contract](02-foundation-plan.md#checkpoint-feedback-contracts)
 records the exact first calibration and API constraints; do not substitute broad
 engine, dependency or fixture work. Shared loadout/presentation/profile edits are
 lead-coordinated, and each small PR retains independent review/current CI/runtime
 evidence. The [qualitative feedback](01-research.md#checkpoint-feedback--7-september-2026)
 does not accept human milestone gates.
+
+### Upcoming documentation maintenance
+
+The user requested whole-code Javadoc after the accepted Tracer installation is
+finished. This is the next documentation-maintenance request, not an implementation
+or acceptance claim. Document existing contracts in bounded reviewable chunks;
+no new gameplay, infrastructure or milestone scope is implied.
 
 ## Shared context update protocol
 
