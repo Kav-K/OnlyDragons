@@ -8,11 +8,23 @@ import org.junit.jupiter.api.*;
 import org.mockbukkit.mockbukkit.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Admission-only MockBukkit regression: oversized footprint rejection is atomic and returned value boxes cannot mutate live bounds. Counts and exact half-open faces are checked; this does not prove native steering, chunk ticking or real arrows.
+ */
 class HomingAdmissionTest {
     ServerMock server;
     OnlyDragonsPlugin plugin;
+    /**
+     * Creates a fresh isolated MockBukkit boundary and the collaborators used by this class's oracles.
+     */
     @BeforeEach void setup() { server = MockBukkit.mock(); plugin = MockBukkit.load(OnlyDragonsPlugin.class); }
+    /**
+     * Releases the mock server/plugin lifecycle after each test so scheduler and static Bukkit state cannot leak between cases.
+     */
     @AfterEach void cleanup() { MockBukkit.unmock(); }
+    /**
+     * Compares empty admission/session/budget after failure, exact box faces and immutable retained snapshots, then verifies close rejects future continuity ticks.
+     */
     @Test void oversizedAdmissionIsAtomicAndViewsCannotRewriteLiveBounds() {
         var player = server.addPlayer(); var bows = plugin.bows(); var id = UUID.randomUUID();
         var mechanic = new MechanicRevision("fixture", "v1");

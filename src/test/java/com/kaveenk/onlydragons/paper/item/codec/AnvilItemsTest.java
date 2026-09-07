@@ -20,14 +20,32 @@ import org.junit.jupiter.api.*;
 import org.mockbukkit.mockbukkit.MockBukkit;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * MockBukkit metadata/preview tests for all ten custom books and clone-preserving weapon edits. Exact fields, literal cost and unchanged inputs are checked; native XP debit, extraction and client slots belong to real anvil scenarios.
+ */
 class AnvilItemsTest {
     private final com.kaveenk.onlydragons.domain.item.ItemRegistry registry = CalibrationLoadouts.compatibleRegistry();
     private final WeaponItemCodec weapons = new WeaponItemCodec(registry);
     private final EnchantBookCodec books = new EnchantBookCodec(registry);
+    /**
+     * Creates a fresh isolated MockBukkit boundary and the collaborators used by this class's oracles.
+     */
     @BeforeEach void start() { MockBukkit.mock(); }
+    /**
+     * Releases the mock server/plugin lifecycle after each test so scheduler and static Bukkit state cannot leak between cases.
+     */
     @AfterEach void stop() { MockBukkit.unmock(); }
+    /**
+     * Encodes a trusted current-catalog book for preview/metadata tests.
+     * @param id catalog enchant ID
+     * @param level valid requested level
+     * @return fresh native book item
+     */
     private ItemStack book(String id, int level) { return books.encode(new EnchantBook("calibration-items-v4", id, level)); }
 
+    /**
+     * Compares original input, UUID, name, durability, prior-work cost, native enchant and foreign PDC while rejecting edits with a different item identity.
+     */
     @Test void cloneEditPreservesEveryUnownedFieldAndDoesNotMutatePreviewInputs() {
         var input = registry.create("ordinary_v4");
         var left = weapons.encode(input);
@@ -52,6 +70,9 @@ class AnvilItemsTest {
         assertThrows(IllegalArgumentException.class, () -> weapons.edit(left, registry.create("ordinary_v4")));
     }
 
+    /**
+     * Every catalog enchant produces typed metadata and nonitalic Roman-level lore; copied display text cannot grant book authority.
+     */
     @Test void allTenBooksHaveValidatedStyledLoreAndSpoofedNamesAreOrdinary() {
         for (var enchant : registry.enchantments().values()) {
             var item = book(enchant.id(), enchant.maxLevel());
@@ -68,6 +89,9 @@ class AnvilItemsTest {
         }
     }
 
+    /**
+     * Literal cost five for Power II plus rename and cost one for rename-only are checked without mutation; vanilla repair stays outside custom ownership.
+     */
     @Test void renameAndRejectionPreviewsDoNotConsumeOrChangeInputsAndVanillaRemainsUnmanaged() {
         var service = new AnvilRecipeService(registry);
         var left = weapons.encode(registry.create("ordinary_v4"));

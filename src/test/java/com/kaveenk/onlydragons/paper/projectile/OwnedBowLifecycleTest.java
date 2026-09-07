@@ -9,18 +9,33 @@ import org.mockbukkit.mockbukkit.*;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * MockBukkit admission/generation and single-receiver ownership tests. Tokens, task counts and registry state are inspected directly; no actual bow input, collision or client disconnect timing is claimed.
+ */
 class OwnedBowLifecycleTest {
     ServerMock server;
     OnlyDragonsPlugin plugin;
     PlayerMock player;
     OwnedBowService bows;
     UUID encounter;
+    /**
+     * Creates a fresh isolated MockBukkit boundary and the collaborators used by this class's oracles.
+     */
     @BeforeEach void setup() {
         server = MockBukkit.mock(); plugin = MockBukkit.load(OnlyDragonsPlugin.class);
         player = server.addPlayer(); bows = plugin.bows(); encounter = UUID.randomUUID();
     }
+    /**
+     * Releases the mock server/plugin lifecycle after each test so scheduler and static Bukkit state cannot leak between cases.
+     */
     @AfterEach void cleanup() { MockBukkit.unmock(); }
+    /**
+     * Opens a broad targetless calibration arena containing the mock player; the service owns reservation/session creation.
+     */
     void admit() { bows.openEncounter(encounter, player.getWorld(), new BoundingBox(-1000, -1000, -1000, 1000, 1000, 1000), new MechanicRevision("calibration", "v1")); }
+    /**
+     * A targetless arena admits already-online players, and reset followed by a new generation produces a different token.
+     */
     @Test void admissionActivatesOnlinePlayersBeforeAnyTargetAndResetInvalidatesSessions() {
         assertTrue(bows.currentSession(player.getUniqueId()).isEmpty()); admit();
         UUID token = bows.currentSession(player.getUniqueId()).orElseThrow();
@@ -28,6 +43,9 @@ class OwnedBowLifecycleTest {
         bows.endEncounter(encounter); assertTrue(bows.currentSession(player.getUniqueId()).isEmpty());
         encounter = UUID.randomUUID(); admit(); assertNotEquals(token, bows.currentSession(player.getUniqueId()).orElseThrow());
     }
+    /**
+     * Cleanup carrying an old token cannot delete the newly activated session.
+     */
     @Test void staleSessionClearCannotInvalidateReplacement() {
         admit(); UUID token = bows.currentSession(player.getUniqueId()).orElseThrow();
         bows.clearSession(player.getUniqueId(), token, false); bows.activate(player);
@@ -36,6 +54,9 @@ class OwnedBowLifecycleTest {
         assertEquals(replacement, bows.currentSession(player.getUniqueId()).orElseThrow());
         assertFalse(bows.isCurrentSession(player.getUniqueId(), token));
     }
+    /**
+     * Overlapping arenas fail before adoption; callback detachment uses exact identity so an unrelated consumer cannot seize authority.
+     */
     @Test void overlappingAdmissionAndCompetingReceiversRejectWithoutReplacingAuthority() {
         admit();
         assertThrows(IllegalArgumentException.class, () -> bows.openEncounter(UUID.randomUUID(), player.getWorld(),
@@ -46,6 +67,9 @@ class OwnedBowLifecycleTest {
         isolated.clearReceiver(hit -> {}); assertThrows(IllegalStateException.class, () -> isolated.receiver(hit -> {}));
         isolated.clearReceiver(receiver); assertDoesNotThrow(() -> isolated.receiver(hit -> {}));
     }
+    /**
+     * Direct movement between nonoverlapping admissions replaces the token; closing the old arena cannot clear the new session.
+     */
     @Test void directArenaTransferReplacesSessionWithoutWaitingForAnUnadmittedLocation() {
         bows.openEncounter(encounter, player.getWorld(), new BoundingBox(-10, -1000, -10, 10, 1000, 10), new MechanicRevision("calibration", "v1"));
         UUID old = bows.currentSession(player.getUniqueId()).orElseThrow();
@@ -58,6 +82,9 @@ class OwnedBowLifecycleTest {
         assertEquals(next, bows.currentSession(player.getUniqueId()).orElseThrow());
         bows.endEncounter(second); assertTrue(bows.currentSession(player.getUniqueId()).isEmpty());
     }
+    /**
+     * Repeated close clears task/capacity/claims/session state and rejects activation while leaving the equipment collaborator available.
+     */
     @Test void disableIsTerminalIdempotentAndCancelsOnlyOwnedTask() {
         admit(); assertEquals(1, bows.taskCount()); bows.close(); bows.close();
         assertEquals(0, bows.taskCount()); assertEquals(0, bows.capacityUsed());

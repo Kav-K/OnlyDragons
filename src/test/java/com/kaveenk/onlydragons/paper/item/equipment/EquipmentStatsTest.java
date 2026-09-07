@@ -18,19 +18,38 @@ import org.junit.jupiter.api.*;
 import org.mockbukkit.mockbukkit.*;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 
+/**
+ * MockBukkit equipment-cache and listener regressions. Literal stat values, immutable prior snapshots, full fingerprints and queued-task cleanup are independent oracles. Manually dispatched inventory events exercise adapter ordering, not protocol inventory transactions.
+ */
 class EquipmentStatsTest {
     ServerMock server;
     OnlyDragonsPlugin plugin;
     EquipmentStatsService stats;
     PlayerMock player;
+    /**
+     * Creates a fresh isolated MockBukkit boundary and the collaborators used by this class's oracles.
+     */
     @BeforeEach void setup() {
         server = MockBukkit.mock(); plugin = MockBukkit.load(OnlyDragonsPlugin.class);
         stats = plugin.equipment(); player = server.addPlayer(); drain();
     }
+    /**
+     * Releases the mock server/plugin lifecycle after each test so scheduler and static Bukkit state cannot leak between cases.
+     */
     @AfterEach void cleanup() { MockBukkit.unmock(); }
+    /**
+     * Discards mock join messages before command-specific feedback assertions.
+     */
     void drain() { while (player.nextMessage() != null) {} }
+    /**
+     * Dispatches arguments through registered production command routing.
+     * @param text arguments after onlydragons
+     */
     void command(String text) { server.dispatchCommand(player, "onlydragons " + text); }
 
+    /**
+     * Equal cloned contents reuse the validated snapshot; swapping hands selects only the main-hand source and leaves the old snapshot unchanged.
+     */
     @Test void cacheReusesValidatedContentsAndReplacesHandsWithoutStacking() {
         var main = stats.createLoadout("ferocity_25");
         var off = stats.createLoadout("ferocity_500");
@@ -47,6 +66,9 @@ class EquipmentStatsTest {
         assertEquals(0, empty.stats().snapshot().raw(WEAPON_DAMAGE));
         assertEquals(0, empty.stats().snapshot().raw(FEROCITY));
     }
+    /**
+     * An enchant edit under the same UUID must change the fingerprint; corrupt stack count contributes no weapon stats.
+     */
     @Test void sameUuidEditsAndCorruptContentsInvalidateWithoutLosingOldSnapshot() {
         var registry = CalibrationLoadouts.registry(); var codec = new WeaponItemCodec(registry);
         var instance = registry.create("ordinary");
@@ -61,6 +83,9 @@ class EquipmentStatsTest {
         assertInstanceOf(ItemReadResult.Invalid.class, invalid.fingerprint().mainHand());
         assertEquals(0, invalid.stats().snapshot().raw(WEAPON_DAMAGE));
     }
+    /**
+     * A trusted 2.5 damage roll and a profile revision change independently invalidate cached identity.
+     */
     @Test void changedRollContentsAndProfileRevisionsArePartOfFingerprint() {
         var base = CalibrationLoadouts.registry().definitions().get("ordinary");
         var definition = new ItemDefinition(base.weapon(), base.displayName(), base.material(), java.util.Set.of("damage"));
@@ -77,6 +102,9 @@ class EquipmentStatsTest {
         var other = new EquipmentStatsService(registry, new StatProfile(p.id(), 2, p.definitions(), p.effectiveCaps()));
         assertNotEquals(before.fingerprint(), other.refresh(player.getUniqueId(), codec.encode(instance), null).fingerprint());
     }
+    /**
+     * Exercises command denial, actual encoded grant, unknown IDs, full storage and malformed bonus values.
+     */
     @Test void permissionsGrantsFullInventoryAndMalformedRequests() {
         command("dev loadout ordinary"); assertTrue(player.nextMessage().contains("permission"));
         assertEquals(-1, player.getInventory().first(Material.BOW));
@@ -88,6 +116,9 @@ class EquipmentStatsTest {
         command("dev bonus ferocity NaN"); assertTrue(org.bukkit.ChatColor.stripColor(player.nextMessage()).startsWith("Invalid"));
         command("dev bonus unknown 1"); assertTrue(org.bukkit.ChatColor.stripColor(player.nextMessage()).startsWith("Invalid"));
     }
+    /**
+     * Repeated bonus replacement does not stack, rejected overflow retains the snapshot, and quit clears session-only sources.
+     */
     @Test void bonusReplacementIsAtomicAndSessionOnly() {
         player.setOp(true); player.getInventory().setItemInMainHand(stats.createLoadout("ordinary"));
         command("dev bonus ferocity 25"); command("dev bonus ferocity 25");
@@ -102,6 +133,9 @@ class EquipmentStatsTest {
         assertNull(stats.cached(player.getUniqueId()));
         assertEquals(0, stats.refresh(player).stats().snapshot().raw(FEROCITY));
     }
+    /**
+     * A bounded mock inventory view permits synthetic slot events; later refresh sees completed mutations while quit/disable cancel stale work.
+     */
     @Test void eventsRefreshAfterMutationAndQuitCancelsQueuedWork() {
         server.getScheduler().performTicks(2);
         player.getInventory().setItemInMainHand(stats.createLoadout("ferocity_25"));
@@ -109,7 +143,10 @@ class EquipmentStatsTest {
         // the production listener only uses the event player, never the converted slot.
         player.openInventory(new org.mockbukkit.mockbukkit.inventory.SimpleInventoryViewMock(
                 player, player.getInventory(), player.getInventory(), org.bukkit.event.inventory.InventoryType.PLAYER) {
-            @Override public int convertSlot(int raw) { return raw; }
+            /** Uses identity slot conversion only to let MockBukkit construct this event; production does not consume the converted slot.
+ * @param raw synthetic raw slot
+ * @return the same slot index
+ */ @Override public int convertSlot(int raw) { return raw; }
         });
         server.getPluginManager().callEvent(new PlayerInventorySlotChangeEvent(player, 0,
                 new ItemStack(Material.AIR), player.getInventory().getItemInMainHand()));
@@ -128,6 +165,9 @@ class EquipmentStatsTest {
         server.getPluginManager().disablePlugin(plugin);
         assertEquals(0, stats.sessionCount());
     }
+    /**
+     * A bonus valid without gear but invalid after equipping is cleared and explained instead of retaining obsolete stats.
+     */
     @Test void incompatibleBonusOnNewEquipmentClearsInsteadOfServingStaleStats() {
         stats.bonus(player, WEAPON_DAMAGE, 1000000000);
         player.getInventory().setItemInMainHand(stats.createLoadout("ordinary"));
@@ -136,6 +176,9 @@ class EquipmentStatsTest {
         assertTrue(next.notice().contains("Session bonuses cleared"));
         assertTrue(next.fingerprint().externalSources().isEmpty());
     }
+    /**
+     * Checks exact Ferocity explanation and source identity, then verifies inspection permission denial.
+     */
     @Test void statsExplainShowsIdentitySourcesAndPermissionDenial() {
         player.getInventory().setItemInMainHand(stats.createLoadout("ferocity_25"));
         command("stats explain");

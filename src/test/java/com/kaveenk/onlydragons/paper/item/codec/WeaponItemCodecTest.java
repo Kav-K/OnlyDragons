@@ -23,12 +23,24 @@ import org.mockbukkit.mockbukkit.MockBukkit;
 import static org.junit.jupiter.api.Assertions.*;
 import static com.kaveenk.onlydragons.domain.item.ItemValidationException.Code.*;
 
+/**
+ * PDC boundary tests over trusted catalog values and deliberately malformed nested containers. Decode results and exact rejection codes are the oracles; display text is never authority. MockBukkit metadata behavior does not substitute for received client inventory evidence.
+ */
 class WeaponItemCodecTest {
     private final ItemRegistry registry = CalibrationLoadouts.registry();
     private final WeaponItemCodec codec = new WeaponItemCodec(registry);
+    /**
+     * Creates a fresh isolated MockBukkit boundary and the collaborators used by this class's oracles.
+     */
     @BeforeEach void start() { MockBukkit.mock(); }
+    /**
+     * Releases the mock server/plugin lifecycle after each test so scheduler and static Bukkit state cannot leak between cases.
+     */
     @AfterEach void stop() { MockBukkit.unmock(); }
 
+    /**
+     * Round-trips every calibration definition through a cloned native item and compares complete resolved values without native damage enchants.
+     */
     @Test void pdcRoundTripRetainsIdentityAndTrustedContributions() {
         for (String definition : registry.definitions().keySet()) {
             ItemInstance input = registry.create(definition);
@@ -43,6 +55,9 @@ class WeaponItemCodecTest {
         }
     }
 
+    /**
+     * Spoofed names/lore remain ordinary; editing presentation on a genuine item cannot rewrite its validated identity.
+     */
     @Test void textCannotGrantBehaviorAndChangedTextCannotRewriteIdentity() {
         var ordinary = new ItemStack(Material.BOW);
         ordinary.editMeta(meta -> {
@@ -58,11 +73,18 @@ class WeaponItemCodecTest {
         assertEquals(codec.encode(input).getItemMeta(), codec.encode(assertInstanceOf(ItemReadResult.Valid.class, codec.decode(stack)).item().instance()).getItemMeta());
     }
 
+    /**
+     * Rejects each unsupported persisted schema with the precise compatibility code.
+     * @param schema unsupported integer schema supplied by the parameterized fixture
+     */
     @ParameterizedTest @ValueSource(ints = {-1, 0, 2, Integer.MAX_VALUE})
     void compatibilityFixturesRejectUnsupportedSchemas(int schema) {
         assertInvalid(UNSUPPORTED_SCHEMA, changed(data -> data.set(key("schema"), PersistentDataType.INTEGER, schema)));
     }
 
+    /**
+     * Injects forbidden fields, wrong types, missing identity, malformed UUID and stale revisions, asserting exact fail-closed codes.
+     */
     @Test void malformedAndUnknownFieldsCannotGrantUncheckedStatsOrKinds() {
         assertInvalid(MALFORMED_DATA, changed(data -> data.set(key("base_damage"), PersistentDataType.DOUBLE, 999999.0)));
         assertInvalid(MALFORMED_DATA, changed(data -> data.set(key("kind"), PersistentDataType.STRING, "ORDINARY")));
@@ -77,6 +99,9 @@ class WeaponItemCodecTest {
         assertInvalid(MALFORMED_DATA, wrongRoot);
     }
 
+    /**
+     * Checks level, membership, namespace, two-ultimate and roll validation on both decoding and encoding.
+     */
     @Test void invalidLevelsUnknownEnchantsAndTwoUltimatesRejectOnLoadAndWrite() {
         assertInvalid(INVALID_LEVEL, changed(data -> enchant(data, "duplex", 6)));
         assertInvalid(INVALID_LEVEL, changed(data -> enchant(data, "duplex", 0)));
@@ -97,6 +122,9 @@ class WeaponItemCodecTest {
         }));
     }
 
+    /**
+     * Rejects stacked/wrong-material items while proving valid foreign PDC is not mutated by decoding.
+     */
     @Test void materialAndAmountMustMatchWhileUnrelatedPdcIsPreservedOnRead() {
         var stack = codec.encode(registry.create("ordinary"));
         stack.setAmount(2);
@@ -111,6 +139,9 @@ class WeaponItemCodecTest {
         assertEquals(before, stack);
     }
 
+    /**
+     * Runs codec entry points on a separate bounded thread and requires ownership failure even for null input; joins the owned thread in cleanup.
+     */
     @Test void serverThreadBoundaryRejectsBeforeAnyItemAccess() throws Exception {
         var attempt = new FutureTask<>(() -> {
             assertThrows(IllegalStateException.class, () -> codec.decode(null));
@@ -123,6 +154,9 @@ class WeaponItemCodecTest {
         finally { thread.interrupt(); thread.join(5000); }
     }
 
+    /**
+     * Rejects wrongly typed nested levels, invalid roll membership markers and a collection beyond the registry entry bound.
+     */
     @Test void nestedWrongTypesInvalidMembershipAndOversizedSetsReject() {
         assertInvalid(MALFORMED_DATA, changed(data -> {
             var levels = data.get(key("enchants"), PersistentDataType.TAG_CONTAINER);
@@ -139,6 +173,11 @@ class WeaponItemCodecTest {
         }));
     }
 
+    /**
+     * Corrupts only the managed nested container of a fresh genuine item.
+     * @param edit deliberate test mutation
+     * @return malformed candidate without altering the trusted registry
+     */
     private ItemStack changed(Consumer<PersistentDataContainer> edit) {
         var stack = codec.encode(registry.create("ordinary"));
         stack.editMeta(meta -> {
@@ -149,15 +188,31 @@ class WeaponItemCodecTest {
         });
         return stack;
     }
+    /**
+     * Writes one nested level directly to construct decoder controls.
+     * @param data managed root container
+     * @param id test enchant ID
+     * @param level test integer level
+     */
     private static void enchant(PersistentDataContainer data, String id, int level) {
         var levels = data.get(key("enchants"), PersistentDataType.TAG_CONTAINER);
         levels.set(key(id), PersistentDataType.INTEGER, level);
         data.set(key("enchants"), PersistentDataType.TAG_CONTAINER, levels);
     }
+    /**
+     * Requires both the precise rejection code and a nonblank diagnostic.
+     * @param code expected rejection
+     * @param stack malformed candidate
+     */
     private void assertInvalid(ItemValidationException.Code code, ItemStack stack) {
         var invalid = assertInstanceOf(ItemReadResult.Invalid.class, codec.decode(stack));
         assertEquals(code, invalid.code());
         assertFalse(invalid.reason().isBlank());
     }
+    /**
+     * Creates the managed namespace key used by deliberate PDC edits.
+     * @param id nested key name
+     * @return OnlyDragons key
+     */
     private static NamespacedKey key(String id) { return new NamespacedKey("onlydragons", id); }
 }

@@ -16,7 +16,9 @@ import org.mockbukkit.mockbukkit.*;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Synthetic event boundary tests; real input and collision proof belongs to owned-firing. */
+/**
+ * Synthetic native-event boundary regressions with explicit pre-event ammo debit and next-tick settlement. They isolate final veto, immutable claims and pending-group session exit; real input/collision/quit ordering is proved by the owned-firing Paper scenario.
+ */
 class OwnedBowBoundaryTest {
     ServerMock server;
     OnlyDragonsPlugin plugin;
@@ -25,6 +27,9 @@ class OwnedBowBoundaryTest {
     UUID encounter;
     EntityShootBowEvent lastBowEvent;
     List<SettledHit> hits = new ArrayList<>();
+    /**
+     * Creates a fresh isolated MockBukkit boundary and the collaborators used by this class's oracles.
+     */
     @BeforeEach void setup() {
         server = MockBukkit.mock(); plugin = MockBukkit.load(OnlyDragonsPlugin.class);
         player = server.addPlayer(); player.setGameMode(GameMode.SURVIVAL);
@@ -32,7 +37,15 @@ class OwnedBowBoundaryTest {
         bows.openEncounter(encounter, player.getWorld(), new BoundingBox(-1000, -1000, -1000, 1000, 1000, 1000), new MechanicRevision("calibration", "v1"));
         plugin.combat().observeSettled(hits::add);
     }
+    /**
+     * Releases the mock server/plugin lifecycle after each test so scheduler and static Bukkit state cannot leak between cases.
+     */
     @AfterEach void cleanup() { MockBukkit.unmock(); }
+    /**
+     * Creates a native mock arrow, injects a half-force bow/launch dispatch and seeds nine arrows to model one prior native debit from ten.
+     * @param loadout trusted fixture loadout
+     * @return captured primary entity
+     */
     Arrow shoot(String loadout) {
         ItemStack bow = plugin.equipment().createLoadout(loadout); player.getInventory().setItemInMainHand(bow);
         // Native ammunition drawing precedes EntityShootBowEvent on the pinned server.
@@ -43,10 +56,17 @@ class OwnedBowBoundaryTest {
         bows.launched(new ProjectileLaunchEvent(arrow));
         return arrow;
     }
+    /**
+     * Registers a mock living parent in the admitted arena.
+     * @return native mock cow used by synthetic collisions
+     */
     Cow target() {
         Cow cow = player.getWorld().spawn(player.getLocation(), Cow.class);
         bows.registerTarget(encounter, UUID.randomUUID(), cow); return cow;
     }
+    /**
+     * A final hit veto produces exactly one rejected claim and removes native/registry identity before any repeat can claim it.
+     */
     @Test void finalPhysicalVetoRetainsOneClaimAndRetiresBeforeReceiver() {
         Arrow arrow = shoot("ordinary"); Cow cow = target();
         ProjectileHitEvent event = new ProjectileHitEvent(arrow, cow, null, null); bows.hit(event);
@@ -56,12 +76,18 @@ class OwnedBowBoundaryTest {
         assertTrue(bows.projectile(arrow.getUniqueId()).isEmpty()); assertFalse(arrow.isValid());
         bows.hit(new ProjectileHitEvent(arrow, cow, null, null)); assertEquals(0, bows.pendingClaims());
     }
+    /**
+     * Re-registering the same native entity under a different logical target invalidates the captured target object.
+     */
     @Test void targetReplacementBeforeSettlementRejectsCapturedRegistration() {
         Arrow arrow = shoot("ordinary"); Cow cow = target(); bows.hit(new ProjectileHitEvent(arrow, cow, null, null));
         bows.unregisterTarget(cow.getUniqueId()); bows.registerTarget(encounter, UUID.randomUUID(), cow);
         server.getScheduler().performOneTick();
         assertEquals(1, hits.size()); assertEquals(SettledHit.Rejection.TARGET_CHANGED, hits.getFirst().rejection().orElseThrow());
     }
+    /**
+     * Direct session invalidation exercises the pending-child branch without claiming a native quit event can precede next-tick settlement.
+     */
     @Test void immediateSessionEndKeepsAcceptedPrimaryButCancelsChildAndRetainsDebit() {
         Arrow arrow = shoot("duplex"); UUID token = bows.currentSession(player.getUniqueId()).orElseThrow();
         assertEquals(1, bows.reservedCapacity()); bows.clearSession(player.getUniqueId(), token, false);
@@ -71,11 +97,17 @@ class OwnedBowBoundaryTest {
         assertEquals(1, hits.size()); assertTrue(hits.getFirst().accepted());
         assertEquals(token, hits.getFirst().projectile().sessionToken()); assertEquals(0, bows.capacityUsed());
     }
+    /**
+     * Reset removes both native arrow and pending claim before the scheduler can notify accounting.
+     */
     @Test void resetDuringPendingClaimCannotDeliverToLaterGeneration() {
         Arrow arrow = shoot("ordinary"); Cow cow = target(); bows.hit(new ProjectileHitEvent(arrow, cow, null, null));
         bows.endEncounter(encounter); server.getScheduler().performOneTick();
         assertTrue(hits.isEmpty()); assertFalse(arrow.isValid()); assertEquals(0, bows.capacityUsed()); assertEquals(0, bows.pendingClaims());
     }
+    /**
+     * Late bow cancellation releases both primary/child reservation and one debit; another reset cannot refund again.
+     */
     @Test void finalBowVetoRefundsWholeGroupExactlyOnce() {
         Arrow arrow = shoot("duplex"); lastBowEvent.setCancelled(true);
         server.getScheduler().performOneTick();
@@ -84,12 +116,20 @@ class OwnedBowBoundaryTest {
         bows.endEncounter(encounter); server.getScheduler().performOneTick();
         assertEquals(10, player.getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum()); assertTrue(hits.isEmpty());
     }
+    /**
+     * Late launch cancellation removes owned entities/reservation and returns one charge without delivering a collision.
+     */
     @Test void nativeLaunchVetoRetiresPrimaryAndReservedDuplexWithoutAClaim() {
         Arrow arrow = shoot("duplex"); var launch = new ProjectileLaunchEvent(arrow);
         bows.launched(launch); launch.setCancelled(true); server.getScheduler().performOneTick();
         assertFalse(arrow.isValid()); assertEquals(0, bows.reservedCapacity()); assertEquals(0, bows.pendingGroups());
         assertEquals(10, player.getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum()); assertTrue(hits.isEmpty());
     }
+    /**
+     * Replacement/bow/launch veto remains terminal even on immediate session exit, and the unrelated replacement entity survives.
+     * @param veto retained native event mutation to exercise
+     * @param sessionExit whether to invalidate the session before scheduled settlement
+     */
     @ParameterizedTest
     @CsvSource({"replacement,false", "replacement,true", "bow,true", "launch,true"})
     void finalLaunchVetoCannotRetainPrimaryOrRefundTwice(String veto, boolean sessionExit) {
@@ -120,12 +160,18 @@ class OwnedBowBoundaryTest {
         assertEquals(10, player.getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum());
         assertTrue(hits.isEmpty());
     }
+    /**
+     * An unregistered arrow keeps its native damage/critical state and entity through encounter reset.
+     */
     @Test void unrelatedProjectileIsNotSuppressedClaimedOrRemoved() {
         Arrow arrow = player.getWorld().spawn(player.getEyeLocation(), Arrow.class); arrow.setDamage(4); arrow.setCritical(true);
         bows.launched(new ProjectileLaunchEvent(arrow)); bows.hit(new ProjectileHitEvent(arrow, target(), null, null));
         assertEquals(4, arrow.getDamage()); assertTrue(arrow.isCritical()); assertTrue(arrow.isValid());
         assertEquals(0, bows.pendingClaims()); bows.endEncounter(encounter); assertTrue(arrow.isValid());
     }
+    /**
+     * Actual mock death cleans a retained arrow even after its session token is gone and prevents later pending delivery.
+     */
     @Test void deathAfterSessionExitRetiresRetainedArrowAndPendingClaim() {
         Arrow arrow = shoot("duplex"); UUID token = bows.currentSession(player.getUniqueId()).orElseThrow();
         bows.clearSession(player.getUniqueId(), token, false); assertTrue(arrow.isValid());
