@@ -16,6 +16,10 @@ import java.util.UUID;
 public record WeaponIdentity(UUID instanceId, String definitionId, int schemaVersion, String definitionRevision) {
     /**
      * Validates structural identity only; catalog existence and revision compatibility require registry resolution.
+     * @param instanceId nonnull per-created-item UUID
+     * @param definitionId nonblank definition reference; strict catalog syntax is checked by ItemRegistry
+     * @param schemaVersion positive format number; registry accepts only its supported schema
+     * @param definitionRevision nonblank author-maintained content label
      */
     public WeaponIdentity {
         Objects.requireNonNull(instanceId, "instanceId");

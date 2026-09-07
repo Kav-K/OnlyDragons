@@ -28,6 +28,10 @@ public record CombatProfile(MechanicRevision mechanic, Mitigation mitigation, Ca
 
     /**
      * Compatibility constructor selecting FIXED HP scaling; all canonical validation still applies.
+     * @param mechanic nonnull caller-maintained policy identity
+     * @param mitigation nonnull defense transformation
+     * @param cap nonnull per-hit cap policy
+     * @param fraction fixed fraction of capped Ferocity damage requested as HP, inclusive 0–1; credit is not scaled
      */
     public CombatProfile(MechanicRevision mechanic, Mitigation mitigation, Cap cap, double fraction) {
         this(mechanic, mitigation, cap, fraction, FerocityHealthPolicy.FIXED);
@@ -49,6 +53,11 @@ public record CombatProfile(MechanicRevision mechanic, Mitigation mitigation, Ca
 
     /**
      * Rejects null policy selectors and non-finite or out-of-range fractions before publication.
+     * @param mechanic nonnull caller-maintained policy identity
+     * @param mitigation nonnull defense transformation
+     * @param cap nonnull per-hit cap policy
+     * @param ferocityHealthFraction finite fixed HP fraction in [0,1], still validated for level-based policy
+     * @param ferocityHealthPolicy nonnull selector; contribution remains the full capped amount
      */
     public CombatProfile {
         Objects.requireNonNull(mechanic, "mechanic");
@@ -61,6 +70,7 @@ public record CombatProfile(MechanicRevision mechanic, Mitigation mitigation, Ca
 
     /**
      * Returns combat-calibration/v1: ordinary defense, no cap, full Ferocity HP and credit.
+     * @return new combat-calibration/v1 policy with ordinary defense, no cap and full proc HP
      */
     public static CombatProfile calibration() {
         return new CombatProfile(new MechanicRevision("combat-calibration", "v1"),
@@ -84,6 +94,7 @@ public record CombatProfile(MechanicRevision mechanic, Mitigation mitigation, Ca
      * <p>
      * Returns dragon-tempo/v2, with the shared active Tempo level selecting only proc HP.
      * Physical damage and contribution are uncapped; this is a sandbox balance choice.
+     * @return new dragon-tempo/v2 policy whose active pre-hit Tempo level selects proc HP only
      */
     public static CombatProfile tempoDragon() {
         return new CombatProfile(new MechanicRevision("dragon-tempo", "v2"),

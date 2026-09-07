@@ -36,6 +36,8 @@ public record EncounterResult(UUID completionId, UUID encounterId, String varian
     public record CommitStamp(long tick, long ordinal) {
         /**
          * Rejects negative ticks and nonpositive ordinals; ordinal/tick ownership across players is checked by ranking.
+         * @param tick nonnegative receiver game tick
+         * @param ordinal positive encounter-global accepted commit sequence
          */
         public CommitStamp {
             DomainChecks.nonNegative(tick, "tick");
@@ -54,13 +56,24 @@ public record EncounterResult(UUID completionId, UUID encounterId, String varian
      */
     public record Contribution(double actualHealthDamage, double contributionDamage, int eyesPlaced, boolean participated,
                                Optional<CommitStamp> firstParticipation, Optional<CommitStamp> lastCreditIncrease) {
-        /** Legacy/imported fixture value; production commits always supply provenance. */
+        /** Legacy/imported fixture value; production commits always supply provenance.
+         * @param health finite nonnegative actual HP removed
+         * @param credit finite nonnegative credited damage, possibly greater than HP removed
+         * @param eyes nonnegative legacy eyes count; this constructor does not imply reward eligibility
+         * @param participated whether at least one successful participation is represented
+         */
         public Contribution(double health, double credit, int eyes, boolean participated) {
             this(health, credit, eyes, participated, Optional.empty(), Optional.empty());
         }
         /**
          * Validates totals and internal stamp consistency. Legacy absent stamps remain constructible;
          * {@link RankedEncounterResult} rejects them rather than inventing ranking provenance.
+         * @param actualHealthDamage finite nonnegative cumulative domain HP loss
+         * @param contributionDamage finite nonnegative cumulative score, retained at full precision
+         * @param eyesPlaced nonnegative placeholder count; combat currently supplies zero
+         * @param participated whether at least one successful participation is represented
+         * @param firstParticipation nonnull optional first accepted commit, including zero
+         * @param lastCreditIncrease nonnull optional latest strict represented-total increase
          */
         public Contribution {
             DomainChecks.nonNegative(actualHealthDamage, "actualHealthDamage");
@@ -80,6 +93,12 @@ public record EncounterResult(UUID completionId, UUID encounterId, String varian
     /**
      * Legacy constructor with completed ordinal zero and no full catalog selection. Suitable for
      * unprovenanced DTO fixtures, not production ranking with stamped participants.
+     * @param completionId nonnull lethal impact identity for production output
+     * @param encounterId nonnull completed generation
+     * @param variantId nonblank selected type ID
+     * @param mechanic nonnull retained combat policy identity
+     * @param completedTick nonnegative lethal receiver tick
+     * @param participants immutable UUID-sorted copy of full-precision totals
      */
     public EncounterResult(UUID completionId, UUID encounterId, String variantId, MechanicRevision mechanic,
                            long completedTick, Map<UUID, Contribution> participants) {
@@ -89,6 +108,14 @@ public record EncounterResult(UUID completionId, UUID encounterId, String varian
     /**
      * Freezes participants, validates optional selection identity and rejects stamps later than
      * completion tick/ordinal. Cross-participant ordinal conflicts are checked by the ranking projection.
+     * @param completionId nonnull lethal impact identity for production output
+     * @param encounterId nonnull completed generation
+     * @param variantId nonblank selected type ID
+     * @param mechanic nonnull retained combat policy identity
+     * @param completedTick nonnegative lethal receiver tick
+     * @param participants immutable UUID-sorted copy of full-precision totals
+     * @param completedOrdinal terminal accepted ordinal; zero only for legacy unprovenanced data
+     * @param selection nonnull optional full catalog content, matching variant and mechanic when present
      */
     public EncounterResult {
         Objects.requireNonNull(completionId, "completionId");

@@ -47,6 +47,9 @@ public record WeaponDefinition(String id, int schemaVersion, String revision, Fi
     public record Enchantment(String id, int level, EnchantmentKind kind) {
         /**
          * Validates structural selection data; does not verify a registry, compatibility or an effect table.
+         * @param id nonblank effect ID; strict syntax/existence is checked by the registry
+         * @param level positive selected level; supported maxima belong to the trusted descriptor
+         * @param kind nonnull trusted category, never accepted from untrusted PDC as authority
          */
         public Enchantment {
             DomainChecks.text(id, "enchantment id");
@@ -58,6 +61,13 @@ public record WeaponDefinition(String id, int schemaVersion, String revision, Fi
     /**
      * Validates identity/numbers and freezes ordered modifiers/enchants. Catalog-specific schema,
      * material, effect availability and allowed rolls are checked by ItemRegistry.
+     * @param id nonblank offensive definition ID
+     * @param schemaVersion positive schema, subject to stricter registry support
+     * @param revision nonblank caller-maintained definition label
+     * @param firingMode nonnull drawn/instant firing selection
+     * @param baseDamage finite nonnegative damage points, supplied as a base exactly once
+     * @param statModifiers copied canonical contributions, including duplicates if supplied
+     * @param enchantments copied ID-sorted selections with unique IDs and at most one ultimate
      */
     public WeaponDefinition {
         DomainChecks.text(id, "id");
@@ -72,6 +82,10 @@ public record WeaponDefinition(String id, int schemaVersion, String revision, Fi
     /**
      * Copies and sorts a nonnull list by case-sensitive ID, rejecting null entries, duplicate IDs
      * and multiple ultimates. Returns immutable selections; supported levels still require a catalog.
+     * @param enchantments nonnull captured selections to copy and validate
+     * @return immutable ID-sorted selections without duplicate IDs or multiple ultimates
+     * @throws NullPointerException if the list or a selection is null
+     * @throws IllegalArgumentException for duplicate IDs or multiple ultimates
      */
     public static List<Enchantment> validatedEnchantments(List<Enchantment> enchantments) {
         var ordered = List.copyOf(enchantments).stream().sorted(Comparator.comparing(Enchantment::id)).toList();

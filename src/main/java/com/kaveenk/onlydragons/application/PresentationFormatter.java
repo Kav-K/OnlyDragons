@@ -13,6 +13,9 @@ public final class PresentationFormatter {
 
     /**
      * Returns Roman I–X for levels 1–10; throws IllegalArgumentException outside that display range.
+     * @param level display level from 1 through 10
+     * @return Roman numeral I through X
+     * @throws IllegalArgumentException if the level is outside 1–10
      */
     public static String roman(int level) {
         if (level < 1 || level > 10) throw new IllegalArgumentException("Display level must be I–X");
@@ -22,6 +25,8 @@ public final class PresentationFormatter {
     /**
      * Formats one nonnull trusted modifier with stat label, sign and unit. FLAT chance/damage/speed
      * percent stats use %, ADDITIVE_PERCENT uses %, and factors use ×. Does not aggregate or resolve stats.
+     * @param modifier nonnull trusted single stat modifier
+     * @return one labeled value with the appropriate sign/unit, without stat aggregation
      */
     public static String statModifier(com.kaveenk.onlydragons.domain.stats.StatModifier modifier) {
         String amount = number(modifier.amount());
@@ -41,6 +46,9 @@ public final class PresentationFormatter {
     /**
      * Formats a finite number with Locale.ROOT grouping and up to two decimals; signed zero becomes
      * "0". A fresh DecimalFormat avoids shared mutable formatter state. Non-finite input rejects.
+     * @param value finite display number; signed zero is normalized
+     * @return Locale.ROOT grouped number with up to two decimals
+     * @throws IllegalArgumentException if value is nonfinite
      */
     public static String number(double value) {
         if (!Double.isFinite(value)) throw new IllegalArgumentException("Nonfinite display value");
@@ -50,6 +58,9 @@ public final class PresentationFormatter {
     /**
      * Formats a finite full-precision credit value with grouping and exactly two decimals; signed
      * zero becomes "0.00". The returned rounded string must never participate in ranking.
+     * @param value finite full-precision credited damage; signed zero is normalized
+     * @return grouped display number with exactly two decimals, never an input to ranking
+     * @throws IllegalArgumentException if value is nonfinite
      */
     public static String credit(double value) {
         if (!Double.isFinite(value)) throw new IllegalArgumentException("Nonfinite display value");
@@ -59,6 +70,8 @@ public final class PresentationFormatter {
     /**
      * Converts a nonnull machine identifier to title words using Locale.ROOT, replacing underscores
      * and hyphens with spaces. Blank input may yield empty output; this is not identity validation.
+     * @param id nonnull machine identifier; this formatter does not validate identity syntax
+     * @return title words with underscores/hyphens replaced by spaces, possibly empty
      */
     public static String label(String id) {
         String[] words = id.toLowerCase(Locale.ROOT).replace('_', ' ').replace('-', ' ').split(" +");
@@ -73,6 +86,8 @@ public final class PresentationFormatter {
 
     /**
      * Returns literal title text in bold gold; no markup parsing, message delivery or gameplay mutation.
+     * @param title literal title text, with no markup parsing
+     * @return bold gold Adventure component, not yet sent to an audience
      */
     public static Component heading(String title) {
         return Component.text(title, NamedTextColor.GOLD).decorate(TextDecoration.BOLD);
@@ -80,6 +95,10 @@ public final class PresentationFormatter {
 
     /**
      * Returns a gray label and aqua finite numeric value using {@link #number(double)}.
+     * @param label literal display label
+     * @param amount finite amount formatted with number(double)
+     * @return gray label followed by an aqua number
+     * @throws IllegalArgumentException if amount is nonfinite
      */
     public static Component value(String label, double amount) {
         return Component.text(label + ": ", NamedTextColor.GRAY)
@@ -90,6 +109,10 @@ public final class PresentationFormatter {
      * Returns health/max clamped to [0,1] and narrowed to float for Adventure. Both inputs must
      * be finite and max strictly positive; negative/over-max health is clamped for display only.
      * No domain HP validation or mutation occurs.
+     * @param health finite current display HP; negative/over-max values are clamped only for the bar
+     * @param max finite strictly positive maximum HP
+     * @return float progress in [0,1] without changing authoritative HP
+     * @throws IllegalArgumentException if either input is nonfinite or max is not positive
      */
     public static float healthProgress(double health, double max) {
         if (!Double.isFinite(health) || !Double.isFinite(max) || max <= 0)
@@ -100,6 +123,11 @@ public final class PresentationFormatter {
     /**
      * Returns a literal heading, displayed HP/max and clamped percentage. Validates via
      * {@link #healthProgress(double,double)}; the printed HP numbers retain the supplied values.
+     * @param name literal dragon name
+     * @param health finite current HP shown as supplied
+     * @param max finite strictly positive maximum HP
+     * @return styled name, HP/max and clamped percentage title
+     * @throws IllegalArgumentException if display health/max validation fails
      */
     public static Component healthTitle(String name, double health, double max) {
         healthProgress(health, max);
@@ -111,6 +139,9 @@ public final class PresentationFormatter {
     /**
      * Renders source kind, captured ordinary crit, actual HP removed, credited damage and supplied
      * remaining domain HP. It neither applies results nor establishes that the hit was accepted.
+     * @param damage nonnull immutable result containing kind, crit, HP and credit amounts
+     * @param remaining finite remaining domain HP supplied by the caller
+     * @return styled diagnostic component; formatting does not establish acceptance
      */
     public static Component combat(com.kaveenk.onlydragons.domain.combat.DamageResult damage, double remaining) {
         return heading(label(damage.kind().name()) + " · " + label(damage.crit().name()))
@@ -124,12 +155,16 @@ public final class PresentationFormatter {
 
     /**
      * Wraps literal text in gray without parsing markup or sending it to an audience.
+     * @param text literal semantic message text
+     * @return gray Adventure component with no markup parsing or delivery
      */
     public static Component message(String text) { return Component.text(text, NamedTextColor.GRAY); }
 
     /**
      * Colors the existing LeaderboardMessages text protocol: gold heading, aqua personal result,
      * or yellow placement/name and white credit. Unknown text falls back to gray; no ranking occurs.
+     * @param text existing semantic leaderboard line
+     * @return styled heading/personal/placement component, or gray fallback for unknown text
      */
     public static Component leaderboard(String text) {
         if (text.startsWith("Dragon defeated!")) return heading(text);

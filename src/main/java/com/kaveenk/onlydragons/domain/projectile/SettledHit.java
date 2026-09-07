@@ -31,6 +31,11 @@ public record SettledHit(OwnedProjectile projectile, PhysicalImpact impact, long
     /**
      * Rejects inconsistent clocks and captured identity; it does not prove external event settlement
      * or independently check target liveness.
+     * @param projectile nonnull immutable captured ownership/session/profile
+     * @param impact nonnull candidate with settlement tick and matching projectile/owner/generation
+     * @param collisionTick nonnegative original native observation tick
+     * @param settlementTick tick at or after collision; must equal impact.tick()
+     * @param rejection nonnull optional adapter rejection; no reason means adapter-admitted, not yet credited
      */
     public SettledHit {
         Objects.requireNonNull(projectile); Objects.requireNonNull(impact); Objects.requireNonNull(rejection);
@@ -46,10 +51,12 @@ public record SettledHit(OwnedProjectile projectile, PhysicalImpact impact, long
      * <p>
      * Returns uniform 1.0 for all managed parts, including rejected DTOs. This is calibration
      * policy, not a semantic head-damage multiplier.
+     * @return uniform calibrated part scale 1.0, including for rejected physical DTOs
      */
     public double partScale() { return 1.0; }
     /**
      * Returns whether the adapter supplied no rejection; combat may still reject a later dead/stale target.
+     * @return true if the physical adapter supplied no rejection; later combat admission remains separate
      */
     public boolean accepted() { return rejection.isEmpty(); }
 }

@@ -14,6 +14,8 @@ public record TempoState(int bonusPercent, long expiresAt, int sourceLevel) {
     /**
      * Compatibility constructor with source level zero; under current invariants only zero bonus is valid.
      * Use the canonical three-argument constructor or {@link #hit(int,long)} for active state.
+     * @param bonusPercent shared bonus in 0\u2013200 percentage points
+     * @param expiresAt nonnegative exclusive game tick; construction does not consult a clock
      */
     public TempoState(int bonusPercent, long expiresAt) {
         this(bonusPercent, expiresAt, 0);
@@ -21,6 +23,9 @@ public record TempoState(int bonusPercent, long expiresAt, int sourceLevel) {
 
     /**
      * Rejects inconsistent bonus/source pairs, unsupported levels, out-of-range bonuses or negative expiry.
+     * @param bonusPercent shared bonus in 0\u2013200 percentage points
+     * @param expiresAt nonnegative exclusive game tick; construction does not consult a clock
+     * @param sourceLevel latest qualifying I\u2013V source, or 0 iff bonus is zero
      */
     public TempoState {
         if (sourceLevel < 0 || sourceLevel > 5 || (bonusPercent == 0) != (sourceLevel == 0))

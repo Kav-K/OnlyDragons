@@ -9,6 +9,9 @@ package com.kaveenk.onlydragons.domain.encounter.definition;
 public record DefinitionIdentity(String id, int schemaVersion, String revision) {
     /**
      * Rejects null/malformed labels and unsupported schema before returning immutable identity.
+     * @param id 1\u201364 token characters; first letter/digit/underscore/hyphen, then dot also allowed
+     * @param schemaVersion exactly 1; no migration exists
+     * @param revision same bounded token grammar, author-maintained and not automatically unique
      */
     public DefinitionIdentity {
         token(id);

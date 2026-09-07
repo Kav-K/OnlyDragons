@@ -16,10 +16,12 @@ public final class ModifierSources {
     private ModifierSources(Map<String, List<StatModifier>> sources) { this.sources = Map.copyOf(sources); }
     /**
      * Returns a fresh empty immutable source collection; no global mutable registry is shared.
+     * @return fresh empty immutable source collection
      */
     public static ModifierSources empty() { return new ModifierSources(Map.of()); }
     /**
      * Returns the immutable source map and immutable lists; map iteration order is not a contract.
+     * @return immutable source map containing immutable modifier lists; order is unspecified
      */
     public Map<String, List<StatModifier>> sources() { return sources; }
 
@@ -47,6 +49,7 @@ public final class ModifierSources {
     /**
      * Returns a new immutable flattened list in {@link StatModifier#EXPLANATION_ORDER},
      * including repeated contributions; callers must not apply the map and this list twice.
+     * @return new immutable flattened list in explanation order, retaining repeated contributions
      */
     public List<StatModifier> modifiers() {
         return sources.values().stream().flatMap(List::stream).sorted(StatModifier.EXPLANATION_ORDER).toList();

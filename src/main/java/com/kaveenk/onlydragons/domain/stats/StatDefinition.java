@@ -15,6 +15,10 @@ import java.util.Objects;
 public record StatDefinition(StatKey key, double defaultValue, double minimumValue, double maximumValue) {
     /**
      * Validates the range and default together; rejects null key or an invalid numeric candidate.
+     * @param key nonnull stat identity
+     * @param defaultValue finite default inside the inclusive range
+     * @param minimumValue finite nonnegative lower bound
+     * @param maximumValue finite upper bound at least minimumValue
      */
     public StatDefinition {
         Objects.requireNonNull(key, "key");
@@ -42,6 +46,7 @@ public record StatDefinition(StatKey key, double defaultValue, double minimumVal
 
     /**
      * Returns the fixed unit of the nonnull key; no numeric conversion occurs.
+     * @return the key's fixed numeric unit, with no value conversion
      */
     public StatUnit unit() { return key.unit(); }
 }

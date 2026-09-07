@@ -26,6 +26,10 @@ public record PhysicalImpact(Key key, UUID ownerId, long tick, Vector3 position,
     public record Key(UUID encounterId, UUID projectileId, UUID targetId, int impactOrdinal) {
         /**
          * Rejects null IDs and negative ordinals; collision proof remains the adapter's responsibility.
+         * @param encounterId nonnull generation UUID
+         * @param projectileId nonnull real arrow UUID
+         * @param targetId nonnull managed parent target UUID
+         * @param impactOrdinal nonnegative adapter-supplied impact ordinal, not the encounter commit ordinal
          */
         public Key {
             Objects.requireNonNull(encounterId, "encounterId");
@@ -37,6 +41,11 @@ public record PhysicalImpact(Key key, UUID ownerId, long tick, Vector3 position,
 
     /**
      * Validates required values, nonnegative tick and an optional nonblank part label.
+     * @param key nonnull generation/projectile/target/ordinal identity
+     * @param ownerId nonnull captured shooter UUID
+     * @param tick nonnegative evaluation tick; {@link com.kaveenk.onlydragons.domain.projectile.SettledHit} retains collision time separately
+     * @param position nonnull finite impact position in world blocks
+     * @param targetPart nonnull optional nonblank diagnostic part label; never an idempotency component
      */
     public PhysicalImpact {
         Objects.requireNonNull(key, "key");

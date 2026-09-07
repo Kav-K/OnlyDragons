@@ -17,6 +17,8 @@ import java.util.TreeMap;
 public record DamageModifiers(Map<String, Double> additiveFractions, Map<String, Double> multipliers) {
     /**
      * Validates and copies both maps; null keys/values or invalid numbers reject before publication.
+     * @param additiveFractions nonblank source IDs to finite nonnegative fractions; 0.4 means +40%
+     * @param multipliers nonblank source IDs to finite nonnegative factors; zero cancels damage
      */
     public DamageModifiers {
         additiveFractions = copy(additiveFractions, "fraction");
@@ -25,6 +27,7 @@ public record DamageModifiers(Map<String, Double> additiveFractions, Map<String,
 
     /**
      * Returns empty additive/multiplicative collections, the identity attack transformation.
+     * @return immutable empty modifier maps, representing the identity transformation
      */
     public static DamageModifiers none() { return new DamageModifiers(Map.of(), Map.of()); }
 

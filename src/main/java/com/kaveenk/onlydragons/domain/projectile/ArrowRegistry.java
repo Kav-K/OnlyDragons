@@ -27,6 +27,8 @@ public final class ArrowRegistry {
     /**
      * Creates an empty registry with positive combined reserved/emitted capacity. All instance
      * operations enforce this constructing thread; adapters own entity removal and scheduler cleanup.
+     * @param capacity positive maximum of emitted arrows plus reserved slots
+     * @throws IllegalArgumentException if capacity is not positive
      */
     public ArrowRegistry(int capacity) {
         if (capacity < 1) throw new IllegalArgumentException("capacity must be positive");
@@ -51,6 +53,8 @@ public final class ArrowRegistry {
      * Converts one reserved slot into an immutable emitted arrow without increasing used capacity.
      * Missing group reservation or duplicate current projectile UUID throws IllegalStateException.
      * The caller owns actual native spawning/rollback; no entity is created here.
+     * @param arrow immutable real-arrow provenance whose group has a reserved slot
+     * @throws IllegalStateException if off the constructing thread, unreserved or already emitted under the same UUID
      */
     public void emit(OwnedProjectile arrow) {
         check(); UUID group = arrow.shot().shotId(), id = arrow.shot().projectileId();
@@ -64,6 +68,8 @@ public final class ArrowRegistry {
      * <p>
      * Returns the owned capture only for the first terminal claim of a registered UUID; unknown
      * or repeated claims return empty. Rejected collisions still require explicit retire to release capacity.
+     * @param id registered native projectile UUID to claim once
+     * @return owned capture for the first claim, or empty for unknown/repeated claims
      */
     public Optional<OwnedProjectile> claim(UUID id) {
         check(); var arrow = arrows.get(id);
@@ -72,26 +78,33 @@ public final class ArrowRegistry {
     /**
      * Idempotently removes one emitted arrow and terminal claim. Does not remove native entities
      * or cancel another still-reserved sibling; call release for remaining group reservations.
+     * @param id native projectile UUID; absent entries are harmless
      */
     public void retire(UUID id) { check(); arrows.remove(id); claimed.remove(id); }
     /**
      * Idempotently releases un-emitted group slots only; already emitted arrows remain owned.
+     * @param group firing group UUID whose un-emitted slots should be released
      */
     public void release(UUID group) { check(); reservations.remove(group); }
     /**
      * Returns the immutable registered capture or empty, including after a claim until retirement.
+     * @param id native projectile UUID to inspect
+     * @return immutable capture, including a claimed entry until retirement; empty if absent
      */
     public Optional<OwnedProjectile> lookup(UUID id) { check(); return Optional.ofNullable(arrows.get(id)); }
     /**
      * Returns an immutable emitted-arrow snapshot in insertion order, including terminally claimed entries.
+     * @return immutable emitted-arrow list in insertion order, including claimed entries
      */
     public List<OwnedProjectile> snapshot() { check(); return List.copyOf(arrows.values()); }
     /**
      * Returns emitted count plus remaining reserved slots; claimed entries still consume capacity.
+     * @return emitted-arrow count plus all remaining reserved slots
      */
     public int used() { check(); return arrows.size() + reservations.values().stream().mapToInt(Integer::intValue).sum(); }
     /**
      * Returns slots not yet emitted; reservations are accounted separately from live arrow identity.
+     * @return number of reserved slots not yet converted to emitted arrows
      */
     public int reserved() { check(); return used() - arrows.size(); }
     /**

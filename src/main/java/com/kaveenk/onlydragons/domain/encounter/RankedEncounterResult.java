@@ -26,6 +26,9 @@ public final class RankedEncounterResult {
      * Retains the nonnull result and builds an immutable ordered projection. Missing production
      * provenance, empty participants, conflicting ordinal ownership/ticks or backdated stamps
      * throw IllegalArgumentException; the input result remains unchanged.
+     * @param result nonnull immutable production completion with complete participant commit provenance
+     * @throws NullPointerException if result is null
+     * @throws IllegalArgumentException if completion/participant provenance is absent, conflicting or backdated
      */
     public RankedEncounterResult(EncounterResult result) {
         this.result = Objects.requireNonNull(result);
@@ -85,14 +88,18 @@ public final class RankedEncounterResult {
 
     /**
      * Returns the exact retained immutable completion, including optional full selection.
+     * @return the identical immutable completion from which this ranking was constructed
      */
     public EncounterResult result() { return result; }
     /**
      * Returns immutable rows in placement order; later session/name/equipment changes cannot reorder them.
+     * @return immutable rows in unique placement order, independent of later names or sessions
      */
     public List<Placement> placements() { return placements; }
     /**
      * Returns the frozen row for the supplied UUID, or empty for a nonparticipant (including null).
+     * @param playerId participant UUID; null is treated as a nonparticipant
+     * @return frozen placement row, or empty when the UUID did not participate
      */
     public Optional<Placement> placement(UUID playerId) {
         return placements.stream().filter(row -> row.playerId().equals(playerId)).findFirst();

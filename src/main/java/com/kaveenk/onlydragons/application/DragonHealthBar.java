@@ -24,6 +24,10 @@ public final class DragonHealthBar implements AutoCloseable {
     public record Display(UUID generation, String name, double health, double maxHealth) {
         /**
          * Validates identity/text presence and display-health arithmetic, not native entity liveness.
+         * @param generation nonnull encounter UUID that determines bar identity
+         * @param name nonnull literal title; blank is allowed
+         * @param health finite domain HP for display, clamped only when calculating progress
+         * @param maxHealth finite strictly positive maximum HP
          */
         public Display { Objects.requireNonNull(generation); Objects.requireNonNull(name); PresentationFormatter.healthProgress(health, maxHealth); }
     }
@@ -35,6 +39,8 @@ public final class DragonHealthBar implements AutoCloseable {
     public record Viewer(UUID id, Audience session) {
         /**
          * Rejects null identity or audience; caller owns eligibility and session lifetime.
+         * @param id nonnull player UUID
+         * @param session nonnull live delivery target, compared by object identity during reconciliation
          */
         public Viewer { Objects.requireNonNull(id); Objects.requireNonNull(session); }
     }
@@ -118,14 +124,17 @@ public final class DragonHealthBar implements AutoCloseable {
     }
     /**
      * Returns cumulative failed show/hide attempts across generations, including cleanup failures.
+     * @return cumulative failed show/hide attempts across generations, including cleanup failures
      */
     public long deliveryFailures() { return deliveryFailures; }
     /**
      * Returns locally tracked successful viewers; this is not confirmation of client packet receipt.
+     * @return number of locally tracked successful viewers, not proof of client packet receipt
      */
     public int viewerCount() { return viewers.size(); }
     /**
      * Returns the currently retained generation, or empty after clear/close; inspection does not reconcile.
+     * @return currently retained generation UUID, or empty after clear/close
      */
     public Optional<UUID> generation() { return Optional.ofNullable(generation); }
     /**

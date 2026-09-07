@@ -25,6 +25,11 @@ public record OverloadCapture(String revision, int level, double rawCritChance,
 
     /**
      * Checks identity, level, sample presence/range and outcome consistency without consuming randomness.
+     * @param revision exactly {@link #REVISION}
+     * @param level 0 absent or equipped I\u2013V
+     * @param rawCritChance finite nonnegative raw percentage points, including excess over 100
+     * @param sample nonnull optional [0,1) draw, present iff equipped
+     * @param megaCritical must equal the strict sampled probability decision
      */
     public OverloadCapture {
         if (!REVISION.equals(revision)) throw new IllegalArgumentException("Unsupported Overload revision");
@@ -39,6 +44,7 @@ public record OverloadCapture(String revision, int level, double rawCritChance,
 
     /**
      * Returns level zero, raw chance zero, no sample and no mega outcome; consumes no random value.
+     * @return level-zero capture with no random sample and no mega-critical outcome
      */
     public static OverloadCapture absent() { return new OverloadCapture(REVISION, 0, 0, OptionalDouble.empty(), false); }
 
@@ -71,6 +77,7 @@ public record OverloadCapture(String revision, int level, double rawCritChance,
 
     /**
      * Returns 1 for a failed/absent mega roll, otherwise 1+0.1×level (1.1–1.5); no reroll occurs.
+     * @return 1 for absent/failed mega-critical, otherwise 1 plus 0.1 times the captured level
      */
     public double multiplier() { return megaCritical ? 1 + level * .1 : 1; }
 

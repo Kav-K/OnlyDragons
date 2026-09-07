@@ -29,6 +29,11 @@ public record StatModifier(String sourceId, StatKey key, ModifierOperation opera
     /**
      * Rejects missing identities, non-finite amounts and negative factors. Negative flat/percent
      * amounts are allowed here; {@link StatResolver} validates the resulting layers.
+     * @param sourceId nonblank replacement/provenance identity, compared case-sensitively
+     * @param key nonnull stat receiving this contribution
+     * @param operation nonnull arithmetic layer
+     * @param amount finite amount: native units for FLAT, points for ADDITIVE_PERCENT, factor for MULTIPLIER
+     * @param order signed ordering priority within key and operation, ascending
      */
     public StatModifier {
         DomainChecks.text(sourceId, "sourceId");

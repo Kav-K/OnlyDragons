@@ -20,6 +20,10 @@ public final class DamageCalculator {
                               Map<String, Double> breakdown) {
         /**
          * Validates the three amounts and copies diagnostics; it does not prove the arithmetic relations.
+         * @param rawOffense finite nonnegative final offense, including captured crit/mega scaling
+         * @param mitigatedDamage finite nonnegative pre-cap damage inherited by Ferocity
+         * @param cappedDamage finite nonnegative per-hit contribution basis
+         * @param breakdown copied diagnostic map; map iteration order is unspecified
          */
         public Calculation {
             DomainChecks.nonNegative(rawOffense, "rawOffense");

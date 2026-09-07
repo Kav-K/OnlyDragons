@@ -22,6 +22,8 @@ public final class TracerRules {
     public record Box(Vector3 min, Vector3 max) {
         /**
          * Rejects null/inverted bounds. Coordinate finiteness is enforced by Vector3.
+         * @param min nonnull minimum world-block corner
+         * @param max nonnull maximum corner, componentwise no lower than min
          */
         public Box {
             Objects.requireNonNull(min); Objects.requireNonNull(max);
@@ -31,6 +33,8 @@ public final class TracerRules {
         /**
          * Tests componentwise half-open bounds: minimum inclusive, maximum exclusive. A zero-width
          * axis contains no point; this differs deliberately from closed nearest-point clamping.
+         * @param p immutable block-coordinate point to test
+         * @return true only on or above each minimum and strictly below each maximum
          */
         public boolean contains(Vector3 p) {
             return p.x() >= min.x() && p.x() < max.x() && p.y() >= min.y() && p.y() < max.y() && p.z() >= min.z() && p.z() < max.z();
@@ -38,6 +42,8 @@ public final class TracerRules {
         /**
          * Returns a new point clamped to the closed box, including its maximum faces. An interior
          * position returns the same coordinates; the argument itself is never mutated.
+         * @param p immutable point to project, possibly outside the box
+         * @return new closest point on the closed box, including maximum faces
          */
         public Vector3 nearest(Vector3 p) {
             return new Vector3(clamp(p.x(), min.x(), max.x()), clamp(p.y(), min.y(), max.y()), clamp(p.z(), min.z(), max.z()));
@@ -52,6 +58,9 @@ public final class TracerRules {
     public record Part(UUID targetId, UUID partId, Box box) {
         /**
          * Requires complete part identity/geometry; adapter owns phase, generation, world and arena eligibility.
+         * @param targetId nonnull managed parent UUID
+         * @param partId nonnull real part UUID, used for deterministic ties
+         * @param box nonnull current part bounds in the arrow's world
          */
         public Part { Objects.requireNonNull(targetId); Objects.requireNonNull(partId); Objects.requireNonNull(box); }
     }
@@ -65,6 +74,9 @@ public final class TracerRules {
     private TracerRules() {}
     /**
      * Returns legacy level×2 blocks for 0–5; invalid levels reject and zero means no guidance.
+     * @param level legacy Tracer level 0–5
+     * @return legacy acquisition radius in blocks, with zero disabling guidance
+     * @throws IllegalArgumentException if the level is outside 0–5
      */
     public static double radius(int level) {
         if (level < 0 || level > 5) throw new IllegalArgumentException("Tracer level must be 0..5");
@@ -75,6 +87,11 @@ public final class TracerRules {
      * <p>
      * Uses legacy v1 radii with no retained target or launch cone. Returns empty at level zero
      * without testing geometry; otherwise chooses nearest visible eligible part with UUID string ties.
+     * @param position current arrow position in blocks
+     * @param level legacy Tracer level 0–5
+     * @param parts currently eligible native-part value boxes
+     * @param visible line-of-sight predicate applied to each nearest-surface candidate
+     * @return nearest visible candidate within the inclusive legacy radius, or empty
      */
     public static Optional<Aim> acquire(Vector3 position, int level, Collection<Part> parts, Predicate<Aim> visible) {
         double radius = radius(level);
@@ -86,6 +103,14 @@ public final class TracerRules {
      * <p>
      * Supports only profiles without a captured-launch cone; AIMED_V3 throws to prevent accidental
      * ungated guidance. Same-target retention is tried first, then honest acquisition at ordinary radius.
+     * @param position current arrow position in blocks
+     * @param level Tracer level 0–5
+     * @param parts currently eligible native-part value boxes
+     * @param visible line-of-sight predicate for candidate surface points
+     * @param profile captured profile without a launch-direction requirement
+     * @param lock optional logical target UUID retained from the previous tick
+     * @return eligible same-target retained candidate first, otherwise nearest ordinary-radius candidate
+     * @throws IllegalArgumentException if the profile requires captured launch-aim inputs
      */
     public static Optional<Aim> acquire(Vector3 position, int level, Collection<Part> parts, Predicate<Aim> visible,
                                         TracerProfile profile, Optional<UUID> lock) {
@@ -201,10 +226,16 @@ public final class TracerRules {
     /**
      * Returns nested-hypot Euclidean magnitude; finite components can still yield infinity when
      * the true magnitude exceeds double range, so guidance callers explicitly check the result.
+     * @param v immutable vector whose magnitude is measured
+     * @return Euclidean magnitude, possibly positive infinity if the represented length overflows
      */
     public static double length(Vector3 v) { return Math.hypot(Math.hypot(v.x(), v.y()), v.z()); }
     /**
      * Returns componentwise a−b; overflowing components reject through Vector3 validation.
+     * @param a left-hand immutable vector
+     * @param b right-hand immutable vector to subtract
+     * @return new vector with componentwise a minus b
+     * @throws IllegalArgumentException if a resulting component is nonfinite
      */
     public static Vector3 subtract(Vector3 a, Vector3 b) { return new Vector3(a.x()-b.x(), a.y()-b.y(), a.z()-b.z()); }
     /**

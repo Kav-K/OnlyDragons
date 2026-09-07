@@ -10,6 +10,8 @@ import com.kaveenk.onlydragons.domain.DomainChecks;
 public record StatValue(double raw, double effective) {
     /**
      * Rejects non-finite, negative, or cap-increased values without rounding.
+     * @param raw finite nonnegative result before the effective cap
+     * @param effective finite nonnegative result no greater than raw; e.g. 750/500 Ferocity
      */
     public StatValue {
         DomainChecks.nonNegative(raw, "raw");

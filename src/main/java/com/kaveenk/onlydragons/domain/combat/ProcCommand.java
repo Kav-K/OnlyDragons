@@ -29,7 +29,18 @@ public record ProcCommand(UUID procId, UUID parentImpactId, PhysicalImpact.Key o
                           UUID ownerId, UUID shotId, long dueTick, double preCapDamage,
                           CritOutcome crit, MechanicRevision mechanic, int fatalTempoSourceLevel,
                           Optional<ProcHealthSnapshot> healthSnapshot) {
-    /** Legacy fixed-profile command. Level-based profiles require explicit admission provenance. */
+    /** Legacy fixed-profile command. Level-based profiles require explicit admission provenance.
+     * @param procId nonnull stable child ID distinct from parentImpactId
+     * @param parentImpactId nonnull accepted physical/Duplex impact ID
+     * @param origin nonnull original physical key
+     * @param ownerId nonnull captured shooter UUID
+     * @param shotId nonnull captured trigger identity
+     * @param dueTick nonnegative game tick; encounter additionally checks parent time
+     * @param preCapDamage finite nonnegative already-mitigated parent basis, not capped output
+     * @param crit nonnull inherited ordinary crit
+     * @param mechanic nonnull frozen policy identity
+     * @param fatalTempoSourceLevel captured refresh eligibility: 0 absent, 1\u20135 eligible
+     */
     public ProcCommand(UUID procId, UUID parentImpactId, PhysicalImpact.Key origin, UUID ownerId,
                        UUID shotId, long dueTick, double preCapDamage, CritOutcome crit,
                        MechanicRevision mechanic, int fatalTempoSourceLevel) {
@@ -39,6 +50,17 @@ public record ProcCommand(UUID procId, UUID parentImpactId, PhysicalImpact.Key o
     /**
      * Rejects malformed IDs, time, numeric basis and refresh levels. Full parent matching is deferred
      * to the encounter; a valid DTO is not independent authorization to enqueue another child.
+     * @param procId nonnull stable child ID distinct from parentImpactId
+     * @param parentImpactId nonnull accepted physical/Duplex impact ID
+     * @param origin nonnull original physical key
+     * @param ownerId nonnull captured shooter UUID
+     * @param shotId nonnull captured trigger identity
+     * @param dueTick nonnegative game tick; encounter additionally checks parent time
+     * @param preCapDamage finite nonnegative already-mitigated parent basis, not capped output
+     * @param crit nonnull inherited ordinary crit
+     * @param mechanic nonnull frozen policy identity
+     * @param fatalTempoSourceLevel captured refresh eligibility: 0 absent, 1\u20135 eligible
+     * @param healthSnapshot nonnull optional pre-parent HP policy; required by active-level profiles
      */
     public ProcCommand {
         Objects.requireNonNull(procId, "procId");

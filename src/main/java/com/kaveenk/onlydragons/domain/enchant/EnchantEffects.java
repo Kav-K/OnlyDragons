@@ -36,6 +36,9 @@ public final class EnchantEffects {
     public record GravityProfile(String revision, Map<Integer, Double> airborneFractions, boolean legacyAlias) {
         /**
          * Validates every supplied entry; a partial table is allowed but a selected missing level fails in modifiers.
+         * @param revision nonblank author-maintained table identity
+         * @param airborneFractions copied map of levels 1\u20136 to finite nonnegative additive fractions
+         * @param legacyAlias whether dragon_hunter may supply a level when Gravity is absent
          */
         public GravityProfile {
             DomainChecks.text(revision, "gravity revision");
@@ -48,6 +51,7 @@ public final class EnchantEffects {
         }
         /**
          * Returns an empty immutable table with alias disabled; selecting Gravity then fails explicitly.
+         * @return empty Gravity table with the legacy alias disabled
          */
         public static GravityProfile deferred() { return new GravityProfile("gravity-deferred", Map.of(), false); }
     }
@@ -56,12 +60,16 @@ public final class EnchantEffects {
     public interface OverloadPolicy {
         /**
          * Returns a stable nonblank policy label used to namespace diagnostic modifier IDs.
+         * @return stable nonblank extension policy label used in diagnostic modifier IDs
          */
         String revision();
         /**
          * Returns nonnull immutable extra modifiers for the captured shot and validated equipped level.
          * Implementations must not reroll impact-time Overload or mutate the shot; checkpointTwo
          * verifies the existing capture and returns no extra factor because DamageCalculator applies it.
+         * @param shot immutable captured shot; implementations must not reroll or mutate it
+         * @param level validated equipped Overload level
+         * @return nonnull immutable extra modifiers; the captured production policy returns neutral maps
          */
         DamageModifiers modifiers(ShotContext shot, int level);
     }
@@ -72,6 +80,10 @@ public final class EnchantEffects {
     /**
      * Retains nonnull Gravity and Overload policies and validates the extension revision.
      * The caller owns extension lifetime and any thread-safety needed by a custom implementation.
+     * @param gravity nonnull immutable Gravity table
+     * @param overload nonnull extension whose revision is nonblank
+     * @throws NullPointerException if either policy is null
+     * @throws IllegalArgumentException if the extension revision is blank
      */
     public EnchantEffects(GravityProfile gravity, OverloadPolicy overload) {
         this.gravity = Objects.requireNonNull(gravity);
@@ -82,12 +94,20 @@ public final class EnchantEffects {
     /**
      * Returns the legacy profile: Power/Snipe active, Gravity and Overload explicitly deferred.
      * Selecting a deferred effect throws IllegalStateException instead of silently ignoring it.
+     * @return legacy effect consumer with Gravity and Overload deliberately unavailable
      */
     public static EnchantEffects calibration() {
         return new EnchantEffects(GravityProfile.deferred(), new OverloadPolicy() {
-            /** Identifies the deliberately unavailable legacy policy. */
+            /** Identifies the deliberately unavailable legacy policy.
+             * @return the explicit overload-deferred policy label
+             */
             public String revision() { return "overload-deferred"; }
-            /** Rejects every requested Overload evaluation until a concrete policy is selected. */
+            /** Rejects every requested Overload evaluation until a concrete policy is selected.
+             * @param shot captured shot, unused because this policy is unavailable
+             * @param level requested level, unused because this policy is unavailable
+             * @return never returns normally
+             * @throws IllegalStateException for every evaluation of the deferred policy
+             */
             public DamageModifiers modifiers(ShotContext shot, int level) {
                 throw new IllegalStateException("Overload probability/damage profile has not been chosen");
             }
@@ -99,13 +119,21 @@ public final class EnchantEffects {
      * <p>
      * Returns the expanded table: Gravity I–VI adds 5/10/15/20/30/40% for AIRBORNE
      * targets; the supplied Overload level must match the shot's immutable capture.
+     * @return expanded Gravity table and a captured-Overload consistency checker, with no duplicate multiplier
      */
     public static EnchantEffects checkpointTwo() {
         return new EnchantEffects(new GravityProfile(OverloadCapture.REVISION,
                 Map.of(1, .05, 2, .10, 3, .15, 4, .20, 5, .30, 6, .40), false), new OverloadPolicy() {
-            /** Identifies the policy whose outcome is already captured in the shot. */
+            /** Identifies the policy whose outcome is already captured in the shot.
+             * @return the revision used by the immutable Overload capture
+             */
             public String revision() { return OverloadCapture.REVISION; }
-            /** Checks captured level consistency and returns no extra factor, avoiding double application. */
+            /** Checks captured level consistency and returns no extra factor, avoiding double application.
+             * @param shot immutable shot carrying the primary Overload outcome
+             * @param level equipped level that must equal the captured level
+             * @return neutral modifier maps because the calculator applies the captured outcome
+             * @throws IllegalArgumentException if the supplied level differs from the capture
+             */
             public DamageModifiers modifiers(ShotContext shot, int level) {
                 if (shot.overload().level() != level) throw new IllegalArgumentException("Missing Overload capture");
                 return new DamageModifiers(Map.of(), Map.of());

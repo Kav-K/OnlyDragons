@@ -26,6 +26,9 @@ public final class QuiverFlameProfile {
     public record Quiver(int level, OptionalDouble sample, boolean saved) {
         /**
          * Rejects unsupported levels and inconsistent sample/decision pairs; no ammunition mutation occurs.
+         * @param level 0 absent or Infinite Quiver I\u2013X
+         * @param sample nonnull optional finite [0,1) sample, absent iff level is zero
+         * @param saved true exactly when equipped sample &lt; level×0.05
          */
         public Quiver {
             QuiverFlameProfile.level(level, 10);
@@ -54,10 +57,16 @@ public final class QuiverFlameProfile {
     /**
      * Returns Flame level×0.03 for 0–2 (zero absent); rejects other levels. The base is accepted
      * physical credit, so Flame II on 100 credit gives potency 6 before vulnerability/cap.
+     * @param level Flame level 0–2, where zero means absent
+     * @return accepted-physical-credit fraction for one fire tick, from 0 through 0.06
+     * @throws IllegalArgumentException if the level is outside 0–2
      */
     public static double fireFraction(int level) { level(level, 2); return level * 0.03; }
     /**
      * Returns 1+0.1×Duplex level for 0–5; zero gives neutral 1. Invalid levels reject.
+     * @param level Duplex level 0–5, where zero means no vulnerability
+     * @return nonstacking fire multiplier from 1 through 1.5
+     * @throws IllegalArgumentException if the level is outside 0–5
      */
     public static double vulnerability(int level) { level(level, 5); return 1 + level * 0.1; }
     /**

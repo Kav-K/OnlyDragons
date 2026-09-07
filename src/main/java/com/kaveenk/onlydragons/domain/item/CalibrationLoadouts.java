@@ -21,6 +21,7 @@ public final class CalibrationLoadouts {
      * Builds the preserved ten-definition v2 catalog: eight original drawn controls, returning
      * Tracer v2 and shortbow v1. Base damage is 100, calibration CD 50 comes from the stat profile;
      * Vicious contributes its level once as flat Ferocity. No items are granted.
+     * @return new preserved v2 catalog containing the original controls and explicit Tracer-v2/shortbow-v1 definitions
      */
     public static ItemRegistry registry() {
         var enchants = new ArrayList<EnchantDefinition>();
@@ -68,6 +69,7 @@ public final class CalibrationLoadouts {
      * <p>
      * Builds v2, v3, v4 in precedence order and returns an exact-revision router. Old identities
      * retain their tables; newest aggregate descriptors do not change old item compatibility.
+     * @return new flat exact-revision router over v2, v3 and v4; old identities retain their own tables
      */
     public static ItemRegistry compatibleRegistry() {
         ItemRegistry legacy = registry();
@@ -78,6 +80,7 @@ public final class CalibrationLoadouts {
 
     /**
      * Builds the standalone eleven-definition v3 catalog, preserving v2 as a separate history.
+     * @return new standalone v3 catalog with expanded bow effects and preserved unavailable controls
      */
     public static ItemRegistry expandedRegistry() {
         return expandedRegistry(registry());
@@ -139,6 +142,7 @@ public final class CalibrationLoadouts {
      * <p>
      * Builds the standalone consumer-capable v4 catalog with six fire/ammo controls and seven
      * held presets; no existing item is migrated or edited.
+     * @return new standalone v4 catalog with active fire/ammo consumers and declared held presets
      */
     public static ItemRegistry fireRegistry() {
         return fireRegistry(expandedRegistry());

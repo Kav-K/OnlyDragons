@@ -10,6 +10,9 @@ public final class FiringRules {
     /**
      * Returns max(1,ceil(10/(1+AS/100))) game ticks for finite nonnegative attack-speed points.
      * AS 0/100/400 yields 10/5/2 ticks; no scheduler or mutable cooldown is owned here.
+     * @param attackSpeed finite nonnegative attack-speed percentage points
+     * @return minimum firing interval in game ticks, rounded up and never below one
+     * @throws IllegalArgumentException if attack speed is negative or nonfinite
      */
     public static int cooldown(double attackSpeed) {
         DomainChecks.nonNegative(attackSpeed, "attackSpeed");
@@ -17,6 +20,9 @@ public final class FiringRules {
     }
     /**
      * Returns level×0.04 for Duplex I–V (0.04–0.20); unsupported levels throw IllegalArgumentException.
+     * @param level captured Duplex level I–V
+     * @return secondary projectile scale from 0.04 through 0.20
+     * @throws IllegalArgumentException if the level is outside I–V
      */
     public static double duplexScale(int level) {
         if (level < 1 || level > 5) throw new IllegalArgumentException("Duplex level must be 1–5");

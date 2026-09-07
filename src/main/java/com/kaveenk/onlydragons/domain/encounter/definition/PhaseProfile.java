@@ -13,6 +13,8 @@ public record PhaseProfile(MechanicRevision mechanic, Set<MechanicRevision> comp
     /**
      * Copies nonnull compatibility entries; loader checks that all references exist in its trusted
      * combat profile set. No native dragon phase transitions are performed.
+     * @param mechanic nonnull phase-contract identity
+     * @param compatibleCombatProfiles nonempty immutable copy of permitted exact combat revision labels
      */
     public PhaseProfile {
         Objects.requireNonNull(mechanic, "phase mechanic");
