@@ -523,7 +523,7 @@
       "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Bounded maintenance dispatched from 53164f85a0ba3f36d16f242429f3a0a7c5a403a7. Existing behavioral requirements reused; focused worker Paper and lead full hosted cohort/review/CI pending. See docs/planning/evidence/maintenance-82.md."
+      "notice": "In review: draft PR83 https://github.com/Kav-K/OnlyDragons/pull/83 from accepted main53164f85. Clean inputs7ae38e3 pass worker builds303/6/33, Python288/bridge25, static/no-weakening, focused Paper25/115/61 and strict focused replay. Lead complete final-head hosted cohort/replay/review/current CI and acceptance pending. No completed requirements claimed. See docs/planning/evidence/maintenance-82.md."
     }
   },
   "milestones": {

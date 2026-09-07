@@ -154,14 +154,15 @@ T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 impleme
 
 ### MAINT-82 — Catalog and combat lifecycle readability
 
-**In progress**, [#82](https://github.com/Kav-K/OnlyDragons/issues/82),
+**In review**, [draft PR #83](https://github.com/Kav-K/OnlyDragons/pull/83), [#82](https://github.com/Kav-K/OnlyDragons/issues/82),
 `symphony/gh-82`, dispatched from accepted main `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`.
 Bounded private catalog reuse/launch-veto extraction, local lifecycle readability,
 player JUnit pin reuse and documentation reconciliation; [scope and audit rationale](evidence/maintenance-82.md).
 Existing requirements, fixture bindings, public APIs and gameplay policy remain.
-Worker gates: pinned production/companion/client builds, Python/bridge checks,
-static/no-weakening checks and clean-commit equipment-stats/owned-firing/owned-flame
-Paper scenarios. The lead owns the single fresh complete hosted cohort, strict
+Worker checks pass: pinned production/companion/client builds (303/6/33 tests),
+288 Python/25 bridge tests, static/no-weakening checks and clean-commit
+equipment-stats/owned-firing/owned-flame Paper scenarios (25/115/61 assertions),
+including focused raw/JUnit/artifact/cleanup replay. Tested inputs: `7ae38e3`. The lead owns the single fresh complete hosted cohort, strict
 raw/JUnit/artifact/cleanup replay, independent review and current-head CI.
 No maintenance acceptance or feature/milestone advancement is claimed.
 
@@ -657,8 +658,8 @@ T08e/T03b and verified the complete current-input cohort, independent replay/rev
 all three task checkpoints and current CI; [final evidence](evidence/checkpoint2-ui-flight.md).
 The focused archive retains exact inputs and integration history. Human appearance/
 readability, authenticated-client compatibility and M1–M5 remain unaccepted.
-T02c/T06b may consume the integrated formatter boundary in document 02 once their
-remaining T06c prerequisite and lead assignment are satisfied.
+T06c is integrated. T02c/T06b may consume the formatter boundary in document 02
+after the temporary MAINT-82 hold ends and the lead dispatches them.
 
 ### T08e — Bounded flight and returning Tracer (GH-65)
 
