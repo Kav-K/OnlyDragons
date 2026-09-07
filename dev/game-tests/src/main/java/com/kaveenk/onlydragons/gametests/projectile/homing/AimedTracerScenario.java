@@ -104,7 +104,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
     private void aimed() {
         // Turning away after launch must not remove an already aimed shot's eligibility either.
         players.request("alpha", "aimed-turn");
-        players.await("post launch turn away", 60, () -> Math.abs(player().getYaw()-180) < .01, () -> { observeTurn(); c.later(45, () -> {
+        players.await("post launch turn away", 60, () -> Math.abs(Math.abs(player().getYaw())-180) < .01, () -> { observeTurn(); c.later(45, () -> {
             var path = path(); var impact = hit();
             c.check("aimed_moving_part_assistance_and_collision", true, impact.isPresent() && impact.get().accepted()
                     && "DRAGON".equals(collisions.get(captured.shot().projectileId()))
@@ -115,7 +115,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
             c.check("aimed_native_speed_turn_grace_cone", true, path.size() > 3 && path.stream().allMatch(this::validFrame)
                     && path.stream().anyMatch(f -> f.groupLaunchAge() < 3 && f.aim().isEmpty()));
             c.check("aimed_postshot_turn_keeps_capture", true, captured.shot().initialVelocity().z() > 0
-                    && Math.abs(player().getYaw()-180) < .01 && impact.isPresent()
+                    && Math.abs(Math.abs(player().getYaw())-180) < .01 && impact.isPresent()
                     && impact.get().projectile().equals(captured)
                     && path.stream().anyMatch(f -> f.tick() >= turnTick && f.aim().isPresent()));
             journal(); trial("plain", 0, () -> shoot(() -> miss(() -> trial("side", 5, () -> shoot(this::turnedMiss)))));
@@ -136,7 +136,7 @@ public final class AimedTracerScenario implements Scenario, Listener {
         turnTick = Integer.toUnsignedLong(Bukkit.getCurrentTick());
         c.check(stage + "_turn_while_airborne", true, latest.isValid()
                 && c.production().bows().projectile(captured.shot().projectileId()).isPresent());
-        c.observe(stage + "TurnTick", turnTick);
+        c.observe(stage + "Turn", Map.of("tick", turnTick, "yaw", player().getYaw(), "pitch", player().getPitch()));
     }
     private void miss(ScenarioContext.Step next) {
         c.later(50, () -> {

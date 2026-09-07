@@ -27,6 +27,13 @@ historical v1 and returning-v2 presets retain their profiles and original fixtur
   the captured runner wait log is `/tmp/gh90-aimed.log`. This is build/resource-wait
   evidence only, not a gameplay pass. No memory policy or unrelated process changed.
 
+- Clean `a27eeba`, run `e50117edbd924ebda19bff808f46265f`, passed all builds
+  and fresh1024MiB memory admission, then failed the fixture's post-shot180-degree
+  turn wait. The matcher expected only positive180 rather than accepting the
+  equivalent negative180 yaw. The next fixture compares direction modulo a full
+  turn and records observed yaw/pitch/tick. The captured ordinary_v4 native shot
+  and five owned cleanup assertions passed; no gameplay acceptance is claimed.
+
 ## Candidate and remaining verification
 
 The corrected candidate routes all thirteen current definitions, tests arbitrary-
