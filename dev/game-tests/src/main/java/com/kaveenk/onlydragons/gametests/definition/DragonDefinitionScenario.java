@@ -18,11 +18,30 @@ import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 
-/** Production loader/registry on real Paper; synthetic catalog candidates, no live dragon or reward policy. */
+/**
+ * Exercises the production classloader, loader and atomic definition registry on Paper.
+ * Malformed and alternate catalogs are explicit fixture candidates; the shipped type
+ * and full retained selections remain the provenance authority. Native inventory,
+ * entity, task and listener sentinels check that catalog operations stay inert.
+ * No live fight, reward eligibility, roll or delivery is established by this scenario.
+ * Cleanup restores the original bundled registry even after the intentional abort.
+ */
 public final class DragonDefinitionScenario implements Scenario {
     private final boolean abort;
+    /** Creates the positive catalog-validation variant. */
     public DragonDefinitionScenario() { this(false); }
+    /**
+     * Selects the deliberate cleanup control or the positive validation sequence.
+     * @param abort true to replace the registry, then abort so cleanup must restore it
+     */
     public DragonDefinitionScenario(boolean abort) { this.abort = abort; }
+    /**
+     * Checks schema/reference/number admission, atomic rollback and retained full-selection identity.
+     * Registers restoration before any replacement; equal revision labels are explicitly
+     * allowed to identify different full content, so provenance comparisons retain values.
+     * @param context server-thread fixture context and cleanup registry
+     * @throws Exception if resources, candidate I/O or fixture initialization fails
+     */
     @Override public void start(ScenarioContext context) throws Exception {
         context.mechanicRevision(abort ? "dragon-definition-cleanup-v1" : "dragon-definition-calibration-v2");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
@@ -157,28 +176,35 @@ public final class DragonDefinitionScenario implements Scenario {
         context.finish();
     }
 
+    /** Snapshots sorted native entity UUIDs across worlds as an independent no-spawn sentinel. */
     private static List<String> entities() {
         return Bukkit.getWorlds().stream().flatMap(w -> w.getEntities().stream()).map(e -> e.getUniqueId().toString()).sorted().toList();
     }
+    /** Requires an invalid candidate to throw and retain the identical previously adopted registry snapshot. */
     private static boolean rejects(DragonDefinitionRegistry registry, String dragons, String tables) throws IOException {
         var before = registry.snapshot();
         try { registry.replace(stream(dragons), stream(tables)); return false; }
         catch (IllegalArgumentException expected) { return before == registry.snapshot(); }
     }
+    /** Injects a failing input stream and verifies atomic rollback preserves the exact prior snapshot. */
     private static boolean ioFailure(DragonDefinitionRegistry registry, String tables) {
         var before = registry.snapshot();
         try {
-            registry.replace(new InputStream() { @Override public int read() throws IOException { throw new IOException("fixture"); } }, stream(tables));
+            registry.replace(new InputStream() { /** Injects a deterministic read failure before any candidate adoption. */ @Override public int read() throws IOException { throw new IOException("fixture"); } }, stream(tables));
             return false;
         } catch (IOException expected) { return before == registry.snapshot(); }
     }
+    /** Deletes one exact property line using line-separator-independent parsing to test required fields. */
     private static String withoutLine(String text, String removed) {
         return text.lines().filter(line -> !line.equals(removed)).collect(java.util.stream.Collectors.joining("\n", "", "\n"));
     }
+    /** Replaces one named fixture property while quoting the key so dots are not treated as regex wildcards. */
     private static String set(String text, String key, String value) {
         return text.replaceAll("(?m)^" + java.util.regex.Pattern.quote(key) + "=.*$", key + "=" + value);
     }
+    /** Encodes synthetic Java-properties content with the ISO-8859-1 representation used by this loader fixture. */
     private static InputStream stream(String text) { return new ByteArrayInputStream(text.getBytes(StandardCharsets.ISO_8859_1)); }
+    /** Reads bundled catalog bytes through the production loader classloader rather than a companion copy. */
     private static String resource(String name) throws IOException {
         try (var input = DragonCatalogLoader.class.getResourceAsStream("/encounters/" + name)) {
             return new String(input.readAllBytes(), StandardCharsets.ISO_8859_1);
