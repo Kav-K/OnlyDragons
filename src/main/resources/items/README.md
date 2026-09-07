@@ -88,3 +88,12 @@ revision is `calibration-items-v3`; schema remains 1. The expanded catalog suppo
 eight effects and exposes all ten [descriptors](../enchants/README.md). Infinite
 Quiver/Flame stay visibly unavailable at every selection boundary until T06c.
 Old immutable equipment/shot snapshots do not change after an edit or grant.
+
+## Consumer-capable catalog v4 (T06c)
+
+`fireRegistry()` supplies `calibration-items-v4`. `compatibleRegistry()` now routes
+three concrete histories; v3 still rejects IQ/Flame and no old item migrates.
+New IDs: ordinary_v4, shortbow_v4, quiver_v4, flame_v4, duplex_flame_v4,
+tempo_flame_v4. Their exact defaults, totals and effect policy are in the
+[T06c contract](../../../../docs/planning/02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70).
+All ten effects are available only on v4's consumer-capable definitions.

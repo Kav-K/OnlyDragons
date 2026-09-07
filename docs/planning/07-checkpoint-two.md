@@ -1,6 +1,6 @@
 # Checkpoint 2: combat feedback, volleys and enchant books
 
-**6 September 2026 — T05b and combined T03b/T08d/T08e accepted; T06c is assigned next. T06b/T02c and human outcomes remain pending.**
+**6 September 2026 — T05b and combined T03b/T08d/T08e accepted; T06c is In review after focused proof. T06b/T02c and human outcomes remain pending.**
 
 The first managed dragon/ranking slice is integrated on main `36b420c`.
 The user now prioritizes a persistent dragon health bar, smoother bounded flight,
@@ -32,8 +32,8 @@ complete through combined [PR #76](https://github.com/Kav-K/OnlyDragons/pull/76)
 [lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308). Original PR74/75/79 focused evidence and
 failed iterations retain their original identities and scope.
 
-T06c/#70 is lead-assigned and ready with T03b integrated; the lead holds its
-Symphony label until this context PR merges. T06b/#68 and T02c/#69 remain planned
+T06c/#70 is In review with T03b integrated; its clean runtime and six focused
+Paper passes are recorded in document 03 and the linked evidence archive. T06b/#68 and T02c/#69 remain planned
 pending T06c. These three tasks retain empty completed requirements/evidence,
 and `quiver-flame-integration`, `held-shortbow-loadouts` and `enchant-books-anvil`
 remain unaccepted. T06c implements the remaining effects before T06b/T02c expose

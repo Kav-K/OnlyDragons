@@ -40,6 +40,9 @@ public final class EquipmentStatsScenario implements Scenario {
             expectedTotals.put("tracer_return_v2", List.of(100.0, 50.0, 0.0, 0.0));
             expectedTotals.put("overload_v3", List.of(100.0, 55.0, 200.0, 0.0));
             expectedTotals.put("gravity_v3", List.of(100.0, 50.0, 0.0, 0.0));
+            for (String id : List.of("ordinary_v4", "shortbow_v4", "quiver_v4", "flame_v4", "duplex_flame_v4"))
+                expectedTotals.put(id, List.of(100.0, 50.0, 0.0, 0.0));
+            expectedTotals.put("tempo_flame_v4", List.of(100.0, 50.0, 0.0, 25.0));
             var expectedIds = new TreeSet<>(expectedTotals.keySet());
             var actualIds = new TreeSet<>(stats.loadouts());
             context.check("all_loadout_ids", List.copyOf(expectedIds), List.copyOf(actualIds));

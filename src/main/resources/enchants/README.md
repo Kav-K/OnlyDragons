@@ -4,7 +4,7 @@
 support `DRAWN_BOW` and `SHORTBOW`. Duplex and Fatal Tempo are ultimate; every
 selection boundary rejects a second ultimate. The other eight are ordinary.
 
-| ID | Maximum | Availability in expanded catalog |
+| ID | Maximum | Availability in preserved v3 catalog |
 | --- | ---: | --- |
 | dragon_tracer | V | Available |
 | duplex | V | Available |
@@ -14,8 +14,8 @@ selection boundary rejects a second ultimate. The other eight are ordinary.
 | snipe | IV | Available |
 | overload | V | Available |
 | gravity | VI | Available |
-| infinite_quiver | X | Unavailable until T06c consumers integrate |
-| flame | II | Unavailable until T06c consumers integrate |
+| infinite_quiver | X | Unavailable in v3; available in v4 |
+| flame | II | Unavailable in v3; available in v4 |
 
 `EnchantDefinition.available()` and `maxLevel()` are public consumer descriptors.
 Unavailable effects fail with `UNAVAILABLE_ENCHANT` on create/edit/resolve and
@@ -54,3 +54,11 @@ of height or native phase. The measured native phase admission stays unchanged.
 Old six-enchant items and snapshots retain their behavior. Vicious still supplies
 +1 Ferocity per level; Power/Snipe remain attack bonuses. Trusted table changes
 require explicit revisions. See [item compatibility](../items/README.md).
+
+## Owned ammunition and fire (T06c)
+
+The explicit `quiver-flame/v1` profile and `calibration-items-v4` implement
+Infinite Quiver I–X and Flame I–II. Preserved v3 selections still reject both.
+See the [level/timing/source/cap/lifecycle contract](../../../../docs/planning/02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70).
+The combined registry's descriptors advertise current v4 availability; use
+`catalog(item.registryRevision())` when validating or presenting an older item.

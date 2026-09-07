@@ -29,6 +29,7 @@ public final class CombatEncounter {
     private long lastCommitTick = -1;
     private final Map<UUID, EncounterResult.CommitStamp> stamps = new LinkedHashMap<>();
     private final DamageCalculator calculator = new DamageCalculator();
+    private final Map<UUID, Integer> flameLevels = new LinkedHashMap<>();
     private final Map<UUID, ProcHealthSnapshot> procPolicies = new LinkedHashMap<>();
     private final Map<UUID, DamageResult> accepted = new LinkedHashMap<>();
     private final Map<PhysicalImpact.Key, UUID> physicalClaims = new LinkedHashMap<>();
@@ -99,6 +100,7 @@ public final class CombatEncounter {
         if (reason.isPresent()) return rejected(id, Optional.empty(), impact.key(), shot.ownerId(), shot.shotId(),
                 kind, impact.tick(), shot.crit(), effectiveFerocity, reason.get());
         if (impact.tick() < shot.launchTick()) throw new IllegalArgumentException("Impact precedes launch");
+        int flame = com.kaveenk.onlydragons.domain.enchant.EnchantEffects.level(shot.enchantments(), "flame", 2);
         var calculation = calculator.physical(shot, modifiers, target, profile);
         var policy = new ProcHealthSnapshot(activeTempo.bonusPercent(), activeTempo.sourceLevel(),
                 activeTempo.bonusPercent() == 0 ? 0 : activeTempo.expiresAt(),
@@ -107,6 +109,7 @@ public final class CombatEncounter {
                 impact.tick(), shot.crit(), effectiveFerocity, calculation, 1);
         physicalClaims.put(impact.key(), id);
         procPolicies.put(id, policy);
+        if (flame > 0) flameLevels.put(id, flame);
         return result;
     }
 
@@ -121,7 +124,7 @@ public final class CombatEncounter {
         if (reason.isPresent()) return rejected(command.procId(), Optional.of(command.parentImpactId()), command.origin(),
                 command.ownerId(), command.shotId(), DamageResult.Kind.FEROCITY, tick, command.crit(), 0, reason.get());
         if (tick < command.dueTick()) throw new IllegalArgumentException("Proc is not due");
-        if (parent == null || parent.kind() == DamageResult.Kind.FEROCITY
+        if (parent == null || (parent.kind() != DamageResult.Kind.PHYSICAL && parent.kind() != DamageResult.Kind.DUPLEX)
                 || !parent.origin().equals(command.origin()) || !parent.ownerId().equals(command.ownerId())
                 || !parent.shotId().equals(command.shotId()) || parent.crit() != command.crit()
                 || parent.amounts().mitigatedDamage() != command.preCapDamage()
@@ -131,6 +134,29 @@ public final class CombatEncounter {
         return commit(command.procId(), Optional.of(command.parentImpactId()), command.origin(), command.ownerId(),
                 command.shotId(), DamageResult.Kind.FEROCITY, tick, command.crit(), parent.effectiveFerocity(),
                 calculator.proc(parent, target, profile), procFraction(command, parent));
+    }
+
+    /** Full HP/full credit, already-resolved physical credit basis; no mitigation or offensive reroll. */
+    public DamageResult fire(FireCommand command, long tick) {
+        checkThread();
+        var source = command.source();
+        if (!profile.mechanic().equals(source.mechanic())) throw new IllegalArgumentException("Fire profile mismatch");
+        var reason = boundary(source.origin());
+        if (reason.isEmpty() && accepted.containsKey(command.id())) reason = Optional.of(DUPLICATE_IMPACT);
+        if (reason.isPresent()) return rejected(command.id(), Optional.of(source.impactId()), source.origin(),
+                source.ownerId(), source.shotId(), DamageResult.Kind.FIRE, tick, source.crit(), 0, reason.get());
+        if (tick < command.dueTick() || !source.equals(accepted.get(source.impactId()))
+                || !Objects.equals(flameLevels.get(source.impactId()), command.level()))
+            throw new IllegalArgumentException("Fire does not match its captured accepted source");
+        double fraction = com.kaveenk.onlydragons.domain.enchant.QuiverFlameProfile.fireFraction(command.level());
+        double potency = DomainChecks.nonNegative(source.amounts().contributionDamage() * fraction, "fire potency");
+        double damage = DomainChecks.nonNegative(potency * command.vulnerability(), "fire damage");
+        var calculation = new DamageCalculator.Calculation(damage, damage, profile.cap(damage, target.maxHealth()),
+                Map.of("fire/quiver-flame-v1/level", (double) command.level(),
+                        "fire/physicalCredit", source.amounts().contributionDamage(), "fire/fraction", fraction,
+                        "fire/potency", potency, "fire/vulnerability", command.vulnerability(), "fire/dueTick", (double) command.dueTick()));
+        return commit(command.id(), Optional.of(source.impactId()), source.origin(), source.ownerId(), source.shotId(),
+                DamageResult.Kind.FIRE, tick, source.crit(), 0, calculation, 1);
     }
 
     public ProcHealthSnapshot procHealthSnapshot(UUID parentImpactId) {

@@ -164,6 +164,17 @@ class ReportContractTests(unittest.TestCase):
             with self.assertRaisesRegex(runner.ValidationError, 'Non-finite'):
                 runner.strict_json(self.path)
 
+    def test_default_raw_json_ceiling_is_inclusive_and_remains_one_mib(self):
+        for filename in ('scenario.json', 'player.json', 'result.json', 'scenarios.json'):
+            with self.subTest(filename=filename):
+                path = self.path.with_name(filename)
+                path.write_bytes(b'{}' + b' ' * (1024 * 1024 - 2))
+                self.assertEqual(runner.strict_json(path), {})
+                with path.open('ab') as stream:
+                    stream.write(b' ')
+                with self.assertRaisesRegex(runner.ValidationError, 'exceeds 1 MiB'):
+                    runner.strict_json(path)
+
 
 class LifecycleContractTests(unittest.TestCase):
     def setUp(self):

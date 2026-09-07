@@ -21,8 +21,7 @@ source/raw review, strict replay, all three task checkpoints and current CI.
 It includes 286 production, six companion and 33 applicable client tests with
 zero failures/errors/skips; [exact evidence and limitations](evidence/checkpoint2-ui-flight.md).
 
-T06c/#70 is lead-assigned and ready with its prerequisites integrated; its Symphony
-label is held until this context PR merges. T06b/#68 and T02c/#69 remain planned
+T06c/#70 is In review on `symphony/gh-70`: clean runtime `016bd69` passes 299/6/33 Java tests and six focused Paper scenarios; [evidence](evidence/t06c-focused-paper.md). Lead combined-cohort acceptance remains pending. T06b/#68 and T02c/#69 remain planned
 pending T06c. T08c/#41 remains planned and undispatched. Other requirements, prior
 evidence and milestone states are unchanged; human outcomes remain separate.
 
@@ -114,8 +113,7 @@ expiry and frozen training overkill credit; [exact acceptance evidence](evidence
 identities and dispositions; their earlier pending statements describe that history.
 
 T03b/T08d/T08e are now separately accepted through [PR #76](evidence/checkpoint2-ui-flight.md).
-T06c/#70 is lead-assigned and ready, with dispatch held until this context PR
-merges; T06b/#68 and T02c/#69 remain planned pending T06c. Human appearance,
+T06c/#70 is In review on `symphony/gh-70`; T06b/#68 and T02c/#69 remain planned pending T06c. Human appearance,
 authenticated compatibility, balance/feel and M1–M5 remain unaccepted.
 
 ### T03b — Expanded bow enchants (GH-67)
@@ -142,6 +140,30 @@ focused runs retain their original setup and scope. Current-profile Windows smok
 authenticated-client visuals/feel, performance and M1–M5 remain separate.
 Next dependency: T06c consumes the descriptors and existing firing authority;
 #70 is lead-assigned and ready, awaiting its label after this context PR merges.
+
+### T06c — Infinite Quiver and owned Flame (GH-70)
+
+In review in [draft PR #81](https://github.com/Kav-K/OnlyDragons/pull/81) on
+`symphony/gh-70`, clean runtime `016bd69`, main `e95447ae` integrated.
+The [owner-published profile](02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70)
+adds explicit v4 descriptors, conserved trigger ammo and bounded owned fire via
+existing firing/combat authorities. [Focused evidence](evidence/t06c-focused-paper.md)
+records six passing Paper scenarios (61 Flame, 22 ammo, 115 firing, 49 expanded,
+31 Tempo, 25 equipment assertions), 299/6/33 Java tests with zero skips, exact
+artifacts and clean JVM cleanup, preserved iterations, and independent lead
+source/raw review. Static checkpoint and 42-case selection pass.
+
+The first hosted 42-case attempt remains failed at aggregate receipt loading
+(1,073,005 bytes exceeded the generic 1 MiB bound). The owner-assigned parser-only
+follow-up permits suite receipts up to 4 MiB while preserving raw limits and all
+semantic verification; 288 Python harness tests pass. [Original failure identity,
+remediation and scope](evidence/t06c-focused-paper.md#hosted-receipt-failure-and-bounded-parser-remediation).
+No gameplay or milestone acceptance advances.
+
+The lead owns the fresh full cohort receipt/replay, task acceptance checkpoint, current
+CI and merge. Windows smoke, authenticated clients, visuals/feel and milestones
+remain pending; no completed requirement is claimed. Next consumers: T06b/#68
+and T02c/#69 after integration.
 
 ## Shared context update protocol
 

@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "planId": "quiver-ammo-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "save-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "save-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "charge-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "charge-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "level-one-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "level-one-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "retained-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "retained-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "native-infinity-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "native-infinity-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "native-infinity-veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "native-infinity-veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "short-save",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "short-charge",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "last-arrow",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "empty",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "launch-veto",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "denied",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "quit-shot",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

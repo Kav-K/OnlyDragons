@@ -75,7 +75,7 @@ class ExpandedEnchantTest {
         var expected = Map.of("dragon_tracer",5,"duplex",5,"fatal_tempo",5,"power",7,"vicious",5,"snipe",4,"overload",5,"gravity",6,"infinite_quiver",10,"flame",2);
         assertEquals(expected.keySet(), registry.enchantments().keySet());
         expected.forEach((id, max) -> {
-            var descriptor = registry.enchant(id);
+            var descriptor = registry.catalog(CalibrationLoadouts.EXPANDED_REVISION).enchant(id);
             assertEquals(max.intValue(), descriptor.maxLevel());
             assertEquals(Set.of(WeaponDefinition.FiringMode.DRAWN_BOW, WeaponDefinition.FiringMode.SHORTBOW), descriptor.compatibleModes());
             assertEquals(!Set.of("infinite_quiver","flame").contains(id), descriptor.available());

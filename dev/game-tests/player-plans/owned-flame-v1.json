@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "planId": "owned-flame-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "baseline-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "baseline-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "baseline-swap",
+              "action": "selectSlot",
+              "args": {
+                "slot": 1
+              }
+            },
+            {
+              "id": "baseline-return",
+              "action": "selectSlot",
+              "args": {
+                "slot": 0
+              }
+            },
+            {
+              "id": "refresh-start",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "refresh-weak",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "refresh-strong",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "vulnerability-mid-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "vulnerability-mid-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "vulnerability-low-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "vulnerability-low-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "owner-alpha",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "expired-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "expired-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "veto-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "veto-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "cap-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "cap-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "tempo-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "tempo-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "after-tempo-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "after-tempo-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "lethal-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "lethal-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "old-session-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "old-session-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reset-burn",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "death-burn",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "respawn",
+              "action": "respawn",
+              "args": {}
+            },
+            {
+              "id": "disable-burn",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "vulnerability-high-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "vulnerability-high-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "owner-beta-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "owner-beta-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "quit-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "quit-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

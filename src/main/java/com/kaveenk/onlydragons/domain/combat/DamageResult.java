@@ -14,7 +14,7 @@ public record DamageResult(UUID impactId, Optional<UUID> parentImpactId, Physica
                            UUID ownerId, UUID shotId, Kind kind, long tick, MechanicRevision mechanic,
                            Amounts amounts, CritOutcome crit, double effectiveFerocity,
                            Map<String, Double> modifierBreakdown, Optional<RejectionReason> rejectionReason) {
-    public enum Kind { PHYSICAL, DUPLEX, FEROCITY }
+    public enum Kind { PHYSICAL, DUPLEX, FEROCITY, FIRE }
     public enum RejectionReason {
         CANCELLED, UNOWNED, WRONG_ENCOUNTER, TARGET_DEAD, INVALID_TARGET, DUPLICATE_IMPACT,
         OUTSIDE_ARENA, PROJECTILE_REMOVED, ENCOUNTER_ENDED
@@ -44,7 +44,7 @@ public record DamageResult(UUID impactId, Optional<UUID> parentImpactId, Physica
         Objects.requireNonNull(ownerId, "ownerId");
         Objects.requireNonNull(shotId, "shotId");
         Objects.requireNonNull(kind, "kind");
-        if (kind == Kind.FEROCITY && parentImpactId.isEmpty()) throw new IllegalArgumentException("Ferocity requires a parent impact");
+        if ((kind == Kind.FEROCITY || kind == Kind.FIRE) && parentImpactId.isEmpty()) throw new IllegalArgumentException("Ferocity requires a parent impact");
         DomainChecks.nonNegative(tick, "tick");
         Objects.requireNonNull(mechanic, "mechanic");
         Objects.requireNonNull(amounts, "amounts");

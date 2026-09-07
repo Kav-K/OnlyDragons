@@ -22,6 +22,9 @@ import paper_test as runner
 
 ValidationError = runner.ValidationError
 require = runner.require
+# Aggregate source and per-case JUnit manifests exceed the raw-report ceiling.
+# Only the suite receipt opts in; its raw evidence retains the runner's 1 MiB bound.
+MAX_SUITE_RECEIPT_BYTES = 4 * 1024 * 1024
 CLEANUP = ('owned_entities_removed', 'owned_tasks_cancelled',
            'owned_chunk_tickets_removed', 'owned_listeners_removed')
 NEGATIVES = {'deliberate-failure', 'cleanup-failure', 'cleanup-abort', 'player-early-exit', 'player-idle'}
@@ -561,7 +564,7 @@ def validate_suite_receipt(project, receipt_path):
     """Replay raw evidence; return the verified receipt, never trusting its pass flags."""
     project = Path(project).resolve()
     path = resolved_evidence_path(project, receipt_path)
-    receipt = runner.strict_json(path)
+    receipt = runner.strict_json(path, max_bytes=MAX_SUITE_RECEIPT_BYTES, artifact='suite receipt')
     require(receipt.get('kind') == 'paper-suite-receipt' and receipt.get('state') == 'complete'
             and receipt.get('passed') is True and runner.json_values_equal(receipt.get('schemaVersion'), 1),
             'Only complete successful suite receipts are acceptance evidence')
