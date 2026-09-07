@@ -128,7 +128,7 @@ if ($Action -ne 'smoke') {
         Write-Host 'Use the Minecraft: Server command task to send commands; stop with Minecraft: Stop server.'
         $lineCount = 0
         while (Test-LabActive $directory) {
-            $lines = @(Get-Content (Join-Path $directory 'console.log'))
+            $lines = @(Get-Content (Join-Path $directory 'console.log') -Encoding UTF8)
             if ($lines.Count -gt $lineCount) { $lines | Select-Object -Skip $lineCount | ForEach-Object { Write-Host $_ }; $lineCount = $lines.Count }
             Start-Sleep -Milliseconds 300
         }
