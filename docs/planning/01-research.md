@@ -337,6 +337,9 @@ no manual second debit is permitted. [Pinned patch](https://github.com/PaperMC/P
 This is API/source evidence, not final transaction acceptance or an upstream game
 balance claim; [T02c iteration status](03-agent-tasks-and-validation.md#t02c--custom-enchant-books-and-xp-cost-anvils-gh-69).
 
+The clean T02c focused runs now corroborate native extraction, received costs/XP,
+conservation and collected-bow effects; [bounded evidence and remaining gates](evidence/t02c-enchant-anvil.md).
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

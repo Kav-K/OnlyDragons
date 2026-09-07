@@ -154,28 +154,27 @@ T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 impleme
 
 ### T02c — Custom enchant books and XP-cost anvils (GH-69)
 
-**In progress**, `symphony/gh-69`, dispatched by the owner from accepted main
-`2158a51572d65e7e8856ec77f44b3decc982450c`; [current dispatch and settled contracts](https://github.com/Kav-K/OnlyDragons/issues/69#issuecomment-5565338834).
-T03b/T08d/T06c and MAINT-82 are integrated. GH68 owns the common hold-release
-reconciliation; this entry records the feature's actual resumed state.
+**In review**, [draft PR #85](https://github.com/Kav-K/OnlyDragons/pull/85),
+`symphony/gh-69`; clean tested runtime `4ed3d2de175d4fde921370630bf5c392efcd08a3`
+includes current main `2158a51572d65e7e8856ec77f44b3decc982450c`.
+[Owner dispatch](https://github.com/Kav-K/OnlyDragons/issues/69#issuecomment-5565338834)
+confirms T03b/T08d/T06c and MAINT-82 integrated; GH68 owns common hold-release reconciliation.
 
-Implemented candidate: strict ten-enchant books/command, pure compatibility and
-cost recipes, metadata-preserving bow edits, native-debit anvil service/listener,
-readable item presentation and bounded protocol anvil observations/actions.
+Implemented all ten books/command, compatibility and calibrated XP recipes,
+metadata-preserving edits, native-debit transaction guards, readable presentation
+and bounded actual-anvil protocol observations/actions.
 [Contract](02-foundation-plan.md#t02c-books-and-native-anvil-transactions-gh-69).
-Build passed 311 production tests with no failures/errors/skips; the first client
-build and focused Python replay checks passed. These remain iteration evidence.
-Paper iteration `82fc5bd9c0c74c26b0774f461b5b9478` passed all ten command/preview/
-native XP/metadata transactions, then failed the collected-bow firing stage because
-the fixture shot origin intersected its placed anvil. Both owned JVMs cleaned up
-without force; the incomplete client exited 1. The firing setup is moved clear.
-No complete Paper or acceptance pass is claimed from that run.
+Three clean focused Paper runs passed **132 assertions** (60 all-ten, 33 compatibility,
+39 lifecycle), with successful original received-report replay and clean unforced
+client/server exits. Builds passed 311 production, 6 companion and 37 client tests;
+Python passed 50 existing action plus 6 anvil tests. [Exact revisions, artifact/report
+hashes, iteration failures and limitations](evidence/t02c-enchant-anvil.md).
 
-Next: fresh all-ten, compatibility and lifecycle cases on clean committed inputs,
-received-preview/XP/conservation replay and affected cross-feature regressions.
-Final combined cohort/review/current CI remains lead-owned under dispatch.
-Authenticated clients, GUI/lore appearance, Windows smoke and human feel remain
-unrun. No milestone or reward/armor behavior is enabled.
+Checkpoint plan is valid. Final combined cohort/receipt, new-tier interaction,
+automated task acceptance, current CI and integration review remain lead-owned
+under dispatch. This handoff does not accept a milestone. Authenticated clients,
+GUI/lore appearance, Windows smoke and human feel remain unrun; [rehearsal](../../dev/enchant-books-play.md).
+Rewards and armor effects remain disabled.
 
 ### MAINT-82 — Catalog and combat lifecycle readability
 
