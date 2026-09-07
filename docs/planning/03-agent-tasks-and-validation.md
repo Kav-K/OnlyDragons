@@ -153,7 +153,14 @@ records six passing Paper scenarios (61 Flame, 22 ammo, 115 firing, 49 expanded,
 artifacts and clean JVM cleanup, preserved iterations, and independent lead
 source/raw review. Static checkpoint and 42-case selection pass.
 
-The lead owns the full cohort receipt/replay, task acceptance checkpoint, current
+The first hosted 42-case attempt remains failed at aggregate receipt loading
+(1,073,005 bytes exceeded the generic 1 MiB bound). The owner-assigned parser-only
+follow-up permits suite receipts up to 4 MiB while preserving raw limits and all
+semantic verification; 288 Python harness tests pass. [Original failure identity,
+remediation and scope](evidence/t06c-focused-paper.md#hosted-receipt-failure-and-bounded-parser-remediation).
+No gameplay or milestone acceptance advances.
+
+The lead owns the fresh full cohort receipt/replay, task acceptance checkpoint, current
 CI and merge. Windows smoke, authenticated clients, visuals/feel and milestones
 remain pending; no completed requirement is claimed. Next consumers: T06b/#68
 and T02c/#69 after integration.

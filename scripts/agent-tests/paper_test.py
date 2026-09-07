@@ -61,7 +61,10 @@ def atomic_json(path, value):
     temporary.replace(path)
 
 
-def strict_json(path):
+MAX_JSON_BYTES = 1024 * 1024
+
+
+def strict_json(path, *, max_bytes=MAX_JSON_BYTES, artifact='scenario report'):
     def finite_number(value):
         number = float(value)
         require(math.isfinite(number), f'Non-finite JSON number: {value}')
@@ -72,13 +75,14 @@ def strict_json(path):
             require(key not in result, f'Duplicate JSON key: {key}')
             result[key] = value
         return result
-    require(path.is_file(), f'Missing scenario report: {path}')
-    require(path.stat().st_size <= 1024 * 1024, 'Scenario report exceeds 1 MiB')
+    require(path.is_file(), f'Missing {artifact}: {path}')
+    require(path.stat().st_size <= max_bytes,
+            f'{artifact.capitalize()} exceeds {max_bytes / (1024 * 1024):g} MiB: {path}')
     try:
         return json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=unique, parse_float=finite_number,
                           parse_constant=lambda value: (_ for _ in ()).throw(ValidationError(f'Non-finite JSON: {value}')))
     except (ValueError, UnicodeError) as error:
-        raise ValidationError(f'Malformed scenario report: {error}') from error
+        raise ValidationError(f'Malformed {artifact}: {path}: {error}') from error
 
 
 def json_values_equal(expected, observed):

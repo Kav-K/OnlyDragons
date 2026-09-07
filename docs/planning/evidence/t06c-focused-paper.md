@@ -4,7 +4,9 @@ Draft review: [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81).
 
 Runtime revision: `016bd69d66f27921051ae31d4a4aea6844cb6f02` (clean for every final run).
 Main integrated: `e95447ae2d41f249a732edd0193e16dd46b3f0b3`; fetch and ordinary
-merge returned already up to date. Later commits only record documentation.
+merge returned already up to date. Original focused handoff commits through
+`439fc3c` only record documentation; the parser-only follow-up below changes
+the validation harness, not the tested Java gameplay inputs.
 Pinned Paper `26.2-121-a2a42c5`, JDK 25, accepted existing EULA, disposable loopback
 profiles, shared lease and memory gate. Expanded-bow waited for memory before
 starting; no limit was bypassed.
@@ -95,6 +97,45 @@ Earlier unit iterations corrected an availability assertion to query exact v3,
 MockBukkit unsupported live-arrow APIs, and fixture arrow-slot initialization.
 The unsupported live-arrow test was not counted as a pass; actual emission is
 covered by Paper. Final 299 tests have zero skips.
+
+## Hosted receipt failure and bounded parser remediation
+
+Hosted [run 34074476010, attempt 1](https://github.com/Kav-K/OnlyDragons/actions/runs/34074476010/attempts/1)
+at `439fc3cb32b275836f295121eacdf8ddf8d0c529` remains **FAILED**.
+Artifact `10002287245`, ZIP SHA-256
+`5f9d4cfb5b986445f30bc970abe8864810386a43f0d7cce7d69479b8304555bf`, contains
+suite `df63e3562c984bf2abf21baeb424a92b`.
+[Lead independent artifact diagnosis](https://github.com/Kav-K/OnlyDragons/issues/70#issuecomment-5564384967)
+reports all 42 cases ran with verified records, but final receipt loading failed:
+the aggregate receipt is 1,073,005 bytes, above the generic 1 MiB JSON limit.
+Its error incorrectly identified the receipt as a scenario report. The same
+diagnosis records Flame `e5988f7fec4a4e1e9595719ed56a3a7c` passing all 61 assertions,
+with clean unforced exit-0 JVMs and result/scenario/player sizes of
+223,095 / 72,823 / 71,485 bytes. These are lead-reported original artifact facts,
+not a new local replay or a successful full-suite acceptance.
+
+The owner-assigned remediation gives only `validate_suite_receipt` an explicit
+`MAX_SUITE_RECEIPT_BYTES` ceiling of 4 MiB through keyword-only `strict_json`
+parameters. Errors name the suite receipt and its path. The default raw
+scenario/player/result/catalog bound stays 1 MiB. Duplicate keys, nonfinite
+numbers, source identity, selection, raw hashes, JUnit, lifecycle and copied
+evidence checks remain intact. Hosted replay and checkpoint acceptance already
+delegate to this same suite validator. No original evidence is rewritten,
+truncated or reclassified as passing.
+
+Local Python harness verification: `python3 -m unittest discover -s
+scripts/agent-tests -p 'test_*.py'` passes **288 tests**, zero failures/errors/skips.
+New cases replay a legitimate receipt with JSON whitespace extending its size
+above 1 MiB and exactly to 4 MiB, reject 4 MiB + 1, and preserve source,
+selection, raw-hash, copied-evidence and forced-cleanup rejection. Receipt
+duplicate/nonfinite controls and default raw 1 MiB boundaries also pass.
+An initial focused test run had two error-message expectation mismatches;
+the actual intended rejections occurred, and the expectations were corrected
+before the complete successful run. Static checkpoint and all-42-case plan
+pass after normal main integration (already up to date at `e95447ae`).
+No Java build or Paper run was repeated for this parser-only follow-up, as
+directed by the owner. The lead owns independent review, current CI, one fresh
+complete hosted cohort and strict original replay/task checkpoint before merge.
 
 ## Delivery gates
 

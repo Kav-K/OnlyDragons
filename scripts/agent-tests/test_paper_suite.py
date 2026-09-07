@@ -152,6 +152,68 @@ class EvidenceTests(unittest.TestCase):
         f.commit()
         self.assertTrue(f.validate()['passed'])
 
+    def pad_receipt(self, size):
+        # Legal JSON whitespace varies serialized size without inventing evidence
+        # fields or bypassing any of the ordinary fixture's semantic checks.
+        path = self.fixture.path
+        content = path.read_bytes()
+        self.assertLess(len(content), size)
+        path.write_bytes(content + b' ' * (size - len(content)))
+        self.assertEqual(path.stat().st_size, size)
+
+    def test_large_receipt_replays_raw_evidence_through_inclusive_ceiling(self):
+        f = self.fixture
+        for size in (1024 * 1024 + 1, 4 * 1024 * 1024):
+            with self.subTest(size=size):
+                f.refresh()
+                self.pad_receipt(size)
+                with self.assertRaisesRegex(suite.ValidationError, 'exceeds 1 MiB'):
+                    suite.runner.strict_json(f.path)
+                self.assertEqual(f.validate(), f.receipt)
+
+    def test_large_receipt_keeps_source_selection_hash_and_semantic_checks(self):
+        f = self.fixture
+        original = copy.deepcopy(f.receipt)
+        mutations = (
+            (lambda: f.receipt['source'].update(sourceInputSha256='0' * 64), 'Current source inputs'),
+            (lambda: f.receipt['selection'].update(caseIds=[]), 'selection|Selection'),
+            (lambda: f.record.update(resultSha256='0' * 64), 'Missing/mutated evidence'),
+            (lambda: f.record['verified'].update(assertions=999), 'independent verification'),
+        )
+        for mutate, message in mutations:
+            with self.subTest(message=message):
+                f.receipt = copy.deepcopy(original)
+                f.record = f.receipt['cases'][0]
+                mutate()
+                f.json(f.path, f.receipt)
+                self.pad_receipt(1024 * 1024 + 1)
+                with self.assertRaisesRegex(suite.ValidationError, message):
+                    f.validate()
+
+    def test_large_receipt_does_not_hide_unclean_raw_process_evidence(self):
+        f = self.fixture
+        f.result['cleanup']['forced'] = True
+        f.refresh()  # Matching raw hashes must not make forced cleanup acceptable.
+        self.pad_receipt(1024 * 1024 + 1)
+        with self.assertRaisesRegex(suite.ValidationError, 'Paper was not reaped cleanly'):
+            f.validate()
+
+    def test_receipt_over_ceiling_rejects_with_artifact_specific_error(self):
+        self.pad_receipt(4 * 1024 * 1024 + 1)
+        with self.assertRaisesRegex(suite.ValidationError, 'Suite receipt exceeds 4 MiB'):
+            self.fixture.validate()
+
+    def test_receipt_parser_keeps_duplicate_and_nonfinite_rejections(self):
+        for content, message in (('{"kind":1,"kind":2}', 'Duplicate JSON key'),
+                                 ('{"value":NaN}', 'Non-finite'),
+                                 ('{"value":Infinity}', 'Non-finite'),
+                                 ('{"value":1e999}', 'Non-finite')):
+            with self.subTest(content=content):
+                self.fixture.write(self.fixture.path, content)
+                self.pad_receipt(1024 * 1024 + 1)
+                with self.assertRaisesRegex(suite.ValidationError, message):
+                    self.fixture.validate()
+
     def test_native_path_alias_replays_receipt_and_profile_with_canonical_project(self):
         f = self.fixture
         path = f.path
