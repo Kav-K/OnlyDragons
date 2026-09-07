@@ -270,7 +270,10 @@ and removed it on actual retirement/reset/close. A labelled score-only fixture
 credited 200 with 100 HP removed; the received bar stayed at domain HP 900/1,000.
 The same checks passed again at clean `ae795386` with strict between-snapshot
 packet replay; fresh and death-animation two-boot UI checks also passed.
-[Exact artifact/run evidence and remaining combined integration gates](evidence/t08d-presentation.md).
+[Original focused artifact/run evidence](evidence/t08d-presentation.md) is preserved.
+The bounded UI/presentation requirements are accepted through PR #76 at
+`a7329e18b886d4766d14d9128eeb256a904161a0`; [combined evidence](evidence/checkpoint2-ui-flight.md) and
+[lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308) record the final disposition.
 This is received protocol/state evidence, not full-client appearance, human feel
 or a researched Hypixel mechanic. Existing combat/phase policy is unchanged.
 ### T08e bounded motion experiment (Paper 121)
@@ -287,7 +290,9 @@ native-positive damage, owned suppression/accounting and returning collisions
 against the moving parts. Received bound-dragon packets measured50.9842 blocks
 across87 updates (maximum received step0.604612, aggregating server ticks).
 These packet observations still do not establish rendered-client smoothness.
-[Exact iteration identities and remaining gates](evidence/t08e-motion-tracer.md).
+[Original iteration identities and limits](evidence/t08e-motion-tracer.md) remain
+unchanged. Later bounded motion/Tracer acceptance through PR #76 at
+`a7329e18b886d4766d14d9128eeb256a904161a0` is recorded separately in the [combined evidence](evidence/checkpoint2-ui-flight.md).
 [The pinned public API](https://jd.papermc.io/paper/26.2/org/bukkit/entity/Entity.html)
 supplies the position adapter; no NMS/reflection is used by production or fixtures.
 
@@ -299,8 +304,10 @@ These are **OnlyDragons decisions**, with no new claim about upstream internals.
 The [implementation contract](02-foundation-plan.md#t03b-expanded-bow-contract-gh-67)
 resolves our formerly deferred probability, multiplier order, Gravity VI and
 AIRBORNE classification. Earlier T05 evidence retains its original limited scope.
-[Focused Paper evidence](evidence/t03b-focused-paper.md) verifies the declared
-physical controls; final combined acceptance remains pending in T03b's ledger.
+[Focused Paper evidence](evidence/t03b-focused-paper.md) preserves the original
+physical controls and failures. T03b's `expanded-bow-enchantments` requirement is
+accepted through PR #76 at `a7329e18b886d4766d14d9128eeb256a904161a0`; [final combined evidence](evidence/checkpoint2-ui-flight.md).
+The v3 IQ/Flame-unavailable controls remain valid; their effects belong to T06c.
 
 ## Decisions still open
 

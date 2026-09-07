@@ -1,9 +1,22 @@
 # T03b expanded bows: focused worker evidence
 
-Draft [PR #79](https://github.com/Kav-K/OnlyDragons/pull/79), GH-67.
+Original focused handoff: [PR #79](https://github.com/Kav-K/OnlyDragons/pull/79), GH-67.
+Current disposition: T03b's `expanded-bow-enchantments` is accepted through combined
+PR #76 at `a7329e18b886d4766d14d9128eeb256a904161a0`; [final evidence](checkpoint2-ui-flight.md) and
+[lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308). The focused inputs and failures below
+retain their original scope; they are not the final combined receipt.
 Clean runtime `5bdb0eecba187e44623111c60cc065d94f756cc3` includes actual main
 `a1070cc9e362662d4a752fed91ad0b63dea1d901` by ordinary merge. The subsequent
 context-only commit records this evidence; it is not the tested runtime revision.
+
+The worker's final documentation handoff `a05ddf921f275ab9f36ff73d461113257cd984d8`
+recorded the earlier plan to re-dispatch GH-67 after PR76's checkpoint correction,
+and the [clear independent focused review](https://github.com/Kav-K/OnlyDragons/issues/67#issuecomment-5562735116).
+The lead subsequently combined the stable implementation into PR76, reconciled
+both profiles/loadouts there and passed one final cohort for all three tasks.
+That supersedes the earlier re-dispatch plan; no additional GH-67 execution is
+needed. The final handoff changed documentation only, and its history is preserved
+in the acceptance-context reconciliation.
 
 ## Verified focused checks
 
@@ -87,13 +100,14 @@ from actual protocol release/collision evidence.
   up. Fixed by exact sorted-list comparison in `5c2fea3`; no validator was relaxed.
   This remains failed evidence, superseded by the fresh passing run above.
 
-## Outstanding acceptance
+## Historical handoff and current disposition
 
 Doctor was ready; static plan validation and changed-area suite selection pass.
 Per the [lead's validation ownership instruction](https://github.com/Kav-K/OnlyDragons/issues/67#issuecomment-5562644532),
 no duplicate complete local cohort was run while PR76's hosted cohort was active.
-PR76 main integration, any affected focused rerun, and the lead-owned final
-current-input hosted cohort/strict replay/T03b checkpoint remain pending.
-Independent review and current CI remain separate gates. Windows smoke,
-authenticated-client compatibility, full-client visuals/feel and performance are
-unrun. T03b is In review; no completed requirement or milestone is claimed.
+At that focused handoff, PR76 integration, affected reruns, the complete current-input
+cohort/replay/T03b checkpoint, independent review and current CI remained pending.
+Their later verified disposition is recorded in the [combined evidence](checkpoint2-ui-flight.md).
+Current-profile Windows smoke, authenticated-client compatibility, full-client
+visuals/feel, performance and M1–M5 remain unaccepted. The v3 IQ/Flame-unavailable
+controls are preserved; no full-ten-effect acceptance is claimed.

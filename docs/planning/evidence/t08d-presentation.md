@@ -1,7 +1,10 @@
 # T08d dragon health and presentation evidence
 
-GH-64 / [draft PR #74](https://github.com/Kav-K/OnlyDragons/pull/74),
-`symphony/gh-64`. Implementation is In review, not accepted.
+Original focused handoff: GH-64 / [PR #74](https://github.com/Kav-K/OnlyDragons/pull/74),
+`symphony/gh-64`. Current disposition: exactly `dragon-bossbar` and
+`combat-presentation` are accepted through combined PR #76 at `a7329e18b886d4766d14d9128eeb256a904161a0`;
+[final evidence](checkpoint2-ui-flight.md) and [lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308).
+The original focused/failed evidence below retains its inputs and limits.
 
 ## Final clean focused candidate
 
@@ -92,16 +95,17 @@ persistence adapter reads it and registers deletion in fixture cleanup. All five
 cleanup checks passed in that failed run; server exit was 0 and client exit 1
 under runner cleanup, both unforced. Missing later assertions were not removed.
 
-## Remaining gates
+## Historical handoff and current disposition
 
 Per [lead comment 5562281339](https://github.com/Kav-K/OnlyDragons/issues/64#issuecomment-5562281339),
-the lead owns merging T05b/#66, combining the clean #64/#65 histories, resolving
-their shared seams, and running one complete current-main cohort plus both task
+the lead owned merging T05b/#66, combining the clean #64/#65 histories, resolving
+their shared seams, and running the complete current-main cohort and task
 checkpoints before integration. The worker was explicitly instructed not to
-duplicate that cohort locally. The full suite receipt/replay, final T08d automated
-checkpoint and combined-source acceptance remain pending.
+duplicate that cohort locally. These were pending gates at the focused handoff;
+the later combined T03b/T08d/T08e acceptance is recorded in
+[the final evidence](checkpoint2-ui-flight.md).
 
-Integration notes for that lead-owned branch:
+Preserved integration instructions for that lead-owned branch:
 
 - Preserve #66's standard/training/calibration spawn modes. Change the two T08d
   plan spawn commands to `spawn calibration` and its fixture-only score-profile
@@ -117,9 +121,9 @@ Integration notes for that lead-owned branch:
   backend/motion/ticket ownership. The display-only formatter in document 02 is
   available to T02c/T06b after integration.
 
-Independent review,
-current CI, Windows smoke/Play and human visual/readability/authenticated-client
-observations remain separate. A connected presenter-close packet test is not a
+The combined evidence separately records final independent review and current CI.
+Current-profile Windows smoke/Play and human visual/readability/authenticated-client
+observations remain unaccepted. A connected presenter-close packet test is not a
 claim that a disconnected client received shutdown packets. Actual process
 restart checks establish an empty new UI instance and fresh generation behavior.
 No M1–M5 milestone, motion/Tracer behavior, rewards or later item/book acceptance
