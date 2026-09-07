@@ -15,13 +15,16 @@ try {
     $start = [Diagnostics.ProcessStartInfo]::new()
     $start.FileName = $config.java
     $directoryTag = [IO.Path]::GetFullPath($Directory).TrimEnd('\')
-    $start.Arguments = '-DminecraftPluginLab.runId=' + $config.runId + ' "-DminecraftPluginLab.directory=' + $directoryTag + '" ' + $config.arguments
+    $start.Arguments = '-Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -DminecraftPluginLab.runId=' + $config.runId + ' "-DminecraftPluginLab.directory=' + $directoryTag + '" ' + $config.arguments
     $start.WorkingDirectory = $Directory
     $start.UseShellExecute = $false
     $start.CreateNoWindow = $true
     $start.RedirectStandardInput = $true
     $start.RedirectStandardOutput = $true
     $start.RedirectStandardError = $true
+    # Match Java's pipe encoding explicitly; Windows PowerShell otherwise uses its OEM code page.
+    $start.StandardOutputEncoding = [Text.UTF8Encoding]::new($false)
+    $start.StandardErrorEncoding = [Text.UTF8Encoding]::new($false)
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $start
     if (-not $process.Start()) { throw 'Java process could not start.' }

@@ -73,8 +73,8 @@ if ($Action -eq 'matrix') {
 }
 $directory = Get-LabProfile $Version $Profile
 if ($Action -eq 'stop') { Stop-LabServer $directory; exit 0 }
-if ($Action -eq 'console') { Send-LabCommand $directory $Command; Start-Sleep -Milliseconds 400; Get-Content (Join-Path $directory 'console.log') -Tail 12; exit 0 }
-if ($Action -eq 'logs') { Get-Content (Join-Path $directory 'console.log') -Tail 60; exit 0 }
+if ($Action -eq 'console') { Send-LabCommand $directory $Command; Start-Sleep -Milliseconds 400; Get-Content (Join-Path $directory 'console.log') -Tail 12 -Encoding UTF8; exit 0 }
+if ($Action -eq 'logs') { Get-Content (Join-Path $directory 'console.log') -Tail 60 -Encoding UTF8; exit 0 }
 if ($Action -eq 'status') {
     [pscustomobject]@{version=$Version;profile=$Profile;running=(Test-LabActive $directory);state=(Read-LabJson (Join-Path $directory 'state.json'));directory=$directory} | ConvertTo-Json -Depth 6
     exit 0

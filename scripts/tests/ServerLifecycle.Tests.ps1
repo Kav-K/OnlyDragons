@@ -47,6 +47,12 @@ try {
 
     $graceful = Start-Fixture 'graceful'
     if (-not $graceful.java -or -not $graceful.worker) { throw 'Managed fixture not discovered' }
+    $unicodeMessage = 'Dragon ' + [char]0x00b7 + ' Idle ' + [char]0x2192 + ' ' + [char]0x2713
+    Send-LabCommand $graceful.directory 'unicode'
+    foreach ($stream in @('stdout','stderr')) {
+        Wait-LabText $graceful.directory ([regex]::Escape("fixture ${stream}: $unicodeMessage")) -Timeout 5
+    }
+    $checks += 'Unicode stdout and stderr survive Java pipes and BOM-less UTF-8 log reads'
     $stateFile = Join-Path $graceful.directory 'state.json'
     $original = [IO.File]::ReadAllText($stateFile)
     $state = $original | ConvertFrom-Json
