@@ -22,16 +22,23 @@ class BootstrapError(RuntimeError):
 
 
 def _require(condition, message):
+    """Raise BootstrapError when a bootstrap trust or path condition is not satisfied."""
     if not condition:
         raise BootstrapError(message)
 
 
 def _digest(path):
+    """Hash the current file bytes with SHA-256; propagate unreadable/missing-file errors."""
     with Path(path).open('rb') as handle:
         return hashlib.file_digest(handle, 'sha256').hexdigest()
 
 
 def _verified_file(path, expected, label):
+    """Return a regular nonsymlink file only when its bytes match the lowercase SHA-256.
+
+    label supplies diagnostics. This verifies the named file now, not an immutable
+    filesystem handle or every ancestor; sensitive consumers recheck after reading.
+    """
     path = Path(path)
     _require(isinstance(expected, str) and re.fullmatch(r'[a-f0-9]{64}', expected),
              f'Invalid {label} SHA256')
@@ -41,7 +48,12 @@ def _verified_file(path, expected, label):
 
 
 def inspect_launcher(paper_jar, pinned_paper_sha256):
-    """Return bounded download metadata authenticated by the exact launcher pin."""
+    """Read bounded Mojang bootstrap metadata authenticated by the exact Paper launcher hash.
+
+    Require one small download-context entry, a safe cache filename and the expected
+    public Mojang HTTPS URL shape. Rehash the launcher after reading to reject detected
+    changes. Return metadata/digests only; never access the URL or execute the archive.
+    """
     paper_jar = _verified_file(paper_jar, pinned_paper_sha256, 'Paper launcher')
     try:
         with zipfile.ZipFile(paper_jar) as archive:
@@ -79,6 +91,11 @@ def inspect_launcher(paper_jar, pinned_paper_sha256):
 
 
 def _project_candidates(root, metadata):
+    """Yield only named verified-artifact caches beneath a project root.
+
+    These candidates are launcher/Mojang caches, never worlds or plugin directories;
+    existence and digest validation belong to resolve_mojang.
+    """
     root = Path(root)
     name = metadata['mojangFileName']
     yield root / 'run/agent-cache' / f"mojang-{metadata['mojangSha256']}.jar"
@@ -134,11 +151,16 @@ def resolve_mojang(project, paper_jar, metadata, supplied=None, environ=None):
 
 
 def _manifest(metadata):
+    """Describe the exact bootstrap input and its fixed relative cache path without I/O."""
     return {'schemaVersion': 1, **metadata,
             'stagedRelativePath': 'cache/' + metadata['mojangFileName']}
 
 
 def _copy_verified(source, destination, digest):
+    """Exclusively create and rehash a staged bootstrap copy; remove only that copy on failure.
+
+    A preexisting destination is never overwritten or deleted by the failure cleanup.
+    """
     _verified_file(source, digest, 'Mojang bootstrap input')
     created = False
     try:
@@ -154,7 +176,13 @@ def _copy_verified(source, destination, digest):
 
 
 def stage_bootstrap(profile_directory, mojang_jar, metadata):
-    """Copy one verified input after the caller stages its pinned server.jar."""
+    """Stage one verified Mojang input beside the caller's pinned server.jar.
+
+    Require a real profile and a previously absent cache directory; rederive metadata
+    from the staged launcher, copy exclusively and validate the resulting manifest.
+    Return the manifest for the receipt. No network, Java launch, EULA or world copying
+    is performed; a failed staging attempt may leave its newly created cache directory.
+    """
     profile = Path(profile_directory)
     _require(not profile.is_symlink() and profile.is_dir(), 'Expected a real disposable profile directory')
     _require(isinstance(metadata, dict), 'Missing Paper bootstrap metadata')
@@ -171,7 +199,12 @@ def stage_bootstrap(profile_directory, mojang_jar, metadata):
 
 
 def validate_bootstrap(profile_directory, manifest, pinned_paper_sha256):
-    """Replay the exact staged input and provenance; no trust in reported hashes alone."""
+    """Replay launcher metadata and the staged Mojang digest against the supplied manifest.
+
+    Reject symlinked profile/cache/input, stale fields and bool-as-version confusion.
+    Return the rederived manifest without modifying files or trusting reported hashes
+    alone; the caller still owns overall run/source and process-window validation.
+    """
     profile = Path(profile_directory)
     _require(not profile.is_symlink() and profile.is_dir(), 'Expected a real disposable profile directory')
     actual = inspect_launcher(profile / 'server.jar', pinned_paper_sha256)

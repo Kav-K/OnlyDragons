@@ -1,4 +1,10 @@
-"""Fixed two-boot extension. No retries, world resets, or second lease acquisition."""
+"""Extend one owned scenario into exactly two boots of the same disposable Paper profile.
+
+The outer runner retains one lease, build and staged artifact cohort. Worlds and
+production configuration survive between boots; distinct nonces/process identities
+separate observations. No retry, world reset or second lease acquisition is hidden
+in this mode. Strict replay checks continuity as well as each phase's assertions.
+"""
 from pathlib import Path
 import copy
 import re
@@ -11,11 +17,17 @@ CONFIG = 'plugins/OnlyDragons/config.yml'
 
 def evidence_path(root, relative):
     # Share the suite's lexical, resolved and no-symlink contract for every new leaf.
+    """Use the suite's contained relative-path and no-symlink policy for restart evidence."""
     from paper_suite import safe_path
     return safe_path(root, relative)
 
 
 def initial_seed(project, descriptor):
+    """Return optional tracked UTF-8 configuration bytes only after bounded path/hash validation.
+
+    Absent initialConfig returns None so execution stages the built plugin default.
+    Seed files are explicit catalog fixtures, never copied from a human server.
+    """
     import paper_test as r
     seed = descriptor.get('initialConfig')
     if seed is None:
@@ -41,6 +53,12 @@ def initial_seed(project, descriptor):
 
 
 def validate_descriptor(project, descriptor):
+    """Validate two ordered phase contracts with an unchanged actor roster.
+
+    Require exact phase fields, unique assertions including parent cleanup requirements,
+    supported expectations and valid action/message bindings. Return phases without
+    executing them; only phase two may be the deliberate cleanup-abort control.
+    """
     import paper_test as r
     r.require(descriptor.get('catalogMode') == MODE and descriptor.get('testPlayerMode') == 'protocol-actions-v1',
               'Restart requires the explicitly declared catalog/player mode')
@@ -71,6 +89,7 @@ def validate_descriptor(project, descriptor):
 
 
 def artifact_hashes(r, directory):
+    """Hash the staged Paper/plugin/client/Mojang files used across both boots."""
     paths = ['server.jar', 'plugins/OnlyDragons.jar', 'plugins/OnlyDragonsGameTests.jar']
     paths += [path.relative_to(directory).as_posix() for path in sorted((directory / 'player-client').glob('*.jar'))]
     paths += [path.relative_to(directory).as_posix() for path in sorted((directory / 'cache').glob('mojang_*.jar'))]
@@ -78,6 +97,7 @@ def artifact_hashes(r, directory):
 
 
 def snapshot(r, source, destination):
+    """Copy a bounded regular production config to the owned evidence path and return its hash."""
     r.require(source.is_file() and not source.is_symlink() and source.stat().st_size <= 65536,
               'Missing, symlink or oversized production config')
     destination.write_bytes(source.read_bytes())
@@ -85,6 +105,13 @@ def snapshot(r, source, destination):
 
 
 def execute_phases(r, args, project, java_home, pins, descriptor, parent, directory, root, outcome):
+    """Run both phases under the caller's existing profile, artifact ownership and shared lease.
+
+    Stage the declared initial config once, create distinct phase nonces and context,
+    recheck memory/artifacts for each boot and preserve before/after config snapshots
+    even on failure. Only the companion's previous report is removed between boots.
+    The runner's boot owns process cleanup; phase failures propagate to the parent.
+    """
     phases = validate_descriptor(project, descriptor)
     outcome.update(catalogMode=MODE, phases=[])
     # The production default is staged once from the exact built JAR. No inter-boot config writes.
@@ -143,6 +170,7 @@ def execute_phases(r, args, project, java_home, pins, descriptor, parent, direct
 
 
 def capture(s, project, reports, record):
+    """Attach both phase evidence records to a suite case without replacing the parent receipt."""
     result = reports / 'result.json'
     record.update(resultPath=result.relative_to(project).as_posix(), resultSha256=s.runner.sha256(result))
     parent = s.runner.strict_json(result)
@@ -158,7 +186,12 @@ def capture(s, project, reports, record):
 
 
 def verify_continuity(r, parent, descriptor, root):
-    """Independent envelope checks in addition to each ordinary phase's strict replay."""
+    """Independently require a shared world/config/artifact lineage and disjoint process windows.
+
+    Validate both nonces, context files, snapshots, native shutdown and the exact final
+    positive/control outcome. Phase ordering uses epoch milliseconds and kernel process
+    start ticks; a reused PID alone cannot establish a new process identity.
+    """
     phases = parent.get('phases')
     r.require(parent.get('catalogMode') == MODE and isinstance(phases, list) and len(phases) == 2,
               'Missing/duplicate restart phases')
@@ -223,6 +256,13 @@ def verify_continuity(r, parent, descriptor, root):
 
 
 def verify_case(s, project, record, case, descriptor, source, suite_root):
+    """Replay the restart envelope, persisted state and each ordinary phase's raw evidence.
+
+    Require the lease to span both boots through cleanup, compare the initial config
+    with its actual JAR/seed source, and rehash final staged artifacts/config. Return an
+    aggregate derived from strict phase results; a successful second boot alone is
+    insufficient evidence of correct persistence or first-boot cleanup.
+    """
     r = s.runner
     validate_descriptor(project, descriptor)
     r.require(case['expectation'] == descriptor['phases'][-1]['expectation'], 'Restart case/final phase expectation mismatch')
@@ -271,6 +311,11 @@ def verify_case(s, project, record, case, descriptor, source, suite_root):
 
 
 def validate_message_bindings(r, phase, plan):
+    """Validate phase message matchers against its declared actor/session action plan.
+
+    Construct only a structural matcher sample for the shared validator; these strings
+    are not claimed to be received messages or runtime evidence.
+    """
     requirements = phase['requiredActorMessages']
     r.require(isinstance(requirements, list) and len(requirements) <= 32, 'Invalid phase message matchers')
     actors = []

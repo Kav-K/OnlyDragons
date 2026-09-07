@@ -1,4 +1,9 @@
-"""Run in WSL: python3 -m unittest discover -s scripts/symphony/tests -v."""
+"""Linux/WSL bridge transformation and owned-child regressions using disposable fixtures.
+
+Run with python3 -m unittest discover -s scripts/symphony/tests -v. The actual Codex
+sandbox smoke is separate in verify-skill-sandbox.py; these tests do not invoke a
+model or turn a mocked protocol response into sandbox/runtime acceptance.
+"""
 import importlib.util
 import json
 import os
@@ -17,7 +22,13 @@ spec.loader.exec_module(bridge)
 
 @unittest.skipUnless(os.name == 'posix', 'The Symphony worker runs under Linux/WSL.')
 class BridgeTests(unittest.TestCase):
+    """Require narrow clone-local grants, unchanged protocol fields and owned bridge cleanup.
+
+    Temporary operator/worker roots model metadata redirection and scope boundaries.
+    POSIX-only behavior is explicitly skipped on other platforms.
+    """
     def setUp(self):
+        """Create test-owned reviewed config, issue metadata, shared lease and a workspaceWrite turn."""
         self.temp = tempfile.TemporaryDirectory(prefix='symphony-bridge-')
         self.addCleanup(self.temp.cleanup)
         self.source = Path(self.temp.name)

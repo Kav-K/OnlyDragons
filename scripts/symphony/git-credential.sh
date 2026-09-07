@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# Git-only credential helper: stdin/stdout are the credential protocol, not a log.
+# Answer get for HTTPS Kav-K/OnlyDragons only; ignore store/erase and other hosts or
+# paths. Read the token file at request time so rotation needs no embedded secret.
+# The caller sets credential.useHttpPath; never run this helper with shell tracing
+# or capture its successful stdout in public task evidence.
 set -euo pipefail
 # Git credential protocol: only answer get requests for this repository over HTTPS.
 [[ "${1:-}" == get ]] || exit 0

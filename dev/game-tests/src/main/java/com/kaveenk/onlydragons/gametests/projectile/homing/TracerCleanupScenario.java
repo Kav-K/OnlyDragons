@@ -6,8 +6,17 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.util.BoundingBox;
 
-/** Deliberate failure with live production ticket demand. No synthetic player or fake projectile admission. */
+/**
+ * Deliberate abort with real production shared-ticket demand and no fake projectile admission.
+ * Two consumers share a ticket footprint; releasing one must retain the other.
+ * Abort releases owned demand/reservations/tasks while preserving a preexisting
+ * native ticket until the fixture releases only the ticket it added itself.
+ */
 public final class TracerCleanupScenario implements Scenario {
+    /**
+     * Registers cleanup before creating shared production ticket demand, then aborts explicitly.
+     * @param context server-thread report/resource owner
+     */
     @Override public void start(ScenarioContext context) {
         context.mechanicRevision("tracer-cleanup-v1");
         var bows = context.production().bows(); var world = Bukkit.getWorlds().getFirst(); UUID arena = UUID.randomUUID();

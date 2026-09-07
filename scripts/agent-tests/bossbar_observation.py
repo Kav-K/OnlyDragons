@@ -1,10 +1,25 @@
-"""Replay the bounded T08d received packet contract; no production formatter dependency."""
+"""Replay received boss-bar lifecycle and styled chat without calling production formatters.
+
+Packet histories establish what each actor actually received. Scenario markers
+supply independent expected HP/title/generation states; samples cannot conceal
+transient extra bars or invalid updates between checkpoints. This tests protocol
+presentation, not client-rendered appearance.
+"""
 import json
 import math
 import uuid
 
 
 def validate(scenario, player):
+    """Reconstruct every actor's bar state from bounded ADD/UPDATE/REMOVE events and match samples.
+
+    Require exact lifecycle markers, one shared bar identity per generation, unique
+    identities after reset, correct health fractions/titles/styles and no stale bars.
+    Permit intermediate title/health combinations because they travel separately. Also
+    validate serialized styled chat and the bounded heading/value/result expectations;
+    restart scenarios use their own phase-specific oracle set. Raises the shared action
+    validation error (or malformed JSON/UUID errors) without rewriting receipts.
+    """
     from player_actions import require
     expected = scenario.get('observations', {}).get('bossBarChecks')
     restart=scenario.get("scenarioId", "").startswith("dragon-restart-")

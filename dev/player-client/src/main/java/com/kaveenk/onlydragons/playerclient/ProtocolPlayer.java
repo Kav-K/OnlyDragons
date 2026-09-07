@@ -42,9 +42,17 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.Serv
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.ServerboundSetCarriedItemPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.ServerboundUseItemPacket;
 
-/** Disposable loopback protocol actor; never authenticates or follows server transfers. */
+/**
+ * Legacy schema-1 calibration actor for a disposable offline loopback profile.
+ * The fixed select/draw/release/quit sequence is separate from {@link ActionPlayer}'s
+ * declared-action mode. Game callbacks are ordered; state is synchronized for concurrent
+ * I/O disconnect callbacks, and network operations run outside the monitor.
+ * Real Paper companion events establish gameplay effects; this actor records protocol
+ * progress and received text, not authenticated-client behavior or visuals.
+ */
 public final class ProtocolPlayer extends SessionAdapter {
     private static final Properties PINS = readPins();
+    /** Built protocol-library coordinate used in receipts; staged artifact hashes are verified separately by the runner. */
     public static final String ARTIFACT = PINS.getProperty("artifact");
     static final String EXPECTED_MINECRAFT = PINS.getProperty("minecraftVersion");
     static final int EXPECTED_PROTOCOL = Integer.parseInt(PINS.getProperty("protocolVersion"));
@@ -61,8 +69,10 @@ public final class ProtocolPlayer extends SessionAdapter {
     private int teleports;
     private String error;
 
+    /** Creates unconnected calibration state; the entry point validates run identity and behavior before use. */
     ProtocolPlayer(String runId, String behavior) { this.runId = runId; this.behavior = behavior; }
 
+    /** Loads generated classpath pins, failing class initialization if the build omitted or corrupted them. */
     private static Properties readPins() {
         var pins = new Properties();
         try (var stream = ProtocolPlayer.class.getResourceAsStream("/player-client.properties")) {
@@ -72,13 +82,25 @@ public final class ProtocolPlayer extends SessionAdapter {
         } catch (Exception failure) { throw new ExceptionInInitializerError(failure); }
     }
 
+    /** Derives a bounded 16-character offline name from a lowercase run UUID without accepting account or host input. */
     static String username(String runId) {
         if (runId == null || !runId.matches("[0-9a-f]{32}")) throw new IllegalArgumentException("Invalid run ID");
         return "od_" + runId.substring(0, 13);
     }
 
+    /**
+     * Prepared work performed after releasing the actor monitor.
+     * @param packets ordered acknowledgement or calibration packets
+     * @param disconnectReason null unless this transition requests transport closure
+     */
     private record Outbound(List<Packet> packets, String disconnectReason) {}
 
+    /**
+     * Prepares a synchronized state transition, then sends/disconnects outside the lock so
+     * blocking I/O closure can complete concurrent callbacks. Invalid transitions fail closed.
+     * @param session transport delivering the packet
+     * @param packet decoded pinned-protocol packet
+     */
     @Override public void packetReceived(Session session, Packet packet) {
         Outbound outbound;
         try {
@@ -95,6 +117,7 @@ public final class ProtocolPlayer extends SessionAdapter {
         if (outbound.disconnectReason() != null) session.disconnect(Component.text(outbound.disconnectReason()));
     }
 
+    /** Updates legacy calibration state and prepares replies; ignores packets after failure, requested quit or disconnect. */
     private synchronized Outbound receive(Packet packet) {
         if (error != null || requestedQuit || disconnected.getCount() == 0) return new Outbound(List.of(), null);
         var outgoing = new ArrayList<Packet>();
@@ -121,6 +144,10 @@ public final class ProtocolPlayer extends SessionAdapter {
 
     // Record received ordinary text, never control markers or action-bar overlays.
     // Bounded flattening fails closed instead of truncating possible evidence.
+    /**
+     * Captures bounded ordinary received text and returns only this run's control suffix.
+     * Overlays and foreign controls are excluded; count/length overflow fails instead of truncating evidence.
+     */
     synchronized String captureChat(Component component, boolean overlay) {
         if (overlay) return null;
         var text = new StringBuilder();
@@ -141,8 +168,14 @@ public final class ProtocolPlayer extends SessionAdapter {
         return null;
     }
 
+    /** Returns an immutable copy of captured ordinary text in receive order. */
     synchronized List<String> capturedMessages() { return List.copyOf(messages); }
 
+    /**
+     * Checks the fixed calibration sequence and loading state before preparing its packets.
+     * The schema-1 action entry is recorded during preparation, before the outer callback
+     * sends; companion evidence remains necessary to prove the native event.
+     */
     private String act(String action, List<Packet> outgoing) {
         List<String> expected = List.of("select", "draw", "release", "quit");
         if (actions.size() >= expected.size() || !expected.get(actions.size()).equals(action)) {
@@ -161,12 +194,18 @@ public final class ProtocolPlayer extends SessionAdapter {
         return null;
     }
 
+    /**
+     * Records actual closure and its cause, then releases the main thread's wait latch.
+     * Unexpected disconnect is a failed calibration, even if earlier actions were prepared.
+     * @param event transport reason and optional failure cause
+     */
     @Override public synchronized void disconnected(DisconnectedEvent event) {
         if (!requestedQuit && error == null) error = "Unexpected disconnect: " + event.getReason();
         if (event.getCause() != null) error = event.getCause().toString();
         disconnected.countDown();
     }
 
+    /** Copies legacy protocol progress and timestamps; success requires the full sequence and actual requested disconnect. */
     synchronized Map<String, Object> report(long started) {
         var report = new LinkedHashMap<String, Object>();
         report.put("schemaVersion", 1);
@@ -190,6 +229,13 @@ public final class ProtocolPlayer extends SessionAdapter {
         return report;
     }
 
+    /**
+     * Starts the fixed loopback calibration, owns cleanup, then atomically publishes its UTF-8 receipt.
+     * Codec, port, behavior and 1-300 second deadline are validated before connecting.
+     * An unsuccessful report exits with status 1; transfers and account authentication are disabled.
+     * @param args run ID, port, report path, timeout seconds and behavior
+     * @throws Exception if argument parsing, transport setup, waiting or report publication fails
+     */
     public static void main(String[] args) throws Exception {
         if (args.length != 5) throw new IllegalArgumentException("Expected runId port reportPath timeoutSeconds behavior");
         String name = username(args[0]);

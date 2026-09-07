@@ -4,7 +4,13 @@ import unittest
 import entity_motion as motion
 
 class EntityMotionTests(unittest.TestCase):
+    """Reject stale, malformed, impossible or incorrectly bound received-motion summaries.
+
+    Synthetic segments isolate schema and matcher checks; they do not establish a
+    rendered trajectory or a real packet stream.
+    """
     def setUp(self):
+        """Create one UUID-bound motion segment and stricter actor/session catalog requirements."""
         self.row={'segment':0,'uuid':'12345678-1234-4234-8234-123456789abc','startedAtEpochMs':100,
                   'endedAtEpochMs':200,'packets':50,'first':[0,100,0],'last':[5,100,0],'path':10,'maxStep':.25}
         self.session={'id':'first','startedAtEpochMs':100,'completedAtEpochMs':300,

@@ -1,20 +1,32 @@
-"""Strict optional received-position evidence; separate from server geometry and client visuals."""
+"""Validate bounded client-received entity-motion summaries and catalog-required motion.
+
+These checks constrain observed position segments; they do not render a Minecraft
+client or independently reconstruct the underlying packet stream.
+"""
 import math
 import uuid
 
 
 def require(condition, message):
+    """Raise ValueError for a malformed or missing motion-evidence condition."""
     if not condition:
         raise ValueError(message)
 
 
 def number(value, low, high):
+    """Require a finite real number within inclusive bounds, excluding booleans, and return it."""
     require(type(value) in (int, float) and math.isfinite(value) and low <= value <= high,
             'Invalid entity motion number')
     return value
 
 
 def validate(rows, start, end):
+    """Validate at most 128 ordered entity segments within an epoch-millisecond session window.
+
+    Require canonical UUIDs, finite bounded positions/distances, nonnegative packet
+    counts and consistent chord/path/maximum-step relationships. Zero packets cannot
+    claim path motion. Return the validated rows without changing them.
+    """
     require(isinstance(rows, list) and len(rows) <= 128, 'Invalid entity motion segments')
     for index, row in enumerate(rows):
         require(isinstance(row, dict) and set(row) == {'segment', 'uuid', 'startedAtEpochMs', 'endedAtEpochMs',
@@ -36,6 +48,11 @@ def validate(rows, start, end):
 
 
 def validate_required(report, descriptor):
+    """Match catalog motion expectations to exact actor/session/target bindings.
+
+    Require each requested packet/path minimum and step maximum in the bound entity's
+    validated segments. This demonstrates received movement, not visual smoothness.
+    """
     requirements = descriptor.get('requiredEntityMotion', [])
     require(isinstance(requirements, list) and len(requirements) <= 16, 'Invalid required motion matchers')
     seen = set()

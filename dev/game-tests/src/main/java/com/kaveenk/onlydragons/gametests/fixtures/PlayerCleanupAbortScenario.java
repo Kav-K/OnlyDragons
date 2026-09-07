@@ -20,7 +20,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-/** Intended abort with two connected players and live, reversibly owned resources. */
+/**
+ * Intentional failure control with two real connections and live owned resources.
+ * It waits for both native status commands and two settling ticks, then aborts before
+ * the planned disconnect steps. The runner must obtain the exact cleanup-abort
+ * client receipt; an arbitrary crash or missing report cannot satisfy this case.
+ */
 public final class PlayerCleanupAbortScenario implements Scenario, Listener {
     private static final String PERMISSION = "onlydragons.fixture.cleanup";
     private final Map<UUID, Integer> commands = new HashMap<>();
@@ -28,6 +33,11 @@ public final class PlayerCleanupAbortScenario implements Scenario, Listener {
     private PlayerFixture players;
     private int lastCommandTick;
 
+    /**
+     * Starts the strict actor roster and registers native command observation.
+     * @param context server-thread report/resource owner
+     * @throws Exception if the staged action plan or isolated-player policy is invalid
+     */
     @Override public void start(ScenarioContext context) throws Exception {
         this.context = context;
         context.mechanicRevision("headless-cleanup-v1");
@@ -41,6 +51,11 @@ public final class PlayerCleanupAbortScenario implements Scenario, Listener {
         context.harness().getLogger().info("OD_PLAYER_READY " + context.harness().runId());
     }
 
+    /**
+     * Creates reversible permission/block/entity/task state and proves it is still live at abort.
+     * Cleanup callbacks independently check restoration and cancellation rather than
+     * assuming context completion implies resource release.
+     */
     private void setup() {
         List<Player> actors = List.of(players.player("alpha"), players.player("beta"));
         context.check("two_distinct_real_players", true,
@@ -112,11 +127,18 @@ public final class PlayerCleanupAbortScenario implements Scenario, Listener {
                 }));
     }
 
+    /**
+     * Selects only tasks owned by this companion, avoiding unrelated plugin scheduler state.
+     */
     private Set<Integer> ownedTaskIds() {
         return Bukkit.getScheduler().getPendingTasks().stream()
                 .filter(task -> task.getOwner() == context.harness()).map(BukkitTask::getTaskId).collect(Collectors.toSet());
     }
 
+    /**
+     * Records only the declared actors' real uncancelled status dispatches and last tick.
+     * @param event native command event
+     */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void command(PlayerCommandPreprocessEvent event) {
         UUID player = event.getPlayer().getUniqueId();

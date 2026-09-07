@@ -13,8 +13,17 @@ import java.util.List;
 import java.util.Map;
 import org.bukkit.Bukkit;
 
-/** Invokes the loaded production resolver using synthetic domain inputs, with no player or combat claim. */
+/**
+ * Invokes the production stat resolver on Paper with synthetic modifier inputs.
+ * Literal expected values independently cover base-once addition, ordered multipliers,
+ * raw versus capped stats and immutable source replacement. It does not equip a real
+ * player or establish the native equipment adapter's behavior.
+ */
 public final class StatsResolutionScenario implements Scenario {
+    /**
+     * Runs deterministic resolver/classloader checks and completes synchronously.
+     * @param context server-thread report and cleanup owner
+     */
     @Override public void start(ScenarioContext context) {
         context.mechanicRevision("stats-calibration-v1");
         context.check("server_thread", true, Bukkit.isPrimaryThread());

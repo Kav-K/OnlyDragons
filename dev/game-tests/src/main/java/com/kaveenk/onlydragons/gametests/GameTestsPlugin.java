@@ -14,6 +14,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * Test-only companion that admits one console-selected scenario per isolated boot.
+ * The run nonce and catalog ID bind the request to the runner; players cannot start
+ * tests. Bukkit state remains on the server thread and only serialized report text
+ * crosses to the single writer executor. This artifact is not a production plugin.
+ */
 public final class GameTestsPlugin extends JavaPlugin {
     private final Map<String, Scenario> scenarios = Map.ofEntries(
             Map.entry("aimed-tracer", new com.kaveenk.onlydragons.gametests.projectile.homing.AimedTracerScenario()),
@@ -65,13 +71,31 @@ public final class GameTestsPlugin extends JavaPlugin {
     private final ExecutorService writer = Executors.newSingleThreadExecutor();
     private ScenarioContext active;
     private String runId;
+    /**
+     * Returns the runner-supplied 32-hex boot nonce.
+     * Restart phases use separate nonces while retaining the parent's actor-name prefix.
+     * @return validated run ID after enable
+     */
     public String runId() { return runId; }
 
+    /**
+     * Validates isolated-run identity before exposing the console test command.
+     * @throws IllegalStateException if the companion was launched outside the runner
+     */
     @Override public void onEnable() {
         runId = System.getProperty("onlydragons.test.runId", "");
         if (!runId.matches("[a-f0-9]{32}")) throw new IllegalStateException("Only start this test companion through the isolated agent runner");
         Objects.requireNonNull(getCommand("odgametest")).setExecutor(this);
     }
+    /**
+     * Admits one known scenario from the console with the exact current run ID.
+     * Rejected commands never create a context; a started context cannot be replaced.
+     * @param sender only a console sender is authorized
+     * @param command registered companion command
+     * @param label invoked alias
+     * @param args run ID followed by scenario ID
+     * @return always {@code true}; rejection is explicit command output
+     */
     @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof ConsoleCommandSender) || args.length != 2 || !args[0].equals(runId) || active != null) {
             sender.sendMessage("OD_GAME_TEST_REJECTED invalid console request or scenario already started");
@@ -86,6 +110,12 @@ public final class GameTestsPlugin extends JavaPlugin {
         try { scenario.start(active); } catch (Exception | AssertionError failure) { active.fail(failure); }
         return true;
     }
+    /**
+     * Serializes server-owned values before asynchronous atomic report publication.
+     * The completion marker is logged only after the temporary file is atomically
+     * renamed. I/O failure is logged as a report error, never converted into a pass.
+     * @param report completed JSON-compatible scenario snapshot
+     */
     void publish(Map<String, Object> report) {
         // Freeze every server-owned value before handing only text to the I/O executor.
         String payload = Json.write(report);
@@ -102,6 +132,11 @@ public final class GameTestsPlugin extends JavaPlugin {
             }
         });
     }
+    /**
+     * Aborts unfinished work, then gives the report writer up to three seconds to drain.
+     * Only this companion's executor is interrupted on timeout; external JVM cleanup
+     * and receipt validation belong to the runner.
+     */
     @Override public void onDisable() {
         if (active != null) active.abort();
         writer.shutdown();

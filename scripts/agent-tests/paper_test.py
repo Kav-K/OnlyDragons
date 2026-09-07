@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
-"""Isolated Linux real-Paper tests. Requires existing operator EULA consent and a shared lease."""
+"""Run one catalog-bound real-Paper scenario in an isolated Linux/WSL profile.
+
+The lifecycle is build -> verify bootstrap -> acquire shared lease -> admit combined
+JVM memory -> stage a fresh profile -> boot and observe -> stop owned processes ->
+write result.json. Only explicit catalog-matching protocol modes disable online
+authentication, and only in the disposable loopback profile. No EULA is accepted.
+
+Scenario success, client success, clean shutdown and absence of Paper errors are
+separate requirements. A boot or a submitted player packet alone proves neither
+damage registration nor feature acceptance. See paper_suite for cohort replay and
+checkpoint for requirement mapping. CLI exit 75 means retryable resource contention;
+exit 1 means validation/execution failure, and exit 0 means this scenario passed.
+"""
 from __future__ import annotations
 
 import argparse
@@ -29,14 +41,20 @@ import player_actions
 
 
 class ValidationError(RuntimeError):
+    """An input, artifact or observed result violates the runner's required contract."""
     pass
 
 
 class ResourceBusy(ValidationError):
+    """Admission could not acquire a lease or verify sufficient memory before its deadline.
+
+    This is a retryable scheduling outcome, never evidence that a scenario passed.
+    """
     pass
 
 
 def require(condition, message):
+    """Raise ValidationError with the supplied diagnostic when a required condition fails."""
     if not condition:
         raise ValidationError(message)
 
@@ -48,6 +66,11 @@ def paper_errors(log):
 
 
 def sha256(path):
+    """Return a lowercase SHA-256 hex digest of a file using bounded one-MiB reads.
+
+    The file is read now; a previously reported digest is not substituted. I/O errors
+    propagate so callers cannot certify missing evidence.
+    """
     digest = hashlib.sha256()
     with Path(path).open('rb') as stream:
         for block in iter(lambda: stream.read(1024 * 1024), b''):
@@ -56,6 +79,11 @@ def sha256(path):
 
 
 def atomic_json(path, value):
+    """Replace a JSON record through its sibling .tmp file after finite-value serialization.
+
+    The caller owns the directory and path. This prevents readers seeing partial JSON;
+    it is not a durable fsync transaction or a lock between concurrent writers.
+    """
     temporary = path.with_suffix(path.suffix + '.tmp')
     temporary.write_text(json.dumps(value, indent=2, allow_nan=False) + '\n', encoding='utf-8')
     temporary.replace(path)
@@ -65,6 +93,13 @@ MAX_JSON_BYTES = 1024 * 1024
 
 
 def strict_json(path, *, max_bytes=MAX_JSON_BYTES, artifact='scenario report'):
+    """Read a bounded UTF-8 JSON artifact, rejecting duplicate keys and non-finite numbers.
+
+    path must be a file no larger than max_bytes (default one MiB). artifact names the
+    diagnostic context. Returns decoded data without imposing a feature schema; callers
+    must validate types, identity, timestamps and required fields separately. Missing or
+    malformed artifacts raise ValidationError; filesystem failures may propagate.
+    """
     def finite_number(value):
         number = float(value)
         require(math.isfinite(number), f'Non-finite JSON number: {value}')
@@ -99,7 +134,16 @@ def json_values_equal(expected, observed):
 
 
 def validate_report(path, expected, issued_ms, deadline_ms, now_ms=None):
-    """Reject missing, stale, truncated, failed, or incomplete evidence, even after a clean boot."""
+    """Validate a completed companion report against one issued scenario invocation.
+
+    issued_ms/deadline_ms and optional now_ms are epoch milliseconds; the latter is
+    injectable for deterministic validation tests. The file's modification time,
+    reported execution window, run/scenario/mechanic identity and actual Paper pin
+    must agree. Each unique assertion must be true and its expected/observed JSON must
+    match; all catalog-required IDs must exist. Returns the decoded report or raises
+    ValidationError. Intentional failure controls are interpreted by paper_suite, not
+    made successful here.
+    """
     report = strict_json(Path(path))
     require(isinstance(report, dict), 'Scenario report must be an object')
     for key in ('runId', 'scenarioId', 'mechanicRevision'):
@@ -135,6 +179,13 @@ def validate_report(path, expected, issued_ms, deadline_ms, now_ms=None):
 
 
 def wait_for_report(path, expected, issued_ms, timeout, process, client_process=None):
+    """Wait at most timeout seconds for a fresh companion file, then validate it.
+
+    Paper must remain alive while waiting; an optional client may remain running or
+    exit zero, but a failed client aborts the wait. Monotonic time bounds waiting and
+    epoch milliseconds bind evidence. An existing invalid file fails immediately; it
+    is not retried until a different report happens to appear.
+    """
     deadline = time.monotonic() + timeout
     deadline_ms = issued_ms + int(timeout * 1000)
     while not path.exists():
@@ -148,6 +199,11 @@ def wait_for_report(path, expected, issued_ms, timeout, process, client_process=
 
 
 def properties(path):
+    """Read the repository's simple UTF-8 key=value format into a last-value-wins mapping.
+
+    This helper trims keys/values and ignores blank/comment lines; it is not the Java
+    Properties escape/continuation grammar or a strict duplicate-key validator.
+    """
     result = {}
     for line in path.read_text(encoding='utf-8').splitlines():
         if line.strip() and not line.startswith('#') and '=' in line:
@@ -157,12 +213,20 @@ def properties(path):
 
 
 def accepted_eula(path):
+    """Require an existing operator-provided file containing eula=true; never create consent."""
     require(path is not None and path.is_file(), 'Supply an existing approved EULA file with --eula-file or ONLYDRAGONS_EULA_FILE')
     require(properties(path).get('eula') == 'true', 'Operator EULA acceptance is absent; this runner never accepts it')
 
 
 @contextmanager
 def server_lease(directory, timeout, evidence=None):
+    """Hold the operator's Linux flock across both owned JVMs and their cleanup.
+
+    directory must already exist. Acquisition polls nonblocking until timeout seconds,
+    then raises ResourceBusy. Optional evidence receives epoch-millisecond acquire and
+    release times. The lock file rejects a symlink; descriptor release runs even when
+    the scenario or shutdown raises. This serializes cooperating test runners only.
+    """
     import fcntl
     require(directory.is_dir(), 'The operator must provision the shared lease directory')
     descriptor = os.open(directory / 'paper-tests.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
@@ -190,7 +254,14 @@ def server_lease(directory, timeout, evidence=None):
 
 
 def assess_memory(memory_mib, linux, windows_available=None, client_memory_mib=0):
-    """Account for already resident, reclaimable WSL cache without assuming it is all reusable."""
+    """Validate memory admission for Paper heap, optional client heap and a 1024-MiB reserve.
+
+    All inputs/returned counts are MiB. Linux availability must cover the total. On WSL,
+    Windows availability plus half of bounded reclaimable Linux cache must also cover
+    it; resident caches are not counted as fully reusable. Returns the recorded
+    calculation or raises ResourceBusy. This is a prelaunch observation, not a memory
+    reservation enforced by the operating system.
+    """
     required = memory_mib + client_memory_mib + 1024
     result = {'linuxMemoryMiB': linux, 'requiredMiB': required, 'paperHeapMiB': memory_mib,
               'playerClientHeapMiB': client_memory_mib, 'combinedReserveMiB': 1024}
@@ -209,6 +280,11 @@ def assess_memory(memory_mib, linux, windows_available=None, client_memory_mib=0
 
 
 def windows_available_memory(timeout=15):
+    """Read Windows host free memory through a bounded, read-only PowerShell probe.
+
+    Returns nonnegative MiB. timeout is seconds. Missing, malformed, failed or late
+    probe output raises ResourceBusy rather than assuming enough memory or zero usage.
+    """
     powershell = shutil.which('powershell.exe') or '/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe'
     command = ("$ErrorActionPreference='Stop'; "
                "$memoryProbe = Get-CimInstance Win32_OperatingSystem -ErrorAction Stop; "
@@ -231,6 +307,11 @@ def windows_available_memory(timeout=15):
 
 
 def available_memory(memory_mib, client_memory_mib=0, probe_timeout=15):
+    """Sample Linux memory and, under WSL, Windows memory before calling assess_memory.
+
+    Heap arguments are MiB and probe_timeout is seconds. No process is stopped to
+    create headroom; unverifiable host availability remains a ResourceBusy result.
+    """
     is_wsl = 'microsoft' in Path('/proc/sys/kernel/osrelease').read_text().lower()
     windows = windows_available_memory(probe_timeout) if is_wsl else None
     raw = dict(re.findall(r'^(\w+):\s+(\d+)\s+kB', Path('/proc/meminfo').read_text(), re.M))
@@ -239,6 +320,12 @@ def available_memory(memory_mib, client_memory_mib=0, probe_timeout=15):
 
 
 def wait_for_memory(memory_mib, timeout, client_memory_mib=0):
+    """Retry admission until timeout seconds elapse, returning the successful memory snapshot.
+
+    Both heap sizes are MiB. Each host probe is bounded by the remaining deadline; a
+    probe finishing after it cannot admit a run. Busy messages are rate-limited. This
+    wait does not evict caches, terminate other processes or weaken the reserve.
+    """
     deadline = time.monotonic() + timeout
     announced = 0.0
     last_busy = ResourceBusy('Busy: memory admission has no successful probe')
@@ -262,6 +349,11 @@ def wait_for_memory(memory_mib, timeout, client_memory_mib=0):
 
 
 def varint(value):
+    """Encode a caller-validated nonnegative protocol integer as continuation bytes.
+
+    This small status-client encoder does not accept arbitrary signed inputs; callers
+    supply bounded lengths, packet IDs and the positive handshake protocol number.
+    """
     output = bytearray()
     while True:
         byte = value & 127
@@ -272,6 +364,7 @@ def varint(value):
 
 
 def read_varint(stream):
+    """Decode at most five bytes from a binary status stream; reject truncation/overlong input."""
     value = 0
     for index in range(5):
         raw = stream.read(1)
@@ -283,6 +376,12 @@ def read_varint(stream):
 
 
 def query_status(port):
+    """Query one loopback Minecraft status endpoint with a five-second socket timeout.
+
+    Returns decoded status JSON after bounded framing checks. It neither logs in a
+    player nor proves plugins or gameplay work; boot separately checks the version and
+    companion/client evidence. Socket and JSON errors propagate.
+    """
     with socket.create_connection(('127.0.0.1', port), timeout=5) as connection:
         connection.settimeout(5)
         host = b'127.0.0.1'
@@ -299,14 +398,29 @@ def query_status(port):
 
 
 def free_port():
+    """Return an ephemeral loopback port observed free at bind time.
+
+    The temporary socket closes before return, so this is not an exclusive reservation
+    against unrelated processes; a later bind failure must remain a failed boot.
+    """
     with socket.socket() as listener:
         listener.bind(('127.0.0.1', 0))
         return listener.getsockname()[1]
 
 
 class OwnedServer:
-    """Controls only the child it created; never searches for or stops other JVMs."""
+    """Own exactly one subprocess group, its pipes/log and an idempotent shutdown receipt.
+
+    Linux parent-death signaling is installed before Java starts, including the parent
+    exit race check. No PID search or global JVM shutdown is used. The caller must call
+    stop even after scenario failure; boot provides that finally path.
+    """
     def __init__(self, command, directory, log_path):
+        """Start command in directory with binary combined stdout/stderr at log_path.
+
+        The process gets its own group and stdin console pipe. Spawn failure closes the
+        opened log; the caller retains ownership of a successfully created instance.
+        """
         self.log_path = log_path
         self.log_file = log_path.open('wb')
         self.process = None
@@ -327,15 +441,25 @@ class OwnedServer:
             raise
 
     def text(self):
+        """Read UTF-8 log output for observations, stripping ANSI codes and replacing invalid bytes."""
         return re.sub(r'\x1b\[[0-9;]*[A-Za-z]', '', self.log_path.read_text(encoding='utf-8', errors='replace'))
 
     def send(self, command):
+        """Write and flush one newline-free console command to this still-running child.
+
+        This is delivery intent, not completion; follow with fresh log/report observation.
+        """
         require(command and not re.search(r'[\r\n]', command), 'Expected one console command')
         require(self.process.poll() is None, 'Paper is no longer running')
         self.process.stdin.write((command + '\n').encode())
         self.process.stdin.flush()
 
     def wait_text(self, pattern, timeout, offset=0):
+        """Require a regex in log text after the character offset before timeout seconds.
+
+        An exited child or expired monotonic deadline raises ValidationError. Use an offset
+        captured before sending a command to avoid matching an older command's response.
+        """
         deadline = time.monotonic() + timeout
         while True:
             if re.search(pattern, self.text()[offset:]):
@@ -345,6 +469,13 @@ class OwnedServer:
             time.sleep(0.1)
 
     def stop(self, timeout=45):
+        """Stop this owned process group and cache its shutdown receipt for repeated callers.
+
+        Try the console stop and wait timeout seconds, then TERM and KILL only this group
+        with bounded ten-second waits. Close the owned streams. Clean Paper shutdown means
+        exit zero, no forced signal and a stopping-server log marker; forced exit remains
+        explicit evidence even if the process eventually returns zero.
+        """
         if self.shutdown is not None:
             return self.shutdown
         forced = False
@@ -374,8 +505,14 @@ class OwnedServer:
 
 
 class OwnedPlayer(OwnedServer):
-    """The same PID/group ownership as Paper, with a client's different exit evidence."""
+    """Reuse owned-group cleanup while keeping client success separate from clean termination.
+
+    A deliberate negative-control client may exit nonzero without forced termination.
+    The result therefore records clean cleanup and successfulExit independently; suite
+    control policy decides which exit outcome was required.
+    """
     def stop(self, timeout=5):
+        """Return cached group cleanup with client-specific clean and successfulExit fields."""
         result = super().stop(timeout)
         result['clean'] = not result['forced'] and result['exitCode'] is not None
         result['successfulExit'] = result['exitCode'] == 0
@@ -383,6 +520,11 @@ class OwnedPlayer(OwnedServer):
 
 
 def player_pins(pins):
+    """Validate the exact timestamped MCProtocolLib coordinate, digest and protocol number.
+
+    Return normalized pin metadata, including its expected distribution JAR filename.
+    A floating snapshot/version or malformed hash cannot establish client provenance.
+    """
     coordinate = pins.get('testPlayerProtocolLib', '')
     require(re.fullmatch(r'org\.geysermc\.mcprotocollib:protocol:[0-9.]+-\d{8}\.\d{6}-\d+', coordinate),
             'Player protocol pin must name an exact timestamped MCProtocolLib publication')
@@ -396,6 +538,11 @@ def player_pins(pins):
 
 
 def player_mode(mode, scenario, control, catalog):
+    """Check explicit runner actor mode against the selected scenario's catalog declaration.
+
+    Return whether a client is required. Unknown modes/controls, an implicit offline
+    mode, or a player failure control without a client raise ValidationError.
+    """
     require(mode in (None, 'protocol-calibration', 'protocol-actions-v1'), 'Unknown isolated player mode')
     require(control in ('calibrate', 'early-exit', 'idle'), 'Unknown player failure control')
     require(isinstance(catalog, dict) and scenario in catalog and isinstance(catalog[scenario], dict),
@@ -410,7 +557,12 @@ def player_mode(mode, scenario, control, catalog):
 
 
 def test_settings(base, run_id, port, with_player=False, actor_count=1):
-    """Return settings for a new disposable directory; never mutate a human/default file."""
+    """Copy base settings into a fresh disposable run configuration.
+
+    Bind loopback, disable remote management and use a run-specific world. Only an
+    explicit with_player mode disables authentication and limits admission to the
+    catalog actor count/whitelist. No human profile or input dictionary is mutated.
+    """
     settings = dict(base)
     settings.update({'server-ip': '127.0.0.1', 'server-port': str(port),
                      'online-mode': 'false' if with_player else 'true',
@@ -454,6 +606,12 @@ def validate_player_messages(report, descriptor):
 
 
 def validate_player_report(path, run_id, issued_ms, timeout, pins, descriptor=None):
+    """Validate the legacy single-actor calibration report and its received messages.
+
+    Bind identity, protocol artifact, action sequence, disconnect and successful result
+    to run_id and the issued epoch-millisecond window (timeout in seconds). This does
+    not accept the multi-actor action schema; boot routes that mode to player_actions.
+    """
     report = strict_json(path)
     require(isinstance(report, dict), 'Player report must be an object')
     pinned = player_pins(pins)
@@ -476,6 +634,13 @@ def validate_player_report(path, run_id, issued_ms, timeout, pins, descriptor=No
 
 
 def build_player_client(project, java_home, report_root, pins):
+    """Build/test the isolated client and verify its installed distribution and locked pin.
+
+    Use java_home and an issue-local Gradle cache; append build output to report_root.
+    Reject failed/skipped/missing JUnit or mismatched MCProtocolLib bytes. Return staged
+    JAR paths plus dependency/JUnit/hash evidence; never add these dependencies to the
+    production plugin classpath.
+    """
     pinned = player_pins(pins)
     env = dict(os.environ, JAVA_HOME=str(java_home), GRADLE_USER_HOME=str(project / '.gradle/agent-home'))
     env['PATH'] = str(java_home / 'bin') + os.pathsep + env.get('PATH', '')
@@ -505,6 +670,12 @@ def build_player_client(project, java_home, report_root, pins):
 
 
 def fetch_paper(project, pins, supplied):
+    """Return the supplied or cached Paper launcher only after verifying its project digest.
+
+    An explicit wrong artifact fails. Otherwise download the pinned HTTPS URL into a
+    temporary cache file and publish it only after hashing. This selects no newer
+    Paper build and does not supply the separate Mojang bootstrap JAR.
+    """
     expected = pins['paperSha256']
     require(re.fullmatch(r'[a-f0-9]{64}', expected), 'Invalid pinned Paper SHA256')
     if supplied:
@@ -525,6 +696,13 @@ def fetch_paper(project, pins, supplied):
 
 
 def build_artifacts(project, java_home, report_root):
+    """Sequentially build the plugin and real-Paper companion with the selected JDK.
+
+    Read the production artifact receipt, require it inside this checkout's build
+    directory, and require both nonempty successful JUnit cohorts without skips. Return
+    the two JAR paths and build counts; no server is launched or evidence reused merely
+    because an older artifact exists.
+    """
     env = dict(os.environ, JAVA_HOME=str(java_home), GRADLE_USER_HOME=str(project / '.gradle/agent-home'))
     env['PATH'] = str(java_home / 'bin') + os.pathsep + env.get('PATH', '')
     with (report_root / 'build.log').open('w', encoding='utf-8') as log:
@@ -555,22 +733,37 @@ def build_artifacts(project, java_home, report_root):
 
 
 def stage_artifact(source, destination, expected_sha256):
+    """Copy one artifact, then require its destination bytes to match the recorded SHA-256."""
     shutil.copyfile(source, destination)
     require(sha256(destination) == expected_sha256, 'Artifact changed after build validation: ' + destination.name)
 
 
 def epoch_ms():
+    """Return wall-clock epoch milliseconds for evidence windows, not monotonic deadlines."""
     return int(time.time() * 1000)
 
 
 def process_identity(owned):
     # Kernel start ticks disambiguate recycled PIDs without searching for other JVMs.
+    """Record this owned live child's PID and Linux kernel start tick to detect PID reuse."""
     stat = Path(f'/proc/{owned.process.pid}/stat').read_text().rsplit(')', 1)[1].split()
     return {'pid': owned.process.pid, 'startTicks': int(stat[19]), 'startedAtEpochMs': epoch_ms()}
 
 
 def boot(args, project, java_home, pins, scenario_id, scenario, action_plan,
          run_id, directory, report_root, outcome, plan_file=None, phase_context=None):
+    """Execute and observe one Paper boot while the caller holds lease and memory admission.
+
+    Inputs bind a fresh profile, run ID, catalog scenario, optional exact action plan
+    and restart phase. Stage creation/building is the caller's responsibility. This
+    method launches Paper, verifies status, issues the companion scenario, optionally
+    launches one client JVM, and cross-checks companion/client/journal evidence.
+
+    It mutates outcome with process windows and observations. A finally path stops
+    client then Paper, restores signal handlers and preserves the raw companion report
+    even on failure. passed becomes true only after validation, clean cleanup and the
+    Paper error scan; an exception never rolls back an earlier observed game action.
+    """
     server = client = None
     plugins = directory / 'plugins'
     client_dir = directory / 'player-client'
@@ -662,6 +855,14 @@ def boot(args, project, java_home, pins, scenario_id, scenario, action_plan,
 
 
 def execute(args):
+    """Own a single scenario's complete filesystem/build/lease/staging/run/report lifecycle.
+
+    Create a unique report directory, validate Linux/JDK/EULA/catalog inputs, and build
+    before acquiring the scarce server lease. Restart descriptors delegate two boots
+    to paper_restart under the same ownership. Always attempt the final result receipt;
+    return 0 on pass, 75 on ResourceBusy or 1 on other failure. The receipt describes
+    this exact source/worktree state and does not itself accept a project milestone.
+    """
     require(sys.platform == 'linux', 'Use this runner on Linux/WSL; Windows human play keeps using mcdev.cmd')
     project = args.project.resolve()
     require((project / 'versions.properties').is_file() and (project / 'AGENTS.md').is_file(), 'Expected an OnlyDragons checkout')
@@ -757,6 +958,7 @@ def execute(args):
 
 
 def main():
+    """Parse the bounded CLI, convert termination into owned cleanup, and return execute's code."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--project', type=Path, default=Path.cwd())
     parser.add_argument('--scenario', default='lifecycle-calibration')

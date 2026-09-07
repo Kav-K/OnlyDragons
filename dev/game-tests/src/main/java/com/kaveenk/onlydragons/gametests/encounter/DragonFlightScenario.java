@@ -9,7 +9,13 @@ import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.util.BoundingBox;
 
-/** Deployed route and cleanup, independent of the feasibility controller. */
+/**
+ * Checks the deployed flight controller using actual dragon parent/part geometry.
+ * Each radius trial runs sustained server-thread samples and literal step/yaw bounds;
+ * stationary, cancelled teleport, redirected yaw and lost-AI controls check retirement.
+ * No player input or rendered-client smoothness is inferred. Context cleanup resets
+ * an active generation and owns the listeners/scheduled checks.
+ */
 public final class DragonFlightScenario implements Scenario, Listener {
     private ScenarioContext c;
     private DevelopmentDragonService dragons;
@@ -21,11 +27,17 @@ public final class DragonFlightScenario implements Scenario, Listener {
     private boolean cancel, redirectYaw;
     private final Set<String> chunks = new HashSet<>();
     private final List<Map<String,Object>> journal = new ArrayList<>();
+    /**
+     * Registers cleanup and native teleport controls, then starts the smallest-radius trial.
+     * @param context run-owned server-thread scheduling, checks and cleanup
+     * @throws Exception if arena setup or the first production spawn fails
+     */
     public void start(ScenarioContext context) throws Exception {
         c=context; c.mechanicRevision("dragon-flight-v1"); dragons=c.production().dragons(); c.listen(this);
         c.cleanup("flight",()->{if(c.production().combat().activeCount()>0)dragons.reset(dragons.generation().orElseThrow());});
         trial(16);
     }
+    /** Resets measurement accumulators and spawns explicit calibration/orbit flight inside the requested arena radius. */
     private void trial(int radius) throws Exception {
         this.radius=radius;tick=0;maxStep=0;maxYaw=0;path=0;previous=null;chunks.clear();
         var world=Bukkit.getWorlds().getFirst();
@@ -34,6 +46,7 @@ public final class DragonFlightScenario implements Scenario, Listener {
         dragon=(EnderDragon)Bukkit.getEntity(dragons.view().orElseThrow().entityId());bounds=arena.bounds();first=dragon.getLocation();
         c.later(5,this::sample);
     }
+    /** Measures 480 native updates, rejects escaped multipart boxes immediately, then checks route extent and reset ticket release. */
     private void sample() throws Exception {
         if (!dragon.isValid()) throw new IllegalStateException("Production flight retired: "+dragons.motion()+" "+c.production().combat().diagnostics());
         Location current=dragon.getLocation();
@@ -53,6 +66,7 @@ public final class DragonFlightScenario implements Scenario, Listener {
             if(radius==16)trial(24);else if(radius==24)trial(48);else stationary();
         });
     }
+    /** Checks exact stationary no-drift before injecting a cancelled native teleport and requiring production retirement. */
     private void stationary() {
         dragons.spawn(DevelopmentDragonService.SpawnMode.CALIBRATION, DragonFlight.Mode.STATIONARY);dragon=(EnderDragon)Bukkit.getEntity(dragons.view().orElseThrow().entityId());first=dragon.getLocation();
         c.later(25,()->{c.check("stationary_calibration_no_drift",true,dragon.getLocation().distance(first)==0&&dragons.motion().orElseThrow().state().equals("STATIONARY"));
@@ -62,6 +76,7 @@ public final class DragonFlightScenario implements Scenario, Listener {
                     &&c.production().bows().continuity().tickets().demandCount()==0&&dragons.motion().orElseThrow().state().startsWith("FAILED"));
                 redirectedYaw();});});
     }
+    /** Checks redirected yaw and externally disabled AI each fail closed and release the production flight resources. */
     private void redirectedYaw() {
         redirectYaw=true;dragons.spawn(DevelopmentDragonService.SpawnMode.CALIBRATION, DragonFlight.Mode.ORBIT);UUID id=dragons.view().orElseThrow().entityId();
         c.later(15,()->{redirectYaw=false;
@@ -75,6 +90,7 @@ public final class DragonFlightScenario implements Scenario, Listener {
             });});
         });
     }
+    /** Applies only the active fixture cancellation/yaw-redirection control to native dragon teleport events. */
     @EventHandler public void teleport(EntityTeleportEvent event){
         if(!(event.getEntity() instanceof EnderDragon))return;
         if(cancel)event.setCancelled(true);

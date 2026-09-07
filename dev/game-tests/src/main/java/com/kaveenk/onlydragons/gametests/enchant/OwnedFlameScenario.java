@@ -18,13 +18,24 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-/** Real native releases/shortbow inputs and physical hits into the stock production combat authority. */
+/**
+ * Real physical inputs into stock combat with independently checked owned FIRE accounting.
+ * It separates captured Flame source, owner vulnerability, native fire suppression,
+ * proc recursion/expiry and terminal cleanup. Two real actors establish ownership
+ * isolation; explicit gear/position/death/pause setup is not relabeled as input.
+ * No reward is granted, including after a FIRE-only native dragon lethal.
+ */
 public final class OwnedFlameScenario implements Scenario,Listener {
     ScenarioContext c;PlayerFixture players;DamageObservationProbe probe;TargetBackend backend;UUID generation;
     final ItemRegistry catalog=CalibrationLoadouts.compatibleRegistry();final WeaponItemCodec codec=new WeaponItemCodec(catalog);
     final List<SettledHit> settled=new ArrayList<>();final Set<UUID> collisions=new HashSet<>();
     final List<Map<String,Object>> evidence=new ArrayList<>();int releases,inputs,fireDeaths,fireXp;UUID lethalEntity;boolean veto,hold;
     final List<Arrow> held=new ArrayList<>();final List<Vector> velocities=new ArrayList<>();
+    /**
+     * Owns the settled subscription/backend cleanup and admits the exact two-actor plan.
+     * @param context server-thread report/resource owner
+     * @throws Exception if actor-plan admission fails
+     */
     public void start(ScenarioContext context) throws Exception {
         c=context;c.mechanicRevision("owned-flame-v1");players=new PlayerFixture(c);probe=new DamageObservationProbe(c);c.listen(this);
         var observer=c.production().combat().observeSettled(settled::add);c.cleanup("flame-observer",observer::close);
@@ -32,6 +43,10 @@ public final class OwnedFlameScenario implements Scenario,Listener {
         players.await("two flame actors",300,players::allOnline,this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY "+c.harness().runId());
     }
+    /**
+     * Proves a real captured Flame arrow survives a slot swap and retains its source through three burn ticks.
+     * The stock Quiver random decision is observed, then independently matched to actual ammo.
+     */
     void setup() {
         var world=players.player("alpha").getWorld();for(int x=-3;x<=3;x++)for(int z=-3;z<=3;z++)c.tickChunk(world.getChunkAt(x,z));
         for(String actor:List.of("alpha","beta")) {
@@ -73,6 +88,9 @@ public final class OwnedFlameScenario implements Scenario,Listener {
             }));
         });
     }
+    /**
+     * Checks stronger-source retention/replacement while preserving original burn cadence and updated expiry.
+     */
     void refresh() {
         reset();open(true,100000,CombatProfile.calibration(),()->{
             equip("alpha",true,Map.of("flame",2),0,0);click("refresh-start",()->{
@@ -91,6 +109,9 @@ public final class OwnedFlameScenario implements Scenario,Listener {
             });
         });
     }
+    /**
+     * Checks strongest active Duplex vulnerability, two source owners, isolated arena exit and exclusive expiry.
+     */
     void owners() {
         reset();open(true,100000,CombatProfile.calibration(),()->{
             equip("beta",false,Map.of("duplex",5),0,0);shoot("beta","vulnerability-high",2,()->{
@@ -136,6 +157,9 @@ public final class OwnedFlameScenario implements Scenario,Listener {
             });
         });
     }
+    /**
+     * Compares managed native-fire suppression with a genuinely burning unmanaged cow, then a vetoed physical trial.
+     */
     void nativeControl() {
         reset();open(false,1000,CombatProfile.calibration(),()->{
             var unmanaged=c.own(players.player("alpha").getWorld().spawn(new Location(players.player("alpha").getWorld(),8,100,0),Cow.class));
@@ -150,6 +174,9 @@ public final class OwnedFlameScenario implements Scenario,Listener {
             });
         });
     }
+    /**
+     * Requires FIRE to use the parent's capped credit basis once with full requested FIRE HP.
+     */
     void capped() {
         reset();open(true,1000,CombatProfile.dragonExperiment(new MechanicRevision("flame-cap","v1"),0),()->{
             equip("alpha",false,Map.of("flame",2),23900,0);shoot("alpha","cap",1,()->awaitBurns(0,()->{
@@ -159,6 +186,9 @@ public final class OwnedFlameScenario implements Scenario,Listener {
             }));
         });
     }
+    /**
+     * Checks FIRE never recursively emits Ferocity or refreshes Tempo beyond its original eligible expiry.
+     */
     void tempo() {
         reset();open(true,10000,CombatProfile.calibration(),()->{
             equip("alpha",false,Map.of("flame",2,"fatal_tempo",5),0,100);shoot("alpha","tempo",1,()->awaitBurns(0,()->{
@@ -172,6 +202,9 @@ public final class OwnedFlameScenario implements Scenario,Listener {
             }));
         });
     }
+    /**
+     * Requires clipped lethal HP, full FIRE credit, eventual real dragon removal and zero native rewards.
+     */
     void lethal() {
         reset();open(true,105,CombatProfile.calibration(),()->{
             lethalEntity=backend.entity().getUniqueId();equip("alpha",false,Map.of("flame",2),0,0);shoot("alpha","lethal",1,()->{
@@ -186,6 +219,9 @@ public final class OwnedFlameScenario implements Scenario,Listener {
             });
         });
     }
+    /**
+     * Checks owner quit, accepted old-session physical credit without new burn, and reset of live effects.
+     */
     void lifecycle() {
         reset();players.setupPosition("beta",new Location(players.player("beta").getWorld(),10,100,-12));
         open(true,10000,CombatProfile.calibration(),()->{
@@ -213,6 +249,9 @@ public final class OwnedFlameScenario implements Scenario,Listener {
             });
         });
     }
+    /**
+     * Creates live effects before API death/packet respawn and service close, preventing vacuous cleanup passes.
+     */
     void deathAndDisable() {
         open(true,10000,CombatProfile.calibration(),()->{
             equip("alpha",true,Map.of("flame",2,"duplex",5),0,0);click("death-burn",2,()->{
@@ -234,55 +273,133 @@ public final class OwnedFlameScenario implements Scenario,Listener {
             });
         });
     }
+    /**
+     * Stages a validated current-catalog bow and replaces explicit production damage/Ferocity bonuses.
+     */
     void equip(String actor,boolean shortbow,Map<String,Integer> enchants,double damage,double ferocity) {
         players.setupItem(actor,0,codec.encode(catalog.edit(catalog.create(shortbow?"shortbow_v4":"ordinary_v4"),enchants,List.of())));
         c.production().equipment().bonus(players.player(actor),StatKey.WEAPON_DAMAGE,damage);c.production().equipment().bonus(players.player(actor),StatKey.FEROCITY,ferocity);
     }
+    /**
+     * Creates an actual backend/production encounter and waits for native part geometry before firing.
+     */
     void open(boolean dragon,double hp,CombatProfile profile,Runnable next) {
         var location=new Location(players.player("alpha").getWorld(),0,100,0);
         backend=dragon?new DragonBackend(location,c.production().bows().continuity().tickets(),r->{},b->{}):new DummyBackend(location);probe.watch(backend.entity());
         generation=c.production().combat().open(players.identity("alpha"),backend,org.bukkit.util.BoundingBox.of(location,24,24,24),hp,0,"test",profile,Optional.empty(),()->.99);
         players.await("flame geometry",100,()->!(backend.entity() instanceof EnderDragon d)||d.getParts().stream().allMatch(p->p.getLocation().getY()>75),next::run);
     }
+    /**
+     * Ends the owner generation and closes its backend before the next independent trial.
+     */
     void reset(){c.production().combat().reset(players.identity("alpha"));if(backend!=null)backend.close();}
+    /**
+     * Reads the exact fixture generation from the production service.
+     */
     ManagedCombatService.View view(){return c.production().combat().view(generation).orElseThrow();}
+    /**
+     * Selects physical and Duplex ledger rows, excluding proc and FIRE children.
+     */
     List<DamageResult> physical(){return view().impacts().stream().filter(r->r.kind()==DamageResult.Kind.PHYSICAL||r.kind()==DamageResult.Kind.DUPLEX).toList();}
+    /**
+     * Selects committed FIRE rows without inferring them from native burn visuals.
+     */
     List<DamageResult> fire(){return view().impacts().stream().filter(r->r.kind()==DamageResult.Kind.FIRE).toList();}
+    /**
+     * Waits with a bounded tick budget for the declared number of active owned burns.
+     */
     void awaitBurns(int count,Runnable next){players.await("owned fire expiry",120,()->c.production().combat().fireMetrics(generation).burns()==count,next::run);}
+    /**
+     * Checks independent domain HP/owner-credit totals and the pinned float native-health projection.
+     */
     void accounting(String id,double hp,Map<String,Double> credits) {
         c.check(id+"_exact_accounting",true,near(view().target().maxHealth()-view().target().currentHealth(),hp)&&credits.entrySet().stream().allMatch(e->near(view().contributions().get(players.identity(e.getKey())).contributionDamage(),e.getValue())));
         c.check(id+"_native_projection",(double)(float)((backend.airborne()?200:20)*view().target().currentHealth()/view().target().maxHealth()),backend.entity().getHealth());
     }
+    /**
+     * Retains generation and immutable ledger diagnostics for later raw review.
+     */
     void capture(String id){evidence.add(Map.of("id",id,"generation",generation.toString(),"health",view().target().currentHealth(),"impacts",view().impacts().toString(),"contributions",view().contributions().toString()));}
+    /**
+     * Positions setup against measured real target geometry with actor offsets; it does not redirect arrows.
+     */
     void aim(String actor) {
         var p=players.player(actor);var entity=backend.entity();var box=entity instanceof EnderDragon d?d.getParts().stream().max(Comparator.comparingDouble(part->part.getBoundingBox().getVolume())).orElseThrow().getBoundingBox():entity.getBoundingBox();
         var origin=box.getCenter().add(new Vector(backend.airborne()?(actor.equals("alpha")?-1:1):0,0,-12));players.setupPosition(actor,new Location(p.getWorld(),origin.getX(),origin.getY()-p.getEyeHeight(),origin.getZ(),0,0));p.setVelocity(new Vector());
     }
+    /**
+     * Requires the exact number of native physical settlements and matching collision/removal identities.
+     */
     void shoot(String actor,String step,int count,Runnable next) {
         int before=settled.size();draw(actor,step,()->players.await("physical flame "+step,100,()->settled.size()>=before+count,()->{
             var hits=settled.subList(before,settled.size());c.check(step+"_real_physical_collision",true,hits.size()==count&&hits.stream().allMatch(h->(veto?!h.accepted():h.accepted())&&collisions.contains(h.projectile().shot().projectileId())&&Bukkit.getEntity(h.projectile().shot().projectileId())==null));next.run();
         }));
     }
+    /**
+     * Requests use/release only after actual hand raise and a full native draw interval.
+     */
     void draw(String actor,String step,Runnable next) {
         aim(actor);int before=releases;var p=players.player(actor);players.request(actor,step+"-use");players.await("flame hand raised "+step,80,p::isHandRaised,()->c.later(22,()->{
             players.request(actor,step+"-release");players.await("flame release "+step,80,()->releases>before,next::run);
         }));
     }
+    /**
+     * Counts real arrows remaining in alpha's inventory, independent of ammo trace text.
+     */
     int ammo(){return players.player("alpha").getInventory().all(Material.ARROW).values().stream().mapToInt(ItemStack::getAmount).sum();}
+    /**
+     * Proves burns and any required vulnerability exist immediately before the cleanup boundary.
+     */
     void liveEffects(String phase,boolean vulnerability){var m=c.production().combat().fireMetrics(generation);c.check(phase+"_live_effect_precondition",true,m.burns()==1&&(!vulnerability||m.vulnerabilities()==1));}
+    /**
+     * Runs the legacy shortbow input expecting one accepted physical settlement.
+     */
     void click(String step,Runnable next) {click(step,1,next);}
+    /**
+     * Requires both actual shortbow input and the exact declared number of accepted physical contacts.
+     */
     void click(String step,int count,Runnable next) {
         aim("alpha");int before=settled.size(),input=inputs;players.request("alpha",step);
         players.await("short flame input and collision "+step,100,()->inputs>input&&settled.size()>=before+count,()->{
             c.check(step+"_real_physical_collision",true,settled.size()==before+count&&settled.subList(before,settled.size()).stream().allMatch(h->h.accepted()&&collisions.contains(h.projectile().shot().projectileId())));next.run();
         });
     }
+    /**
+     * Observes the exact FIRE-lethal native UUID and requires empty drops/XP at death dispatch.
+     * @param e native entity death event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void died(EntityDeathEvent e){if(e.getEntity().getUniqueId().equals(lethalEntity)){fireDeaths++;c.check("fire_native_death_rewards_empty",true,e.getDroppedExp()==0&&e.getDrops().isEmpty());}}
+    /**
+     * Counts spawned XP only when Paper attributes its source to the FIRE-lethal entity.
+     * @param e native entity spawn event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void reward(EntitySpawnEvent e){if(e.getEntity() instanceof ExperienceOrb orb&&lethalEntity!=null&&lethalEntity.equals(orb.getSourceEntityId()))fireXp+=orb.getExperience();}
+    /**
+     * Treats the server tick counter as unsigned for expiry arithmetic.
+     */
     static long now(){return Integer.toUnsignedLong(Bukkit.getCurrentTick());}
+    /**
+     * Uses the explicit absolute tolerance for independent expected and observed amounts.
+     */
     static boolean near(double a,double b){return Math.abs(a-b)<1e-7;}
+    /**
+     * Counts native player bow releases for input-stage progression.
+     * @param e native release event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void release(EntityShootBowEvent e){if(e.getEntity() instanceof Player)releases++;}
+    /**
+     * Counts actual left-click events used by the legacy shortbow steps.
+     * @param e native interaction event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void input(PlayerInteractEvent e){if(e.getAction().isLeftClick())inputs++;}
+    /**
+     * Pauses only the explicit swap/session trial's real arrows, retaining velocities for native resumption.
+     * @param e native launch event
+     */
     @EventHandler(priority=EventPriority.MONITOR)public void launch(ProjectileLaunchEvent e){if(hold&&e.getEntity() instanceof Arrow arrow){held.add(arrow);velocities.add(arrow.getVelocity().clone());arrow.setGravity(false);arrow.setVelocity(new Vector());}}
+    /**
+     * Records target/part contacts and applies only the declared physical-veto control.
+     * @param e native hit event
+     */
     @EventHandler(priority=EventPriority.HIGHEST)public void hit(ProjectileHitEvent e){Entity parent=e.getHitEntity() instanceof EnderDragonPart part?part.getParent():e.getHitEntity();if(parent!=null&&backend!=null&&parent.getUniqueId().equals(backend.entity().getUniqueId())){collisions.add(e.getEntity().getUniqueId());if(veto)e.setCancelled(true);}}
 }

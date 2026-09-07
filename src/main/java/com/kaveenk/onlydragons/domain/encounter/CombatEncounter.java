@@ -19,29 +19,91 @@ import static com.kaveenk.onlydragons.domain.combat.DamageResult.RejectionReason
  * The adapter settles physical validity/cancellation before calling physical; this service
  * cannot prove collision or suppress native damage. End on reset/shutdown and discard the
  * instance; use a fresh encounter UUID next time. Only immutable snapshots cross threads.
+ * <p>
+ * All instance APIs enforce creating-thread ownership with IllegalStateException. Accepted
+ * records, claims and stamps are retained for the entire generation; recentImpacts is only
+ * a projection, not pruning. Numeric/provenance validation precedes each atomic commit.
+ * @see com.kaveenk.onlydragons.application.proc.ProcCoordinator
+ * @see com.kaveenk.onlydragons.application.fire.OwnedFireCoordinator
  */
 public final class CombatEncounter {
+    /**
+     * Creating thread shared with the proc coordinator; Paper constructs on its server thread.
+     */
     private final Thread ownerThread = Thread.currentThread();
     private final CombatProfile profile;
     private final String variantId;
+    /**
+     * Optional full immutable content provenance, retained even when catalog labels are later reused.
+     */
     private final Optional<com.kaveenk.onlydragons.domain.encounter.definition.DragonCatalog.Selection> selection;
+    /**
+     * Encounter-global successful-commit sequence; accepted zeros also consume an ordinal.
+     */
     private long acceptedOrdinal;
+    /**
+     * Last accepted receiver tick, initially −1; rejects backdated successful commits.
+     */
     private long lastCommitTick = -1;
+    /**
+     * Accepted impact ID to immutable tick/ordinal, retained until the encounter is discarded.
+     */
     private final Map<UUID, EncounterResult.CommitStamp> stamps = new LinkedHashMap<>();
     private final DamageCalculator calculator = new DamageCalculator();
+    /**
+     * Captured Flame levels for accepted physical sources, used to reject forged fire commands.
+     */
     private final Map<UUID, Integer> flameLevels = new LinkedHashMap<>();
+    /**
+     * Full pre-hit HP policy bound to each accepted physical parent; never recomputed at drain.
+     */
     private final Map<UUID, ProcHealthSnapshot> procPolicies = new LinkedHashMap<>();
+    /**
+     * Authoritative accepted results in commit order; also validates virtual parent equality and IDs.
+     */
     private final Map<UUID, DamageResult> accepted = new LinkedHashMap<>();
+    /**
+     * Generation-local physical-key deduplication; unsuccessful candidates never reserve a key.
+     */
     private final Map<PhysicalImpact.Key, UUID> physicalClaims = new LinkedHashMap<>();
+    /**
+     * Cumulative full-precision HP/credit and provenance by owner UUID, independent of login.
+     */
     private final Map<UUID, EncounterResult.Contribution> contributions = new TreeMap<>();
+    /**
+     * Current immutable domain HP projection replaced at each commit.
+     */
     private TargetState target;
+    /**
+     * Null before a lethal commit; thereafter the single retained immutable completion.
+     */
     private EncounterResult completion;
+    /**
+     * Terminal admission flag; setting it neither clears diagnostic state nor mints a defeat.
+     */
     private boolean ended;
 
+    /**
+     * Creates a full-health generation without catalog provenance. Null inputs, blank variant or
+     * a target that is not at full positive HP reject; retain this instance only for this generation.
+     * @param target nonnull full-positive-health initial target and generation
+     * @param variantId nonblank variant identity retained in completion
+     * @param profile nonnull immutable encounter damage policy
+     * @throws NullPointerException if a required input is null
+     * @throws IllegalArgumentException if the variant is blank or the target is not at full positive HP
+     */
     public CombatEncounter(TargetState target, String variantId, CombatProfile profile) {
         this(target, variantId, profile, Optional.empty());
     }
 
+    /**
+     * Creates a generation on the calling thread. Optional full catalog selection must match
+     * variant ID, complete combat profile, maximum HP and defense exactly. No native entity is spawned.
+     * @param target nonnull initial full positive domain HP
+     * @param variantId nonblank type identity
+     * @param profile nonnull immutable encounter policy
+     * @param selection nonnull optional retained full catalog content
+     */
     public CombatEncounter(TargetState target, String variantId, CombatProfile profile,
                            Optional<com.kaveenk.onlydragons.domain.encounter.definition.DragonCatalog.Selection> selection) {
         this.target = Objects.requireNonNull(target, "target");
@@ -58,26 +120,89 @@ public final class CombatEncounter {
         });
     }
 
+    /**
+     * Returns the current immutable domain HP value; a retained older value never follows later commits.
+     * @return current immutable HP/defense snapshot, which does not update previously retained values
+     */
     public TargetState target() { checkThread(); return target; }
+    /**
+     * Returns the frozen lethal completion, or empty before defeat and after nonlethal end.
+     * Ending a defeated encounter does not erase its existing completion.
+     * @return frozen lethal result, or empty before defeat or after a nonlethal end
+     */
     public Optional<EncounterResult> completion() { checkThread(); return Optional.ofNullable(completion); }
+    /**
+     * Returns an immutable copy of every accepted hit in commit order, including accepted zeros.
+     * @return immutable copy of all accepted hits in commit order, including accepted zeros
+     */
     public List<DamageResult> impacts() { checkThread(); return List.copyOf(accepted.values()); }
-    /** Bounded diagnostic projection; authoritative idempotency/accounting remains intact. */
+    /**
+     * Bounded diagnostic projection; authoritative idempotency/accounting remains intact.
+     * <p>
+     * Returns the newest limit accepted hits in their original commit order; zero returns empty.
+     * A negative limit rejects. This call does not remove claims, parent data or history.
+     * @param limit nonnegative maximum number of newest accepted hits; zero requests none
+     * @return immutable bounded tail in original commit order, without deleting authoritative history
+     * @throws IllegalArgumentException if limit is negative
+     */
     public List<DamageResult> recentImpacts(int limit) {
         checkThread(); if (limit < 0) throw new IllegalArgumentException("Negative impact limit");
         return accepted.values().stream().skip(Math.max(0, accepted.size() - limit)).toList();
     }
+    /**
+     * Returns an immutable full-precision totals snapshot; map iteration order is unspecified.
+     * @return immutable full-precision per-owner totals snapshot with unspecified map order
+     */
     public Map<UUID, EncounterResult.Contribution> contributions() { checkThread(); return Map.copyOf(contributions); }
+    /**
+     * Idempotently closes this generation to new accepted hits, preserving HP, claims and completion.
+     * No defeat is manufactured and no native resources are released; the adapter owns their cleanup.
+     */
     public void end() { checkThread(); ended = true; }
+    /**
+     * Returns the total successful commits, starting at zero and increasing for accepted zero damage too.
+     * @return number of successful commits, including accepted zero-damage hits
+     */
     public long acceptedOrdinal() { checkThread(); return acceptedOrdinal; }
+    /**
+     * Returns the accepted commit stamp for an impact ID, or empty for unknown/rejected IDs.
+     * No stamp is minted by inspection.
+     * @param impact accepted impact UUID to inspect
+     * @return existing commit stamp, or empty for unknown/rejected IDs
+     */
     public Optional<EncounterResult.CommitStamp> stamp(UUID impact) { checkThread(); return Optional.ofNullable(stamps.get(impact)); }
 
+    /**
+     * Convenience physical entry with no active pre-hit Tempo. Delegates all acceptance and commit
+     * checks to the overload with explicit state; it does not sample live buffs.
+     * @param shot immutable captured physical attack
+     * @param impact physical identity and adapter-observed commit request
+     * @param modifiers named additive and multiplicative attack contributions
+     * @param effectiveFerocity effective Ferocity used for this physical evaluation
+     * @param adapterRejection optional adapter veto, preserved as an explicit rejection
+     * @return accepted or rejected immutable result using an empty pre-hit Tempo state
+     */
     public DamageResult physical(ShotContext shot, PhysicalImpact impact, DamageModifiers modifiers,
                                  double effectiveFerocity, Optional<DamageResult.RejectionReason> adapterRejection) {
         return physical(shot, impact, modifiers, effectiveFerocity, adapterRejection,
                 new com.kaveenk.onlydragons.domain.enchant.TempoState(0, 0));
     }
 
-    /** Coordinator supplies the pre-hit shared state; commit binds it to this physical identity. */
+    /**
+     * Coordinator supplies the pre-hit shared state; commit binds it to this physical identity.
+     * <p>
+     * Commits one settled candidate after generation/target/owner/veto/duplicate checks. Same-tick
+     * candidates commit in caller order; the first lethal freezes completion. Malformed policy,
+     * expired active Tempo, backdated timing and arithmetic failure throw before ledger mutation.
+     * Rejected candidates return zero HP/credit without reserving the physical key.
+     * @param shot nonnull immutable launch inputs matching the encounter policy
+     * @param impact nonnull settled candidate with receiver tick and real collision position
+     * @param modifiers nonnull physical modifiers to apply once
+     * @param effectiveFerocity finite nonnegative pre-hit diagnostic Ferocity
+     * @param adapterRejection nonnull optional settled external rejection
+     * @param activeTempo nonnull already-expired-or-live pre-hit state from the coordinator
+     * @return immutable authoritative accepted or rejected result
+     */
     public DamageResult physical(ShotContext shot, PhysicalImpact impact, DamageModifiers modifiers,
                                  double effectiveFerocity, Optional<DamageResult.RejectionReason> adapterRejection,
                                  com.kaveenk.onlydragons.domain.enchant.TempoState activeTempo) {
@@ -113,7 +238,17 @@ public final class CombatEncounter {
         return result;
     }
 
-    /** T05 owns scheduling/counts. A child can only consume a matching accepted physical parent. */
+    /**
+     * T05 owns scheduling/counts. A child can only consume a matching accepted physical parent.
+     * <p>
+     * Checks the due tick and exact parent origin, owner, shot, crit, policy and mitigated basis.
+     * The captured HP snapshot must match the bound parent; legacy absent snapshots require FIXED.
+     * A virtual child cannot parent another child. Lifecycle/duplicate rejection returns zero credit;
+     * malformed or premature commands throw before mutation. Count authorization remains external.
+     * @param command nonnull admitted command
+     * @param tick nonnegative receiver tick at or after due time for a live accepted child
+     * @return immutable result; callers must not apply its damage again
+     */
     public DamageResult proc(ProcCommand command, long tick) {
         checkThread();
         DomainChecks.nonNegative(tick, "tick");
@@ -136,7 +271,17 @@ public final class CombatEncounter {
                 calculator.proc(parent, target, profile), procFraction(command, parent));
     }
 
-    /** Full HP/full credit, already-resolved physical credit basis; no mitigation or offensive reroll. */
+    /**
+     * Full HP/full credit, already-resolved physical credit basis; no mitigation or offensive reroll.
+     * <p>
+     * Verifies exact accepted source and its captured Flame level, then computes physical credit
+     * × Flame fraction × sampled vulnerability and applies one cap. This path never builds Tempo
+     * or recursively admits effects. Lifecycle/duplicate returns zero credit; mismatched or early
+     * commands throw. Scheduling/count admission belongs to the fire coordinator.
+     * @param command nonnull admitted due strike
+     * @param tick nonnegative evaluation game tick
+     * @return authoritative immutable strike result, with actual HP clipped independently of credit
+     */
     public DamageResult fire(FireCommand command, long tick) {
         checkThread();
         var source = command.source();
@@ -159,6 +304,13 @@ public final class CombatEncounter {
                 DamageResult.Kind.FIRE, tick, source.crit(), 0, calculation, 1);
     }
 
+    /**
+     * Returns the full immutable HP policy bound to an accepted physical parent. Unknown IDs
+     * throw IllegalArgumentException; consumers retain this exact value across later buff changes.
+     * @param parentImpactId UUID of an accepted physical parent
+     * @return the complete HP-policy snapshot frozen for that parent
+     * @throws IllegalArgumentException if no accepted physical-parent policy exists
+     */
     public ProcHealthSnapshot procHealthSnapshot(UUID parentImpactId) {
         checkThread();
         var policy = procPolicies.get(parentImpactId);
@@ -166,6 +318,10 @@ public final class CombatEncounter {
         return policy;
     }
 
+    /**
+     * Selects fixed legacy policy only when allowed, otherwise verifies the entire captured parent
+     * policy by equality before returning its HP fraction; does not read current live Tempo.
+     */
     private double procFraction(ProcCommand command, DamageResult parent) {
         if (command.healthSnapshot().isEmpty()) {
             if (profile.ferocityHealthPolicy() != CombatProfile.FerocityHealthPolicy.FIXED)
@@ -178,12 +334,23 @@ public final class CombatEncounter {
         return snapshot.healthFraction();
     }
 
-    /** Stable across duplicate delivery; part names and event source deliberately do not enter this key. */
+    /**
+     * Stable across duplicate delivery; part names and event source deliberately do not enter this key.
+     * <p>
+     * Derives a UTF-8 name UUID from encounter, projectile, target and impact ordinal. Pure and
+     * thread-independent; neither tick nor part label can turn duplicate delivery into a new hit.
+     * @param key encounter/projectile/target/ordinal physical identity
+     * @return deterministic name UUID independent of delivery tick and part display label
+     */
     public static UUID physicalId(PhysicalImpact.Key key) {
         String value = "physical:" + key.encounterId() + ":" + key.projectileId() + ":" + key.targetId() + ":" + key.impactOrdinal();
         return UUID.nameUUIDFromBytes(value.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Ordered rejection precedence: wrong encounter, wrong target, dead target, ended generation.
+     * Thus a matching dead target returns TARGET_DEAD even if the generation has also ended.
+     */
     private Optional<DamageResult.RejectionReason> boundary(PhysicalImpact.Key key) {
         if (!key.encounterId().equals(target.encounterId())) return Optional.of(WRONG_ENCOUNTER);
         if (!key.targetId().equals(target.targetId())) return Optional.of(INVALID_TARGET);
@@ -192,6 +359,12 @@ public final class CombatEncounter {
         return Optional.empty();
     }
 
+    /**
+     * Prepares validated result, totals, target and possible completion before publishing any field.
+     * Nondecreasing ticks and strictly increasing ordinals order accepted zeros and rounded-away
+     * additions too. Only a strict represented-credit increase changes the last-increase stamp;
+     * lethal credit is not clipped to remaining HP. No external callback runs inside this transaction.
+     */
     private DamageResult commit(UUID id, Optional<UUID> parent, PhysicalImpact.Key origin, UUID player, UUID shot,
                                 DamageResult.Kind kind, long tick, CritOutcome crit, double ferocity,
                                 DamageCalculator.Calculation calculation, double healthFraction) {
@@ -228,6 +401,9 @@ public final class CombatEncounter {
         return result;
     }
 
+    /**
+     * Builds a zero-amount diagnostic result without storing a claim, stamp, participant or history entry.
+     */
     private DamageResult rejected(UUID id, Optional<UUID> parent, PhysicalImpact.Key origin, UUID player, UUID shot,
                                   DamageResult.Kind kind, long tick, CritOutcome crit, double ferocity,
                                   DamageResult.RejectionReason reason) {
@@ -235,6 +411,9 @@ public final class CombatEncounter {
                 new DamageResult.Amounts(0, 0, 0, 0, 0, 0), crit, ferocity, Map.of(), Optional.of(reason));
     }
 
+    /**
+     * Rejects access from any thread other than the constructing thread; this is confinement, not locking.
+     */
     private void checkThread() {
         if (Thread.currentThread() != ownerThread) throw new IllegalStateException("Combat encounter accessed outside its owner thread");
     }

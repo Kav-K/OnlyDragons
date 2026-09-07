@@ -1,4 +1,42 @@
 function Prepare-LabServer {
+    <#
+    .SYNOPSIS
+    Builds and stages one stopped, version-isolated human lab profile.
+    .DESCRIPTION
+    Selects separate build/runtime JDKs, runs the existing wrapper tasks unless skipped,
+    then validates plugin identity, Java/API compatibility and prior EULA acceptance.
+    Reuses the profile server pin unless explicitly updated; downloaded archives are
+    hash-checked before staging. Refuses unmanaged/modified plugin JARs, removes only
+    previously tracked stale plugin JARs, and preserves world/config data while enforcing
+    loopback, authenticated mode and disabled RCON/query in server.properties.
+    Writes pin/plugin/session metadata and returns a fresh run descriptor. Preparation
+    is not a transaction: later failures can leave already prepared files on disk.
+    It does not launch Paper or prove a plugin compatible merely by passing metadata checks.
+    .PARAMETER Directory
+    Stopped profile directory chosen by the validated version/profile path helper.
+    .PARAMETER Version
+    Explicit server version.
+    .PARAMETER PluginPath
+    Empty selects the build artifact manifest; otherwise a JAR or directory.
+    .PARAMETER DependencyPath
+    Optional additional dependency JARs.
+    .PARAMETER ServerJar
+    Optional custom server JAR whose actual hash is pinned.
+    .PARAMETER JavaVersion
+    Runtime major override; zero chooses the lab version mapping.
+    .PARAMETER Port
+    Loopback game port written to server.properties.
+    .PARAMETER DebugPort
+    Loopback JDWP port when requested.
+    .PARAMETER MemoryMb
+    Maximum heap in MiB; caller validates its bound.
+    .PARAMETER DebugServer
+    Add loopback debugger arguments.
+    .PARAMETER SkipBuild
+    Reuse existing build outputs while retaining staging checks.
+    .PARAMETER UpdateServer
+    Allow replacement of an existing server pin with an explicitly resolved selection.
+    #>
     param($Directory, [string]$Version, [string]$PluginPath, [string]$DependencyPath,
           [string]$ServerJar, [int]$JavaVersion, [int]$Port, [int]$DebugPort,
           [int]$MemoryMb, [switch]$DebugServer, [switch]$SkipBuild, [switch]$UpdateServer)
@@ -104,6 +142,18 @@ function Prepare-LabServer {
     return $session
 }
 
+<#
+.SYNOPSIS
+Starts a detached profile worker and waits for readiness of its exact run.
+.DESCRIPTION
+Probes game/debug ports, clears only stale command files in the stopped profile, then starts hidden Windows PowerShell. Ignores state from another run ID. On timeout it attempts graceful profile cleanup before failing; readiness proves startup only, not plugin/gameplay acceptance.
+.PARAMETER Directory
+Prepared stopped profile with commands and session metadata.
+.PARAMETER Session
+Fresh descriptor returned by preparation, including run ID and ports.
+.PARAMETER Timeout
+Maximum startup wait seconds.
+#>
 function Start-LabServer($Directory, $Session, [int]$Timeout) {
     Assert-LabPort $Session.port
     if ($Session.debugPort) { Assert-LabPort $Session.debugPort }

@@ -13,7 +13,14 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-/** Real connected commands and native bow arrows into the production dragon and shared accounting. */
+/**
+ * Exercises managed dragon commands, native physical/proc defeat and terminal cleanup.
+ * The protocol actor supplies real releases; permissions, equipment, bonuses, held
+ * arrows, vetoes and native-damage/reward sentinels are explicit fixture interventions.
+ * Independent event journals distinguish frozen accounting from native death,
+ * animation, removal and suppressed loot. Failure/reentry controls must not publish
+ * an ordinary completion. Context owns callbacks/listeners and production reset cleanup.
+ */
 public final class DragonCombatScenario implements Scenario, Listener {
     ScenarioContext c; PlayerFixture players; DevelopmentDragonService dragons; DamageObservationProbe probe;
     double unrelatedHealth; org.bukkit.entity.Cow unrelated; EnderDragon dragon, control; UUID generation; int commands, releases, deaths, animationStart=-1, removedAt=-1, xp, items, controlXp;
@@ -22,6 +29,11 @@ public final class DragonCombatScenario implements Scenario, Listener {
     final java.util.function.Consumer<DevelopmentDragonService.Completion> repeatedConsumer=event->{};
     final List<SettledHit> settled=new ArrayList<>();
     final Map<UUID,Integer> hits=new LinkedHashMap<>(); final List<Map<String,Object>> rewards=new ArrayList<>();
+    /**
+     * Registers settled-hit reentry observation and cleanup before awaiting the actor.
+     * @param context run-owned server-thread checks, fixtures and cleanup
+     * @throws Exception if initialization cannot establish the declared player fixture
+     */
     public void start(ScenarioContext context)throws Exception {
         c=context;c.mechanicRevision("dragon-combat-v1");dragons=c.production().dragons();players=new PlayerFixture(c);probe=new DamageObservationProbe(c);c.listen(this);
         var observation=c.production().combat().observeSettled(hit->{
@@ -31,6 +43,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
         c.cleanup("managed-dragon",()->{ if(dragons.generation().isPresent()&&c.production().combat().ownsEntity(dragons.view().orElseThrow().entityId()))dragons.reset(dragons.generation().orElseThrow());observation.close(); });
         players.await("dragon actor",300,players::allOnline,this::setup);c.harness().getLogger().info("OD_PLAYER_READY "+c.harness().runId());
     }
+    /** Creates an unrelated native sentinel and checks connected setup/spawn, veto, suppression, stale tokens and active-arena rejection. */
     void setup(){
         var p=players.player("alpha");c.check("native_mob_drops_enabled",true,Boolean.TRUE.equals(p.getWorld().getGameRuleValue(GameRules.MOB_DROPS)));p.setGameMode(GameMode.SURVIVAL);p.setAllowFlight(true);p.setFlying(true);p.setInvulnerable(true);
         p.getInventory().clear();p.getInventory().setHeldItemSlot(0);p.setTotalExperience(0);p.setLevel(0);p.setExp(0);
@@ -54,6 +67,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
             })));
         }));
     }
+    /** Accumulates fixed physical hits, then releases two fixture-held arrows together while leaving a third pending across lethal cleanup. */
     void killShot(int index){
         if(index==7){
             hold=true;draw("late",()->draw("hit7",()->draw("hit8",()->{
@@ -68,6 +82,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
         }
         draw("hit"+index,()->awaitSettled(3+index,()->killShot(index+1)));
     }
+    /** Checks frozen result/subscriber behavior separately from native death animation, delayed reward suppression and ticket retirement. */
     void terminal(){
         var v=view();var result=v.completion().orElseThrow();
         c.check("settled_close_rejected_without_poisoning",true,settledCloseRejected);
@@ -91,6 +106,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
             });
         });
     }
+    /** Kills an unmanaged native dragon to prove the XP observer works, then checks reset and repeated reset never fabricate a result. */
     void positiveControl(){
         var w=players.player("alpha").getWorld();control=c.own(w.spawn(new Location(w,35,100,0),EnderDragon.class));control.setPersistent(false);control.setPhase(EnderDragon.Phase.HOVER);control.setHealth(0);
         players.await("native unmanaged XP positive control",400,()->controlXp>0,()->{
@@ -104,6 +120,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
             });
         });
     }
+    /** Repeats the explicit cancelled-spawn control and checks combat/ticket capacity returns to baseline on every attempt. */
     void failedSpawn(int index){
         if(index==3){procTrial();return;}
         failSpawn=true;command("failed"+index,()->{
@@ -111,6 +128,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
             failedSpawn(index+1);
         });
     }
+    /** Uses trusted Ferocity plus a labelled damage bonus for proc-lethal credit/HP and reset-during-animation preservation. */
     void procTrial(){command("proc-spawn",()->{
         capture();loadout="ferocity_100";bonus=500;
         draw("proc",()->players.await("proc lethal",100,()->view().completion().isPresent(),()->{
@@ -123,6 +141,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
             });
         }));
     });}
+    /** Cancels native lethal death, proving the frozen diagnostic cannot become an ordinary notification even after administrative follow-up. */
     void cancelledTrial(){command("cancel-spawn",()->{
         capture();cancelDeath=true;loadout="ordinary";bonus=900;
         draw("cancel",()->players.await("cancelled native lethal",100,()->view().completion().isPresent(),()->{
@@ -139,6 +158,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
             });
         }));
     });}
+    /** Removes the native dragon from an arrow-retirement callback to test nonordinary removal before completion delivery. */
     void removalTrial(){command("removal-spawn",()->{
         capture();held.clear();velocities.clear();hold=true;bonus=900;
         draw("removal-held",()->{
@@ -150,8 +170,11 @@ public final class DragonCombatScenario implements Scenario, Listener {
             }));
         });
     });}
+    /** Checks unrelated-entity/subscription preservation, records native journals and waits for the actual final quit. */
     void finish(){c.check("unrelated_entity_preserved",true,unrelated.isValid()&&unrelated.getHealth()==unrelatedHealth);c.check("subscriptions_return_to_baseline",0,dragons.subscriberCount());c.observe("rewardEvents",rewards);c.observe("physicalHits",hits.entrySet().stream().map(e->Map.of("uuid",e.getKey().toString(),"tick",e.getValue())).toList());c.observe("playerActions",players.journal());players.request("alpha","quit");players.await("actual quit",100,()->players.quits("alpha")==1,c::finish);}
+    /** Reads the retained combat view for this exact captured generation, including after native retirement. */
     ManagedCombatService.View view(){return c.production().combat().view(generation).orElseThrow();}
+    /** Captures native identity and registers deliberate throwing/reentrant subscribers, including stale/equal-handle isolation controls. */
     void capture(){generation=dragons.generation().orElseThrow();dragon=(EnderDragon)Bukkit.getEntity(view().entityId());probe.watch(dragon);
         if(oldHandle==null)oldHandle=dragons.subscribe(generation,repeatedConsumer);
         else if(!handlesChecked){
@@ -166,6 +189,7 @@ public final class DragonCombatScenario implements Scenario, Listener {
             try{dragons.close();}catch(IllegalStateException expected){reentryRejected=true;}
         });
     }
+    /** Aims from the largest current native part, sets labelled loadout/ammo/bonus, then anchors a real release to observed raised-hand state. */
     void draw(String step,Runnable next){
         var p=players.player("alpha");var box=dragon.getParts().stream().max(Comparator.comparingDouble(part->part.getBoundingBox().getVolume())).orElseThrow().getBoundingBox();
         var aim=box.getCenter();var origin=aim.clone().add(new Vector(0,0,-12));
@@ -174,20 +198,33 @@ public final class DragonCombatScenario implements Scenario, Listener {
         c.production().equipment().bonus(p,com.kaveenk.onlydragons.domain.stats.StatKey.WEAPON_DAMAGE,bonus);
         int before=releases;players.request("alpha",step+"-use");players.await("draw "+step,60,p::isHandRaised,()->c.later(22,()->{players.request("alpha",step+"-release");players.await("release "+step,60,()->releases>before,next::run);}));
     }
+    /** Waits for receiver notifications and one additional tick before evaluating the next boundary. */
     void awaitSettled(int count,Runnable next){players.await("settled "+count,100,()->settled.size()>=count,()->c.later(1,next::run));}
+    /** Requests a declared protocol command and waits beyond its native preprocess event before checking results. */
     void command(String step,Runnable next){int before=commands;players.request("alpha",step);players.await("command "+step,80,()->commands>before,()->c.later(2,next::run));}
+    /** Counts native command preprocess events used to sequence the fixture. */
     @EventHandler(priority=EventPriority.MONITOR)public void command(PlayerCommandPreprocessEvent e){commands++;}
+    /** Counts real player bow-release events rather than queued client requests. */
     @EventHandler(priority=EventPriority.MONITOR)public void release(EntityShootBowEvent e){if(e.getEntity()instanceof Player)releases++;}
+    /** Cancels native dragon creation only during the explicit failed-spawn trials. */
     @EventHandler(priority=EventPriority.HIGHEST)public void spawn(CreatureSpawnEvent e){if(failSpawn&&e.getEntity()instanceof EnderDragon)e.setCancelled(true);}
+    /** Applies the labelled cancellation only to this generation's native dragon death. */
     @EventHandler(priority=EventPriority.HIGHEST)public void cancelDeath(EntityDeathEvent e){if(cancelDeath&&dragon!=null&&e.getEntity().getUniqueId().equals(dragon.getUniqueId()))e.setCancelled(true);}
+    /** Optionally restores native-damage pressure or holds real arrows with saved velocities to isolate terminal ordering. */
     @EventHandler(priority=EventPriority.MONITOR)public void launch(ProjectileLaunchEvent e){if(e.getEntity()instanceof Arrow arrow){
         if(nativeGuard)c.later(1,()->{if(arrow.isValid())arrow.setDamage(2);});
         if(hold){held.add(arrow);velocities.add(arrow.getVelocity().clone());arrow.setGravity(false);arrow.setVelocity(new Vector());}
     }}
+    /** Normalizes part hits to the parent, records physical collision ticks and applies the selected veto. */
     @EventHandler(priority=EventPriority.HIGHEST)public void hit(ProjectileHitEvent e){Entity parent=e.getHitEntity()instanceof EnderDragonPart part?part.getParent():e.getHitEntity();if(parent!=null&&dragon!=null&&parent.getUniqueId().equals(dragon.getUniqueId())){hits.put(e.getEntity().getUniqueId(),Bukkit.getCurrentTick());if(veto)e.setCancelled(true);}}
+    /** Injects a diamond drop before production death handling so suppression is tested against positive loot pressure. */
     @EventHandler(priority=EventPriority.LOWEST)public void sentinel(EntityDeathEvent e){if(dragon!=null&&e.getEntity().getUniqueId().equals(dragon.getUniqueId())&&sentinel)e.getDrops().add(new ItemStack(Material.DIAMOND));}
+    /** Checks the first native death has a frozen domain completion and cleared drops/XP after production handling. */
     @EventHandler(priority=EventPriority.MONITOR)public void death(EntityDeathEvent e){if(dragon!=null&&e.getEntity().getUniqueId().equals(dragon.getUniqueId())){deaths++;if(deaths==1)c.check("native_death_rewards_cleared",true,e.getDrops().isEmpty()&&e.getDroppedExp()==0&&!e.isCancelled()&&view().completion().isPresent());}}
+    /** Injects the retirement-removal race when selected and separately records actual native DEATH removal timing. */
     @EventHandler(priority=EventPriority.MONITOR)public void removed(EntityRemoveEvent e){if(removeOnRetirement&&held.stream().anyMatch(a->a.getUniqueId().equals(e.getEntity().getUniqueId())))dragon.remove();if(dragon!=null&&e.getEntity().getUniqueId().equals(dragon.getUniqueId())&&e.getCause()==EntityRemoveEvent.Cause.DEATH)removedAt=Bukkit.getCurrentTick();}
+    /** Attributes native XP by source UUID, retaining an unmanaged positive control and owning spawned orbs for cleanup. */
     @EventHandler(priority=EventPriority.MONITOR)public void xp(EntitySpawnEvent e){if(e.getEntity()instanceof ExperienceOrb orb){UUID source=orb.getSourceEntityId();rewards.add(Map.of("source",String.valueOf(source),"reason",orb.getSpawnReason().toString(),"value",orb.getExperience()));if(dragon!=null&&dragon.getUniqueId().equals(source))xp+=orb.getExperience();if(control!=null&&control.getUniqueId().equals(source))controlXp+=orb.getExperience();c.own(orb);}}
+    /** Counts the injected diamond sentinel and owns every observed item entity for cleanup. */
     @EventHandler(priority=EventPriority.MONITOR)public void item(ItemSpawnEvent e){if(e.getEntity().getItemStack().getType()==Material.DIAMOND)items++;c.own(e.getEntity());}
 }

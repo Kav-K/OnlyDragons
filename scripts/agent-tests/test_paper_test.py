@@ -17,7 +17,13 @@ spec.loader.exec_module(runner)
 
 
 class ReportContractTests(unittest.TestCase):
+    """Mutation tests for strict companion report identity, types, timing and assertion truth.
+
+    Each test starts with a synthetic schema-valid report and changes one boundary.
+    These files exercise the validator; their passed flags are not Paper observations.
+    """
     def setUp(self):
+        """Create a disposable report path and internally consistent synthetic epoch window."""
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.path = Path(self.temp.name) / 'report.json'
@@ -32,9 +38,11 @@ class ReportContractTests(unittest.TestCase):
                                       {'id': 'cleanup', 'expected': 0, 'observed': 0, 'passed': True}]}
 
     def write(self, report=None):
+        """Serialize the selected synthetic report so tests exercise the real file reader."""
         self.path.write_text(json.dumps(self.report if report is None else report))
 
     def validate(self):
+        """Validate the current file against the fixed invocation and injected wall clock."""
         return runner.validate_report(self.path, self.expected, self.now, self.now + 10000, self.now)
 
     def test_complete_actual_run_passes(self):
@@ -177,6 +185,12 @@ class ReportContractTests(unittest.TestCase):
 
 
 class LifecycleContractTests(unittest.TestCase):
+    """Exercise consent, lease, memory and owned-process failure boundaries without Minecraft.
+
+    Linux-specific tests use disposable Python children and real signals/locks; memory
+    probes are controlled where needed. Platform skips are explicit and cannot be
+    reported as Linux process-cleanup evidence on Windows.
+    """
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -364,6 +378,11 @@ finally:
 
 
 class BuildEvidenceTests(unittest.TestCase):
+    """Prove successful wrapper exits cannot hide invalid production/companion JUnit evidence.
+
+    Artifact bytes and XML are synthetic; subprocess execution is mocked. This isolates
+    the acceptance boundary rather than compiling or executing the plugin.
+    """
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -384,6 +403,7 @@ class BuildEvidenceTests(unittest.TestCase):
 
     @staticmethod
     def xml(count, failure=None):
+        """Construct reconciled testcase XML, optionally adding one named failure/error/skip."""
         counts = {'failures': 0, 'errors': 0, 'skipped': 0}
         if failure:
             counts[failure] = 1
@@ -394,6 +414,7 @@ class BuildEvidenceTests(unittest.TestCase):
 
     def build(self):
         # No JVM: emulate successful wrapper exits to exercise the evidence gate itself.
+        """Invoke the real build-evidence validator with wrapper processes replaced by zero exits."""
         with patch.object(runner.subprocess, 'run', return_value=Mock(returncode=0)):
             return runner.build_artifacts(self.project, self.project / 'java', self.reports)
 
@@ -418,6 +439,7 @@ class BuildEvidenceTests(unittest.TestCase):
 
 
 class PaperLogPolicyTests(unittest.TestCase):
+    """Require both console and file error formats to fail while ordinary information remains valid."""
     def test_console_and_file_error_formats_are_both_rejected(self):
         for line in ('[01:24:14 ERROR]: Failed to request yggdrasil public key',
                      '[01:24:14] [Server thread/ERROR]: Event registration failed',

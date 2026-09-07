@@ -1,3 +1,7 @@
+"""Mutation tests for packet-derived boss-bar lifecycle and styled chat replay.
+
+Synthetic histories establish validator sensitivity, not rendered client appearance.
+"""
 import copy
 import json
 import unittest
@@ -6,7 +10,13 @@ import bossbar_observation as ui
 from player_actions import ActionValidationError
 
 class BossBarReplayTests(unittest.TestCase):
+    """Require complete generation/viewer lifecycle coverage and reject hidden transient UI changes."""
     def fixture(self):
+        """Construct independent expected markers plus matching synthetic event/sample/chat histories.
+
+        Distinct generated UUIDs model encounter generations; health fractions and styled
+        titles are explicit test oracles rather than calls to production formatters.
+        """
         ids={g:str(uuid.uuid4()) for g in ('main','reset','ghost','standard','training')}
         markers=[('full',1000,'main'),('veto',1000,'main'),('damaged',900,'main'),('reconnected',900,'main'),('outside',900,'main'),('returned',900,'main'),('animation',0,'main'),('retired',0,''),('new-generation',1000,'reset'),('reset',0,''),('ghost-full',1000,'ghost'),('ghost-credit',900,'ghost'),('ghost-stable',900,'ghost'),('closed',0,'')]
         markers += [('standard-full',1000,'standard'),('standard-reset',0,''),('training-full',100000,'training'),('training-reset',0,'')]

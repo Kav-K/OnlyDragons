@@ -10,6 +10,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Preserved calibration-enchant tests using exact samples around fractional Ferocity thresholds,
+ * explicit tick expiry, continuous launch displacement and trusted Vicious projection. Deferred
+ * Gravity/Overload rejection is tested only for the legacy profile; a named custom policy is a
+ * fixture for the extension interface, not adopted gameplay balance.
+ */
 class EnchantRulesTest {
     @ParameterizedTest
     @CsvSource({"0,0,0", "25,0.249999,1", "25,0.25,0", "99,0.98,1", "99,0.99,0",
@@ -89,7 +95,9 @@ class EnchantRulesTest {
         assertThrows(IllegalStateException.class, () -> deferred.modifiers(shot("overload", 1), new Vector3(0, 0, 0), true));
         var explicit = new EnchantEffects(new EnchantEffects.GravityProfile("experimental-test-only", Map.of(1, .123), true),
                 new EnchantEffects.OverloadPolicy() {
+                    /** Gives the injected policy a fixture-only identity independent of production calibration. */
                     public String revision() { return "extension-test-only"; }
+                    /** Asserts access to uncapped chance and supplies a distinct factor as the extension oracle. */
                     public DamageModifiers modifiers(ShotContext shot, int level) {
                         assertEquals(175, shot.stats().raw(StatKey.CRIT_CHANCE));
                         return new DamageModifiers(Map.of(), Map.of("fixture", 1.25));
@@ -111,6 +119,10 @@ class EnchantRulesTest {
         assertThrows(ItemValidationException.class, () -> registry.edit(registry.create("ordinary"), Map.of("snipe", 5), List.of()));
     }
 
+    /**
+     * Builds one explicit enchant capture with raw CC 175. The Overload fixture carries a .99
+     * launch decision so deferred/custom effect tests reach the policy boundary, not DTO rejection.
+     */
     private static ShotContext shot(String enchant, int level) {
         var stats = new StatResolver(StatProfile.calibration()).resolve("v1", Map.of(StatKey.CRIT_CHANCE, 175.0), ModifierSources.empty()).snapshot();
         return new ShotContext(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), 0, Optional.empty(), UUID.randomUUID(),

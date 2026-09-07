@@ -18,7 +18,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-/** Native player releases and real entity motion. Fixture setup never teleports or replaces arrows. */
+/**
+ * Preserved continuity-v1 physics and chunk-ownership fixture with real player
+ * releases. Trials cover later target acquisition, all five original radii, target
+ * loss/reacquisition, obstruction, age renewal and motion after the player quits.
+ * Some trials deliberately move the native target or accelerate arrow age as
+ * labelled setup; they never teleport or replace arrows. Native velocity/part
+ * witnesses supplement service frames, without claiming human rendering or the
+ * later aimed-v3 policy.
+ */
 public final class TracerContinuityScenario implements Scenario, Listener {
     private ScenarioContext context;
     private PlayerFixture players;
@@ -39,6 +47,13 @@ public final class TracerContinuityScenario implements Scenario, Listener {
     private int nativeVelocitySamples;
     private final Set<UUID> nativeTurns = new HashSet<>();
     private final List<Map<String, Object>> nativeWitnesses = new ArrayList<>();
+    /**
+     * Observes deployed settlements and registers evidence/encounter cleanup before
+     * waiting for the actor. The fixture later explicitly closes the service to test
+     * terminal cleanup in this disposable boot.
+     * @param context report and server-thread resource owner
+     * @throws Exception if initial setup fails
+     */
     @Override public void start(ScenarioContext context) throws Exception {
         this.context = context; context.mechanicRevision("tracer-continuity-v1");
         bows = context.production().bows(); players = new PlayerFixture(context);
@@ -47,6 +62,11 @@ public final class TracerContinuityScenario implements Scenario, Listener {
         players.await("tracer actor", 300, players::allOnline, this::setup);
         context.harness().getLogger().info("OD_PLAYER_READY " + context.harness().runId());
     }
+    /**
+     * Creates a safe Creative actor and an arena with no eager chunk demand. The
+     * single production task and initially empty ticket broker are asserted before
+     * native shooting begins.
+     */
     private void setup() {
         world = players.player("alpha").getWorld();
         var p = players.player("alpha"); p.setGameMode(GameMode.CREATIVE); p.setAllowFlight(true); p.setFlying(true); p.setInvulnerable(true);
@@ -58,6 +78,13 @@ public final class TracerContinuityScenario implements Scenario, Listener {
         context.check("arena_reservation_does_not_load_all_chunks", 0, bows.continuity().tickets().ticketCount());
         sample(); prefire();
     }
+    /**
+     * Retains unique frame ticks and checks current native velocity against applied
+     * steering. Independent nearest-point geometry must show a real turn toward the
+     * matching live part, while accelerated lifetime renewal preserves launch age.
+     * The level trial's small target teleport is explicit motion setup after sampling;
+     * it is not evidence of the production ORBIT adapter.
+     */
     private void sample() {
         if (finished) return;
         for (var owned : bows.projectiles()) bows.continuity().frame(owned.shot().projectileId()).ifPresent(frame -> {
@@ -95,6 +122,12 @@ public final class TracerContinuityScenario implements Scenario, Listener {
         if (moveTarget && dragon != null && dragon.isValid()) dragon.teleport(dragon.getLocation().add(0.08, 0, 0));
         context.later(1, this::sample);
     }
+    /**
+     * Releases with no target and first proves real ballistic gravity/motion. A dragon
+     * is spawned later near that same arrow; physical settlement must retain the UUID
+     * and launch-before-spawn ordering. Setting lifetime to 1199 accelerates only the
+     * native age-renewal boundary, not launch age or velocity.
+     */
     private void prefire() {
         kit(5);
         draw("prefire", 22, () -> context.later(4, () -> {
@@ -120,6 +153,12 @@ public final class TracerContinuityScenario implements Scenario, Listener {
             });
         }));
     }
+    /**
+     * Runs each preserved v1 level against an explicitly moving native target. The
+     * literal two-block-per-level radius and six-degree/speed bounds are checked with
+     * native turning witnesses as well as captured enchant identity.
+     * @param level next enchant level from one through five; six advances the suite
+     */
     private void level(int level) {
         if (level == 6) { loss(); return; }
         spawnDragon(new Location(world, 0.5, 120, 20.5));
@@ -143,6 +182,11 @@ public final class TracerContinuityScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Unregisters and later re-registers the same real target while keeping the same
+     * arrow alive. It requires a previously observed lock, ballistic frames after
+     * loss and reacquisition only after registration is restored.
+     */
     private void loss() {
         kit(5); players.setupPosition("alpha", new Location(world, 0.5, 180, 0.5, 0, -5));
         draw("loss", 22, () -> {
@@ -165,12 +209,25 @@ public final class TracerContinuityScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Moves only the target to controlled current positions near a live arrow for
+     * the bounded loss/reacquisition trial.
+     * @param arrow original native projectile, never relocated by this helper
+     * @param remaining server ticks of target setup
+     * @param next continuation after the bounded sequence
+     * @throws IllegalStateException if the original arrow is removed early
+     */
     private void follow(Arrow arrow, int remaining, Runnable next) {
         if (remaining == 0) { next.run(); return; }
         if (!arrow.isValid()) throw new IllegalStateException("Follow trial arrow removed");
         dragon.teleport(arrow.getLocation().add(12, -1, 6));
         context.later(1, () -> follow(arrow, remaining - 1, next));
     }
+    /**
+     * Places reversible native blocks before firing and requires no acquisition plus
+     * an actual block collision and retirement. Removing the wall and spawning a later
+     * target must not rearm that retired arrow.
+     */
     private void wall() {
         players.setupPosition("alpha", new Location(world, 0.5, 120, 0.5, 0, 0)); kit(5);
         var blocks = new ArrayList<org.bukkit.block.BlockState>();
@@ -194,6 +251,13 @@ public final class TracerContinuityScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Reduces disposable-world simulation range, establishes a distant destination
+     * without player/ticket influence, then lets a real arrow cross chunks after quit.
+     * Observed native motion and load level must show broker demand promoting entity
+     * ticking. A separate retained demand proves one arrow's removal cannot release
+     * another owner's ticket share. World distances are restored by context cleanup.
+     */
     private void crossing() {
         int oldSimulation = world.getSimulationDistance(), oldView = world.getViewDistance();
         context.cleanup("world-distances", () -> { world.setSimulationDistance(oldSimulation); world.setViewDistance(oldView); });
@@ -245,6 +309,11 @@ public final class TracerContinuityScenario implements Scenario, Listener {
             });
         });
     }
+    /**
+     * Asserts preserved v1 trace identity, applied native velocity and complete reset
+     * cleanup, then explicitly closes the deployed service and checks task/ticket
+     * release. Clearing the encounter marker keeps later context cleanup idempotent.
+     */
     private void finish() {
         finished = true; bows.endEncounter(encounter);
         context.check("v1_trace_profile_preserved", true, bows.trace().stream().anyMatch(t -> t.kind().equals("tracer-acquired"))
@@ -259,6 +328,10 @@ public final class TracerContinuityScenario implements Scenario, Listener {
         publishEvidence();
         context.finish();
     }
+    /**
+     * Publishes native release/collision rows, independent turning witnesses and
+     * JSON-safe frame samples on both successful completion and cleanup failure paths.
+     */
     private void publishEvidence() {
         context.observe("nativeFlight", journal);
         context.observe("nativeSteeringWitnesses", nativeWitnesses);
@@ -267,18 +340,43 @@ public final class TracerContinuityScenario implements Scenario, Listener {
                         "before", list(f.before()), "after", list(f.after()), "distance", f.aim().map(a -> a.distance()).orElse(-1.0),
                         "target", f.aim().map(a -> a.part().targetId().toString()).orElse("none"))).toList())).toList());
     }
+    /**
+     * Ends the current encounter and allocates a new identity for the next trial,
+     * preserving the original continuity-v1 arena and mechanic policy.
+     */
     private void reset() { bows.endEncounter(encounter); encounter = UUID.randomUUID(); bows.openEncounter(encounter, world,
             new BoundingBox(-80, 60, -80, 80, 300, 180), new MechanicRevision("tracer-fixture", "v1")); }
+    /**
+     * Spawns a context-owned native HOVER dragon and registers a separate logical
+     * target identity with the bow service.
+     * @param at explicit fixture spawn location
+     */
     private void spawnDragon(Location at) {
         dragon = context.own(world.spawn(at, EnderDragon.class, d -> { d.setPersistent(false); d.setPhase(EnderDragon.Phase.HOVER); }));
         targetId = UUID.randomUUID(); bows.registerTarget(encounter, targetId, dragon);
     }
+    /**
+     * Stops fixture target motion, unregisters its native identity and removes the
+     * owned entity before the next trial.
+     */
     private void removeDragon() { moveTarget = false; if (dragon != null) { bows.unregisterTarget(dragon.getUniqueId()); dragon.remove(); dragon = null; } }
+    /**
+     * Installs an original-catalog Tracer item and arrows as labelled server setup;
+     * the captured policy therefore remains continuity-v1.
+     * @param level enchant level to encode into the managed item
+     */
     private void kit(int level) {
         var registry = CalibrationLoadouts.registry(); var item = registry.edit(registry.create("tracer"), Map.of("dragon_tracer", level), List.of());
         players.setupItem("alpha", 0, new WeaponItemCodec(registry).encode(item));
         players.setupItem("alpha", 9, new ItemStack(Material.ARROW, 64)); players.player("alpha").updateInventory();
     }
+    /**
+     * Uses real use/release packets with observed raised-hand and native release
+     * boundaries, allowing one tick for registry/frame state before the continuation.
+     * @param prefix declared player-plan action namespace
+     * @param duration native draw duration in server ticks
+     * @param next stage after an actual release
+     */
     private void draw(String prefix, int duration, Runnable next) {
         int before = nativeReleases; players.request("alpha", prefix + "-use");
         players.await("draw " + prefix, 60, () -> players.player("alpha").isHandRaised(), () -> context.later(duration, () -> {
@@ -286,23 +384,59 @@ public final class TracerContinuityScenario implements Scenario, Listener {
             players.await("release " + prefix, 60, () -> nativeReleases > before, () -> context.later(1, next::run));
         }));
     }
+    /**
+     * Captures only an uncanceled release from alpha and requires the native UUID
+     * to already resolve to its immutable production shot.
+     * @param e actual bow-release event
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void release(EntityShootBowEvent e) {
         if (!e.getEntity().getUniqueId().equals(players.identity("alpha")) || e.isCancelled()) return;
         latest = (Arrow) e.getProjectile(); captured = bows.projectile(latest.getUniqueId()).orElseThrow(); nativeReleases++;
         journal.add(Map.of("kind", "native-release", "projectile", latest.getUniqueId().toString(), "tick", tick(), "position", list(captured.shot().launchPosition())));
     }
+    /**
+     * Records the first collision kind by UUID and journals every native hit event.
+     * Later assertions bind those observations to the specific trial projectile.
+     * @param e native physical collision
+     */
     @EventHandler(priority=EventPriority.MONITOR) public void collision(ProjectileHitEvent e) {
         String kind = e.getHitEntity() instanceof EnderDragonPart ? "DRAGON" : e.getHitBlock() != null ? "BLOCK" : "OTHER";
         collisions.putIfAbsent(e.getEntity().getUniqueId(), kind);
         journal.add(Map.of("kind", "physical-hit", "projectile", e.getEntity().getUniqueId().toString(), "tick", tick(), "collision", kind));
     }
+    /**
+     * Looks for an observed assisted frame, not merely a registered nearby target.
+     * @param id original projectile UUID
+     * @return whether that arrow has ever acquired in retained samples
+     */
     private boolean acquired(UUID id) { return frames.getOrDefault(id, List.of()).stream().anyMatch(f -> f.aim().isPresent()); }
+    /**
+     * Checks literal radius, equal speed and at most six degrees of steering using
+     * Bukkit vector arithmetic independently of the production steering function.
+     * @param f assisted continuity frame
+     * @param radius expected original-profile acquisition radius
+     * @return whether all geometric bounds hold
+     */
     private boolean validFrame(ArrowContinuity.Frame f, double radius) {
         Vector a = vec(f.before()), b = vec(f.after()); double speed = a.length();
         return f.aim().orElseThrow().distance() <= radius && Math.abs(speed-b.length()) < 1e-9
                 && (speed == 0 || Math.acos(Math.max(-1, Math.min(1, a.dot(b)/(speed*b.length())))) <= Math.toRadians(6) + 1e-9);
     }
+    /**
+     * Creates a mutable native vector for independent sampled-geometry checks.
+     * @param v immutable domain vector
+     * @return copied coordinates
+     */
     private static Vector vec(Vector3 v) { return new Vector(v.x(), v.y(), v.z()); }
+    /**
+     * Converts coordinates to a report-compatible ordered array.
+     * @param v domain vector
+     * @return x, y and z values
+     */
     private static List<Double> list(Vector3 v) { return List.of(v.x(), v.y(), v.z()); }
+    /**
+     * Normalizes Bukkit's signed tick counter for recorded launch/collision timing.
+     * @return current tick interpreted as an unsigned long
+     */
     private static long tick() { return Integer.toUnsignedLong(Bukkit.getCurrentTick()); }
 }

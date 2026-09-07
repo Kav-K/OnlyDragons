@@ -13,14 +13,53 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Captured at acceptance; swapping gear cannot rewrite an already accepted physical arrow. */
+/**
+ * Captured at acceptance; swapping gear cannot rewrite an already accepted physical arrow.
+ * <p>
+ * Contains no live equipment/player/entity reference. The adapter validates trusted item identity
+ * and reserves admission; constructing this record alone proves neither firing nor a collision.
+ * @param encounterId nonnull admitted generation
+ * @param shotId nonnull trigger/group identity shared by primary and Duplex
+ * @param projectileId nonnull real arrow identity
+ * @param ordinal nonnegative projectile index within the group, distinct from impact/commit ordinal
+ * @param parentProjectileId nonnull optional real primary UUID, never self
+ * @param ownerId nonnull captured shooter UUID independent of current session
+ * @param weapon nonnull persistent weapon identity
+ * @param stats nonnull immutable effective/raw launch stats, excluding impact-time Tempo
+ * @param enchantments copied ID-sorted captured selections with one ultimate at most
+ * @param mechanic nonnull retained combat policy identity
+ * @param launchTick nonnegative arrow emission game tick
+ * @param launchPosition nonnull finite world-block origin used by Snipe and aimed Tracer
+ * @param initialVelocity nonnull finite blocks/tick launch vector, retained across owner movement
+ * @param crit nonnull captured ordinary roll
+ * @param drawScale finite nonnegative factor; this DTO does not cap it at one
+ * @param projectileScale finite nonnegative factor; Duplex receives its own scaled basis
+ * @param overload nonnull immutable mega capture consistent with enchant level, raw CC and ordinary crit
+ */
 public record ShotContext(UUID encounterId, UUID shotId, UUID projectileId, int ordinal,
                           Optional<UUID> parentProjectileId, UUID ownerId, WeaponIdentity weapon,
                           StatSnapshot stats, List<WeaponDefinition.Enchantment> enchantments,
                           MechanicRevision mechanic, long launchTick, Vector3 launchPosition,
                           Vector3 initialVelocity, CritOutcome crit, double drawScale, double projectileScale,
                           OverloadCapture overload) {
-    /** Legacy callers cannot silently construct an equipped Overload shot without a decision. */
+    /** Legacy callers cannot silently construct an equipped Overload shot without a decision.
+     * @param encounterId nonnull admitted generation
+     * @param shotId nonnull trigger/group identity shared by primary and Duplex
+     * @param projectileId nonnull real arrow identity
+     * @param ordinal nonnegative projectile index within the group, distinct from impact/commit ordinal
+     * @param parentProjectileId nonnull optional real primary UUID, never self
+     * @param ownerId nonnull captured shooter UUID independent of current session
+     * @param weapon nonnull persistent weapon identity
+     * @param stats nonnull immutable effective/raw launch stats, excluding impact-time Tempo
+     * @param enchantments copied ID-sorted captured selections with one ultimate at most
+     * @param mechanic nonnull retained combat policy identity
+     * @param launchTick nonnegative arrow emission game tick
+     * @param launchPosition nonnull finite world-block origin used by Snipe and aimed Tracer
+     * @param initialVelocity nonnull finite blocks/tick launch vector, retained across owner movement
+     * @param crit nonnull captured ordinary roll
+     * @param drawScale finite nonnegative factor; this DTO does not cap it at one
+     * @param projectileScale finite nonnegative factor; Duplex receives its own scaled basis
+     */
     public ShotContext(UUID encounterId, UUID shotId, UUID projectileId, int ordinal,
                        Optional<UUID> parentProjectileId, UUID ownerId, WeaponIdentity weapon,
                        StatSnapshot stats, List<WeaponDefinition.Enchantment> enchantments,
@@ -31,6 +70,27 @@ public record ShotContext(UUID encounterId, UUID shotId, UUID projectileId, int 
                 projectileScale, OverloadCapture.absent());
     }
 
+    /**
+     * Validates structural ownership, nonnegative inputs and captured Overload consistency, then
+     * freezes enchant order. Does not consult item catalogs, a random source or live target state.
+     * @param encounterId nonnull admitted generation
+     * @param shotId nonnull trigger/group identity shared by primary and Duplex
+     * @param projectileId nonnull real arrow identity
+     * @param ordinal nonnegative projectile index within the group, distinct from impact/commit ordinal
+     * @param parentProjectileId nonnull optional real primary UUID, never self
+     * @param ownerId nonnull captured shooter UUID independent of current session
+     * @param weapon nonnull persistent weapon identity
+     * @param stats nonnull immutable effective/raw launch stats, excluding impact-time Tempo
+     * @param enchantments copied ID-sorted captured selections with one ultimate at most
+     * @param mechanic nonnull retained combat policy identity
+     * @param launchTick nonnegative arrow emission game tick
+     * @param launchPosition nonnull finite world-block origin used by Snipe and aimed Tracer
+     * @param initialVelocity nonnull finite blocks/tick launch vector, retained across owner movement
+     * @param crit nonnull captured ordinary roll
+     * @param drawScale finite nonnegative factor; this DTO does not cap it at one
+     * @param projectileScale finite nonnegative factor; Duplex receives its own scaled basis
+     * @param overload nonnull immutable mega capture consistent with enchant level, raw CC and ordinary crit
+     */
     public ShotContext {
         Objects.requireNonNull(encounterId, "encounterId");
         Objects.requireNonNull(shotId, "shotId");

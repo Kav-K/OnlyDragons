@@ -17,16 +17,40 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import static com.kaveenk.onlydragons.domain.item.ItemValidationException.Code.*;
 
-/** Schema v1, owning only onlydragons:weapon. Call on the classic Paper server thread. */
+/**
+ * Strict schema-v1 boundary owning only {@code onlydragons:weapon} inside item PDC.
+ * All stack/PDC operations require the classic Paper server thread. Catalog revisions,
+ * material, single-item amount and selections must match trusted definitions; display
+ * text and foreign outer keys supply no authority. No migration or anti-copy ledger
+ * is implied, and privileged plugins can still forge valid PDC.
+ * @see ItemReadResult
+ * @see ItemRegistry
+ */
 public final class WeaponItemCodec {
+    /**
+     * Owned nested PDC root; foreign outer keys are outside this codec schema.
+     */
     public static final NamespacedKey ROOT = key("weapon");
     private static final Set<NamespacedKey> FIELDS = Set.of("schema", "instance", "definition", "definition_revision",
             "registry_revision", "enchants", "rolls").stream().map(WeaponItemCodec::key).collect(Collectors.toUnmodifiableSet());
     private final ItemRegistry registry;
 
+    /**
+     * Captures the trusted catalog/router without creating any items.
+     * @param registry non-null immutable catalog boundary
+     * @throws NullPointerException if registry is null
+     */
     public WeaponItemCodec(ItemRegistry registry) { this.registry = java.util.Objects.requireNonNull(registry); }
 
-    /** Creates a new physical stack for a validated identity; grant fresh identities through the registry. */
+    /**
+     * Creates a new physical stack for a validated identity, with generated presentation.
+     * It does not allocate a fresh identity; grants must create one through the registry.
+     * Unlike {@link #edit}, this operation preserves no metadata from an existing stack.
+     * @param instance complete identity, exact revisions, enchant levels and named rolls
+     * @return new amount-one stack carrying only generated weapon metadata/presentation
+     * @throws IllegalStateException if called off the server thread
+     * @throws ItemValidationException if the instance fails catalog validation
+     */
     public ItemStack encode(ItemInstance instance) {
         requireServerThread();
         var resolved = registry.resolve(instance);
@@ -51,7 +75,16 @@ public final class WeaponItemCodec {
         return stack;
     }
 
-    /** Edits only the owned root and generated lore; identity, rolls and all other components survive. */
+    /**
+     * Clones a valid stack and replaces only the owned weapon root and generated lore/glint.
+     * Identity, catalog and rolls cannot change. Durability, names, native enchants and
+     * foreign metadata remain on the clone; the final decoded value must equal replacement.
+     * @param original managed amount-one stack, never mutated
+     * @param replacement full validated replacement enchant selection with unchanged identity/catalog/rolls
+     * @return separately owned edited stack; original remains unchanged
+     * @throws ItemValidationException for invalid inputs, forbidden identity changes or final mismatch
+     * @throws IllegalStateException if called off the server thread
+     */
     public ItemStack edit(ItemStack original, ItemInstance replacement) {
         requireServerThread();
         if (!(decode(original) instanceof ItemReadResult.Valid valid)) {
@@ -77,6 +110,14 @@ public final class WeaponItemCodec {
         return result;
     }
 
+    /**
+     * Reads the owned root and resolves its entire instance against trusted catalogs.
+     * Unknown/missing/wrong-type fields, unsupported revisions and invalid amounts are
+     * reported as Invalid rather than silently becoming ordinary items. No lore is read.
+     * @param stack candidate stack, or null for an empty hand
+     * @return non-null Valid, Invalid or NotManaged classification
+     * @throws IllegalStateException if called off the server thread
+     */
     public ItemReadResult decode(ItemStack stack) {
         requireServerThread();
         if (stack == null || !stack.hasItemMeta()) return new ItemReadResult.NotManaged();
@@ -120,12 +161,29 @@ public final class WeaponItemCodec {
         }
     }
 
+    /**
+     * Reads a required nonblank schema string, bounded to 64 characters.
+     * @param data owned nested schema container
+     * @param field owned field identifier
+     * @return validated string
+     * @throws ItemValidationException for missing/wrong-type/blank/oversized content
+     */
     private static String text(PersistentDataContainer data, String field) {
         String value = required(data, key(field), PersistentDataType.STRING);
         if (value.isBlank() || value.length() > 64) throw malformed("Invalid text length for " + field);
         return value;
     }
 
+    /**
+     * Requires exact PDC type agreement and a non-null stored value.
+     * @param <P> persistent primitive type
+     * @param <C> exposed complex type
+     * @param data container being validated
+     * @param key exact field key
+     * @param type required PDC codec
+     * @return non-null stored value
+     * @throws ItemValidationException when absent or typed differently
+     */
     private static <P, C> C required(PersistentDataContainer data, NamespacedKey key, PersistentDataType<P, C> type) {
         if (!data.has(key, type)) throw malformed("Missing or wrong PDC type for " + key.getKey());
         C value = data.get(key, type);
@@ -133,10 +191,21 @@ public final class WeaponItemCodec {
         return value;
     }
 
+    /**
+     * Bounds nested selection counts before iterating attacker-controlled item metadata.
+     * @param data enchant or named-roll container
+     * @throws ItemValidationException if the catalog entry-count limit is exceeded
+     */
     private static void checkEntries(PersistentDataContainer data) {
         if (data.getKeys().size() > ItemRegistry.MAX_ENTRIES) throw malformed("Too many item entries");
     }
 
+    /**
+     * Requires the owned namespace and a bounded lowercase identifier, not arbitrary PDC keys.
+     * @param key nested selection key
+     * @return validated identifier without the namespace
+     * @throws ItemValidationException for another namespace or malformed identifier
+     */
     private static String entryId(NamespacedKey key) {
         if (!key.getNamespace().equals("onlydragons") || !key.getKey().matches("[a-z0-9_]{1,64}")) {
             throw malformed("Invalid item entry namespace or key");
@@ -144,8 +213,21 @@ public final class WeaponItemCodec {
         return key.getKey();
     }
 
+    /**
+     * Creates the typed malformed-data rejection used by the public decode outcome.
+     * @param reason exact violated metadata invariant
+     * @return new validation exception without changing any item
+     */
     private static ItemValidationException malformed(String reason) { return new ItemValidationException(MALFORMED_DATA, reason); }
+    /**
+     * Builds a key inside this codec's owned namespace.
+     * @param id validated or constant local key
+     * @return namespaced PDC key
+     */
     private static NamespacedKey key(String id) { return new NamespacedKey("onlydragons", id); }
+    /**
+     * Rejects stack/PDC access outside classic Paper ownership; no asynchronous fallback exists.
+     */
     private static void requireServerThread() {
         if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Weapon item access belongs to the server thread");
     }

@@ -12,17 +12,56 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.*;
 
-/** Bounded data, never a script or arbitrary packet description. */
+/**
+ * A hash-bound, data-only action plan admitted by the isolated runner.
+ * The parser rejects duplicate/unknown keys, invalid UTF-8, coercions and unbounded
+ * values before any connection is opened. Parser-created collections are immutable;
+ * the record constructors themselves are not an alternative validation boundary.
+ * No plan value chooses a host, packet class or executable expression.
+ *
+ * @param planId bounded identifier used to select fixture observation behavior
+ * @param targets target-reference names which may later bind to observed entity UUIDs
+ * @param actors ordered actors; their indices determine distinct offline identities
+ * @param sha256 lowercase SHA-256 of the original UTF-8 bytes, including whitespace
+ */
 record ActionPlan(String planId, List<String> targets, List<Actor> actors, String sha256) {
+    /**
+     * One identity's ordered connections; reconnect preserves the identity.
+     * @param id actor marker identifier, unique within the plan
+     * @param sessions parser-frozen sequence of connection plans
+     */
     record Actor(String id, List<SessionPlan> sessions) {}
+    /**
+     * Steps for one connection, ending in reconnect or final disconnect.
+     * @param id connection identifier, unique within its actor
+     * @param steps parser-frozen steps with unique IDs and exactly one terminal step
+     */
     record SessionPlan(String id, List<Step> steps) {}
+    /**
+     * A declared action whose arguments are validated by {@link ActionPlan#parse(byte[])}.
+     * Runtime markers select this ID; they never supply replacement arguments.
+     * @param id step identifier, unique within its connection
+     * @param action admitted primitive name
+     * @param args normalized immutable arguments in parser-created plans
+     */
     record Step(String id, String action, Map<String, Object> args) {
+        /** Reads an argument already admitted as an exact JSON integer; performs no coercion. */
         int integer(String key) { return (Integer) args.get(key); }
+        /** Reads an admitted finite numeric argument as a double. */
         double number(String key) { return ((Number) args.get(key)).doubleValue(); }
+        /** Reads an argument already admitted as a JSON boolean. */
         boolean bool(String key) { return (Boolean) args.get(key); }
+        /** Reads an argument already admitted as a string or bounded choice. */
         String text(String key) { return (String) args.get(key); }
     }
 
+    /**
+     * Loads at most 65,536 bytes and binds the parsed plan to the supplied digest.
+     * @param path staged plan file, chosen by the runner
+     * @param expected exact lowercase SHA-256 expected for the file
+     * @return validated plan with immutable nested collections
+     * @throws Exception if reading, decoding, schema validation or digest matching fails
+     */
     static ActionPlan load(Path path, String expected) throws Exception {
         require(expected != null && expected.matches("[a-f0-9]{64}"), "Invalid plan digest");
         require(Files.size(path) <= 65536, "Plan exceeds byte limit");
@@ -31,6 +70,14 @@ record ActionPlan(String planId, List<String> targets, List<Actor> actors, Strin
         return plan;
     }
 
+    /**
+     * Validates schema 1 and computes provenance from the exact input bytes.
+     * Admits 1-4 actors, 1-4 sessions each, at most 16 targets and 64 total steps.
+     * Every nonfinal session reconnects; each actor's final session disconnects.
+     * @param bytes original UTF-8 document, nonempty and at most 65,536 bytes
+     * @return validated plan; identical semantics with different bytes have different hashes
+     * @throws Exception if encoding, structural bounds, ordering or action arguments fail
+     */
     static ActionPlan parse(byte[] bytes) throws Exception {
         require(bytes.length > 0 && bytes.length <= 65536, "Plan exceeds byte limit");
         String text = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
@@ -87,6 +134,11 @@ record ActionPlan(String planId, List<String> targets, List<Actor> actors, Strin
                 HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes)));
     }
 
+    /**
+     * Admits only the fields and bounds of a known primitive, with no server-state guesses.
+     * Movement displacement, observed entity IDs and fresh container state are checked later
+     * by {@link ActionSession}; schema admission alone cannot authorize an action.
+     */
     private static Map<String, Object> arguments(String action, JsonElement raw) {
         var result = new LinkedHashMap<String, Object>();
         JsonObject args;
@@ -142,6 +194,10 @@ record ActionPlan(String planId, List<String> targets, List<Actor> actors, Strin
         return Collections.unmodifiableMap(result);
     }
 
+    /**
+     * Builds strict JSON while rejecting duplicate keys and nulls before Gson can erase them.
+     * The shared node counter and depth limit bound nested input independently of byte size.
+     */
     private static JsonElement read(JsonReader reader, int depth, int[] nodes) throws Exception {
         require(depth <= 12 && ++nodes[0] <= 4096, "Plan nesting/node limit");
         return switch (reader.peek()) {
@@ -161,25 +217,37 @@ record ActionPlan(String planId, List<String> targets, List<Actor> actors, Strin
             default -> throw new IllegalArgumentException("Null/invalid plan value");
         };
     }
+    /** Fails schema/argument admission with its specific diagnostic instead of coercing input. */
     static void require(boolean condition, String message) { if (!condition) throw new IllegalArgumentException(message); }
+    /** Requires precisely the supplied field names; missing and additional fields both fail. */
     private static JsonObject object(JsonElement value, String... keys) {
         require(value != null && value.isJsonObject(), "Expected object");
         var object = value.getAsJsonObject(); require(object.keySet().equals(Set.of(keys)), "Unknown/missing object fields: " + object.keySet()); return object;
     }
+    /** Requires a JSON array whose length falls within the inclusive collection bounds. */
     private static JsonArray array(JsonElement value, int min, int max) {
         require(value != null && value.isJsonArray(), "Expected array"); var array = value.getAsJsonArray();
         require(array.size() >= min && array.size() <= max, "Array size outside bounds"); return array;
     }
+    /** Requires a JSON string rather than stringifying another primitive. */
     private static String string(JsonElement value) {
         require(value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isString(), "Expected string"); return value.getAsString();
     }
+    /** Requires a lowercase identifier of 1-32 characters suitable for fixture markers. */
     private static String id(JsonElement value) { String id = string(value); require(id.matches("[a-z][a-z0-9-]{0,31}"), "Invalid identifier"); return id; }
+    /** Requires an exact member of the admitted string choices. */
     private static String choice(JsonElement value, String... choices) { String text = string(value); require(List.of(choices).contains(text), "Invalid enum value"); return text; }
+    /** Requires a JSON boolean rather than truthiness or a quoted value. */
     private static boolean bool(JsonElement value) { require(value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isBoolean(), "Expected boolean"); return value.getAsBoolean(); }
+    /**
+     * Requires integer lexical syntax and inclusive bounds; fractions and exponent forms fail
+     * even when mathematically integral. Parsing overflow also rejects the document.
+     */
     private static int integer(JsonElement value, int min, int max) {
         require(value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber() && value.getAsString().matches("-?(0|[1-9][0-9]*)"), "Expected integer");
         long parsed = Long.parseLong(value.getAsString()); require(parsed >= min && parsed <= max, "Integer outside bounds"); return (int) parsed;
     }
+    /** Requires a finite number within inclusive bounds and normalizes either signed zero to positive zero. */
     private static double number(JsonElement value, double min, double max) {
         require(value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber(), "Expected number");
         double parsed = value.getAsDouble(); require(Double.isFinite(parsed) && parsed >= min && parsed <= max, "Number outside bounds"); return parsed == 0 ? 0.0 : parsed;

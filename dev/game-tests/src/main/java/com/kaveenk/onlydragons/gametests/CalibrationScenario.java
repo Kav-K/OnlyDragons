@@ -9,11 +9,24 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
-/** Calibrates the real runtime and harness; it does not claim the planned combat exists. */
+/**
+ * Basic Paper/harness calibration with production enable, PDC round-trip and native flight.
+ * The arrow is server-spawned and has gravity disabled for this measurement; it is
+ * not evidence of player firing, production collision acceptance or combat math.
+ * The deliberate-failure variant proves the runner rejects a false assertion.
+ */
 public final class CalibrationScenario implements Scenario {
     private final boolean deliberateFailure;
+    /**
+     * Chooses the positive calibration or exact negative assertion control.
+     * @param deliberateFailure append the known false assertion after native observations
+     */
     public CalibrationScenario(boolean deliberateFailure) { this.deliberateFailure = deliberateFailure; }
 
+    /**
+     * Checks the loaded production service and item serialization, then waits for ticking terrain.
+     * @param context server-thread resource and report owner
+     */
     @Override public void start(ScenarioContext context) {
         context.check("server_thread", true, Bukkit.isPrimaryThread());
         context.check("production_enabled", true, context.production().isEnabled());
@@ -37,6 +50,9 @@ public final class CalibrationScenario implements Scenario {
         context.later(1, () -> awaitTicking(context, start, 200));
     }
 
+    /**
+     * Polls actual ENTITY_TICKING readiness with a finite tick budget before measuring movement.
+     */
     private void awaitTicking(ScenarioContext context, org.bukkit.Location start, int remaining) {
         if (start.getChunk().getLoadLevel() == org.bukkit.Chunk.LoadLevel.ENTITY_TICKING) {
             context.observe("chunkReadinessWaitTicks", 200 - remaining);
@@ -48,6 +64,10 @@ public final class CalibrationScenario implements Scenario {
         }
     }
 
+    /**
+     * Tracks a real arrow UUID and measures displacement after eight server ticks.
+     * It finishes only after observations, so every path releases the owned arrow/chunk.
+     */
     private void launch(ScenarioContext context, org.bukkit.Location start) {
         var world = start.getWorld();
         context.check("test_chunk_entity_ticking", "ENTITY_TICKING", start.getChunk().getLoadLevel().name());

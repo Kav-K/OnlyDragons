@@ -23,6 +23,12 @@ import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Structural DTO oracles for immutable ownership, one ultimate, physical-key identity and separate
+ * HP/credit amounts. Uses fixed UUIDs and directly constructed results; the 210/52.5/20 example
+ * proves representability and validation, not execution by the combat calculator or Paper collisions.
+ * @see com.kaveenk.onlydragons.domain.combat.CombatServicesTest
+ */
 class DomainContractsTest {
     private static final UUID ENCOUNTER = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final UUID OWNER = UUID.fromString("00000000-0000-0000-0000-000000000002");
@@ -113,17 +119,27 @@ class DomainContractsTest {
         assertThrows(UnsupportedOperationException.class, () -> result.participants().clear());
     }
 
+    /**
+     * Constructs a direct DTO with fixed origin/tick and supplied amounts; no ledger calculation occurs.
+     */
     private static DamageResult result(UUID id, Optional<UUID> parent, DamageResult.Kind kind,
                                        DamageResult.Amounts amounts, Optional<DamageResult.RejectionReason> rejection) {
         return new DamageResult(id, parent, ORIGIN, OWNER, SHOT, kind, 20, PROFILE, amounts,
                 CritOutcome.CRITICAL, 25, Map.of("power", 40.0), rejection);
     }
 
+    /**
+     * Builds the minimal 100-damage drawn definition to isolate enchant-list copying and validation.
+     */
     private static WeaponDefinition weapon(List<WeaponDefinition.Enchantment> enchantments) {
         return new WeaponDefinition("calibration_bow", 1, "v1", WeaponDefinition.FiringMode.DRAWN_BOW,
                 100, List.of(), enchantments);
     }
 
+    /**
+     * Builds a complete zero-default stat map with explicit weapon damage and a captured critical flag;
+     * this is a DTO fixture, not a CritResolver probability sample.
+     */
     private static ShotContext shot(List<WeaponDefinition.Enchantment> enchantments) {
         var stats = new EnumMap<StatKey, StatValue>(StatKey.class);
         for (StatKey key : StatKey.values()) stats.put(key, new StatValue(0, 0));

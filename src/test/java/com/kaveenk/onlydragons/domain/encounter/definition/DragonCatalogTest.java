@@ -16,6 +16,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Whole-candidate catalog validation and immutable-retention suite over the bundled properties.
+ * Asserts every required field, LF/CRLF handling, exact references, finite numeric boundaries,
+ * I/O rollback and same-label/different-content retention. Extra fixture types/tables are temporary
+ * parser inputs, not enabled production roster or reward content.
+ */
 class DragonCatalogTest {
     private final DragonCatalogLoader loader = DragonCatalogLoader.calibration(CalibrationLoadouts.registry());
     private final DragonDefinitionRegistry registry = new DragonDefinitionRegistry(loader);
@@ -185,25 +191,42 @@ class DragonCatalogTest {
 
     @Test void ioFailureAndAbsentStreamsDoNotAdoptPartialCatalog() {
         var before = registry.snapshot();
-        var broken = new InputStream() { @Override public int read() throws IOException { throw new IOException("fixture failure"); } };
+        var broken = new InputStream() { /** Fails before yielding bytes to test atomic catalog retention on I/O errors. */ @Override public int read() throws IOException { throw new IOException("fixture failure"); } };
         assertThrows(IOException.class, () -> registry.replace(broken, stream(tables)));
         assertSame(before, registry.snapshot());
         assertThrows(IllegalArgumentException.class, () -> registry.replace(stream(dragons), null));
         assertSame(before, registry.snapshot());
     }
 
+    /**
+     * Checks both exception and same-object previous catalog retention for every invalid candidate;
+     * this prevents a superficially failing parser from partially adopting content.
+     */
     private void rejects(String candidate, String candidateTables) {
         var before = registry.snapshot();
         assertThrows(IllegalArgumentException.class, () -> registry.replace(stream(candidate), stream(candidateTables)));
         assertSame(before, registry.snapshot(), "Every rejection must retain the entire previous catalog");
     }
+    /**
+     * Removes an exact property line and normalizes to LF with final newline; source fixtures
+     * separately exercise both LF and CRLF input.
+     */
     private static String withoutLine(String text, String removed) {
         return text.lines().filter(line -> !line.equals(removed)).collect(java.util.stream.Collectors.joining("\n", "", "\n"));
     }
+    /**
+     * Replaces one exact property key at line start for bounded malformed/reference candidates.
+     */
     private static String set(String text, String key, String value) {
         return text.replaceAll("(?m)^" + java.util.regex.Pattern.quote(key) + "=.*$", key + "=" + value);
     }
+    /**
+     * Encodes fixtures using Java Properties' ISO-8859-1 stream convention, preserving escaped values.
+     */
     private static InputStream stream(String value) { return new ByteArrayInputStream(value.getBytes(StandardCharsets.ISO_8859_1)); }
+    /**
+     * Reads and closes the bundled properties as ISO-8859-1; missing/I/O inputs fail the fixture.
+     */
     private static String resource(String name) {
         try (var input = DragonCatalogTest.class.getResourceAsStream("/encounters/" + name)) {
             return new String(input.readAllBytes(), StandardCharsets.ISO_8859_1);

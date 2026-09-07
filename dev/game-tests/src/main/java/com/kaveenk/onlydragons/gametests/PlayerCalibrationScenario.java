@@ -20,13 +20,30 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-/** Validates a real loopback protocol player; no manufactured Bukkit callbacks. */
+/**
+ * Legacy single-actor protocol calibration using real login/select/draw/release/quit packets.
+ * The server explicitly supplies position, Survival mode, bow and ammunition as
+ * setup. Native callbacks prove input effects; no authenticated client, rendered
+ * animation or production damage claim follows. Optional soak measures connection
+ * survival for forty seconds, not throughput or a multiplayer capacity envelope.
+ */
 final class PlayerCalibrationScenario implements Scenario {
     private final boolean soak;
 
+    /**
+     * Selects the ordinary bounded input calibration without the keepalive soak.
+     */
     PlayerCalibrationScenario() { this(false); }
+    /**
+     * Selects the additional post-shot connection soak.
+     * @param soak require forty wall-clock seconds online before requesting quit
+     */
     PlayerCalibrationScenario(boolean soak) { this.soak = soak; }
 
+    /**
+     * Binds the one permitted offline identity and installs the staged native-event flow.
+     * @param context server-thread report and resource owner
+     */
     @Override public void start(ScenarioContext context) {
         context.mechanicRevision(soak ? "protocol-player-soak-v1" : "protocol-player-v1");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
@@ -47,11 +64,21 @@ final class PlayerCalibrationScenario implements Scenario {
             private boolean shot;
             private boolean quitting;
 
+            /**
+             * Filters the single runner-derived player name before observing native callbacks.
+             */
             private boolean ours(Player candidate) { return candidate.getName().equals(name); }
+            /**
+             * Sends a run-bound legacy action marker; it is a request, not packet acceptance.
+             */
             private void request(String action) {
                 player.sendMessage(Component.text("OD_PLAYER:" + context.harness().runId() + ":" + action));
             }
 
+            /**
+             * Verifies real identity/address before scheduling explicitly synthetic inventory/position setup.
+             * @param event native join callback
+             */
             @EventHandler(priority = EventPriority.MONITOR)
             public void join(PlayerJoinEvent event) {
                 if (!ours(event.getPlayer())) return;
@@ -74,6 +101,10 @@ final class PlayerCalibrationScenario implements Scenario {
                 });
             }
 
+            /**
+             * Waits for the actual slot change to apply before requesting bow use.
+             * @param event native hotbar selection callback
+             */
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
             public void held(PlayerItemHeldEvent event) {
                 if (!ours(event.getPlayer()) || selected || event.getNewSlot() != 1) return;
@@ -86,6 +117,10 @@ final class PlayerCalibrationScenario implements Scenario {
                 });
             }
 
+            /**
+             * Starts draw polling only after the player's real main-hand bow interaction.
+             * @param event native interaction callback
+             */
             @EventHandler(priority = EventPriority.MONITOR)
             public void interact(PlayerInteractEvent event) {
                 if (!ours(event.getPlayer()) || drawing || !selected || event.getHand() != EquipmentSlot.HAND
@@ -95,6 +130,9 @@ final class PlayerCalibrationScenario implements Scenario {
                 awaitDraw(0);
             }
 
+            /**
+             * Polls Paper's hand-raised state before waiting a full draw interval and requesting release.
+             */
             private void awaitDraw(int elapsed) {
                 context.later(1, () -> {
                     if (player.isHandRaised()) {
@@ -106,6 +144,10 @@ final class PlayerCalibrationScenario implements Scenario {
                 });
             }
 
+            /**
+             * Captures the real Arrow and shooter, then verifies live motion after dispatch.
+             * @param event uncancelled native bow release callback
+             */
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
             public void shoot(EntityShootBowEvent event) {
                 if (!(event.getEntity() instanceof Player shooter) || !ours(shooter) || shot) return;
@@ -129,11 +171,17 @@ final class PlayerCalibrationScenario implements Scenario {
                 });
             }
 
+            /**
+             * Marks the expected terminal stage before asking the client to disconnect.
+             */
             private void quitNormally() {
                 quitting = true;
                 request("quit");
             }
 
+            /**
+             * Uses monotonic elapsed time and continued online identity, while yielding between tick samples.
+             */
             private void awaitSoak(long started) {
                 context.later(20, () -> {
                     long elapsedMs = (System.nanoTime() - started) / 1_000_000;
@@ -146,6 +194,10 @@ final class PlayerCalibrationScenario implements Scenario {
                 });
             }
 
+            /**
+             * Requires an intentional post-shot quit and checks server removal two ticks later.
+             * @param event native quit callback
+             */
             @EventHandler(priority = EventPriority.MONITOR)
             public void quit(PlayerQuitEvent event) {
                 if (!ours(event.getPlayer())) return;

@@ -6,8 +6,16 @@ import com.kaveenk.onlydragons.domain.projectile.Vector3;
 import java.util.*;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Preserved returning-v2 calibration tests for inclusive acquisition plus same-target retention,
+ * three original-group ballistic ticks, 18-degree turns and exact trusted-definition routing.
+ * The v1 fallback assertions protect legacy loadouts; no current v3 guidance is inferred here.
+ */
 class TracerReturnTest {
     private static final Vector3 ZERO = new Vector3(0, 0, 0);
+    /**
+     * Builds a current synthetic box whose nearest x face is the supplied range boundary.
+     */
     private static TracerRules.Part part(UUID target, double x) {
         return new TracerRules.Part(target, UUID.randomUUID(), new TracerRules.Box(new Vector3(x, -1, -1), new Vector3(x+1, 1, 1)));
     }
@@ -25,6 +33,10 @@ class TracerReturnTest {
         assertTrue(aim(0, part(target, 0), Optional.of(target)).isEmpty());
         assertThrows(IllegalArgumentException.class, () -> TracerProfile.RETURN_V2.radius(6));
     }
+    /**
+     * Queries returning v2 from the origin with an always-visible predicate and optional target
+     * lock; real obstruction is outside this helper.
+     */
     private Optional<TracerRules.Aim> aim(int level, TracerRules.Part part, Optional<UUID> lock) {
         return TracerRules.acquire(ZERO, level, List.of(part), a -> true, TracerProfile.RETURN_V2, lock);
     }

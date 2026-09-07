@@ -23,8 +23,17 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-/** Validates a real loopback protocol player; no manufactured Bukkit callbacks. */
+/**
+ * One real legacy-client bow release followed by explicitly API-spawned player-owned trials.
+ * The protocol actor proves native login/select/draw/release/quit. {@link PlayerDragonTrials}
+ * keeps subsequent controlled geometry/phase arrows distinct from that original input;
+ * neither path validates full-client visuals or production damage accounting.
+ */
 public final class ProjectilePlayerFeasibilityScenario implements Scenario {
+    /**
+     * Binds one isolated identity and owns the native event flow plus tick deadline.
+     * @param context server-thread report/resource owner
+     */
     @Override public void start(ScenarioContext context) {
         context.mechanicRevision("projectile-player-v3");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
@@ -46,11 +55,21 @@ public final class ProjectilePlayerFeasibilityScenario implements Scenario {
             private boolean shot;
             private boolean quitting;
 
+            /**
+             * Filters the sole runner-derived player name before observing callbacks.
+             */
             private boolean ours(Player candidate) { return candidate.getName().equals(name); }
+            /**
+             * Sends the current run's legacy action marker without asserting its delivery.
+             */
             private void request(String action) {
                 player.sendMessage(Component.text("OD_PLAYER:" + context.harness().runId() + ":" + action));
             }
 
+            /**
+             * Checks actual identity/loopback state and schedules explicit equipment/geometry setup.
+             * @param event native join event
+             */
             @EventHandler(priority = EventPriority.MONITOR)
             public void join(PlayerJoinEvent event) {
                 if (!ours(event.getPlayer())) return;
@@ -74,6 +93,10 @@ public final class ProjectilePlayerFeasibilityScenario implements Scenario {
                 });
             }
 
+            /**
+             * Requires the real hotbar change to apply before requesting use.
+             * @param event native selection event
+             */
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
             public void held(PlayerItemHeldEvent event) {
                 if (!ours(event.getPlayer()) || selected || event.getNewSlot() != 1) return;
@@ -86,6 +109,10 @@ public final class ProjectilePlayerFeasibilityScenario implements Scenario {
                 });
             }
 
+            /**
+             * Starts draw polling from the actor's actual main-hand bow interaction.
+             * @param event native interaction event
+             */
             @EventHandler(priority = EventPriority.MONITOR)
             public void interact(PlayerInteractEvent event) {
                 if (!ours(event.getPlayer()) || drawing || !selected || event.getHand() != EquipmentSlot.HAND
@@ -95,6 +122,9 @@ public final class ProjectilePlayerFeasibilityScenario implements Scenario {
                 awaitDraw(0);
             }
 
+            /**
+             * Waits for Paper hand-raised state before the full draw interval and release request.
+             */
             private void awaitDraw(int elapsed) {
                 context.later(1, () -> {
                     if (player.isHandRaised()) {
@@ -106,6 +136,10 @@ public final class ProjectilePlayerFeasibilityScenario implements Scenario {
                 });
             }
 
+            /**
+             * Passes the exact real released Arrow to the collision trials, retaining shooter identity.
+             * @param event native bow release event
+             */
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
             public void shoot(EntityShootBowEvent event) {
                 if (!(event.getEntity() instanceof Player shooter) || !ours(shooter) || shot) return;
@@ -125,6 +159,10 @@ public final class ProjectilePlayerFeasibilityScenario implements Scenario {
                 });
             }
 
+            /**
+             * Completes only after the intentional post-trials quit and native player removal.
+             * @param event native quit event
+             */
             @EventHandler(priority = EventPriority.MONITOR)
             public void quit(PlayerQuitEvent event) {
                 if (!ours(event.getPlayer())) return;

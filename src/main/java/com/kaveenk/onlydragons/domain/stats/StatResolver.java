@@ -7,11 +7,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/** Stateless resolver: base, flat sum, additive percentage sum, ordered factors, effective cap. */
+/**
+ * Stateless resolver: base, flat sum, additive percentage sum, ordered factors, effective cap.
+ * <p>
+ * Instances retain one immutable {@link StatProfile} and mutate no shared state. Every
+ * intermediate must remain finite even when a later zero factor or cap would hide overflow.
+ */
 public final class StatResolver {
     private final StatProfile profile;
+    /**
+     * Retains the nonnull validated profile; later catalog replacement cannot alter this resolver.
+     * @param profile nonnull immutable validated stat policy retained by this resolver
+     * @throws NullPointerException if profile is null
+     */
     public StatResolver(StatProfile profile) { this.profile = Objects.requireNonNull(profile, "profile"); }
 
+    /**
+     * Resolves all seven stats and freezes both numeric output and arithmetic provenance.
+     * For base 100.25, flat +0.75, additive +50%, then factors 0.5 and 2, raw output is 151.5.
+     * No rounding occurs. Negative post-flat values or additive factors reject before later layers.
+     * @param revision nonblank snapshot label allocated by the equipment/session caller
+     * @param baseOverrides nonnull partial base map; absent keys use profile defaults
+     * @param sources immutable source collection, already grouped by replacement identity
+     * @return complete immutable snapshot plus explanation, with effective caps applied last
+     * @throws IllegalArgumentException for range violations, negative layers or arithmetic overflow
+     */
     public ExplainedStatSnapshot resolve(String revision, Map<StatKey, Double> baseOverrides, ModifierSources sources) {
         var overrides = Map.copyOf(baseOverrides);
         var modifiers = sources.modifiers();
@@ -47,9 +67,15 @@ public final class StatResolver {
         return new ExplainedStatSnapshot(new StatSnapshot(revision, values, modifiers), profile.revision(), explanations);
     }
 
+    /**
+     * Selects one stat/layer while preserving the already canonical order supplied by ModifierSources.
+     */
     private static List<StatModifier> layer(List<StatModifier> modifiers, StatKey key, ModifierOperation operation) {
         return modifiers.stream().filter(modifier -> modifier.key() == key && modifier.operation() == operation).toList();
     }
+    /**
+     * Sums in canonical order and rejects each overflowing partial sum, not just the final total.
+     */
     private static double sum(List<StatModifier> modifiers) {
         double result = 0;
         for (StatModifier modifier : modifiers) result = finite(result + modifier.amount());

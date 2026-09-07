@@ -14,6 +14,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 import static com.kaveenk.onlydragons.domain.item.ItemValidationException.Code.*;
 
+/**
+ * Trusted item-boundary suite covering distinct grant UUIDs, explicit preset totals, whole-map
+ * edits, one ultimate, schemas/revisions, named rolls and defensive copying. The custom precision
+ * roll catalog is a labelled projection fixture; raw roll amounts never enter through ItemInstance.
+ * These tests exercise domain values, not persistence bytes or inventory mutation.
+ */
 class ItemRegistryTest {
     private final ItemRegistry registry = CalibrationLoadouts.registry();
 

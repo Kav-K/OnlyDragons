@@ -10,9 +10,25 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
-/** Immutable validated calibration. Construct a candidate fully before adopting it. */
+/**
+ * Immutable validated calibration. Construct a candidate fully before adopting it.
+ * <p>
+ * The full value is retained by {@link StatResolver}; replacement does not update existing resolvers.
+ * @param id nonblank policy family
+ * @param version positive author-maintained version
+ * @param definitions complete immutable copy keyed by each definition's own key
+ * @param effectiveCaps complete immutable copy of finite caps inside each definition's raw range
+ */
 public record StatProfile(String id, int version, Map<StatKey, StatDefinition> definitions,
                           Map<StatKey, Double> effectiveCaps) {
+    /**
+     * Validates all definitions and caps before returning a candidate; missing/null entries reject.
+     * Labels may be reused by callers, so {@link #revision()} is not a content hash.
+     * @param id nonblank policy family
+     * @param version positive author-maintained version
+     * @param definitions complete immutable copy keyed by each definition's own key
+     * @param effectiveCaps complete immutable copy of finite caps inside each definition's raw range
+     */
     public StatProfile {
         DomainChecks.text(id, "profile id");
         if (version < 1) throw new IllegalArgumentException("Profile version must be positive");
@@ -26,8 +42,19 @@ public record StatProfile(String id, int version, Map<StatKey, StatDefinition> d
         }
     }
 
+    /**
+     * Returns the display/provenance label id + "-v" + version, without registering or adopting it.
+     * @return profile ID followed by -v and its version, for display/provenance
+     */
     public String revision() { return id + "-v" + version; }
 
+    /**
+     * Loads and closes the bundled calibration resource. Missing resource or I/O failure throws
+     * IllegalStateException; malformed policy content retains its validation exception.
+     * @return validated immutable bundled calibration profile
+     * @throws IllegalStateException if the bundled resource is missing or cannot be read
+     * @throws IllegalArgumentException if bundled policy content is invalid
+     */
     public static StatProfile calibration() {
         try (var input = StatProfile.class.getResourceAsStream("/stats/calibration-v1.properties")) {
             if (input == null) throw new IllegalStateException("Missing stats calibration resource");
@@ -35,9 +62,20 @@ public record StatProfile(String id, int version, Map<StatKey, StatDefinition> d
         } catch (IOException failure) { throw new IllegalStateException("Cannot read stats calibration", failure); }
     }
 
-    /** Strict property vocabulary; caller owns the stream. No partial/defaulted candidate is returned. */
+    /**
+     * Strict property vocabulary; caller owns the stream. No partial/defaulted candidate is returned.
+     * <p>
+     * Duplicate, missing, unknown and unsupported-policy properties reject with IllegalArgumentException.
+     * @param input nonnull Java-properties stream, left open for its caller
+     * @return fully validated immutable profile
+     * @throws IOException if the stream cannot be read
+     */
     public static StatProfile load(InputStream input) throws IOException {
         var properties = new Properties() {
+            /**
+             * Rejects a repeated property before replacement, preserving evidence that Properties.load would otherwise overwrite.
+             * Returns the superclass insertion result for a new key; this parser is not a general concurrent store.
+             */
             @Override public synchronized Object put(Object key, Object value) {
                 if (containsKey(key)) throw new IllegalArgumentException("Duplicate profile property: " + key);
                 return super.put(key, value);
@@ -61,6 +99,10 @@ public record StatProfile(String id, int version, Map<StatKey, StatDefinition> d
         return new StatProfile(properties.getProperty("id"), Integer.parseInt(properties.getProperty("version")), definitions, caps);
     }
 
+    /**
+     * Reads one mandatory numeric field; missing and malformed values reject before profile adoption.
+     * Finite/range validation belongs to the constructed definition and profile.
+     */
     private static double number(Properties properties, StatKey key, String field) {
         String value = properties.getProperty(key.id() + "." + field);
         if (value == null) throw new IllegalArgumentException("Missing " + key.id() + "." + field);

@@ -11,6 +11,12 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Deterministic fire/ammo policy suite using direct accepted domain impacts and explicit ticks.
+ * Flame II on 100 credit yields three six-point strikes at 20/40/60, with independent refresh,
+ * vulnerability, two-owner lethal ordering and cleanup controls. No native ammunition debit,
+ * ignition or event delivery is inferred from these domain calls.
+ */
 class OwnedFireCoordinatorTest {
     final UUID generation = UUID.randomUUID(), target = UUID.randomUUID();
     final Session a = new Session(UUID.randomUUID(), UUID.randomUUID()), b = new Session(UUID.randomUUID(), UUID.randomUUID());

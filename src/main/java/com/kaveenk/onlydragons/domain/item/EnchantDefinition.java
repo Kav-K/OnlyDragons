@@ -7,18 +7,48 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Trusted level table. Item input supplies an ID/level, never a kind or stat amount. */
+/**
+ * Trusted level table. Item input supplies an ID/level, never a kind or stat amount.
+ * @param id lowercase item-key syntax, 1–64 characters
+ * @param displayName nonblank generated label
+ * @param kind nonnull trusted ordinary/ultimate category
+ * @param compatibleModes nonempty copied supported firing modes
+ * @param levelModifiers nonempty copied table with explicit levels 1–255 and immutable modifier lists; gaps are allowed
+ * @param available whether consumers exist for selection in this catalog
+ */
 public record EnchantDefinition(String id, String displayName, WeaponDefinition.EnchantmentKind kind,
                                 Set<WeaponDefinition.FiringMode> compatibleModes,
                                 Map<Integer, List<StatModifier>> levelModifiers, boolean available) {
+    /**
+     * Convenience descriptor constructor selecting available=true; canonical table validation applies.
+     * @param id lowercase item-key syntax, 1\u201364 characters
+     * @param displayName nonblank generated label
+     * @param kind nonnull trusted ordinary/ultimate category
+     * @param compatibleModes nonempty copied supported firing modes
+     * @param levelModifiers nonempty copied table with explicit levels 1\u2013255 and immutable modifier lists; gaps are allowed
+     */
     public EnchantDefinition(String id, String displayName, WeaponDefinition.EnchantmentKind kind,
                              Set<WeaponDefinition.FiringMode> compatibleModes,
                              Map<Integer, List<StatModifier>> levelModifiers) {
         this(id, displayName, kind, compatibleModes, levelModifiers, true);
     }
 
+    /**
+     * Returns the greatest explicitly defined table key; does not imply every lower level exists.
+     * @return greatest explicit level-table key, without implying lower keys are contiguous
+     */
     public int maxLevel() { return levelModifiers.keySet().stream().mapToInt(Integer::intValue).max().orElseThrow(); }
 
+    /**
+     * Validates descriptor identity/modes/table and deep-copies the lists. Empty modifier lists are
+     * valid for effects applied at firing/impact instead of stat resolution.
+     * @param id lowercase item-key syntax, 1\u201364 characters
+     * @param displayName nonblank generated label
+     * @param kind nonnull trusted ordinary/ultimate category
+     * @param compatibleModes nonempty copied supported firing modes
+     * @param levelModifiers nonempty copied table with explicit levels 1\u2013255 and immutable modifier lists; gaps are allowed
+     * @param available whether consumers exist for selection in this catalog
+     */
     public EnchantDefinition {
         id = ItemValidationException.id(id);
         if (displayName == null || displayName.isBlank()) throw new IllegalArgumentException("Missing enchant display name");
@@ -32,6 +62,15 @@ public record EnchantDefinition(String id, String displayName, WeaponDefinition.
         }
     }
 
+    /**
+     * Returns a trusted selection only after availability, exact table level and firing-mode checks.
+     * Failures use UNAVAILABLE_ENCHANT, INVALID_LEVEL or INCOMPATIBLE_ENCHANT in that order.
+     * No modifiers are applied by this method.
+     * @param level exact level-table key to validate
+     * @param mode weapon firing mode against which compatibility is checked
+     * @return trusted enchant selection containing ID, validated level and kind
+     * @throws ItemValidationException for unavailable enchant, unsupported level or incompatible firing mode
+     */
     public WeaponDefinition.Enchantment validate(int level, WeaponDefinition.FiringMode mode) {
         if (!available) throw new ItemValidationException(ItemValidationException.Code.UNAVAILABLE_ENCHANT,
                 displayName + " is unavailable until its effect consumer is integrated");

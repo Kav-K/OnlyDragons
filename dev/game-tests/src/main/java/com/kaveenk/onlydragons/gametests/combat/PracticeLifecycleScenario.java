@@ -15,7 +15,14 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-/** Native actors and real arrows; explicit fixture flight holds isolate reconnect/terminal ordering. */
+/**
+ * Exercises practice encounter/session retirement with real actors and native arrows.
+ * Some native launches are explicitly held by the fixture, then released with their
+ * saved velocity to isolate stale-session and terminal races. Those holds are test
+ * setup, not production flight behavior. Domain totals, actual quit/death/collision
+ * events and captured owner/session provenance remain separate evidence.
+ * Context-owned server-thread callbacks and cleanup retire fights and subscriptions.
+ */
 public final class PracticeLifecycleScenario implements Scenario,Listener {
     ScenarioContext c; PlayerFixture players; DamageObservationProbe probe; ManagedCombatService service;
     UUID generation; LivingEntity target; Arrow held; OwnedProjectile captured; Vector velocity;
@@ -24,6 +31,11 @@ public final class PracticeLifecycleScenario implements Scenario,Listener {
     final Map<UUID,Integer> releases=new HashMap<>(),commands=new HashMap<>();
     final Map<UUID,Integer> hits=new LinkedHashMap<>();
     final Map<UUID,UUID> owners=new LinkedHashMap<>();
+    /**
+     * Installs settled-hit and native-event observation before starting the lifecycle sequence.
+     * @param context run-owned server-thread scheduling, evidence and cleanup
+     * @throws Exception if the declared player fixture cannot initialize
+     */
     @Override public void start(ScenarioContext context)throws Exception{
         c=context;c.mechanicRevision("practice-lifecycle-v1");service=c.production().combat();players=new PlayerFixture(c);probe=new DamageObservationProbe(c);c.listen(this);
         var observation=service.observeSettled(hit->{
@@ -36,6 +48,7 @@ public final class PracticeLifecycleScenario implements Scenario,Listener {
         c.cleanup("practice-lifecycle",()->{service.reset(players.identity("alpha"));service.reset(players.identity("beta"));observation.close();});
         players.await("lifecycle actors",300,players::allOnline,this::setup);c.harness().getLogger().info("OD_PLAYER_READY "+c.harness().runId());
     }
+    /** Holds an actual launch across alpha reconnect, then verifies its frozen old token permits physical credit but no new procs. */
     void setup(){World w=players.player("alpha").getWorld();for(int x=-2;x<=2;x++)for(int z=-2;z<=2;z++)c.tickChunk(w.getChunkAt(x,z));
         for(String a:List.of("alpha","beta"))prepare(a);players.permission("alpha","onlydragons.practice",true);
         command("alpha","open",()->{capture();freeze="alpha";kit("alpha","ferocity_100");draw("alpha","old",()->{
@@ -54,6 +67,7 @@ public final class PracticeLifecycleScenario implements Scenario,Listener {
             });
         });});
     }
+    /** Schedules actual death after a physical claim has queued work, proves child retirement, then requests a protocol respawn. */
     void death(){deathOnHit=true;kit("alpha","ferocity_100");draw("alpha","death",()->{
         players.await("actual alpha death",80,()->deathCount==1,()->c.later(4,()->{
             deathOnHit=false;c.check("queued_child_cleared_on_real_death",true,queuedAtDeath&&view().acceptedImpacts()==2&&view().target().currentHealth()==800&&view().procs().queued()==0);
@@ -62,6 +76,7 @@ public final class PracticeLifecycleScenario implements Scenario,Listener {
             });
         }));
     });}
+    /** Requests beta reconnect from the accepted-parent observation and checks that queued children do not survive the actual quit. */
     void quit(){kit("beta","ferocity_100");quitOnSettlement=true;draw("beta","quit-shot",()->{
         players.await("beta reconnect after queued parent",150,()->players.joins("beta")==2,()->{
             prepare("beta");c.production().bows().activate(players.player("beta"));c.later(4,()->{
@@ -71,11 +86,13 @@ public final class PracticeLifecycleScenario implements Scenario,Listener {
             });
         });
     });}
+    /** Moves beta outside the arena after collision and checks session/queued-child retirement without erasing accepted physical credit. */
     void exit(){exitOnHit=true;kit("beta","ferocity_100");int before=settlements.size();draw("beta","exit",()->settled(before+1,()->c.later(5,()->{
         exitOnHit=false;c.check("queued_child_cleared_on_arena_exit",true,view().acceptedImpacts()==4&&view().target().currentHealth()==600&&view().procs().queued()==0
                 &&c.production().bows().currentSession(players.identity("beta")).isEmpty());
         prepare("beta");c.production().bows().activate(players.player("beta"));resetAirborne();
     })));}
+    /** Keeps a real arrow pending while the connected reset command terminates its generation without publishing a defeat. */
     void resetAirborne(){freeze="alpha";held=null;kit("alpha","ordinary");draw("alpha","reset-airborne",()->{
         players.await("airborne before command reset",40,()->held!=null,()->{
             Arrow old=held;UUID oldGeneration=generation;c.check("reset_has_real_pending_arrow",true,old.isValid()&&c.production().bows().projectile(old.getUniqueId()).isPresent());
@@ -88,6 +105,7 @@ public final class PracticeLifecycleScenario implements Scenario,Listener {
             });
         });
     });}
+    /** Checks proc-lethal HP/credit and commit stamps while another held arrow must retire without claiming the completed target. */
     void procLethal(){freeze="beta";held=null;kit("beta","ordinary");draw("beta","late",()->{
         players.await("pending late native arrow",40,()->held!=null,()->{
             Arrow late=held;UUID lateId=late.getUniqueId();c.check("real_late_arrow_pending_before_lethal",true,late.isValid()&&c.production().bows().projectile(lateId).isPresent());
@@ -104,6 +122,7 @@ public final class PracticeLifecycleScenario implements Scenario,Listener {
             }));
         });
     });}
+    /** Creates two same-tick native lethal claims against 75 HP and verifies only one receiver commit/completion survives terminal cleanup. */
     void compete(){competing=true;peakClaims=0;int hitBefore=hits.size(),before=settlements.size();
         for(String a:List.of("alpha","beta")){kit(a,"ordinary");players.request(a,"compete-use");}
         players.await("competing real draws",60,()->players.player("alpha").isHandRaised()&&players.player("beta").isHandRaised(),()->c.later(22,()->{
@@ -122,9 +141,13 @@ public final class PracticeLifecycleScenario implements Scenario,Listener {
             }));
         }));
     }
+    /** Reads the exact captured generation rather than whichever encounter was most recently opened. */
     ManagedCombatService.View view(){return service.view(generation).orElseThrow();}
+    /** Captures alpha-owned generation/native identity and registers the actual target with the damage probe. */
     void capture(){generation=service.owned(players.identity("alpha")).orElseThrow().encounterId();target=(LivingEntity)Bukkit.getEntity(view().entityId());probe.watch(target);}
+    /** Performs explicit survival/flight/inventory-slot and location setup for a newly connected or respawned actor. */
     void prepare(String a){Player p=players.player(a);p.setGameMode(GameMode.SURVIVAL);p.setAllowFlight(true);p.setFlying(true);p.setInvulnerable(true);p.setCollidable(false);p.getInventory().setHeldItemSlot(0);players.setupPosition(a,new Location(p.getWorld(),a.equals("alpha")?-.7:.7,100,.5,0,2));}
+    /** Sets trusted equipment/ammo and native-part aim as server setup before requesting real use/release packets. */
     void kit(String a,String id){prepare(a);
         if(target!=null&&target.isValid()){
             Player p=players.player(a);var location=p.getLocation();double dx=target.getLocation().getX()-location.getX(),dz=target.getLocation().getZ()-location.getZ();
@@ -132,19 +155,27 @@ public final class PracticeLifecycleScenario implements Scenario,Listener {
             p.setVelocity(new Vector());players.setupPosition(a,location);
         }
         players.setupItem(a,0,c.production().equipment().createLoadout(id));players.setupItem(a,9,new ItemStack(Material.ARROW,64));}
+    /** Waits for a command preprocess event and a short handler boundary before evaluating command results. */
     void command(String a,String id,Runnable next){int before=commands.getOrDefault(players.identity(a),0);players.request(a,id);players.await("command "+id,60,()->commands.getOrDefault(players.identity(a),0)>before,()->c.later(2,next::run));}
+    /** Waits for an observed raised hand, holds for 22 ticks, then waits for the native release event. */
     void draw(String a,String id,Runnable next){int before=releases.getOrDefault(players.identity(a),0);players.request(a,id+"-use");players.await("draw "+id,60,()->players.player(a).isHandRaised(),()->c.later(22,()->{players.request(a,id+"-release");players.await("release "+id,60,()->releases.getOrDefault(players.identity(a),0)>before,next::run);}));}
+    /** Waits for the expected production notification count and advances one tick before reading totals. */
     void settled(int n,Runnable next){players.await("settlements "+n,100,()->settlements.size()>=n,()->c.later(1,next::run));}
+    /** Counts native command events for declared-action synchronization. */
     @EventHandler(priority=EventPriority.MONITOR)public void command(PlayerCommandPreprocessEvent e){commands.merge(e.getPlayer().getUniqueId(),1,Integer::sum);}
+    /** Counts actual player releases rather than treating a client request marker as a shot. */
     @EventHandler(priority=EventPriority.MONITOR)public void bow(EntityShootBowEvent e){if(e.getEntity()instanceof Player p)releases.merge(p.getUniqueId(),1,Integer::sum);}
+    /** Records shooter ownership and optionally freezes an actual launch while preserving its original captured projectile and velocity. */
     @EventHandler(priority=EventPriority.MONITOR)public void launch(ProjectileLaunchEvent e){if(e.getEntity()instanceof Arrow arrow&&arrow.getShooter()instanceof Player p){
         owners.put(arrow.getUniqueId(),p.getUniqueId());
         if(freeze!=null&&p.getUniqueId().equals(players.identity(freeze))){held=arrow;velocity=arrow.getVelocity().clone();captured=c.production().bows().projectile(arrow.getUniqueId()).orElseThrow();arrow.setGravity(false);arrow.setVelocity(new Vector());}
     }}
+    /** Records target collisions and pending-claim pressure, scheduling labelled death/arena-exit interventions two ticks later. */
     @EventHandler(priority=EventPriority.MONITOR)public void hit(ProjectileHitEvent e){if(e.getHitEntity()!=null&&target!=null&&e.getHitEntity().getUniqueId().equals(target.getUniqueId())&&e.getEntity()instanceof Arrow arrow){
         hits.put(arrow.getUniqueId(),Bukkit.getCurrentTick());if(competing)peakClaims=Math.max(peakClaims,c.production().bows().pendingClaims());
         if(deathOnHit)c.later(2,()->players.player("alpha").setHealth(0));
         if(exitOnHit)c.later(2,()->players.setupPosition("beta",new Location(players.player("beta").getWorld(),2500,100,0)));
     }}
+    /** Counts actual alpha death events for the respawn/queued-work boundary. */
     @EventHandler(priority=EventPriority.MONITOR)public void death(PlayerDeathEvent e){if(e.getPlayer().getUniqueId().equals(players.identity("alpha")))deathCount++;}
 }

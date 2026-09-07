@@ -13,6 +13,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+/**
+ * Deterministic damage/ledger oracles: 210 critical offense, historical raw-input cap bands,
+ * pre-cap proc inheritance, independent overkill/ghost credit and atomic validation failures.
+ * Fixed identities/ticks and injected threshold samples isolate domain behavior; direct physical
+ * candidates do not establish native collision or suppression. A separate thread tests confinement.
+ */
 class CombatServicesTest {
     private static final UUID ENCOUNTER = new UUID(0, 1), OWNER = new UUID(0, 2), TARGET = new UUID(0, 3);
     private static final CombatProfile CALIBRATION = CombatProfile.calibration();
@@ -263,15 +269,25 @@ class CombatServicesTest {
     }
     private static TargetState target(double hp, double defense) { return new TargetState(ENCOUNTER, TARGET, hp, hp, defense); }
     private static CombatEncounter encounter(double hp, double defense, CombatProfile profile) { return new CombatEncounter(target(hp, defense), "practice", profile); }
+    /**
+     * Uses the bundled resolver with explicit damage/chance, retaining its baseline crit damage 50.
+     */
     private static StatSnapshot stats(double damage, double chance) {
         return new StatResolver(StatProfile.calibration()).resolve("fixture-v1",
                 Map.of(StatKey.WEAPON_DAMAGE, damage, StatKey.CRIT_CHANCE, chance), ModifierSources.empty()).snapshot();
     }
+    /**
+     * Creates distinguishable deterministic group/arrow/weapon UUIDs at launch tick 10; crit and
+     * scales are supplied explicitly so this fixture isolates damage from random capture.
+     */
     private static ShotContext shot(long id, double damage, CritOutcome crit, CombatProfile profile, double draw, double scale, Optional<UUID> parent) {
         return new ShotContext(ENCOUNTER, new UUID(1, id), new UUID(0, id), 0, parent, OWNER,
                 new WeaponIdentity(new UUID(2, id), "test-bow", 1, "v1"), stats(damage, 100), List.of(),
                 profile.mechanic(), 10, new Vector3(0, 100, 0), new Vector3(0, 1, 0), crit, draw, scale);
     }
+    /**
+     * Supplies a synthetic settled candidate at tick 20 and ten-block displacement; not collision proof.
+     */
     private static PhysicalImpact impact(ShotContext shot) {
         return new PhysicalImpact(new PhysicalImpact.Key(shot.encounterId(), shot.projectileId(), TARGET, 0), OWNER, 20,
                 new Vector3(0, 110, 0), Optional.empty());
@@ -279,10 +295,17 @@ class CombatServicesTest {
     private static DamageResult hit(CombatEncounter session, ShotContext shot, DamageModifiers modifiers) {
         return session.physical(shot, impact(shot), modifiers, 25, Optional.empty());
     }
+    /**
+     * Constructs a legacy fixed-policy child due at tick 22 with supplied basis/crit, including
+     * intentional mismatches for rejection tests.
+     */
     private static ProcCommand child(DamageResult parent, long id, double basis, CritOutcome crit) {
         return new ProcCommand(new UUID(0, id), parent.impactId(), parent.origin(), parent.ownerId(), parent.shotId(),
                 22, basis, crit, parent.mechanic(), 0);
     }
+    /**
+     * Requires the exact rejection plus zero actual HP and credit; a reason alone is insufficient.
+     */
     private static void assertRejected(DamageResult.RejectionReason reason, DamageResult result) {
         assertEquals(Optional.of(reason), result.rejectionReason());
         assertEquals(0, result.amounts().actualHealthDamage());

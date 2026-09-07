@@ -6,12 +6,23 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Pure companion tests for bounded diagnostic evidence; no Paper process is required.
+ * They protect the original failure text and JSON compatibility as well as size,
+ * cycle and immutability boundaries. They do not certify scenario cleanup itself.
+ */
 class ExceptionDiagnosticsTest {
+    /**
+     * Extracts the fixture's known chain schema for precise nested-value assertions.
+     */
     @SuppressWarnings("unchecked")
     private List<Map<String, Object>> chain(Map<String, Object> report) {
         return (List<Map<String, Object>>) report.get("chain");
     }
 
+    /**
+     * Checks a literal source frame/cause and proves extraction leaves the original throwable text intact.
+     */
     @Test void preservesFailureLocationAndCauseWithoutChangingOriginalText() {
         var cause = new NullPointerException("missing stats");
         cause.setStackTrace(new StackTraceElement[] {new StackTraceElement("test.Equipment", "inspect", "Equipment.java", 42)});
@@ -29,6 +40,9 @@ class ExceptionDiagnosticsTest {
         assertDoesNotThrow(() -> Json.write(report));
     }
 
+    /**
+     * Covers nullable exception messages and native frames through the actual report serializer.
+     */
     @Test void absentMessagesAndSourceFilesRemainSerializable() {
         var failure = new NullPointerException();
         failure.setStackTrace(new StackTraceElement[] {new StackTraceElement("test.Native", "run", null, -2)});
@@ -40,6 +54,9 @@ class ExceptionDiagnosticsTest {
         assertTrue(json.contains("\"line\":-2"));
     }
 
+    /**
+     * Uses oversized independent inputs to require exact caps and explicit omission counts.
+     */
     @Test void boundsLargeMessagesAndStacksAndReportsOmissions() {
         String huge = "x".repeat(10_000);
         var failure = new IllegalArgumentException(huge);
@@ -55,6 +72,9 @@ class ExceptionDiagnosticsTest {
         assertTrue(Json.write(report).length() < 20_000);
     }
 
+    /**
+     * Requires bounded iterative traversal of a five-thousand-cause chain.
+     */
     @Test void deepCauseChainStopsWithoutRecursiveTraversal() {
         Throwable failure = new IllegalStateException("root");
         for (int i = 0; i < 5000; i++) failure = new IllegalStateException("level " + i, failure);
@@ -64,6 +84,9 @@ class ExceptionDiagnosticsTest {
         assertEquals(false, report.get("causeCycle"));
     }
 
+    /**
+     * Distinguishes a real cause cycle from ordinary length truncation without duplicate entries.
+     */
     @Test void cyclicCausesAreIdentifiedWithoutRepeatingEntries() {
         var first = new IllegalStateException("first");
         var second = new IllegalArgumentException("second", first);
@@ -75,6 +98,9 @@ class ExceptionDiagnosticsTest {
         assertDoesNotThrow(() -> Json.write(report));
     }
 
+    /**
+     * Mutates the source throwable after capture and checks all exposed container levels reject mutation.
+     */
     @Test void resultIsAnImmutableSnapshotOfExceptionState() {
         var failure = new IllegalStateException("original");
         var report = ExceptionDiagnostics.describe(failure);

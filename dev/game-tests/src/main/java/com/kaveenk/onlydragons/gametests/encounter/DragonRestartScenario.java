@@ -10,7 +10,15 @@ import org.bukkit.entity.EnderDragon;
 import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-/** Two real boots: loaded arena queried before setup; production owns first-boot shutdown cleanup. */
+/**
+ * One phase of a declared two-boot, same-profile restart case.
+ * The runner supplies parent/phase/nonce and previous-report identity. The second boot
+ * queries loaded configuration before setup and loads the old native chunks before
+ * asserting absence. First-boot production dragons are deliberately not fixture-owned:
+ * actual plugin shutdown must retire them. Stationary, legacy config, animation and
+ * moving variants keep distinct declarations; packet UI expectations remain separate
+ * from server state and from full-client visual acceptance.
+ */
 public final class DragonRestartScenario implements Scenario, Listener {
     private final boolean legacy;
     private final boolean animation;
@@ -22,12 +30,32 @@ public final class DragonRestartScenario implements Scenario, Listener {
     private final java.util.List<java.util.Map<String,Object>> uiChecks = new java.util.ArrayList<>();
     private byte[] initial;
     private RestartPhase phase;
+    /**
+     * Creates a stationary restart variant without animation.
+     * @param legacy whether the runner supplied the legacy configuration seed
+     */
     public DragonRestartScenario(boolean legacy) { this(legacy, false); }
+    /**
+     * Creates a stationary restart with optional native death-animation shutdown.
+     * @param legacy whether the profile began from the declared legacy seed
+     * @param animation whether first shutdown occurs during native death animation
+     */
     public DragonRestartScenario(boolean legacy, boolean animation) { this(legacy, animation, false); }
+    /**
+     * Selects one declared restart variant, rejecting motion combined with legacy/animation.
+     * @param legacy whether the initial configuration is the runner's legacy seed
+     * @param animation whether native death animation is active at first shutdown
+     * @param motion whether first shutdown observes production orbit motion
+     */
     public DragonRestartScenario(boolean legacy, boolean animation, boolean motion) {
         if(motion&&(legacy||animation))throw new IllegalArgumentException("Moving restart is a separate variant");
         this.legacy = legacy; this.animation = animation; this.motion = motion;
     }
+    /**
+     * Checks boot-time config/native identity before any setup command and awaits the phase actor.
+     * @param context run context with a nonnull declared restart phase
+     * @throws Exception if seed/config or previous-phase evidence cannot be read
+     */
     public void start(ScenarioContext context) throws Exception {
         c = context; c.mechanicRevision(motion ? "dragon-restart-motion-v1" : "dragon-restart-v1"); dragons = c.production().dragons();
         phase = Objects.requireNonNull(c.restartPhase()); var world = Bukkit.getWorlds().getFirst();
@@ -56,7 +84,9 @@ public final class DragonRestartScenario implements Scenario, Listener {
         players.await("restart actor", 300, players::allOnline, this::setup);
         c.harness().getLogger().info("OD_PLAYER_READY " + c.harness().runId());
     }
+    /** Locates only the production config within this disposable profile. */
     private Path config() { return c.production().getDataFolder().toPath().resolve("config.yml"); }
+    /** Checks initial empty UI and permission/config rejection on boot one; boot two uses the already loaded arena. */
     private void setup() {
         uiSample("restart-idle", false);
         c.check("restart_ui_initially_empty", true, c.production().dragonHealth().generation().isEmpty() && c.production().dragonHealth().viewerCount()==0);
@@ -80,6 +110,11 @@ public final class DragonRestartScenario implements Scenario, Listener {
             command("status", () -> command("spawn", this::active));
         }
     }
+    /**
+     * Temporarily replaces config with a directory to force a read failure, retaining
+     * cleanup restoration before invoking the command. Saved-byte equality proves fixture
+     * restoration only; the production assertion here is retention of the loaded arena.
+     */
     private void persistenceFailure(Runnable next) {
         try {
             byte[] saved = Files.readAllBytes(config());
@@ -98,6 +133,7 @@ public final class DragonRestartScenario implements Scenario, Listener {
             });
         } catch(Exception failure) { throw new IllegalStateException(failure); }
     }
+    /** Records native/selection identity for the next boot, then leaves first-boot cleanup to production or checks second-boot reset. */
     private void active() {
         uiSample("restart-active", true);
         c.check("restart_ui_active", 1, c.production().dragonHealth().viewerCount());
@@ -127,6 +163,7 @@ public final class DragonRestartScenario implements Scenario, Listener {
             command("repeat", () -> { uiSample("restart-reset", false); c.check("restart_ui_reset_empty", true, c.production().dragonHealth().generation().isEmpty() && c.production().dragonHealth().viewerCount()==0); c.check("repeat_reset_no_result", true, c.production().combat().completions().isEmpty()); quit(); });
         });
     }
+    /** Uses a real lethal bow release and waits for native animation while the production parent/tickets remain owned at shutdown. */
     private void prepareAnimationShutdown(EnderDragon dragon) {
         var p=players.player("alpha");
         p.setGameMode(GameMode.SURVIVAL);p.setAllowFlight(true);p.setFlying(true);p.setInvulnerable(true);
@@ -145,12 +182,16 @@ public final class DragonRestartScenario implements Scenario, Listener {
             }));
         });
     }
+    /** Pairs a literal calibration-bar expectation with a client sample marker for this phase's current connection. */
     private void uiSample(String marker, boolean visible) {
         uiChecks.add(Map.of("actor","alpha","session","s1","marker",marker,"generation",visible?"restart-current":"", "title",visible?"Test Dragon (Calibration)  |  1,000 / 1,000 HP  (100%)":"", "percent",visible?1.0:0.0));
         c.observe("bossBarChecks",java.util.List.copyOf(uiChecks));
         players.player("alpha").sendMessage(net.kyori.adventure.text.Component.text("OD_UI_CHECK:"+c.harness().runId()+":"+marker));
     }
+    /** Waits for actual actor quit and freezes its journal without resetting the first-boot production dragon. */
     private void quit() { players.request("alpha", "quit"); players.await("actual quit", 100, () -> players.quits("alpha") == 1, () -> { c.observe("playerActions", players.journal()); c.finish(); }); }
+    /** Sequences a declared command after native preprocessing and its handler boundary. */
     private void command(String step, Runnable next) { int before = commands; players.request("alpha", step); players.await("command " + step, 80, () -> commands > before, () -> c.later(2, next::run)); }
+    /** Counts native command preprocessing independently of the requested action marker. */
     @EventHandler(priority = EventPriority.MONITOR) public void command(PlayerCommandPreprocessEvent event) { commands++; }
 }

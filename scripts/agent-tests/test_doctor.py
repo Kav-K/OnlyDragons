@@ -9,6 +9,11 @@ import doctor
 
 
 class DoctorTests(unittest.TestCase):
+    """Keep unavailable inputs, temporary resource waits and successful preflight distinct.
+
+    Use temporary directories and explicit memory/lease seams; assert probe cleanup and
+    absence of subprocess launch. A ready diagnostic must not grow a gameplay pass flag.
+    """
     def test_missing_context_and_consent_are_unavailable_not_test_passes(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(doctor.runner, 'available_memory', return_value={}):
             result = doctor.inspect(Path(directory), None, None, None)

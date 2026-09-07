@@ -15,7 +15,13 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class RestartContracts(unittest.TestCase):
+    """Mutate synthetic two-boot envelopes to reject nonce, world/config and process-lineage drift.
+
+    The fixture uses real temporary files but invented process identities and timing.
+    These tests certify continuity validation behavior, not a completed Paper restart.
+    """
     def setUp(self):
+        """Construct two nonoverlapping synthetic phases with linked config snapshots and distinct nonces."""
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
@@ -58,6 +64,7 @@ class RestartContracts(unittest.TestCase):
             self.parent['phases'].append(phase)
 
     def verify(self):
+        """Invoke the real continuity validator on the current test-owned envelope and snapshots."""
         restart.verify_continuity(runner, self.parent, self.descriptor, self.root)
 
     def test_initial_seed_default_valid_and_rejections(self):
@@ -178,8 +185,14 @@ class RestartContracts(unittest.TestCase):
 
 
 class FullRestartReplayTests(unittest.TestCase):
-    """Exercise the real suite entry point, including nested phase plan containment."""
+    """Exercise the actual suite replay entry point with a complete synthetic two-phase archive.
+
+    Extend ReceiptFixture using tiny fake protocol/plugin artifacts and copied tracked
+    plans. Deliberately forged test pins match those bytes; they are never production
+    artifact identity. Mutations must fail nested phase/plan/path continuity checks.
+    """
     def setUp(self):
+        """Build the test-only restart artifact, config, actor and evidence graph for strict replay."""
         import io
         import zipfile
         import paper_suite as suite

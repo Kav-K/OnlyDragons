@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 # Install the pinned Linux x86_64 tools without changing system tools or auth.
+# Run explicitly from Linux x86_64 with Linux Node/Python and the listed utilities.
+# Installs under this checkout's .symphony/runtime, verifies pinned download hashes
+# and npm integrity, then provisions navigation tools. No tracker, model, Minecraft
+# server or login is started. An unexpected existing JDK is left for operator review.
+# Version literals are also parsed by hosted CI: changes require deliberate pin
+# review, not merely updating these comments or resolving a floating latest release.
 set -euo pipefail
 
 PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -31,6 +37,9 @@ fi
 mkdir -p "$RUNTIME_ROOT" "$RUNTIME_ROOT/burrito"
 export XDG_DATA_HOME="$RUNTIME_ROOT/burrito"
 
+# Arguments: HTTPS source URL, owned cache destination, expected SHA-256. Reuse only
+# hash-matching bytes; otherwise verify a sibling .download before publishing it.
+# A failed download may leave that partial cache file for a later explicit retry.
 download_verified() {
   local source_url="$1" target_file="$2" expected_sha="$3"
   if [[ -f "$target_file" ]] && printf '%s  %s\n' "$expected_sha" "$target_file" | sha256sum --check --status; then

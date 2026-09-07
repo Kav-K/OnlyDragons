@@ -11,6 +11,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Level-based ghost-HP regression suite separating pre-hit shared source from child refresh
+ * eligibility. Explicit .99 samples isolate whole-hundred behavior; a 70-tick spacing fixture
+ * carries queued HP policy beyond the 60-tick Tempo expiry. Full credit, mixed-level replacement,
+ * stale-session cleanup and forged/missing parent policy are asserted without native projection.
+ */
 class TempoGhostPolicyTest {
     final UUID id=UUID.randomUUID(), target=UUID.randomUUID(), owner=UUID.randomUUID();
     final ProcCoordinator.Session session=new ProcCoordinator.Session(owner,UUID.randomUUID());

@@ -12,7 +12,9 @@ import org.geysermc.mcprotocollib.network.ClientSession;
 import org.geysermc.mcprotocollib.network.event.session.DisconnectedEvent;
 import org.junit.jupiter.api.Test;
 
+/** Pure cohort lifecycle tests with fake transports and real owned executors; no server acceptance is inferred. */
 class ActionPlayerTest {
+    /** Builds two actors with two sessions each so reconnect identity and cohort cleanup can be exercised together. */
     static ActionPlan multiple() throws Exception {
         String reconnect = step("again", "reconnect", "{\"delayMillis\":100}");
         String first = "{\"id\":\"first\",\"steps\":[" + reconnect + "]}";
@@ -21,6 +23,7 @@ class ActionPlayerTest {
                 + "{\"id\":\"alpha\",\"sessions\":[" + first + "," + second + "]},"
                 + "{\"id\":\"beta\",\"sessions\":[" + first + "," + second + "]}]}" );
     }
+    /** Controlled transports with separate callback/I/O executors, exposing connection ownership without opening sockets. */
     static final class Connections implements ActionPlayer.ConnectionFactory, AutoCloseable {
         final ActionPlan plan;
         final boolean idle;
@@ -28,7 +31,9 @@ class ActionPlayerTest {
         final List<AtomicBoolean> connected = new CopyOnWriteArrayList<>();
         final List<String> commands = new CopyOnWriteArrayList<>();
         final ExecutorService io = Executors.newSingleThreadExecutor();
+        /** Selects scripted successful callbacks or idle behavior for the supplied validated plan. */
         Connections(ActionPlan plan, boolean idle) { this.plan = plan; this.idle = idle; }
+        /** Creates a proxy whose disconnect waits for independent I/O, detecting network calls made while holding session state. */
         public ClientSession create(String name, ExecutorService callbacks) {
             int index = Integer.parseInt(name.substring(name.length() - 1));
             int visit = visits.merge(name, 1, Integer::sum) - 1;
@@ -63,8 +68,10 @@ class ActionPlayerTest {
                 }
             });
         }
+        /** Stops the test-owned I/O executor and requires bounded termination; does not swallow cleanup failure. */
         public void close() throws Exception { io.shutdownNow(); assertTrue(io.awaitTermination(3, TimeUnit.SECONDS)); }
     }
+    /** Checks independent reconnect histories and that every opened peer is closed when the cohort finishes. */
     @Test void twoActorsReconnectIndependentlyKeepIdentityAndCloseAllConnections() throws Exception {
         var plan = multiple();
         try (var connections = new Connections(plan, false)) {
@@ -81,6 +88,7 @@ class ActionPlayerTest {
             assertEquals(2, ((List<?>) actors.get(1).get("sessions")).size());
         }
     }
+    /** Keeps actors idle to prove timeout retires both connections and records failure rather than partial success. */
     @Test void timeoutClosesEveryOwnedConnectionAndCannotReportPartialSuccess() throws Exception {
         var plan = multiple();
         try (var connections = new Connections(plan, true)) {
@@ -91,6 +99,7 @@ class ActionPlayerTest {
             assertTrue(connections.connected.stream().noneMatch(AtomicBoolean::get));
         }
     }
+    /** Fails creation of the second actor to verify cleanup of the first registered live peer. */
     @Test void connectionCreationFailureClosesAlreadyRegisteredPeer() throws Exception {
         var plan = multiple();
         try (var connections = new Connections(plan, true)) {

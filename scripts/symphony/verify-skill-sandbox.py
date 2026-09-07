@@ -19,15 +19,18 @@ import time
 
 
 def require(condition, message):
+    """Raise RuntimeError when a scoped sandbox observation differs from the reviewed contract."""
     if not condition:
         raise RuntimeError(message)
 
 
 def git(cwd, *args):
+    """Run bounded Git against the explicitly owned fixture repository and return trimmed text."""
     return subprocess.check_output(['git', *args], cwd=cwd, stderr=subprocess.PIPE, timeout=15).decode().strip()
 
 
 def configure_author(repo):
+    """Set deterministic local-only author, line-ending and signing settings in a scratch clone."""
     git(repo, 'config', 'user.name', 'OnlyDragons Sandbox Fixture')
     git(repo, 'config', 'user.email', 'sandbox-fixture@example.invalid')
     git(repo, 'config', 'core.autocrlf', 'false')
@@ -35,7 +38,13 @@ def configure_author(repo):
 
 
 class AppServer:
+    """Own a no-model app-server subprocess and a sequential line-delimited RPC stream.
+
+    The caller supplies disposable workspace/CODEX_HOME and must call close. Remote
+    plugins and MCP servers are disabled so this probe tests sandbox behavior directly.
+    """
     def __init__(self, binary, workspace, codex_home):
+        """Start the supplied binary in an owned session with isolated config and piped protocol I/O."""
         self.process = subprocess.Popen(
             [str(binary), '--disable', 'remote_plugin', '--config', 'mcp_servers={}', 'app-server'],
             cwd=workspace, env=dict(os.environ, CODEX_HOME=str(codex_home)),
@@ -46,10 +55,15 @@ class AppServer:
         self.identifier = 0
 
     def notify(self, method, params):
+        """Send and flush a protocol notification that does not expect a response ID."""
         self.process.stdin.write(json.dumps({'method': method, 'params': params}).encode() + b'\n')
         self.process.stdin.flush()
 
     def rpc(self, method, params):
+        """Send one incrementing request and wait at most 30 seconds for its exact response ID.
+
+        Retain partial lines between reads; unrelated notifications do not satisfy the call.
+        """
         self.identifier += 1
         self.process.stdin.write(json.dumps({'id': self.identifier, 'method': method, 'params': params}).encode() + b'\n')
         self.process.stdin.flush()
@@ -68,6 +82,7 @@ class AppServer:
         raise TimeoutError(method)
 
     def close(self):
+        """Close input and reap only this app-server group, escalating after bounded waits."""
         self.process.stdin.close()
         try:
             self.process.wait(timeout=5)
@@ -83,6 +98,14 @@ class AppServer:
 
 
 def run(binary, base):
+    """Exercise the pinned Linux sandbox with disposable Git/skill/sibling control files.
+
+    Require scratch outside default writable temporary roots so denied sibling writes
+    remain meaningful. Compare baseline denials, narrow reviewed grants, an ordinary
+    two-parent skill merge and the known nested-only grant failure. Verify protected
+    files survive, cleanly reap the child and remove owned scratch. Return observations;
+    this explicit smoke is not run by ordinary unit discovery or a model turn.
+    """
     require(sys.platform == 'linux', 'This smoke requires Linux/WSL sandbox facilities')
     temporary_roots = [Path('/tmp').resolve()]
     if os.environ.get('TMPDIR'):
@@ -155,6 +178,7 @@ def run(binary, base):
             app.notify('initialized', {})
 
             def execute(command, requested_policy):
+                """Request a ten-second command execution under the exact supplied sandbox policy."""
                 return app.rpc('command/exec', {'command': command, 'cwd': str(workspace),
                                                 'sandboxPolicy': requested_policy, 'timeoutMs': 10000})
 
@@ -195,6 +219,7 @@ def run(binary, base):
 
 
 def main():
+    """Parse explicit Codex/scratch paths and print the no-model sandbox observation JSON."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--codex', required=True, type=Path)
     parser.add_argument('--scratch-root', required=True, type=Path)

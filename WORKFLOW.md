@@ -70,17 +70,23 @@ than creating duplicate commits, comments, or pull requests.
 
 - Read AGENTS.md, .cursor/rules/minecraft.mdc, README.md, and versions.properties
   before editing. Follow their development conventions within this workflow.
-- Read docs/planning/01-research.md, docs/planning/02-foundation-plan.md, and
-  docs/planning/03-agent-tasks-and-validation.md as shared context for every
-  issue. Match this issue to its task/dependencies or record a bounded unlisted
+- Follow AGENTS.md's source-first route: dev/source-contracts.md, current status
+  in docs/planning/03-agent-tasks-and-validation.md, source Javadoc/consumers/tests,
+  and affected sections of docs/planning/01-research.md and
+  docs/planning/02-foundation-plan.md. Read all three entries for new product scope,
+  cross-cutting decisions, ambiguity or missing design context. Routine bounded
+  changes do not require unrelated planning/history. Match this issue to its
+  task/dependencies or record a bounded unlisted
   maintenance task; do not execute the rest of the backlog. Reconcile relevant
   issue/PR state with the delivery ledger before assuming a dependency is done.
   Pass the context paths, revision, scope, and gates to any subagent.
-  Read the mandatory documents in bounded sections (about 120-180 lines at a
+  Read relevant documents in bounded sections (about 120-180 lines at a
   time), with output budgets large enough at both the shell and enclosing tool
   layers. If output truncates, retrieve only the missing section. After merging
-  main, inspect the context diff and reread affected sections; do not repeatedly
-  dump all three documents when their earlier content is still in context.
+  main, inspect source/context diffs and reread affected contracts. Comments
+  describe implemented behavior; user decisions and acceptance gates remain in
+  the shared plan. Investigate conflicts before changing behavior or claiming
+  completion. Do not repeatedly dump unrelated historical evidence.
 - Use the relevant repository skills under .agents/skills/ and tool routing in
   dev/agent-workflow.md. Context7 supplies API documentation; Serena is already
   bound to this issue checkout for Java navigation. Before symbol work, confirm
@@ -142,14 +148,16 @@ than creating duplicate commits, comments, or pull requests.
    dev/checks/project.json when commands or their expected behavior change.
 4. Run bash ./gradlew build --console=plain with the provisioned JDK 25 after
    meaningful code changes. Inspect failures and test reports; skipped tests
-   are not passes. For documentation-only changes, verify the affected commands
-   and references without claiming a plugin build was run.
+   are not passes. For Markdown-only changes, verify commands and references
+   without claiming a build. For source-documentation changes, compile/generate
+   affected Javadoc and verify executable syntax is preserved; do not suppress
+   doclint or relabel old runtime receipts as evidence of new source bytes.
    At implementation checkpoints, before an expensive Paper run, after merging
    main, and before publishing, read this issue's latest owner comments and the
    relevant dependency API notes. Reconcile changed contracts and calibration
    totals before spending another test run. Record concise API/ownership changes
    in the issue early; do not poll on every tool call or repeat unchanged comments.
-5. Run the feature's actual Paper scenarios using scripts/agent-tests/paper_test.py
+5. For gameplay/runtime changes, run the feature's actual Paper scenarios using scripts/agent-tests/paper_test.py
    and dev/agent-paper-tests.md. Add meaningful scenario assertions for the
    production feature. Await each Gradle-owning command's exit before starting
    another in this checkout, and freeze source while its build/run is active.
@@ -183,7 +191,9 @@ than creating duplicate commits, comments, or pull requests.
    and logs. Update the affected planning context under document 03's maintenance
    protocol: research in 01, design/contract changes in 02, status/evidence and
    remaining gates in 03. Include those updates in the same branch as the work.
-   Commit only relevant source, tests, configuration, and documentation.
+   Maintain affected source Javadoc/native script contracts alongside behavior;
+   document units, ordering, ownership, snapshot timing, rejection and cleanup at
+   the responsible API. Commit only relevant source, tests, configuration, and documentation.
    Use ordinary git push -u origin symphony/gh-{{ issue.id }}. The workspace's
    credential helper supplies scoped Git authentication; do not read token files,
    print authentication, or add secrets to Git URLs. Never force-push.

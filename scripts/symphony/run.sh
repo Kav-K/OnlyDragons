@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+# Operator entry point for the pinned WSL Symphony runtime. Resolves this checkout
+# as the authority for credentials, workflow, Codex home and shared Paper lease.
+# check reports readiness; start keeps an exclusive lifetime dispatcher lock.
+# login may use device authentication; install delegates pinned local provisioning.
+# status queries loopback only; stop verifies the recorded PID's source environment
+# and command before requesting TERM. A shutdown request is not proof of cleanup.
+# Token aliases are scrubbed for the pinned upstream release; never enable shell
+# tracing here because the tracker token and credential-helper environment are private.
 set -euo pipefail
 ONLYDRAGONS_SOURCE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd -P)
 export ONLYDRAGONS_SOURCE
@@ -63,6 +71,8 @@ python3 "$ONLYDRAGONS_SOURCE/scripts/symphony/check-github.py" || missing=1
 [[ "$missing" == 0 ]] || exit 1
 [[ "$action" == start ]] || exit 0
 # Hold the lock through the entire process lifetime; prevents duplicate dispatchers.
+# File descriptor 9 deliberately survives exec so the dispatcher owns the lock
+# until process exit. The PID file is an ownership hint, never sufficient by itself.
 exec 9>"$state_root/symphony.lock"
 flock -n 9 || { echo 'OnlyDragons Symphony is already running.' >&2; exit 1; }
 printf '%s\n' "$$" > "$state_root/symphony.pid"

@@ -1,9 +1,25 @@
 # Process ownership is checked against a managed profile, its worker, and its run ID.
 # Never terminate by executable name or port number alone.
 function Get-LabProcesses {
+    <#
+    .SYNOPSIS
+    Snapshots candidate Windows shell and Java processes through CIM.
+    .DESCRIPTION
+    Returns process identity/path/command metadata for later ownership checks. Candidate executable names alone never authorize stopping a process.
+    #>
     @(Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe' OR Name = 'pwsh.exe' OR Name = 'java.exe' OR Name = 'javaw.exe'")
 }
 
+<#
+.SYNOPSIS
+Binds a profile session to its actual worker and/or owned Java process.
+.DESCRIPTION
+Requires the managed directory shape, matching state/session run IDs and expected launcher/JAR arguments. Java must match its executable and either a verified worker parent or exact run/directory tags, permitting orphan discovery. Inspection failures warn and produce no owned result.
+.PARAMETER Directory
+Candidate version/profile directory.
+.PARAMETER Processes
+CIM snapshot used consistently for this identity comparison.
+#>
 function Get-LabManagedServer([string]$Directory, $Processes) {
     try {
         $full = [IO.Path]::GetFullPath($Directory).TrimEnd('\')
@@ -34,6 +50,12 @@ function Get-LabManagedServer([string]$Directory, $Processes) {
     } catch { Write-Warning "Could not inspect managed profile ${Directory}: $($_.Exception.Message)" }
 }
 
+<#
+.SYNOPSIS
+Discovers managed profiles from actual worker arguments or Java ownership tags.
+.DESCRIPTION
+Takes one candidate process snapshot, extracts distinct profile paths and subjects each to full session/worker/Java identity checks. Discovery can span projects for the human Play workflow.
+#>
 function Get-LabManagedServers {
     $processes = Get-LabProcesses
     $directories = foreach ($process in $processes) {
@@ -51,6 +73,14 @@ function Get-LabManagedServers {
     }
 }
 
+<#
+.SYNOPSIS
+Terminates an already verified process only if its creation time still matches.
+.DESCRIPTION
+Opens a live process handle, rejects PID reuse and waits for that exact process to exit. Callers must supply prior ownership evidence; this helper does not establish ownership from a PID alone.
+.PARAMETER Expected
+Verified CIM process record with ProcessId and CreationDate, or null for no work.
+#>
 function Stop-LabOwnedProcess($Expected) {
     if (-not $Expected) { return }
     $live = Get-Process -Id $Expected.ProcessId -ErrorAction SilentlyContinue
@@ -66,6 +96,16 @@ function Stop-LabOwnedProcess($Expected) {
     } finally { $live.Dispose() }
 }
 
+<#
+.SYNOPSIS
+Stops a verified managed session gracefully before bounded forced recovery.
+.DESCRIPTION
+Re-resolves ownership and run ID before each phase. After graceful timeout, terminates only the current verified Java/worker, confirms lock release and marks forcedStop only in the same run's state. A changed session aborts recovery.
+.PARAMETER Server
+Previously verified managed-server record.
+.PARAMETER Timeout
+Graceful shutdown deadline in seconds, default 45.
+#>
 function Stop-LabManagedServer($Server, [int]$Timeout = 45) {
     $current = Get-LabManagedServer $Server.directory (Get-LabProcesses)
     if (-not $current) { return }
@@ -96,12 +136,26 @@ function Stop-LabManagedServer($Server, [int]$Timeout = 45) {
     Write-Host 'Managed server stopped (forced).'
 }
 
+<#
+.SYNOPSIS
+Stops each verified managed development server except an optional profile.
+.DESCRIPTION
+Used by human Play/restart/start/run under the startup mutex. It intentionally spans projects; it does not select unrelated Java by executable name or listening port.
+.PARAMETER ExcludeDirectory
+Exact profile directory to retain, used when start/run may reuse their own session.
+#>
 function Stop-LabOtherServers([string]$ExcludeDirectory = '') {
     foreach ($server in @(Get-LabManagedServers)) {
         if ($server.directory -ne $ExcludeDirectory) { Stop-LabManagedServer $server }
     }
 }
 
+<#
+.SYNOPSIS
+Serializes managed server startup for the current Windows user in this session.
+.DESCRIPTION
+Acquires a SID-named Local mutex within 30 seconds, accepting abandoned ownership. Returns the held mutex; the caller must release and dispose it in finally. Failure disposes the handle.
+#>
 function Enter-LabStartLock {
     $sid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
     $mutex = [Threading.Mutex]::new($false, ('Local\MinecraftPluginLab.Start.' + $sid))

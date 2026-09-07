@@ -38,21 +38,25 @@ skipping a tool call does not itself save that startup cost.
 
 1. Inspect the working tree and preserve existing changes. Read `AGENTS.md`,
    `versions.properties`, `build.gradle.kts`, `src/main/resources/plugin.yml`, and
-   the code/tests relevant to the task. When `docs/planning/` exists, read all
-   three planning documents under AGENTS.md's shared-context contract. Check
-   the delivery ledger and relevant issues/PRs before claiming a task.
+   the code/tests relevant to the task. Follow AGENTS.md's source-first route:
+   [source contracts](source-contracts.md), the current delivery ledger, relevant
+   issue/owner comments, and affected design/research sections. Source Javadoc
+   explains implemented contracts; the planning entries retain product decisions
+   and gates. Read all three entries for new scope, cross-cutting decisions or
+   missing design context. Check relevant issues/PRs before claiming a task.
    Read in bounded sections with complete tool output. Honor both nested command
    and outer orchestration output limits; retrieve missing ranges after truncation.
-   On main integration, review the context diff and affected sections. Repeat all
-   three reads if changing tasks or recovering missing context. Historical
-   evidence is linked from the current summaries and read when relevant.
+   On main integration, review source/context diffs and affected contracts.
+   Historical evidence is linked from current summaries and read when validating
+   its claim; unrelated history is not a mandatory read for a bounded change.
 2. Treat the repository pins as the target. Resolve Context7's library ID before
    requesting documentation, and include the pinned API version in the question.
    A result for another release is not proof an API exists here. Check official
    Paper/Bukkit documentation or the resolved dependency when necessary.
 3. Implement one coherent change. Keep pure logic separate from server callbacks;
    review thread ownership and lifecycle cleanup when the feature crosses threads.
-   Update commands, permissions, config, tests, and console assertions as applicable.
+   Update commands, permissions, config, tests, console assertions and source
+   contracts as applicable. Keep Javadoc close to the code that owns behavior.
 4. Before handoff, update the affected project context in the same change.
    Record what exists, actual validation and remaining gates, decisions and
    blockers, task/PR references, and the next dependency. The integration lead
@@ -80,7 +84,10 @@ The build covers compilation, JUnit/MockBukkit, API isolation, and artifact crea
 The smoke command builds by default, prepares the pinned Paper server, checks status
 and plugin enablement, runs `dev/checks/project.json`, scans for errors, and stops
 that test server. Use the smoke step for lifecycle, commands, permissions, event/API
-integration, dependency, or resource changes. A prose-only edit needs neither step.
+integration, dependency, or resource changes. A Markdown-only edit needs neither
+step. Source-documentation maintenance should compile/generate affected Javadoc
+and check executable syntax is preserved; it does not need a new Paper run solely
+for comments. Historical runtime evidence retains its original source identity.
 Inspect relevant behavior tests for pure logic changes; do not add tests that merely
 repeat implementation details.
 

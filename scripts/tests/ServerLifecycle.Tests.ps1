@@ -1,3 +1,16 @@
+<#
+.SYNOPSIS
+Checks Windows lab process ownership and pipe cleanup using small Java fixtures.
+.DESCRIPTION
+Compiles the maintained LifecycleFixture with an installed JDK 25 into a unique
+build/tests directory, then launches owned lab workers and a separately owned
+unrelated-process sentinel. Exercises Unicode stdout/stderr, stale PID rejection,
+graceful/repeated stop, forced stop and tagged orphan recovery. It starts no Paper
+server and supplies no gameplay acceptance. Writes result.json only after all checks
+pass, retaining fixture logs; finally retires only the test-created processes.
+.NOTES
+Used by Windows CI. Requires the installed JDK and CIM process inspection; it does not install a runtime. Startup and cleanup timeouts fail visibly rather than treating incomplete work as passed.
+#>
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $projectRoot 'scripts\Lab.Common.ps1')
@@ -13,6 +26,16 @@ $started = @()
 $unrelated = $null
 $checks = @()
 
+<#
+.SYNOPSIS
+Starts one uniquely named test profile through the actual lab worker.
+.DESCRIPTION
+Creates only beneath this invocation's test root, records ownership before waiting and returns a verified managed-server record after readiness. The tiny Java fixture uses no game port; timeout remains a test failure.
+.PARAMETER Name
+Scenario suffix used under the isolated test root.
+.PARAMETER IgnoreStop
+Selects the fixture's deliberate unresponsive shutdown control.
+#>
 function Start-Fixture([string]$Name, [bool]$IgnoreStop = $false) {
     $directory = Join-Path $testRoot "run\servers\26.2-$Name"
     New-Item -ItemType Directory -Path $directory,(Join-Path $directory 'commands') -Force | Out-Null

@@ -17,48 +17,162 @@ import java.util.*;
  * this coordinator and its encounter. Never feed tempo back into a captured stat snapshot.
  */
 public final class ProcCoordinator implements AutoCloseable {
+    /**
+     * Captured lifecycle identity used to prevent old arrows/callbacks rebuilding a new login's buffs.
+     * @param ownerId nonnull player UUID
+     * @param token nonnull fresh session UUID allocated by the composition root
+     */
     public record Session(UUID ownerId, UUID token) {
+        /**
+         * Rejects null owner/token; freshness is the caller's lifecycle responsibility.
+         * @param ownerId nonnull player UUID
+         * @param token nonnull fresh session UUID allocated by the composition root
+         */
         public Session { Objects.requireNonNull(ownerId); Objects.requireNonNull(token); }
     }
+    /**
+     * Positive independent bounds; queue overflow rejects a whole child group after parent credit.
+     * @param queueCapacity maximum pending children in this encounter
+     * @param maxDuePerTick maximum polled children per distinct drain tick, including failures/inactive entries
+     * @param maxSessions maximum simultaneously activated owners
+     * @param spacingTicks positive game ticks between siblings
+     */
     public record Limits(int queueCapacity, int maxDuePerTick, int maxSessions, int spacingTicks) {
+        /**
+         * Rejects any nonpositive bound; limits are immutable for this coordinator.
+         * @param queueCapacity maximum pending children in this encounter
+         * @param maxDuePerTick maximum polled children per distinct drain tick, including failures/inactive entries
+         * @param maxSessions maximum simultaneously activated owners
+         * @param spacingTicks positive game ticks between siblings
+         */
         public Limits {
             if (queueCapacity < 1 || maxDuePerTick < 1 || maxSessions < 1 || spacingTicks < 1) {
                 throw new IllegalArgumentException("Queue/session limits and spacing must be positive");
             }
         }
     }
-    public enum Admission { QUEUED, NO_CHILDREN, CAPACITY_REJECTED, INACTIVE_SESSION, PHYSICAL_REJECTED }
+    /**
+     * Child admission outcome separate from physical acceptance. CAPACITY_REJECTED and
+     * INACTIVE_SESSION preserve already-committed parent damage; NO_CHILDREN can still build Tempo.
+     */
+    public enum Admission {
+        /** The entire rolled child group was admitted. */ QUEUED,
+        /** The accepted physical impact rolled zero children. */ NO_CHILDREN,
+        /** The whole child group was refused by queue capacity. */ CAPACITY_REJECTED,
+        /** The captured session is not currently active; no new children are admitted. */ INACTIVE_SESSION,
+        /** The encounter rejected the parent, so no children are requested. */ PHYSICAL_REJECTED
+    }
+    /**
+     * Returned physical commit plus child admission, not a request to reapply damage.
+     * @param damage authoritative encounter result
+     * @param admission reason children were or were not queued
+     * @param requestedChildren rolled count when accepted; zero for rejected physical input
+     * @param children immutable copy of the admitted whole group, empty when none admitted
+     */
     public record PhysicalResult(DamageResult damage, Admission admission, int requestedChildren,
                                  List<ProcCommand> children) {
+        /**
+         * Copies children; this diagnostic DTO does not independently validate admission/count consistency.
+         * @param damage authoritative encounter result
+         * @param admission reason children were or were not queued
+         * @param requestedChildren rolled count when accepted; zero for rejected physical input
+         * @param children immutable copy of the admitted whole group, empty when none admitted
+         */
         public PhysicalResult { children = List.copyOf(children); }
     }
+    /**
+     * Immutable inspection without advancing time or expiring state.
+     * @param queued current pending child count
+     * @param sessions current activated owner count
+     * @param tempoStates retained buff count, expired when the clock next advances
+     * @param capacityRejectedChildren cumulative children rejected by whole-group capacity
+     * @param inactiveRejectedChildren cumulative children denied or discarded for stale sessions
+     * @param clearedChildren cumulative children explicitly removed by session cleanup or close
+     */
     public record Metrics(int queued, int sessions, int tempoStates, long capacityRejectedChildren,
                           long inactiveRejectedChildren, long clearedChildren) {}
+    /**
+     * One consumed child whose evaluation threw a validation/arithmetic exception.
+     * @param command exact failed command, never automatically requeued
+     * @param reason exception message; may be null for an injected exception without a message
+     */
     public record ChildFailure(ProcCommand command, String reason) {}
+    /**
+     * Partial-outcome report for a consumed tick; successful earlier commits are never rolled back.
+     * @param results copied committed/rejected child results in drain order
+     * @param failures copied failed commands in encounter order; no result is fabricated for them
+     */
     public record Drain(List<DamageResult> results, List<ChildFailure> failures) {
+        /**
+         * Freezes both lists; callers reconcile successes and failures without retrying this tick.
+         * @param results copied committed/rejected child results in drain order
+         * @param failures copied failed commands in encounter order; no result is fabricated for them
+         */
         public Drain { results = List.copyOf(results); failures = List.copyOf(failures); }
     }
     /** Earlier children remain committed; callers can reconcile without retrying the consumed tick. */
     public static final class DrainFailure extends IllegalArgumentException {
         private final Drain drain;
         private DrainFailure(Drain drain) { super("Proc drain failed: " + drain.failures()); this.drain = drain; }
+        /**
+         * Returns the retained immutable partial drain for legacy callers catching this exception.
+         * @return immutable partial drain containing both completed results and failures
+         */
         public Drain drain() { return drain; }
     }
+    /**
+     * Internal pairing that preserves the captured session even if the owner later reconnects.
+     * @param command admitted immutable child
+     * @param session exact launch lifecycle token
+     */
     private record Pending(ProcCommand command, Session session) {}
 
+    /**
+     * Creating thread shared with the encounter; every externally driven operation checks ownership.
+     */
     private final Thread ownerThread = Thread.currentThread();
     private final CombatEncounter encounter;
     private final Limits limits;
     private final RandomSource random;
+    /**
+     * Current exact lifecycle token per owner; replacing a token invalidates that owner’s queued children and buff.
+     */
     private final Map<UUID, Session> sessions = new HashMap<>();
+    /**
+     * Retained shared buffs by owner; time advancement removes expired values.
+     */
     private final Map<UUID, TempoState> tempo = new HashMap<>();
+    /**
+     * Pending children ordered by due tick then proc UUID, independent of owner-map iteration.
+     */
     private final PriorityQueue<Pending> queue = new PriorityQueue<>(Comparator
             .comparingLong((Pending p) -> p.command().dueTick()).thenComparing(p -> p.command().procId()));
+    /**
+     * Latest accepted coordinator clock; physical admission and draining may advance it.
+     */
     private long now;
+    /**
+     * Last consumed drain tick; repeated same-tick calls cannot replay effects.
+     */
     private long lastDrain = -1;
+    /**
+     * Cumulative child counts for capacity refusal, stale sessions and explicit cleanup respectively.
+     */
     private long capacityRejected, inactiveRejected, cleared;
+    /**
+     * Terminal local state; close clears effects and ends the associated encounter.
+     */
     private boolean closed;
 
+    /**
+     * Retains nonnull encounter, limits and random source; immediately verifies encounter access
+     * on this constructing thread. Owns no external scheduler. The caller must drive and close it.
+     * @param encounter nonnull encounter owned on the constructing thread
+     * @param limits nonnull bounded queue/session/tick policy
+     * @param random nonnull probability source; sampling remains coordinator-owned
+     * @throws NullPointerException if a collaborator is null
+     * @throws IllegalStateException if encounter ownership differs from this constructing thread
+     */
     public ProcCoordinator(CombatEncounter encounter, Limits limits, RandomSource random) {
         this.encounter = Objects.requireNonNull(encounter);
         this.limits = Objects.requireNonNull(limits);
@@ -66,7 +180,16 @@ public final class ProcCoordinator implements AutoCloseable {
         encounter.target(); // Verify that both authorities have the same owner thread.
     }
 
-    /** Bounded admission; reconnect uses a new token. Repeating the current token preserves tempo. */
+    /**
+     * Bounded admission; reconnect uses a new token. Repeating the current token preserves tempo.
+     * <p>
+     * Returns false only for a new owner at capacity; returns true for the same active token
+     * without resetting state. Replacing an owner's token first clears its old children and Tempo.
+     * Closed or wrong-thread access throws IllegalStateException.
+     * @param session nonnull owner/token pair; reconnect supplies a replacement token
+     * @return true for accepted or unchanged activation, false for a new owner at session capacity
+     * @throws IllegalStateException if closed or off the constructing thread
+     */
     public boolean activate(Session session) {
         requireOpen();
         Objects.requireNonNull(session);
@@ -78,7 +201,13 @@ public final class ProcCoordinator implements AutoCloseable {
         return true;
     }
 
-    /** A late quit callback for an old token cannot erase a reconnected session. */
+    /**
+     * A late quit callback for an old token cannot erase a reconnected session.
+     * <p>
+     * Removes children for exactly this token and clears Tempo only if that token is still active.
+     * Safe after close on the owning thread; it cannot clear another session for the same UUID.
+     * @param session exact token to retire; stale tokens cannot erase a replacement session
+     */
     public void clearSession(Session session) {
         checkThread();
         if (sessions.remove(session.ownerId(), session)) tempo.remove(session.ownerId());
@@ -87,6 +216,15 @@ public final class ProcCoordinator implements AutoCloseable {
         cleared += before - queue.size();
     }
 
+    /**
+     * Advances the nondecreasing game clock, expires old state and returns this exact active
+     * session's bonus, otherwise zero. This inspection has clock/expiry side effects and requires open state.
+     * @param session exact active owner/session token to inspect
+     * @param tick nonnegative game tick that may not precede the coordinator clock
+     * @return active unexpired Tempo bonus percentage, otherwise zero; inspection advances expiry
+     * @throws IllegalStateException if closed or off-thread
+     * @throws IllegalArgumentException if the supplied tick moves backward
+     */
     public int tempoBonus(Session session, long tick) {
         requireOpen(); advance(tick);
         return live(session) ? tempo.getOrDefault(session.ownerId(), new TempoState(0, 0)).bonusAt(tick) : 0;
@@ -96,6 +234,17 @@ public final class ProcCoordinator implements AutoCloseable {
      * This is the sole proc-admitting physical entry; accepted DTOs cannot be resubmitted to mint
      * more children. The combat authority rejects duplicate physical keys before queue admission.
      * Offline old arrows may credit captured physical damage, but cannot create buffs or children.
+     * <p>
+     * Preflights timing and fractional randomness, commits the parent, then builds eligible Tempo
+     * and reserves all children or none. Failures before commit can still advance the coordinator
+     * clock/expire buffs or consume a draw. Capacity rejection does not undo parent HP/credit or
+     * eligible Tempo refresh. Whole hundreds consume no draw. Children retain pre-hit HP policy.
+     * @param shot immutable launch snapshot excluding live Tempo
+     * @param impact settled candidate with nondecreasing receiver tick
+     * @param modifiers physical modifiers applied once by the encounter
+     * @param capturedSession exact launch token with matching shot owner
+     * @param adapterRejection nonnull optional settled veto
+     * @return physical result plus immutable admission details
      */
     public PhysicalResult physical(ShotContext shot, PhysicalImpact impact, DamageModifiers modifiers,
                                    Session capturedSession, Optional<DamageResult.RejectionReason> adapterRejection) {
@@ -136,14 +285,33 @@ public final class ProcCoordinator implements AutoCloseable {
         return new PhysicalResult(damage, Admission.QUEUED, count, commands);
     }
 
-    /** Bounded work even after a late tick; repeated calls at the same tick cannot bypass the budget. */
+    /**
+     * Bounded work even after a late tick; repeated calls at the same tick cannot bypass the budget.
+     * <p>
+     * Returns immutable results when all children evaluate normally; throws {@link DrainFailure}
+     * with the complete partial outcome if any child fails. Same-tick repeats return empty.
+     * Due ordering is dueTick then stable child UUID, not insertion order.
+     * @param tick nonnegative nondecreasing game tick to drain within the shared per-tick budget
+     * @return immutable successfully evaluated results; same-tick repeats return empty
+     * @throws DrainFailure if any child fails, carrying the complete partial drain
+     * @throws IllegalStateException if closed or off-thread
+     * @throws IllegalArgumentException if the supplied tick moves backward
+     */
     public List<DamageResult> tick(long tick) {
         Drain drain = tickOutcomes(tick);
         if (!drain.failures().isEmpty()) throw new DrainFailure(drain);
         return drain.results();
     }
 
-    /** Per-child transaction boundary; a failed child is consumed and explicitly reported. */
+    /**
+     * Per-child transaction boundary; a failed child is consumed and explicitly reported.
+     * <p>
+     * Advances/expires buffs, drains dueTick/UUID order up to the configured budget, and isolates
+     * IllegalArgumentException/ArithmeticException per child. Earlier commits survive failures;
+     * each removed child is consumed. Accepted eligible children may refresh Tempo, never recurse.
+     * @param tick nonnegative nondecreasing game tick; same-tick repeats return an empty drain
+     * @return immutable results and failures; no scheduler or retry is installed
+     */
     public Drain tickOutcomes(long tick) {
         requireOpen(); advance(tick);
         if (lastDrain == tick) return new Drain(List.of(), List.of());
@@ -166,16 +334,35 @@ public final class ProcCoordinator implements AutoCloseable {
         return new Drain(results, failures);
     }
 
+    /**
+     * Returns current counters on the creating thread, including after close; does not expire buffs.
+     * @return current queue/session/Tempo counts and cumulative admission/cleanup counters
+     */
     public Metrics metrics() {
         checkThread();
         return new Metrics(queue.size(), sessions.size(), tempo.size(), capacityRejected, inactiveRejected, cleared);
     }
-    /** Adapter provenance need only remain while one of these bounded parents has queued children. */
+    /**
+     * Adapter provenance need only remain while one of these bounded parents has queued children.
+     * <p>
+     * Returns an immutable set of physical parent IDs still referenced by queued children.
+     * Adapters may prune their bounded diagnostics for other parents; domain claims remain retained.
+     * @return immutable set of accepted physical-parent IDs still referenced by queued children
+     */
     public Set<UUID> pendingParents() {
         checkThread(); var parents = new HashSet<UUID>();
         queue.forEach(p -> parents.add(p.command().parentImpactId())); return Set.copyOf(parents);
     }
 
+    /**
+     * Returns a stable UTF-8 name UUID from parent ID and sibling index 1–5; null parent and
+     * out-of-range index reject. This pure helper is callable without owning-thread access.
+     * @param parent nonnull accepted physical parent UUID
+     * @param index sibling ordinal from 1 through 5
+     * @return stable name UUID for that parent/sibling pair, independent of delivery timing
+     * @throws NullPointerException if parent is null
+     * @throws IllegalArgumentException if the index is outside 1–5
+     */
     public static UUID childId(UUID parent, int index) {
         Objects.requireNonNull(parent);
         if (index < 1 || index > 5) throw new IllegalArgumentException("Child index must be 1–5");
@@ -192,12 +379,23 @@ public final class ProcCoordinator implements AutoCloseable {
         encounter.end();
     }
 
+    /**
+     * Compares the complete captured Session against the current owner entry, not UUID alone.
+     */
     private boolean live(Session session) { return session.equals(sessions.get(session.ownerId())); }
+    /**
+     * Only an eligible positive captured level in the exact live session refreshes the shared
+     * state at coordinator time. Called after successful parent/child damage, never for rejection.
+     */
     private void buildTempo(Session session, int level) {
         if (level > 0 && live(session)) {
             tempo.put(session.ownerId(), tempo.getOrDefault(session.ownerId(), new TempoState(0, 0)).hit(level, now));
         }
     }
+    /**
+     * Rejects negative/backward/unrepresentable expiry time before storing the clock, then removes
+     * Tempo whose exclusive expiry is reached. Tick draining and physical admission share this clock.
+     */
     private void advance(long tick) {
         DomainChecks.nonNegative(tick, "tick");
         if (tick < now) throw new IllegalArgumentException("Coordinator clock cannot move backwards");
@@ -205,7 +403,13 @@ public final class ProcCoordinator implements AutoCloseable {
         now = tick;
         tempo.values().removeIf(state -> state.expiresAt() <= tick);
     }
+    /**
+     * Enforces thread confinement and terminal closure before mutable admission/drain operations.
+     */
     private void requireOpen() { checkThread(); if (closed) throw new IllegalStateException("Proc coordinator is closed"); }
+    /**
+     * Throws IllegalStateException outside the creating thread; immutable returned DTOs may be retained.
+     */
     private void checkThread() {
         if (Thread.currentThread() != ownerThread) throw new IllegalStateException("Proc coordinator accessed outside its owner thread");
     }

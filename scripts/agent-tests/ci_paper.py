@@ -22,18 +22,20 @@ import paper_test
 
 
 def require(condition, message):
+    """Raise RuntimeError when hosted execution or artifact provenance violates its contract."""
     if not condition:
         raise RuntimeError(message)
 
 
 def canonical_root(run_id, attempt):
+    """Derive the fixed temporary run root from bounded positive Actions run/attempt IDs."""
     require(isinstance(run_id, str) and re.fullmatch(r'[1-9][0-9]{0,19}', run_id), 'Invalid Actions run ID')
     require(isinstance(attempt, str) and re.fullmatch(r'[1-9][0-9]{0,5}', attempt), 'Invalid Actions attempt')
     return Path('/tmp/onlydragons-paper-ci') / (run_id + '-' + attempt)
 
 
 def java_version(checkout):
-    """Use the existing exact Linux runtime pin, checked against the project's major."""
+    """Read the installer's exact literal JDK pin and require its major to match the project."""
     major = paper_test.properties(Path(checkout) / 'versions.properties')['javaVersion']
     script = (Path(checkout) / 'scripts/symphony/install-runtime.sh').read_text(encoding='utf-8')
     matches = re.findall(r'^JAVA_VERSION="([0-9]+(?:\.[0-9]+){0,3})"\s*$', script, re.MULTILINE)
@@ -43,7 +45,11 @@ def java_version(checkout):
 
 
 def java_archive_pin(checkout):
-    """Read literal archive pins without executing the installer or resolving a version range."""
+    """Extract and validate the exact Temurin archive URL/hash and Linux build identity.
+
+    Read installer literals only; do not execute the installer or resolve a floating
+    release. Return version, runtime, directory, URL and SHA-256 provenance fields.
+    """
     version = java_version(checkout)
     script = (Path(checkout) / 'scripts/symphony/install-runtime.sh').read_text(encoding='utf-8')
     values = {}
@@ -64,7 +70,12 @@ def java_archive_pin(checkout):
 
 
 def provision_java(checkout, root):
-    """Provision only inside a fresh owned CI root; never reuse ambient JAVA_HOME."""
+    """Download, safely unpack and verify the pinned JDK under the caller-owned fresh root.
+
+    Bound archive/member counts and expanded bytes; reject escaping/duplicate entries
+    and unsupported file kinds. Verify executables and release vendor/build/platform
+    metadata. Return Java home and identity; never alter the host's installed JDK.
+    """
     pin = java_archive_pin(checkout)
     archive_path = Path(root) / 'temurin-linux-x64.tar.gz'
     destination = Path(root) / 'jdk'
@@ -115,6 +126,11 @@ def provision_java(checkout, root):
 
 
 def materialize_consent(encoded, destination):
+    """Exclusively write canonical base64-decoded operator EULA bytes and return their hash.
+
+    The bounded input must already contain accepted consent. This copies consent into
+    the isolated job with mode 600; it does not manufacture or infer operator agreement.
+    """
     require(isinstance(encoded, str) and 0 < len(encoded) <= 32768,
             'Set ONLYDRAGONS_PAPER_EULA_BASE64 from the existing accepted file; no consent is generated')
     try:
@@ -131,6 +147,11 @@ def materialize_consent(encoded, destination):
 
 
 def download_verified(url, destination, expected):
+    """Download bounded HTTPS bytes to a new file and require the expected SHA-256.
+
+    Reject non-HTTPS redirects, excessive size and digest mismatch. Network/I/O failures
+    propagate; a failed partial file belongs to the caller's isolated output directory.
+    """
     require(isinstance(url, str) and url.startswith('https://')
             and re.fullmatch(r'[a-f0-9]{64}', expected), 'Download requires HTTPS and a pinned SHA256')
     request = urllib.request.Request(url, headers={'User-Agent': 'OnlyDragons-Paper-CI (https://github.com/Kav-K/OnlyDragons)'})
@@ -146,6 +167,11 @@ def download_verified(url, destination, expected):
 
 
 def clone_exact(checkout, project, revision):
+    """Clone a verified clean checkout without hardlinks and detach the requested commit.
+
+    Use literal source bytes (autocrlf disabled) and return the new clean-source identity;
+    never move the operator checkout or silently substitute a newer branch head.
+    """
     require(isinstance(revision, str) and re.fullmatch(r'[a-f0-9]{40,64}', revision), 'Use an exact source commit SHA')
     actual = paper_suite.git(checkout, 'rev-parse', 'HEAD').decode().strip()
     require(actual == revision, 'Actions checkout differs from the requested commit')
@@ -209,6 +235,12 @@ def evidence_files(project):
 
 
 def export_evidence(project, output, manifest):
+    """Archive only replay-allowlisted files and write their export manifest with a fresh digest.
+
+    Preserve raw contents/paths; deduplicate identical bytes with backward archive-local
+    hardlinks. Rehash copied files to detect changes. No worlds, credentials or general
+    caches are exported. An export failure must keep the overall job unsuccessful.
+    """
     output = Path(output)
     files = evidence_files(project) if Path(project).is_dir() else []
     archive_path = output / 'evidence.tar.gz'
@@ -243,6 +275,13 @@ def export_evidence(project, output, manifest):
 
 
 def execute(args):
+    """Own the exact manually dispatched GitHub-hosted validation and evidence-export lifecycle.
+
+    Require matching Actions environment identity, create a fresh canonical root, copy
+    existing EULA consent, pin Java/Paper/Mojang, run the complete suite and independently
+    replay it. Export original evidence even after failure. This hosted-only path must
+    not bypass the shared local runner lease on a workstation.
+    """
     require(sys.platform == 'linux', 'Hosted Paper execution requires Linux; replay also uses Linux/WSL')
     checkout = args.checkout.resolve()
     hosted = {'GITHUB_ACTIONS': 'true', 'RUNNER_ENVIRONMENT': 'github-hosted',
@@ -317,6 +356,7 @@ def execute(args):
 
 
 def main(argv=None):
+    """Expose the JDK-pin query and guarded hosted run; report exceptions as a nonzero exit."""
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
     version = commands.add_parser('java-version')

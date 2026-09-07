@@ -1,4 +1,9 @@
-"""Bounded received ANVIL identity, full-state and action evidence; no window-0 relaxation."""
+"""Replay received ANVIL window identity, full-state, cost and XP evidence.
+
+Anvil windows use positive container IDs and 39 slots; player inventory window 0
+retains its separate stricter contract. A preview or submitted extraction alone
+does not establish item conservation or an accepted XP debit.
+"""
 import re
 
 ACTION_FIELDS = ('anvilOpenSequence', 'containerId', 'stateId', 'anvilSnapshotSequence', 'anvilSnapshotSha256')
@@ -6,6 +11,13 @@ ACTION_FIELDS = ('anvilOpenSequence', 'containerId', 'stateId', 'anvilSnapshotSe
 
 def validate(session, expected, start, end):
     # Import lazily to retain one shared validation exception and primitive boundary.
+    """Bind every anvil action to a fresh received snapshot of its exact open window.
+
+    start/end are epoch milliseconds. Require bounded opens, snapshots, costs, XP and
+    closes, matching state IDs/hashes, no newer ignored state, and post-action settlement
+    before termination. Missing observations are allowed only when no anvil action was
+    planned. Validation raises the shared ActionValidationError and changes no state.
+    """
     from player_actions import require, _object, _array, _integer, _number
     actions = [s for s in expected['steps'] if s['action'].startswith('anvil')]
     data = session.get('anvil')
@@ -20,6 +32,7 @@ def validate(session, expected, start, end):
     closes = _array(data['closes'], 0, 256)
 
     def header(row, keys, earliest=start):
+        """Require exact bounded packet metadata and a receive time within the session window."""
         _object(row, *keys, 'receivedAtEpochMs', 'sha256')
         _integer(row['receivedAtEpochMs'], earliest, end)
         require(isinstance(row['sha256'], str) and re.fullmatch('[a-f0-9]{64}', row['sha256']), 'Invalid anvil packet hash')
@@ -33,6 +46,7 @@ def validate(session, expected, start, end):
         previous = row['receivedAtEpochMs']
 
     def bound(row):
+        """Require an observation to belong to its named open before any newer anvil window."""
         sequence = _integer(row['openSequence'], 1, len(opens))
         opened = opens[sequence-1]
         _integer(row['containerId'], 1, 2**31-1)
@@ -80,7 +94,13 @@ def validate(session, expected, start, end):
 
 
 def validate_feature(scenario, report):
-    """Bind feature transactions to received previews, destinations, cost and XP packets."""
+    """Cross-check native extraction transactions against received previews, output and XP.
+
+    For the named feature scenarios, independently require the ten-enchant cost matrix
+    or boundary outcomes, matching result-slot clicks, fresh destination state, input
+    conservation and accepted level/fraction changes. Rejected recipes must preserve
+    inputs/cursor and avoid an XP debit. Other scenarios are intentionally untouched.
+    """
     from player_actions import require
     name = scenario.get('scenarioId')
     if name not in ('enchant-anvil', 'anvil-boundaries', 'anvil-lifecycle'):

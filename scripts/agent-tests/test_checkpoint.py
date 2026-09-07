@@ -25,8 +25,14 @@ SHA = 'a' * 40
 
 
 class VerifiedSuite:
-    """Checkpoint seam: the actual suite validator has its own raw-report tests."""
+    """Injected suite seam for checkpoint policy tests, never a substitute for raw-evidence replay.
+
+    Records source/receipt/changed-path calls and returns copied synthetic data or an
+    explicit error. test_paper_suite owns strict replay tests; this seam isolates whether
+    checkpoint correctly combines verified evidence with requirement/dependency gates.
+    """
     def __init__(self, case_ids):
+        """Initialize a synthetic source identity, selected cases and observable call log."""
         self.source = {'revision': SHA, 'sourceInputSha256': 'b' * 64, 'gitTreeSha256': 'c' * 64}
         self.receipt = {'source': deepcopy(self.source), 'cases': [{'caseId': key} for key in case_ids]}
         self.required = ['stats-resolution']
@@ -34,22 +40,32 @@ class VerifiedSuite:
         self.calls = []
 
     def source_identity(self, project):
+        """Record the source check and return a copy so callers cannot mutate the seam accidentally."""
         self.calls.append('source')
         return deepcopy(self.source)
 
     def validate_suite_receipt(self, project, receipt_path):
+        """Record replay intent and return copied synthetic evidence or the configured rejection."""
         self.calls.append(('receipt', receipt_path))
         if self.error:
             raise RuntimeError(self.error)
         return deepcopy(self.receipt)
 
     def required_cases(self, project, changed):
+        """Record the actual changed paths passed by checkpoint and return configured case requirements."""
         self.calls.append(('changed', changed))
         return self.required
 
 
 class CheckpointTests(unittest.TestCase):
+    """Reject false progress using copied planning/catalog data, mutation cases and local Git history.
+
+    No network or Minecraft runs. The suite seam is explicit; no-weakening tests use real
+    comparison commits while selected acceptance tests mock that independent boundary.
+    External/human gates remain distinct from structural validity and machine readiness.
+    """
     def setUp(self):
+        """Copy current shared contracts into disposable storage and install the synthetic suite seam."""
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.project = Path(self.temporary.name)
@@ -70,30 +86,41 @@ class CheckpointTests(unittest.TestCase):
         self.suite = VerifiedSuite(list(cases))
 
     def read(self, path):
+        """Decode one test-owned JSON contract for a targeted mutation."""
         return json.loads((self.project / path).read_text(encoding='utf-8'))
 
     def write(self, path, value):
+        """Persist a test-owned JSON contract; never edit repository planning state."""
         (self.project / path).write_text(json.dumps(value), encoding='utf-8')
 
     def git(self, *arguments):
         # Commit-triggered maintenance may detach and race TemporaryDirectory
         # cleanup. These disposable histories need no automatic maintenance.
+        """Run local fixture Git with automatic maintenance disabled for deterministic cleanup."""
         return subprocess.check_output(['git', '-c', 'maintenance.auto=false', *arguments],
                                        cwd=self.project, stderr=subprocess.DEVNULL)
 
     def change(self, path, mutation):
+        """Apply one in-place mutation to a decoded test contract and write it back."""
         value = self.read(path)
         mutation(value)
         self.write(path, value)
 
     def plan(self):
+        """Run real structural plan validation on the temporary contract set."""
         return checkpoint.validate_plan(self.project)
 
     def reject_plan(self, text):
+        """Require a structural rejection whose diagnostic matches the intended boundary."""
         with self.assertRaisesRegex(checkpoint.CheckpointError, text):
             self.plan()
 
     def acceptance(self, tasks=()):
+        """Exercise acceptance composition with explicit suite/no-weakening/diff seams.
+
+        Dedicated tests cover the real Git/no-weakening boundary; this helper does not
+        claim a real runtime receipt or project acceptance.
+        """
         with patch.object(checkpoint, 'validate_no_weakening', return_value=SHA), \
                 patch.object(checkpoint.subprocess, 'check_output', return_value=b'src/main/java/stats/Changed.java\0'):
             return checkpoint.validate_acceptance(self.project, 'build/receipt.json', 'origin/main', tasks, self.suite)
@@ -101,6 +128,7 @@ class CheckpointTests(unittest.TestCase):
     def block_dependent_fixture_tasks(self, task_id):
         # A scenario that uncompletes a prerequisite must also put its downstream
         # fixture tasks on hold. Keep production progress and gate validation intact.
+        """Keep downstream fixture tasks blocked when a test deliberately uncompletes a prerequisite."""
         affected = {task_id}
         tasks = self.read(BACKLOG)['tasks']
         while True:
