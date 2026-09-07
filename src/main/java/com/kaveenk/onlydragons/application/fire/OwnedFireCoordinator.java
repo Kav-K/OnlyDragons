@@ -89,6 +89,10 @@ public final class OwnedFireCoordinator implements AutoCloseable {
     /**
      * Retains a nonnull encounter and positive per-store/session capacity. It captures this thread
      * but does not verify the encounter's thread until later access; construct both on the server thread.
+     * @param encounter nonnull encounter owned on the same creating thread
+     * @param capacity positive bound for each burn/vulnerability/session store
+     * @throws NullPointerException if encounter is null
+     * @throws IllegalArgumentException if capacity is not positive
      */
     public OwnedFireCoordinator(CombatEncounter encounter, int capacity) {
         this.encounter = Objects.requireNonNull(encounter);
@@ -99,6 +103,8 @@ public final class OwnedFireCoordinator implements AutoCloseable {
      * Adds an exact session token idempotently; throws IllegalStateException for a new token at
      * capacity. Closed activation is inert. Caller must clear old tokens on reconnect; this set
      * does not replace other sessions sharing the UUID.
+     * @param session exact owner/session token to activate without replacing other tokens
+     * @throws IllegalStateException if off-thread or a new session exceeds capacity
      */
     public void activate(Session session) {
         thread(); if (closed) return;
@@ -108,12 +114,14 @@ public final class OwnedFireCoordinator implements AutoCloseable {
     /**
      * Removes only the supplied exact session's activation, burn and vulnerability; idempotent
      * and permitted after close on the creating thread. Other owners/tokens remain intact.
+     * @param session exact owner/session token whose fire state is invalidated
      */
     public void clearSession(Session session) {
         thread(); sessions.remove(session); burns.remove(session); vulnerabilities.remove(session);
     }
     /**
      * Returns retained counts on the creating thread, including after close; no expiry side effects.
+     * @return retained burn, vulnerability and session counts without performing expiry
      */
     public Metrics metrics() { thread(); return new Metrics(burns.size(), vulnerabilities.size(), sessions.size()); }
     /**

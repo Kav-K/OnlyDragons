@@ -25,6 +25,8 @@ public final class ProcCoordinator implements AutoCloseable {
     public record Session(UUID ownerId, UUID token) {
         /**
          * Rejects null owner/token; freshness is the caller's lifecycle responsibility.
+         * @param ownerId nonnull player UUID
+         * @param token nonnull fresh session UUID allocated by the composition root
          */
         public Session { Objects.requireNonNull(ownerId); Objects.requireNonNull(token); }
     }
@@ -38,6 +40,10 @@ public final class ProcCoordinator implements AutoCloseable {
     public record Limits(int queueCapacity, int maxDuePerTick, int maxSessions, int spacingTicks) {
         /**
          * Rejects any nonpositive bound; limits are immutable for this coordinator.
+         * @param queueCapacity maximum pending children in this encounter
+         * @param maxDuePerTick maximum polled children per distinct drain tick, including failures/inactive entries
+         * @param maxSessions maximum simultaneously activated owners
+         * @param spacingTicks positive game ticks between siblings
          */
         public Limits {
             if (queueCapacity < 1 || maxDuePerTick < 1 || maxSessions < 1 || spacingTicks < 1) {
@@ -67,6 +73,10 @@ public final class ProcCoordinator implements AutoCloseable {
                                  List<ProcCommand> children) {
         /**
          * Copies children; this diagnostic DTO does not independently validate admission/count consistency.
+         * @param damage authoritative encounter result
+         * @param admission reason children were or were not queued
+         * @param requestedChildren rolled count when accepted; zero for rejected physical input
+         * @param children immutable copy of the admitted whole group, empty when none admitted
          */
         public PhysicalResult { children = List.copyOf(children); }
     }
@@ -95,6 +105,8 @@ public final class ProcCoordinator implements AutoCloseable {
     public record Drain(List<DamageResult> results, List<ChildFailure> failures) {
         /**
          * Freezes both lists; callers reconcile successes and failures without retrying this tick.
+         * @param results copied committed/rejected child results in drain order
+         * @param failures copied failed commands in encounter order; no result is fabricated for them
          */
         public Drain { results = List.copyOf(results); failures = List.copyOf(failures); }
     }
@@ -104,6 +116,7 @@ public final class ProcCoordinator implements AutoCloseable {
         private DrainFailure(Drain drain) { super("Proc drain failed: " + drain.failures()); this.drain = drain; }
         /**
          * Returns the retained immutable partial drain for legacy callers catching this exception.
+         * @return immutable partial drain containing both completed results and failures
          */
         public Drain drain() { return drain; }
     }
@@ -154,6 +167,11 @@ public final class ProcCoordinator implements AutoCloseable {
     /**
      * Retains nonnull encounter, limits and random source; immediately verifies encounter access
      * on this constructing thread. Owns no external scheduler. The caller must drive and close it.
+     * @param encounter nonnull encounter owned on the constructing thread
+     * @param limits nonnull bounded queue/session/tick policy
+     * @param random nonnull probability source; sampling remains coordinator-owned
+     * @throws NullPointerException if a collaborator is null
+     * @throws IllegalStateException if encounter ownership differs from this constructing thread
      */
     public ProcCoordinator(CombatEncounter encounter, Limits limits, RandomSource random) {
         this.encounter = Objects.requireNonNull(encounter);
@@ -168,6 +186,9 @@ public final class ProcCoordinator implements AutoCloseable {
      * Returns false only for a new owner at capacity; returns true for the same active token
      * without resetting state. Replacing an owner's token first clears its old children and Tempo.
      * Closed or wrong-thread access throws IllegalStateException.
+     * @param session nonnull owner/token pair; reconnect supplies a replacement token
+     * @return true for accepted or unchanged activation, false for a new owner at session capacity
+     * @throws IllegalStateException if closed or off the constructing thread
      */
     public boolean activate(Session session) {
         requireOpen();
@@ -185,6 +206,7 @@ public final class ProcCoordinator implements AutoCloseable {
      * <p>
      * Removes children for exactly this token and clears Tempo only if that token is still active.
      * Safe after close on the owning thread; it cannot clear another session for the same UUID.
+     * @param session exact token to retire; stale tokens cannot erase a replacement session
      */
     public void clearSession(Session session) {
         checkThread();
@@ -197,6 +219,11 @@ public final class ProcCoordinator implements AutoCloseable {
     /**
      * Advances the nondecreasing game clock, expires old state and returns this exact active
      * session's bonus, otherwise zero. This inspection has clock/expiry side effects and requires open state.
+     * @param session exact active owner/session token to inspect
+     * @param tick nonnegative game tick that may not precede the coordinator clock
+     * @return active unexpired Tempo bonus percentage, otherwise zero; inspection advances expiry
+     * @throws IllegalStateException if closed or off-thread
+     * @throws IllegalArgumentException if the supplied tick moves backward
      */
     public int tempoBonus(Session session, long tick) {
         requireOpen(); advance(tick);
@@ -264,6 +291,11 @@ public final class ProcCoordinator implements AutoCloseable {
      * Returns immutable results when all children evaluate normally; throws {@link DrainFailure}
      * with the complete partial outcome if any child fails. Same-tick repeats return empty.
      * Due ordering is dueTick then stable child UUID, not insertion order.
+     * @param tick nonnegative nondecreasing game tick to drain within the shared per-tick budget
+     * @return immutable successfully evaluated results; same-tick repeats return empty
+     * @throws DrainFailure if any child fails, carrying the complete partial drain
+     * @throws IllegalStateException if closed or off-thread
+     * @throws IllegalArgumentException if the supplied tick moves backward
      */
     public List<DamageResult> tick(long tick) {
         Drain drain = tickOutcomes(tick);
@@ -304,6 +336,7 @@ public final class ProcCoordinator implements AutoCloseable {
 
     /**
      * Returns current counters on the creating thread, including after close; does not expire buffs.
+     * @return current queue/session/Tempo counts and cumulative admission/cleanup counters
      */
     public Metrics metrics() {
         checkThread();
@@ -314,6 +347,7 @@ public final class ProcCoordinator implements AutoCloseable {
      * <p>
      * Returns an immutable set of physical parent IDs still referenced by queued children.
      * Adapters may prune their bounded diagnostics for other parents; domain claims remain retained.
+     * @return immutable set of accepted physical-parent IDs still referenced by queued children
      */
     public Set<UUID> pendingParents() {
         checkThread(); var parents = new HashSet<UUID>();
@@ -323,6 +357,11 @@ public final class ProcCoordinator implements AutoCloseable {
     /**
      * Returns a stable UTF-8 name UUID from parent ID and sibling index 1–5; null parent and
      * out-of-range index reject. This pure helper is callable without owning-thread access.
+     * @param parent nonnull accepted physical parent UUID
+     * @param index sibling ordinal from 1 through 5
+     * @return stable name UUID for that parent/sibling pair, independent of delivery timing
+     * @throws NullPointerException if parent is null
+     * @throws IllegalArgumentException if the index is outside 1–5
      */
     public static UUID childId(UUID parent, int index) {
         Objects.requireNonNull(parent);
