@@ -2245,6 +2245,18 @@
         "quiver-ammo",
         "owned-flame"
       ]
+    },
+    "shortbow-no-draw": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Meaningful existing real-Paper/protocol input, release/swap/anvil and lifecycle regressions; verify client-visible item/presentation state where the supported API exposes it. Full-client no-pullback appearance is a separate targeted human check, not inferred from packets. Report a concrete unsupported API limit before choosing a presentation dependency.",
+      "fixtures": []
+    },
+    "aimed-dragon-tracer": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Direction/radius/finite-vector boundary tests and one narrow actual-Paper scenario comparing aimed moving-target assistance with side/behind/out-of-range misses. Verify post-shot player turning cannot authorize an originally off-axis shot, obstruction/lost lock, retained profile identity and owned cleanup. Targeted human aiming feel remains separate.",
+      "fixtures": []
     }
   },
   "tasks": {
@@ -2386,6 +2398,12 @@
       "suite-baseline",
       "checkpoint-unit-checks",
       "bridge-unit-checks"
+    ],
+    "T06d": [
+      "shortbow-no-draw"
+    ],
+    "T07b": [
+      "aimed-dragon-tracer"
     ]
   },
   "paperCases": {

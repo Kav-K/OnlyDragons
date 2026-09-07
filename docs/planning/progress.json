@@ -590,6 +590,18 @@
       },
       "notice": "Accepted PR83; full42-case/48-boot hosted suite34082923431, strict replay, checkpoint, independent review and final-head CI34082803590 passed. Acceptance5565312809. Original worker evidence retained in docs/planning/evidence/maintenance-82.md. No gameplay/human/milestone advancement.",
       "mergedRevision": "2158a51572d65e7e8856ec77f44b3decc982450c"
+    },
+    "T06d": {
+      "status": "blocked",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "User decision, 7 September 2026: keep vanilla bows and defer the animation fix. shortbow-no-draw remains deferred with no evidence. Preserve working native held input; do not research or dispatch this task unless the user reopens it. See issue #89 comment5575451702."
+    },
+    "T07b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {},
+      "notice": "Registered checkpoint-feedback issue #90; deferred requirement aimed-dragon-tracer. No implementation or acceptance evidence. Wait for integrated context and explicit lead dispatch; preserve earlier accepted profiles and every milestone gate."
     }
   },
   "milestones": {

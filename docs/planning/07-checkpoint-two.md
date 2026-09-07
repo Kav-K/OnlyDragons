@@ -1,6 +1,6 @@
 # Checkpoint 2: combat feedback, volleys and enchant books
 
-**Checkpoint 2 — all seven scoped tasks have their named automated acceptance; T06b/T02c accepted through PR86. Human outcomes remain separate.**
+**Checkpoint 2 — the original seven scoped tasks retain automated acceptance. T07b is planned next; T06d is deferred by the user. Human milestone outcomes remain separate.**
 
 The first managed dragon/ranking slice is integrated on main `36b420c`.
 The user now prioritizes a persistent dragon health bar, smoother bounded flight,
@@ -9,6 +9,23 @@ all ten custom enchants as XP-cost anvil books, and readable in-game presentatio
 Armor needs a future category/slot boundary only; no armor stats or effects are selected.
 Real rewards remain disabled. This scoped work does not release ritual, economy or
 T11/T12 gates, and it accepts no M1–M5 milestone or unobserved human outcome.
+
+## Small feedback follow-ups
+
+The [7 September user observations](01-research.md#checkpoint-feedback--7-september-2026)
+request no shortbow pullback and aiming-dependent Tracer. Motion looked fine but
+too bounded; other tested experience was reported good, without formal M3 acceptance.
+
+| Follow-up task | Scope |
+| --- | --- |
+| T06d / [#89](https://github.com/Kav-K/OnlyDragons/issues/89) | **Blocked:** user chose vanilla bows and deferred the animation fix. Preserve working held input; no dispatch or repeated API investigation. |
+| T07b / [#90](https://github.com/Kav-K/OnlyDragons/issues/90) | New captured aimed Tracer profile; preserve explicit old profiles and airborne arrows. |
+
+The [foundation contract](02-foundation-plan.md#checkpoint-feedback-contracts) records
+the first lead-selected calibration. T07b is the next single small chunk;
+T06d requires the user to reopen it. Neither is dispatched or implemented by registration. The selected
+[Old/Young/Armored/Master roles](05-encounter-expansion.md#selected-later-roster) remain
+later gated content, separate from these fixes and from armor gear.
 
 ## Tasks and integration order
 

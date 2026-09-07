@@ -242,6 +242,29 @@
       "scope": "GH-82 runtime allowlist only: private catalog reuse, launch-veto predicate and local lifecycle/import readability; player JUnit property, stale README and accepted T06c context. Preserve public APIs, values, provenance, order and output.",
       "acceptance": "Existing value/boundary tests and pinned builds; Python/bridge/static/no-weakening checks; worker clean-commit equipment-stats, owned-firing and owned-flame. Lead fresh complete hosted cohort, strict replay, independent review and current CI. No new gameplay milestone.",
       "coordination": "Dispatched from accepted PR81 main 53164f85a0ba3f36d16f242429f3a0a7c5a403a7. Lead holds T06b/#68 and T02c/#69 temporarily and must resume both after this single cleanup PR acceptance/merge. See evidence/maintenance-82.md."
+    },
+    {
+      "id": "T06d",
+      "title": "Remove shortbow pullback while preserving held input",
+      "dependsOn": [
+        "T06b",
+        "T02c"
+      ],
+      "scope": "Small checkpoint-feedback change using a supported public Paper 26.2/client presentation path. Remove unwanted shortbow draw animation while retaining press/hold/release, shared cadence, ammo, swaps, real inventory/anvil interruption and immutable airborne capture. Do not simply cancel native use: existing held fire depends on isHandRaised. Preserve drawn bows and every accepted combat/ownership contract.",
+      "acceptance": "Meaningful existing real-Paper/protocol input, release/swap/anvil and lifecycle regressions; verify client-visible item/presentation state where the supported API exposes it. Full-client no-pullback appearance is a separate targeted human check, not inferred from packets. Report a concrete unsupported API limit before choosing a presentation dependency.",
+      "coordination": "Issue #89, comment5575451702. User chose to keep vanilla bows and defer this fix; do not dispatch or repeat feasibility research. Retain current native held input and all accepted behavior. T07b proceeds independently as the next single feature.",
+      "manualGate": "User reopens the deferred animation fix while preserving the chosen vanilla-bow constraint"
+    },
+    {
+      "id": "T07b",
+      "title": "Require aimed shots for Dragon Tracer assistance",
+      "dependsOn": [
+        "T08e",
+        "T06b"
+      ],
+      "scope": "New immutable aimed Tracer profile for the seven held-shortbow definitions, preserving explicit legacy calibrations and every existing arrow captured profile. Use the exact first calibration in issue #90 and the linked foundation contract; captured launch direction/position gates both acquisition and retention. Preserve native motion, collisions, line of sight, bounds and generation/UUID ownership; no automatic hits or combat/ammo changes.",
+      "acceptance": "Direction/radius/finite-vector boundary tests and one narrow actual-Paper scenario comparing aimed moving-target assistance with side/behind/out-of-range misses. Verify post-shot player turning cannot authorize an originally off-axis shot, obstruction/lost lock, retained profile identity and owned cleanup. Targeted human aiming feel remains separate.",
+      "coordination": "Issue #90. One small PR after lead assignment. Keep the lead-selected calibration distinct from user-approved final balance. Report a concrete public-source flaw before substituting another policy. Coordinate trusted loadout/profile routing with T06d without combining the two mechanics."
     }
   ]
 }
