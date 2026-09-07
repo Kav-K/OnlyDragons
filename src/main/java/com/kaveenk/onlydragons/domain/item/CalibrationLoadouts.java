@@ -53,7 +53,7 @@ public final class CalibrationLoadouts {
     public static final String EXPANDED_REVISION = "calibration-items-v3";
 
     /** Production catalog exposes both explicit histories. No automatic identity migration. */
-    public static ItemRegistry compatibleRegistry() { return new ItemRegistry(registry(), expandedRegistry()); }
+    public static ItemRegistry compatibleRegistry() { return new ItemRegistry(List.of(registry(), expandedRegistry(), fireRegistry())); }
 
     public static ItemRegistry expandedRegistry() {
         var legacy = registry();
@@ -89,6 +89,29 @@ public final class CalibrationLoadouts {
                 List.of(new WeaponDefinition.Enchantment("gravity", 6, WeaponDefinition.EnchantmentKind.ORDINARY))),
                 "Gravity Calibration v3", "BOW", Set.of()));
         return new ItemRegistry(EXPANDED_REVISION, definitions, enchants, Map.of());
+    }
+
+    public static final String FIRE_REVISION = "calibration-items-v4";
+
+    /** Explicit consumer-capable catalog; v2/v3 identities and unavailable controls remain unchanged. */
+    public static ItemRegistry fireRegistry() {
+        var enchants = expandedRegistry().enchantments().values().stream()
+                .map(e -> new EnchantDefinition(e.id(), e.displayName(), e.kind(), e.compatibleModes(), e.levelModifiers(), true)).toList();
+        var definitions = new ArrayList<ItemDefinition>();
+        for (String id : List.of("ordinary_v4", "shortbow_v4", "quiver_v4", "flame_v4", "duplex_flame_v4", "tempo_flame_v4")) {
+            var selected = new ArrayList<WeaponDefinition.Enchantment>();
+            if (id.equals("quiver_v4") || id.equals("shortbow_v4"))
+                selected.add(new WeaponDefinition.Enchantment("infinite_quiver", 10, WeaponDefinition.EnchantmentKind.ORDINARY));
+            if (id.contains("flame") || id.equals("shortbow_v4"))
+                selected.add(new WeaponDefinition.Enchantment("flame", 2, WeaponDefinition.EnchantmentKind.ORDINARY));
+            if (id.equals("duplex_flame_v4")) selected.add(enchant("duplex", true));
+            if (id.equals("tempo_flame_v4")) selected.add(enchant("fatal_tempo", true));
+            definitions.add(new ItemDefinition(new WeaponDefinition(id, ItemRegistry.SCHEMA_VERSION, FIRE_REVISION,
+                    id.equals("shortbow_v4") ? WeaponDefinition.FiringMode.SHORTBOW : WeaponDefinition.FiringMode.DRAWN_BOW,
+                    100, id.equals("tempo_flame_v4") ? List.of(flat("item:tempo_flame_v4", StatKey.FEROCITY, 25)) : List.of(), selected),
+                    id.replace('_', ' ') + " (Development)", "BOW", Set.of()));
+        }
+        return new ItemRegistry(FIRE_REVISION, definitions, enchants, Map.of());
     }
 
     private static ItemDefinition bow(String id, String name, double crit, double ferocity,

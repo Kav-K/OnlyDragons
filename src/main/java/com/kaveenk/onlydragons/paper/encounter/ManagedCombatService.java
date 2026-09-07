@@ -41,12 +41,14 @@ public final class ManagedCombatService implements AutoCloseable {
         final BoundingBox bounds;
         final CombatEncounter combat;
         final ProcCoordinator procs;
+        final com.kaveenk.onlydragons.application.fire.OwnedFireCoordinator fire;
         final Map<UUID, ProcCoordinator.Session> sessions = new HashMap<>();
         final Map<UUID, ShotContext> shots = new HashMap<>();
         final Map<UUID, Long> collisions = new HashMap<>();
         State state = State.ACTIVE;
         Fight(UUID id, UUID owner, TargetBackend backend, BoundingBox bounds, CombatEncounter combat, ProcCoordinator procs) {
             this.id = id; this.owner = owner; this.entityId = backend.entity().getUniqueId(); this.backend = backend; this.bounds = bounds.clone(); this.combat = combat; this.procs = procs;
+            this.fire = new com.kaveenk.onlydragons.application.fire.OwnedFireCoordinator(combat, 128);
         }
         boolean contains(Player p) { return p.getWorld().equals(backend.entity().getWorld()) && bounds.contains(p.getLocation().toVector()); }
         View view() { return new View(id, owner, entityId, state, combat.target(), combat.contributions(),
@@ -112,6 +114,10 @@ public final class ManagedCombatService implements AutoCloseable {
     public Optional<Explanation> last(UUID owner) { thread(); return Optional.ofNullable(last.get(owner)); }
     public List<EncounterResult> completions() { thread(); return List.copyOf(completions.values()); }
     public int activeCount() { thread(); return fights.size(); }
+    public com.kaveenk.onlydragons.application.fire.OwnedFireCoordinator.Metrics fireMetrics(UUID encounter) {
+        thread(); var f = fights.get(encounter);
+        return f == null ? new com.kaveenk.onlydragons.application.fire.OwnedFireCoordinator.Metrics(0, 0, 0) : f.fire.metrics();
+    }
     public int taskCount() { thread(); return task == null ? 0 : 1; }
     public boolean ownsEntity(UUID entity) { thread(); return fights.values().stream().anyMatch(f -> f.entityId.equals(entity)); }
     public void reset(UUID owner) {
@@ -122,7 +128,7 @@ public final class ManagedCombatService implements AutoCloseable {
         mutation(); last.remove(owner);
         for (Fight f : List.copyOf(fights.values())) {
             ProcCoordinator.Session old = f.sessions.remove(owner);
-            if (old != null) f.procs.clearSession(old);
+            if (old != null) { f.procs.clearSession(old); f.fire.clearSession(old); }
             reconcile(f);
         }
     }
@@ -141,14 +147,16 @@ public final class ManagedCombatService implements AutoCloseable {
         for (var old : List.copyOf(f.sessions.values())) {
             Player p = Bukkit.getPlayer(old.ownerId());
             if (!bows.isCurrentSession(old.ownerId(), old.token()) || p == null || !p.isOnline() || p.isDead() || !f.contains(p)) {
-                f.procs.clearSession(old); f.sessions.remove(old.ownerId(), old);
+                f.procs.clearSession(old); f.fire.clearSession(old); f.sessions.remove(old.ownerId(), old);
             }
         }
         prune(f);
         for (Player p : Bukkit.getOnlinePlayers()) if (!p.isDead() && f.contains(p)) {
             bows.currentSession(p.getUniqueId()).ifPresent(token -> {
                 var session = new ProcCoordinator.Session(p.getUniqueId(), token);
-                if (!session.equals(f.sessions.get(p.getUniqueId())) && f.procs.activate(session)) f.sessions.put(p.getUniqueId(), session);
+                if (!session.equals(f.sessions.get(p.getUniqueId())) && f.procs.activate(session)) {
+                    f.sessions.put(p.getUniqueId(), session); f.fire.activate(session);
+                }
             });
         }
     }
@@ -175,6 +183,9 @@ public final class ManagedCombatService implements AutoCloseable {
                 if (!result.children().isEmpty()) {
                     f.shots.put(result.damage().impactId(), shot); f.collisions.put(result.damage().impactId(), hit.collisionTick());
                 }
+                var session = new ProcCoordinator.Session(shot.ownerId(), hit.projectile().sessionToken());
+                if (session.equals(f.sessions.get(shot.ownerId())))
+                    f.fire.physical(shot, result.damage(), hit.collisionTick(), session);
                 explain(f, result.damage(), shot, hit.collisionTick(), result.admission());
                 prune(f); synchronize(f);
             } catch (RuntimeException failure) { failed(f, failure); }
@@ -208,6 +219,10 @@ public final class ManagedCombatService implements AutoCloseable {
                 for (var result : drain.results()) explain(f, result, f.shots.get(result.parentImpactId().orElse(result.impactId())),
                         f.collisions.getOrDefault(result.parentImpactId().orElse(result.impactId()), result.tick()), ProcCoordinator.Admission.NO_CHILDREN);
                 prune(f);
+                if (drain.failures().isEmpty() && f.combat.target().alive()) {
+                    for (var fire : f.fire.tick(now)) explain(f, fire.damage(), fire.source().shot(),
+                            fire.source().collisionTick(), ProcCoordinator.Admission.NO_CHILDREN);
+                }
                 // Both parent and drain already mutated the domain. Never apply their damage again.
                 synchronize(f);
                 if (!drain.failures().isEmpty()) {
@@ -232,7 +247,7 @@ public final class ManagedCombatService implements AutoCloseable {
         Optional<EncounterResult> result = f.combat.completion();
         if (result.isPresent() && f.state == State.ACTIVE) {
             // Publish immutable completion and close admission BEFORE native health zero/death can reenter.
-            f.state = State.DEFEATED; f.procs.close(); f.sessions.clear();
+            f.state = State.DEFEATED; f.fire.close(); f.procs.close(); f.sessions.clear();
             EncounterResult frozen = result.get();
             if (!completions.containsKey(frozen.completionId())) {
                 putBounded(completions, frozen.completionId(), frozen, 64);
@@ -260,12 +275,13 @@ public final class ManagedCombatService implements AutoCloseable {
         if (f.state == State.ACTIVE) f.state = State.TERMINATED;
         // Every resource is attempted even when an extension backend fails.
         try { f.procs.close(); } catch (RuntimeException failure) { diagnostic("Proc cleanup failed: " + failure); }
-        f.sessions.clear(); f.shots.clear(); f.collisions.clear();
+        f.fire.close(); f.sessions.clear(); f.shots.clear(); f.collisions.clear();
         try { bows.endEncounter(f.id); } catch (RuntimeException failure) { diagnostic("Bow cleanup failed: " + failure); }
         try { f.backend.close(); } catch (RuntimeException failure) { diagnostic("Backend cleanup failed: " + failure); }
         finally { release(f); }
     }
     private void release(Fight f) {
+        f.fire.close();
         f.shots.clear(); f.collisions.clear();
         try { putBounded(history, f.id, f.view(), 32); }
         catch (RuntimeException failure) { diagnostic("History projection failed: " + failure); }

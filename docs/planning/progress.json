@@ -508,7 +508,7 @@
       "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Lead-assigned and ready after T03b integrated through PR #76 at a7329e18b886d4766d14d9128eeb256a904161a0. Symphony dispatch label is pending this context merge. Implement Infinite Quiver and Flame against the existing firing/combat authorities and current issue owner contracts. No completed requirements or evidence yet; T06b/T02c remain planned pending T06c integration."
+      "notice": "Dispatched and In progress on symphony/gh-70 with T03b integrated. Infinite Quiver and owned Flame v1 implemented; 299 production tests and focused dirty-source iterations pass. Strengthened clean-commit proof, lead combined cohort/review/current CI and all human gates remain pending. See document 03. No accepted requirement claimed; T06b/T02c remain planned pending integration."
     }
   },
   "milestones": {

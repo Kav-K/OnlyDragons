@@ -45,9 +45,11 @@ public final class OwnedBowService implements AutoCloseable {
         long due;
         int duplex;
         boolean accepted;
+        boolean debitOutstanding;
+        com.kaveenk.onlydragons.domain.enchant.QuiverFlameProfile.Quiver quiver;
         boolean physicalRetirement;
         Group(UUID id, UUID owner, UUID session, Arena arena, ItemStack ammo) {
-            this.id = id; this.owner = owner; this.session = session; this.arena = arena; this.ammo = ammo;
+            this.id = id; this.owner = owner; this.session = session; this.arena = arena; this.ammo = ammo; this.debitOutstanding = ammo != null;
         }
     }
     private static final class Candidate {
@@ -206,15 +208,15 @@ public final class OwnedBowService implements AutoCloseable {
         if (!(hand instanceof ItemReadResult.Valid valid)) return;
         // T01b defines only main-hand offense. Shortbow native release must never create a second primary.
         if (event.getHand() != EquipmentSlot.HAND || valid.item().resolvedWeapon().firingMode() == WeaponDefinition.FiringMode.SHORTBOW) {
-            event.setCancelled(true); refundNative(player, event.getConsumable()); return;
+            event.setCancelled(true); refundNative(player, event.getConsumable(), event.getBow()); return;
         }
-        if (event.isCancelled()) { refundNative(player, event.getConsumable()); return; }
+        if (event.isCancelled()) { refundNative(player, event.getConsumable(), event.getBow()); return; }
         if (!player.hasPermission("onlydragons.fire") || !(event.getProjectile() instanceof Arrow arrow)
                 || event.getForce() <= 0 || !Objects.equals(event.getBow(), player.getInventory().getItemInMainHand())) {
-            event.setCancelled(true); refundNative(player, event.getConsumable()); return;
+            event.setCancelled(true); refundNative(player, event.getConsumable(), event.getBow()); return;
         }
         Group group = reserve(player, arena, valid.item(), event.getConsumable(), true);
-        if (group == null) { event.setCancelled(true); refundNative(player, event.getConsumable()); return; }
+        if (group == null) { event.setCancelled(true); refundNative(player, event.getConsumable(), event.getBow()); return; }
         try {
             group.bowEvent = event;
             group.primary = capture(player, arrow, group, valid.item(), inspection, event.getForce());
@@ -348,6 +350,7 @@ public final class OwnedBowService implements AutoCloseable {
             if (ammo == null) { registry.release(id); feedback(player, "An ordinary arrow is required."); return null; }
         }
         Group group = new Group(id, player.getUniqueId(), token, arena, ammo); group.duplex = duplex;
+        if (nativeDebit && nativeInfinity(player.getInventory().getItemInMainHand(), consumable)) group.debitOutstanding = false;
         groups.put(id, group); return group;
     }
     private OwnedProjectile capture(Player player, Arrow arrow, Group group, ItemRegistry.ResolvedItem item,
@@ -359,6 +362,8 @@ public final class OwnedBowService implements AutoCloseable {
                 com.kaveenk.onlydragons.domain.enchant.OverloadCapture.roll(
                         com.kaveenk.onlydragons.domain.enchant.EnchantEffects.level(item.enchantments(), "overload", 5),
                         inspection.stats().snapshot(), random));
+        group.quiver = com.kaveenk.onlydragons.domain.enchant.QuiverFlameProfile.capture(
+                com.kaveenk.onlydragons.domain.enchant.EnchantEffects.level(item.enchantments(), "infinite_quiver", 10), random);
         return new OwnedProjectile(shot, group.session,
                 com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile.forDefinition(item.definition().weapon()), shot.launchTick());
     }
@@ -391,7 +396,7 @@ public final class OwnedBowService implements AutoCloseable {
                 if (!child.isValid()) { fail(group); return; }
             } catch (RuntimeException failure) { fail(group); throw failure; }
         }
-        group.accepted = true; registry.release(group.id); groups.remove(group.id);
+        acceptAmmo(group); registry.release(group.id); groups.remove(group.id);
         record("accepted-group", group.primary, "children=" + (group.duplex > 0 ? 1 : 0));
     }
     private void settle(Candidate candidate) {
@@ -435,6 +440,7 @@ public final class OwnedBowService implements AutoCloseable {
                 || arrow != null && arrow.isValid();
     }
     private void cancelDelayed(Group group) {
+        acceptAmmo(group);
         groups.remove(group.id); registry.release(group.id);
         for (UUID id : List.copyOf(group.emitted)) {
             Arrow arrow = entities.get(id);
@@ -446,12 +452,25 @@ public final class OwnedBowService implements AutoCloseable {
         if (groups.remove(group.id) == null) return;
         registry.release(group.id);
         for (UUID id : List.copyOf(group.emitted)) retire(id, Retirement.FAILED_LAUNCH);
-        if (!group.accepted && group.ammo != null) {
-            Player player = Bukkit.getPlayer(group.owner);
-            if (refundDeath != null && refundDeath.getPlayer().getUniqueId().equals(group.owner) && !refundDeath.getKeepInventory())
-                refundDeath.getDrops().add(group.ammo);
-            else if (player != null) player.getInventory().addItem(group.ammo).values().forEach(stack -> player.getWorld().dropItem(player.getLocation(), stack));
-        }
+        if (!group.accepted) restoreDebit(group);
+    }
+    private void acceptAmmo(Group group) {
+        if (group.accepted) return;
+        group.accepted = true;
+        if (group.quiver != null && group.quiver.saved()) restoreDebit(group);
+        record("ammo-settled", group.primary, "profile=" + com.kaveenk.onlydragons.domain.enchant.QuiverFlameProfile.REVISION
+                + "; level=" + group.quiver.level() + "; sample=" + group.quiver.sample()
+                + "; saved=" + group.quiver.saved() + "; debited=" + group.debitOutstanding);
+        group.debitOutstanding = false; // The accepted charge is final; cancellation cannot refund it again.
+    }
+    private void restoreDebit(Group group) {
+        if (!group.debitOutstanding) return;
+        group.debitOutstanding = false;
+        Player player = Bukkit.getPlayer(group.owner);
+        if (refundDeath != null && refundDeath.getPlayer().getUniqueId().equals(group.owner) && !refundDeath.getKeepInventory())
+            refundDeath.getDrops().add(group.ammo);
+        else if (player != null) player.getInventory().addItem(group.ammo).values()
+                .forEach(stack -> player.getWorld().dropItem(player.getLocation(), stack));
     }
     private void retire(UUID id, Retirement reason) {
         var owned = registry.lookup(id);
@@ -468,8 +487,13 @@ public final class OwnedBowService implements AutoCloseable {
         if (traces.size() == 512) traces.removeFirst();
         traces.addLast(new Trace(kind, owned.shot().projectileId(), owned.shot().ownerId(), now(), detail));
     }
-    private void refundNative(Player player, ItemStack consumable) {
-        if (player.getGameMode() != GameMode.CREATIVE && consumable != null && !consumable.getType().isAir())
+    private static boolean nativeInfinity(ItemStack bow, ItemStack consumable) {
+        return bow != null && consumable != null && consumable.getType() == Material.ARROW
+                && bow.containsEnchantment(org.bukkit.enchantments.Enchantment.INFINITY);
+    }
+    private void refundNative(Player player, ItemStack consumable, ItemStack bow) {
+        if (player.getGameMode() != GameMode.CREATIVE && consumable != null && !consumable.getType().isAir()
+                && !nativeInfinity(bow, consumable))
             player.getInventory().addItem(consumable.asQuantity(1)).values().forEach(stack -> player.getWorld().dropItem(player.getLocation(), stack));
     }
     private void feedback(Player player, String message) { player.sendActionBar(net.kyori.adventure.text.Component.text(message)); }

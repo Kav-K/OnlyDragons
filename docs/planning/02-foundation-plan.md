@@ -760,6 +760,61 @@ old retained selections remain valid. [Catalog compatibility](../../src/main/res
 This supersedes the deferred Overload/Gravity implementation statements above
 only for the explicit expanded profile; legacy calibration remains available.
 
+### T06c ammunition and owned fire contract (GH-70)
+
+`quiver-flame/v1` implements the owner-selected OnlyDragons calibration, not
+upstream parity. `CalibrationLoadouts.fireRegistry()` adds the concrete
+`calibration-items-v4`; flat ordered `ItemRegistry(List<ItemRegistry>)` routing
+keeps v2/v3 immutable and preserves the two-catalog constructor. V3 continues to
+reject IQ/Flame as unavailable. V4 supports all ten descriptors, with distinct
+`ordinary_v4`, `shortbow_v4`, `quiver_v4`, `flame_v4`, `duplex_flame_v4`, and
+`tempo_flame_v4` definitions. All have damage100/CC0/CD50; only tempo supplies
+25 Ferocity. Quiver and shortbow default to IQ X; Flame/shortbow/Duplex/Tempo
+fire presets use Flame II, with the named ultimate V on its separate bow.
+No item migration, armor effect or reward grant is added.
+
+Infinite Quiver I–X captures one strict `sample < 0.05 × level` decision after
+the existing primary crit/Overload capture, before final veto. Level0 consumes
+no extra random value. Native and owned shortbow paths first reserve a real
+ordinary survival arrow; Duplex never reserves another. Acceptance restores a
+saved actual debit once, including `cancelDelayed` retaining a launched primary.
+Failure restores only an outstanding actual debit. Creative and native-Infinity
+ordinary-arrow draws have no actual debit and cannot receive a refund. The pinned
+bow event's consume flag is not reliable debit evidence. Shortbows retain their
+own ordinary-arrow requirement, independent of native Infinity. Ammo settlement
+traces include profile, level, sample, saved decision and actual charge.
+
+One `OwnedFireCoordinator` per fight retains at most128 owner-session burns and
+128 vulnerabilities through the existing combat tick. Only accepted physical or
+Duplex impacts from the exact current captured session can create effects. Flame
+I/II has a3%/6% potency from accepted physical credited damage, before remaining-HP
+clipping. An unrefreshed burn strikes at+20/+40/+60 ticks, including the final
+boundary. Refresh extends its end to the latest impact+60 without postponing its
+next strike or changing creation order. Weaker refresh retains the stronger
+source/potency; equal or stronger adopts the latest captured source. Different
+owners remain separate. Immutable source shot/result/collision/session data lives
+with the burn, independently of Ferocity-parent diagnostic pruning.
+
+An accepted Duplex secondary applies its captured level's1.1/1.2/1.3/1.4/1.5 fire
+vulnerability for1200 ticks without igniting. Same-owner refresh replaces its
+level and expiry; the strongest currently active owner record wins, without
+multiplication between records. Expiry is exclusive. Each due fire strike samples
+that multiplier once, applies the target cap once through `CombatEncounter.fire`,
+and commits full HP/full credit before remaining-HP clipping. It neither rerolls
+crit/Overload/Ferocity nor refreshes Tempo or reapplies physical bow modifiers.
+Fire retains parent attribution but cannot parent a Ferocity or fire chain.
+
+Drain Ferocity first. Only a successful, nonterminal drain proceeds to fire,
+ordered by next due tick then creation order, at most one strike per active burn
+per server tick. Refresh retains order. The shared atomic ledger and one native
+HP synchronization own completion; a failure retains prior commits and closes
+admission/owned resources. Session death/quit/exit, retirement/reset and disable
+clear relevant state before further fire. A stale flying arrow may still credit
+its captured UUID but cannot create new burn/vulnerability state. Managed native
+fire remains suppressed at the existing ingress guard even for immune dragons;
+managed DOT uses domain policy, and ordinary unmanaged mobs retain native fire.
+No native ignition or cosmetic entity fire is required for the effect.
+
 ### T05b level-based ghost policy (GH-66)
 
 Accepted through merged PR #73 at `29f0cf3`, exactly for

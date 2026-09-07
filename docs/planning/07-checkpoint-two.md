@@ -32,8 +32,8 @@ complete through combined [PR #76](https://github.com/Kav-K/OnlyDragons/pull/76)
 [lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/76#issuecomment-5563386308). Original PR74/75/79 focused evidence and
 failed iterations retain their original identities and scope.
 
-T06c/#70 is lead-assigned and ready with T03b integrated; the lead holds its
-Symphony label until this context PR merges. T06b/#68 and T02c/#69 remain planned
+T06c/#70 is dispatched and In progress with T03b integrated; its implementation
+and focused iteration evidence are recorded in document 03. T06b/#68 and T02c/#69 remain planned
 pending T06c. These three tasks retain empty completed requirements/evidence,
 and `quiver-flame-integration`, `held-shortbow-loadouts` and `enchant-books-anvil`
 remain unaccepted. T06c implements the remaining effects before T06b/T02c expose

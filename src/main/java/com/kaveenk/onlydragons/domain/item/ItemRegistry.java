@@ -61,16 +61,26 @@ public final class ItemRegistry {
 
     /** Exact revision routing; catalogs must have disjoint item IDs and cannot nest routers. */
     public ItemRegistry(ItemRegistry primary, ItemRegistry expanded) {
-        if (!primary.catalogs.isEmpty() || !expanded.catalogs.isEmpty() || primary.revision.equals(expanded.revision))
-            throw new IllegalArgumentException("Catalog routing requires distinct concrete revisions");
-        var definitions = new java.util.HashMap<>(primary.items);
-        expanded.items.forEach((id, item) -> {
-            if (definitions.putIfAbsent(id, item) != null) throw new IllegalArgumentException("Ambiguous item grant ID: " + id);
-        });
-        var descriptors = new java.util.HashMap<>(primary.enchants);
-        descriptors.putAll(expanded.enchants);
-        catalogs = Map.of(primary.revision, primary, expanded.revision, expanded);
-        revision = primary.revision;
+        this(List.of(primary, expanded));
+    }
+
+    /** Flat, ordered catalogs. Later descriptors describe new grants, never old item resolution. */
+    public ItemRegistry(List<ItemRegistry> concreteCatalogs) {
+        if (concreteCatalogs.isEmpty()) throw new IllegalArgumentException("Missing catalogs");
+        var routes = new java.util.LinkedHashMap<String, ItemRegistry>();
+        var definitions = new java.util.HashMap<String, ItemDefinition>();
+        var descriptors = new java.util.HashMap<String, EnchantDefinition>();
+        for (var catalog : List.copyOf(concreteCatalogs)) {
+            if (!catalog.catalogs.isEmpty() || routes.putIfAbsent(catalog.revision, catalog) != null)
+                throw new IllegalArgumentException("Catalog routing requires distinct concrete revisions");
+            catalog.items.forEach((id, item) -> {
+                if (definitions.putIfAbsent(id, item) != null)
+                    throw new IllegalArgumentException("Ambiguous item grant ID: " + id);
+            });
+            descriptors.putAll(catalog.enchants);
+        }
+        catalogs = Map.copyOf(routes);
+        revision = concreteCatalogs.getFirst().revision;
         items = Map.copyOf(definitions);
         enchants = Map.copyOf(descriptors);
         rolls = Map.of();

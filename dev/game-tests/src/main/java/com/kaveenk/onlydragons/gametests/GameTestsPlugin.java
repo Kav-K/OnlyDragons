@@ -20,6 +20,8 @@ public final class GameTestsPlugin extends JavaPlugin {
             Map.entry("dragon-flight", new com.kaveenk.onlydragons.gametests.encounter.DragonFlightScenario()),
             Map.entry("dragon-motion-experiment", new com.kaveenk.onlydragons.gametests.encounter.DragonMotionExperiment()),
             Map.entry("dragon-restart-animation", new com.kaveenk.onlydragons.gametests.encounter.DragonRestartScenario(false, true)),
+            Map.entry("quiver-ammo", new com.kaveenk.onlydragons.gametests.enchant.QuiverAmmoScenario()),
+            Map.entry("owned-flame", new com.kaveenk.onlydragons.gametests.enchant.OwnedFlameScenario()),
             Map.entry("expanded-bow", new com.kaveenk.onlydragons.gametests.enchant.ExpandedBowScenario()),
             Map.entry("tempo-ghost", new com.kaveenk.onlydragons.gametests.enchant.TempoGhostScenario()),
             Map.entry("dragon-presentation", new com.kaveenk.onlydragons.gametests.encounter.DragonPresentationScenario()),

@@ -309,6 +309,19 @@ physical controls and failures. T03b's `expanded-bow-enchantments` requirement i
 accepted through PR #76 at `a7329e18b886d4766d14d9128eeb256a904161a0`; [final combined evidence](evidence/checkpoint2-ui-flight.md).
 The v3 IQ/Flame-unavailable controls remain valid; their effects belong to T06c.
 
+### T06c native debit inspection
+
+**Source inspected, 7 September 2026:** the pinned Paper projectile-weapon patch
+passes `consume=true` to the bow event after drawing ammunition. That flag cannot
+establish whether a native Infinity ordinary-arrow draw charged inventory.
+T06c separately tracks actual refundable debit and adds real survival controls;
+the dirty-source iteration `dafb472d02bd4f9681701efd2adfcdfe` observed both
+accepted native Infinity and veto paths retain exactly 20 arrows, with no refund
+created from a non-debit. Clean-commit confirmation remains pending.
+[Pinned source](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/patches/sources/net/minecraft/world/item/ProjectileWeaponItem.java.patch).
+The [quiver-fire profile](02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70)
+is owner-selected OnlyDragons balance, with no new upstream mechanic claim.
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

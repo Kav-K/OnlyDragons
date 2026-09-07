@@ -207,6 +207,18 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
+    },
+    "quiver-ammo": {
+      "scenarioId": "quiver-ammo",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 180
+    },
+    "owned-flame": {
+      "scenarioId": "owned-flame",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 240
     }
   },
   "suites": {
@@ -241,7 +253,9 @@
       "dragon-flight",
       "moving-tracer",
       "dragon-restart-moving",
-      "expanded-bow"
+      "expanded-bow",
+      "quiver-ammo",
+      "owned-flame"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -294,7 +308,9 @@
       "dragon-flight",
       "moving-tracer",
       "dragon-restart-moving",
-      "expanded-bow"
+      "expanded-bow",
+      "quiver-ammo",
+      "owned-flame"
     ]
   },
   "areas": {
@@ -363,7 +379,9 @@
         "dragon-flight",
         "moving-tracer",
         "dragon-restart-moving",
-        "expanded-bow"
+        "expanded-bow",
+        "quiver-ammo",
+        "owned-flame"
       ],
       "affects": [
         "stats",
@@ -569,7 +587,9 @@
         "dragon-flight",
         "moving-tracer",
         "dragon-restart-moving",
-        "expanded-bow"
+        "expanded-bow",
+        "quiver-ammo",
+        "owned-flame"
       ],
       "affects": []
     },
@@ -728,6 +748,31 @@
       ],
       "cases": [
         "expanded-bow"
+      ],
+      "affects": []
+    },
+    "quiver-flame": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/application/fire/*",
+        "src/main/java/com/kaveenk/onlydragons/domain/combat/FireCommand.java",
+        "src/main/java/com/kaveenk/onlydragons/domain/enchant/QuiverFlameProfile.java",
+        "src/test/java/com/kaveenk/onlydragons/application/fire/*",
+        "src/test/java/com/kaveenk/onlydragons/domain/item/FireCatalogTest.java",
+        "src/test/java/com/kaveenk/onlydragons/paper/projectile/QuiverAmmoTest.java",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/enchant/QuiverAmmoScenario.java",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/enchant/OwnedFlameScenario.java",
+        "dev/game-tests/player-plans/quiver-ammo-v1.json",
+        "dev/game-tests/player-plans/owned-flame-v1.json",
+        "src/main/java/com/kaveenk/onlydragons/paper/projectile/OwnedBowService.java",
+        "src/main/java/com/kaveenk/onlydragons/paper/encounter/ManagedCombatService.java",
+        "src/main/java/com/kaveenk/onlydragons/domain/encounter/CombatEncounter.java",
+        "src/main/java/com/kaveenk/onlydragons/domain/item/*",
+        "src/main/java/com/kaveenk/onlydragons/domain/enchant/*",
+        "src/main/java/com/kaveenk/onlydragons/application/proc/*"
+      ],
+      "cases": [
+        "quiver-ammo",
+        "owned-flame"
       ],
       "affects": []
     }
