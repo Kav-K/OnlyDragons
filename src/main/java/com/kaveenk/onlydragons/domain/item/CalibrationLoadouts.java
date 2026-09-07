@@ -52,7 +52,7 @@ public final class CalibrationLoadouts {
 
     public static final String EXPANDED_REVISION = "calibration-items-v3";
 
-    /** Production catalog exposes both explicit histories. No automatic identity migration. */
+    /** Production catalog exposes all three explicit histories. No automatic identity migration. */
     public static ItemRegistry compatibleRegistry() {
         ItemRegistry legacy = registry();
         ItemRegistry expanded = expandedRegistry(legacy);
@@ -68,10 +68,17 @@ public final class CalibrationLoadouts {
         var enchants = new ArrayList<>(legacy.enchantments().values());
         for (String id : List.of("overload", "gravity", "infinite_quiver", "flame")) {
             var levels = new LinkedHashMap<Integer, List<StatModifier>>();
-            int max = switch (id) { case "overload" -> 5; case "gravity" -> 6; case "infinite_quiver" -> 10; default -> 2; };
-            for (int level = 1; level <= max; level++) levels.put(level, id.equals("overload")
-                    ? List.of(flat("enchant:overload", StatKey.CRIT_CHANCE, level),
-                              flat("enchant:overload", StatKey.CRIT_DAMAGE, level)) : List.of());
+            int max = switch (id) {
+                case "overload" -> 5;
+                case "gravity" -> 6;
+                case "infinite_quiver" -> 10;
+                default -> 2;
+            };
+            for (int level = 1; level <= max; level++) {
+                levels.put(level, id.equals("overload")
+                        ? List.of(flat("enchant:overload", StatKey.CRIT_CHANCE, level),
+                                  flat("enchant:overload", StatKey.CRIT_DAMAGE, level)) : List.of());
+            }
             enchants.add(new EnchantDefinition(id, switch (id) {
                 case "infinite_quiver" -> "Infinite Quiver";
                 default -> Character.toUpperCase(id.charAt(0)) + id.substring(1);
@@ -108,16 +115,23 @@ public final class CalibrationLoadouts {
 
     private static ItemRegistry fireRegistry(ItemRegistry expanded) {
         var enchants = expanded.enchantments().values().stream()
-                .map(e -> new EnchantDefinition(e.id(), e.displayName(), e.kind(), e.compatibleModes(), e.levelModifiers(), true)).toList();
+                .map(enchant -> new EnchantDefinition(enchant.id(), enchant.displayName(), enchant.kind(),
+                        enchant.compatibleModes(), enchant.levelModifiers(), true)).toList();
         var definitions = new ArrayList<ItemDefinition>();
         for (String id : List.of("ordinary_v4", "shortbow_v4", "quiver_v4", "flame_v4", "duplex_flame_v4", "tempo_flame_v4")) {
             var selected = new ArrayList<WeaponDefinition.Enchantment>();
-            if (id.equals("quiver_v4") || id.equals("shortbow_v4"))
+            if (id.equals("quiver_v4") || id.equals("shortbow_v4")) {
                 selected.add(new WeaponDefinition.Enchantment("infinite_quiver", 10, WeaponDefinition.EnchantmentKind.ORDINARY));
-            if (id.contains("flame") || id.equals("shortbow_v4"))
+            }
+            if (id.contains("flame") || id.equals("shortbow_v4")) {
                 selected.add(new WeaponDefinition.Enchantment("flame", 2, WeaponDefinition.EnchantmentKind.ORDINARY));
-            if (id.equals("duplex_flame_v4")) selected.add(enchant("duplex", true));
-            if (id.equals("tempo_flame_v4")) selected.add(enchant("fatal_tempo", true));
+            }
+            if (id.equals("duplex_flame_v4")) {
+                selected.add(enchant("duplex", true));
+            }
+            if (id.equals("tempo_flame_v4")) {
+                selected.add(enchant("fatal_tempo", true));
+            }
             definitions.add(new ItemDefinition(new WeaponDefinition(id, ItemRegistry.SCHEMA_VERSION, FIRE_REVISION,
                     id.equals("shortbow_v4") ? WeaponDefinition.FiringMode.SHORTBOW : WeaponDefinition.FiringMode.DRAWN_BOW,
                     100, id.equals("tempo_flame_v4") ? List.of(flat("item:tempo_flame_v4", StatKey.FEROCITY, 25)) : List.of(), selected),
