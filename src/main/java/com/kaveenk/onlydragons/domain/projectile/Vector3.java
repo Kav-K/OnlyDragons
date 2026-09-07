@@ -13,6 +13,9 @@ import com.kaveenk.onlydragons.domain.DomainChecks;
 public record Vector3(double x, double y, double z) {
     /**
      * Rejects NaN/infinite components; finite components do not guarantee a finite derived magnitude.
+     * @param x finite x component, in blocks for positions or blocks/tick for velocities
+     * @param y finite y component in the same unit
+     * @param z finite z component in the same unit
      */
     public Vector3 {
         DomainChecks.finite(x, "x");

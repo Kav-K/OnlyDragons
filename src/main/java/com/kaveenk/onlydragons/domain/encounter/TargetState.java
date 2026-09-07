@@ -17,6 +17,11 @@ import java.util.UUID;
 public record TargetState(UUID encounterId, UUID targetId, double maxHealth, double currentHealth, double defense) {
     /**
      * Rejects null IDs, invalid HP bounds and negative/non-finite defense; does not read a native entity.
+     * @param encounterId nonnull generation identity
+     * @param targetId nonnull managed target identity
+     * @param maxHealth finite strictly positive domain HP
+     * @param currentHealth finite HP in [0,maxHealth]
+     * @param defense finite nonnegative defense points
      */
     public TargetState {
         Objects.requireNonNull(encounterId, "encounterId");
@@ -30,6 +35,7 @@ public record TargetState(UUID encounterId, UUID targetId, double maxHealth, dou
 
     /**
      * Returns whether domain current HP is strictly positive; native animation/removal is a separate state.
+     * @return true only while domain current HP is strictly positive
      */
     public boolean alive() { return currentHealth > 0; }
 }

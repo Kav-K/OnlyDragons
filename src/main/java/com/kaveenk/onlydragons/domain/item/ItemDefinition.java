@@ -14,6 +14,10 @@ public record ItemDefinition(WeaponDefinition weapon, String displayName, String
     /**
      * Rejects invalid presentation/reference syntax or unsupported material; freezes allowed roll IDs.
      * Adding another material family requires an explicit compatibility contract.
+     * @param weapon nonnull offensive definition with strict item ID and bounded revision syntax
+     * @param displayName nonblank generated presentation, never decoded as authority
+     * @param material exactly BOW in this bounded catalog
+     * @param allowedRolls copied set of valid named roll IDs; registry verifies they exist
      */
     public ItemDefinition {
         Objects.requireNonNull(weapon);

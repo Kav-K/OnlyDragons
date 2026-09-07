@@ -24,6 +24,10 @@ public record ExplainedStatSnapshot(StatSnapshot snapshot, String profileRevisio
     public record Step(String stage, double operand, double result, List<StatModifier> contributions) {
         /**
          * Copies contributions and rejects blank stages or non-finite arithmetic observations.
+         * @param stage nonblank layer label (flat, additive_percent, multiplier, cap in the resolver)
+         * @param operand finite sum, percentage points, factor or cap according to stage
+         * @param result finite value after the stage, in the stat's unit
+         * @param contributions copied nonnull list of source modifiers; empty for a cap
          */
         public Step {
             DomainChecks.text(stage, "stage");
@@ -40,6 +44,8 @@ public record ExplainedStatSnapshot(StatSnapshot snapshot, String profileRevisio
     public record Explanation(double base, List<Step> steps) {
         /**
          * Validates the base and copies steps without recalculating the caller-supplied history.
+         * @param base finite nonnegative starting value in that stat's unit
+         * @param steps immutable copy in application order, ending with the effective cap for resolver output
          */
         public Explanation {
             DomainChecks.nonNegative(base, "base");
@@ -48,6 +54,9 @@ public record ExplainedStatSnapshot(StatSnapshot snapshot, String profileRevisio
     }
     /**
      * Rejects missing explanations or snapshot and freezes the full map before publication.
+     * @param snapshot nonnull complete numeric snapshot
+     * @param profileRevision nonblank label of the resolving policy, separate from equipment revision
+     * @param explanations complete copied map for all stats; immutable entries retain no live services
      */
     public ExplainedStatSnapshot {
         Objects.requireNonNull(snapshot, "snapshot");

@@ -34,6 +34,9 @@ public record EnchantTarget(Category category, Slot slot, WeaponDefinition.Firin
 
     /**
      * Requires category and slot but permits absent firing mode for an unsupported target.
+     * @param category nonnull equipment family; ARMOR is currently unsupported
+     * @param slot nonnull equipment location; only MAIN_HAND is supported now
+     * @param firingMode nullable structural field; null cannot support any enchant
      */
     public EnchantTarget {
         Objects.requireNonNull(category);
@@ -43,6 +46,8 @@ public record EnchantTarget(Category category, Slot slot, WeaponDefinition.Firin
     /**
      * Returns true only for a main-hand bow with a nonnull compatible firing mode and available
      * descriptor. This is a capability predicate, not validation that a live item occupies that slot.
+     * @param enchant trusted availability and firing-mode descriptor
+     * @return true only for a compatible available enchant on the declared main-hand bow capability
      */
     public boolean supports(EnchantDefinition enchant) {
         return category == Category.BOW && slot == Slot.MAIN_HAND && firingMode != null

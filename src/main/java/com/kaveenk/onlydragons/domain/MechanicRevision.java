@@ -11,6 +11,8 @@ package com.kaveenk.onlydragons.domain;
 public record MechanicRevision(String profileId, String revision) {
     /**
      * Validates both labels; null rejects with NullPointerException, blank with IllegalArgumentException.
+     * @param profileId nonblank policy family; case and surrounding spaces are retained
+     * @param revision nonblank version label, changed by the policy author with content
      */
     public MechanicRevision {
         DomainChecks.text(profileId, "profileId");

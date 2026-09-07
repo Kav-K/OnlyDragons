@@ -24,6 +24,10 @@ public record StatProfile(String id, int version, Map<StatKey, StatDefinition> d
     /**
      * Validates all definitions and caps before returning a candidate; missing/null entries reject.
      * Labels may be reused by callers, so {@link #revision()} is not a content hash.
+     * @param id nonblank policy family
+     * @param version positive author-maintained version
+     * @param definitions complete immutable copy keyed by each definition's own key
+     * @param effectiveCaps complete immutable copy of finite caps inside each definition's raw range
      */
     public StatProfile {
         DomainChecks.text(id, "profile id");
@@ -40,12 +44,16 @@ public record StatProfile(String id, int version, Map<StatKey, StatDefinition> d
 
     /**
      * Returns the display/provenance label id + "-v" + version, without registering or adopting it.
+     * @return profile ID followed by -v and its version, for display/provenance
      */
     public String revision() { return id + "-v" + version; }
 
     /**
      * Loads and closes the bundled calibration resource. Missing resource or I/O failure throws
      * IllegalStateException; malformed policy content retains its validation exception.
+     * @return validated immutable bundled calibration profile
+     * @throws IllegalStateException if the bundled resource is missing or cannot be read
+     * @throws IllegalArgumentException if bundled policy content is invalid
      */
     public static StatProfile calibration() {
         try (var input = StatProfile.class.getResourceAsStream("/stats/calibration-v1.properties")) {

@@ -18,6 +18,10 @@ public record ItemInstance(WeaponIdentity identity, String registryRevision,
     /**
      * Copies caller collections and sorts rolls without interpreting selections; malformed or forged
      * content may still be structurally constructible and must pass ItemRegistry.resolve.
+     * @param identity nonnull persistent identity
+     * @param registryRevision nonnull exact catalog label; compatibility is deferred to resolve
+     * @param enchantLevels copied map of requested ID/level pairs, not trusted effect descriptors
+     * @param rolledModifierIds copied sorted named selections; duplicates remain until resolve rejects them
      */
     public ItemInstance {
         Objects.requireNonNull(identity);

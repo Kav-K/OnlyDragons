@@ -20,10 +20,12 @@ public enum StatKey {
 
     /**
      * Returns the stable lowercase resource/property identifier; display labels must not replace it.
+     * @return stable lowercase machine identifier used in resources and properties
      */
     public String id() { return id; }
     /**
      * Returns the numeric unit shared by modifiers, raw values and effective values for this key.
+     * @return unit shared by this stat's modifiers, raw values and effective values
      */
     public StatUnit unit() { return unit; }
 }

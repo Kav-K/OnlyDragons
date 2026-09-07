@@ -11,6 +11,9 @@ package com.kaveenk.onlydragons.domain.item.anvil;
 public record EnchantBook(String catalogRevision, String enchantId, int level) {
     /**
      * Rejects malformed/null references or out-of-range levels; does not establish effect availability.
+     * @param catalogRevision 1\u201364 letters/digits/dot/underscore/hyphen
+     * @param enchantId strict lowercase letters/digits/underscore, length 1\u201364
+     * @param level selected book level 1\u201310; actual descriptor table may be narrower
      */
     public EnchantBook {
         if (catalogRevision == null || !catalogRevision.matches("[A-Za-z0-9._-]{1,64}"))

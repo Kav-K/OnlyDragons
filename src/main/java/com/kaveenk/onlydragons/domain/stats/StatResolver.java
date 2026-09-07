@@ -17,6 +17,8 @@ public final class StatResolver {
     private final StatProfile profile;
     /**
      * Retains the nonnull validated profile; later catalog replacement cannot alter this resolver.
+     * @param profile nonnull immutable validated stat policy retained by this resolver
+     * @throws NullPointerException if profile is null
      */
     public StatResolver(StatProfile profile) { this.profile = Objects.requireNonNull(profile, "profile"); }
 

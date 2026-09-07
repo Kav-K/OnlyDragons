@@ -30,6 +30,7 @@ public record DragonOrbit(double radius) {
     public record Pose(Vector3 offset, float yaw) {}
     /**
      * Rejects non-finite or out-of-range radius before route use.
+     * @param radius finite horizontal orbit radius in blocks, inclusive 4\u20138
      */
     public DragonOrbit {
         if (!Double.isFinite(radius) || radius < 4 || radius > 8) throw new IllegalArgumentException("Unsafe orbit radius");
@@ -37,6 +38,9 @@ public record DragonOrbit(double radius) {
     /**
      * Accepts finite arena radius 16–48 blocks and returns min(8,arenaRadius−12). The smallest
      * arena gets radius 4; native geometry checks remain necessary in the backend.
+     * @param arenaRadius finite enclosing cube half-extent in blocks, inclusive 16–48
+     * @return pure route with radius min(8, arenaRadius minus 12) blocks
+     * @throws IllegalArgumentException if the arena radius is outside the finite supported range
      */
     public static DragonOrbit forArena(double arenaRadius) {
         if (!Double.isFinite(arenaRadius) || arenaRadius < 16 || arenaRadius > 48)
@@ -47,6 +51,9 @@ public record DragonOrbit(double radius) {
      * Samples nonnegative elapsed game ticks using a smoothstep entry and nominal horizontal
      * speed 0.20 blocks/tick after entry. Returns center-relative offset/yaw without advancing
      * state; callers must supply monotonic elapsed ticks when moving an actual entity.
+     * @param elapsed nonnegative game ticks since this route began
+     * @return centre-relative position offset and yaw for that elapsed tick
+     * @throws IllegalArgumentException if elapsed ticks are negative
      */
     public Pose at(long elapsed) {
         if (elapsed < 0) throw new IllegalArgumentException("Negative route age");

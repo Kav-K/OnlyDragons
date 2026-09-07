@@ -18,6 +18,9 @@ public final class DragonCatalog {
         /**
          * Checks reference equality against the retained weapon definition; catalog membership was
          * resolved by the loader and cannot be reconstructed from this label alone.
+         * @param catalogRevision valid exact item-catalog label resolved by the loader
+         * @param identity nonnull reference matching the weapon ID/schema/revision exactly
+         * @param definition nonnull full trusted item definition retained even after catalog replacement
          */
         public ItemBinding {
             DefinitionIdentity.token(catalogRevision);
@@ -40,6 +43,9 @@ public final class DragonCatalog {
         /**
          * Copies bindings and rejects missing identities or empty contents; schema/reference validation
          * is performed during whole-candidate loading.
+         * @param catalogIdentity nonnull parent table-catalog identity
+         * @param identity nonnull table identity
+         * @param items nonempty immutable copy of ordered trusted bindings, with no grant quantities
          */
         public SampleTable {
             Objects.requireNonNull(catalogIdentity);
@@ -69,6 +75,14 @@ public final class DragonCatalog {
         /**
          * Validates numeric bounds and full compatibility; constructing a selection does not spawn
          * a dragon, change native phase admission, roll loot or grant an item.
+         * @param catalogIdentity nonnull dragon-catalog identity
+         * @param identity nonnull type identity
+         * @param displayName nonblank title
+         * @param maxHealth finite domain HP in (0,1e9]
+         * @param defense finite defense points in [0,1e9]
+         * @param combatProfile nonnull full immutable damage policy
+         * @param phaseProfile nonnull inert policy compatible with that exact combat revision
+         * @param table nonnull complete inert sample table and trusted item bindings
          */
         public Selection {
             Objects.requireNonNull(catalogIdentity);
@@ -104,19 +118,25 @@ public final class DragonCatalog {
 
     /**
      * Returns the author-maintained catalog label; retain full selection content for provenance.
+     * @return author-maintained catalog identity label, not a hash of the retained content
      */
     public DefinitionIdentity identity() { return identity; }
     /**
      * Returns the immutable type map; map iteration order is unspecified and replacement cannot alter it.
+     * @return immutable type-ID to full-selection map, unaffected by later registry replacement
      */
     public Map<String, Selection> definitions() { return definitions; }
     /**
      * Returns immutable inert tables; these bindings are not executable reward rules.
+     * @return immutable inert table bindings; these do not grant or roll rewards
      */
     public Map<String, SampleTable> tables() { return tables; }
     /**
      * Returns the full retained selection for a valid exact type token; malformed or unknown IDs
      * throw IllegalArgumentException with no fallback to the test type.
+     * @param typeId exact valid type token, with no fallback or normalization
+     * @return full immutable retained selection
+     * @throws IllegalArgumentException if the token is malformed or unknown
      */
     public Selection select(String typeId) {
         var selection = definitions.get(DefinitionIdentity.token(typeId));

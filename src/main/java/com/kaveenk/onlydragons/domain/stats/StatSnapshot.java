@@ -19,6 +19,9 @@ public record StatSnapshot(String revision, Map<StatKey, StatValue> values, List
     /**
      * Validates completeness and freezes values/provenance. This constructor does not resolve
      * modifiers or prove that supplied values agree with provenance; use {@link StatResolver} for that.
+     * @param revision nonblank caller-allocated snapshot identity, not automatically incremented here
+     * @param values complete nonnull map for every {@link StatKey}; copied in enum order
+     * @param provenance nonnull contributions copied and sorted in canonical order; duplicates retained
      */
     public StatSnapshot {
         DomainChecks.text(revision, "revision");
@@ -36,10 +39,14 @@ public record StatSnapshot(String revision, Map<StatKey, StatValue> values, List
 
     /**
      * Returns the pre-cap value in the nonnull key's unit; raw crit chance may exceed 100.
+     * @param key nonnull stat key to inspect
+     * @return pre-cap value in that stat's unit, including raw crit chance above 100
      */
     public double raw(StatKey key) { return values.get(Objects.requireNonNull(key, "key")).raw(); }
     /**
      * Returns the separately capped value in the nonnull key's unit; no live equipment is consulted.
+     * @param key nonnull stat key to inspect
+     * @return effective capped value in the stat's unit from this retained snapshot
      */
     public double effective(StatKey key) { return values.get(Objects.requireNonNull(key, "key")).effective(); }
 
@@ -48,6 +55,7 @@ public record StatSnapshot(String revision, Map<StatKey, StatValue> values, List
      * <p>
      * Returns a probability in [0,1] from effective chance/100. For raw 175 and effective 25,
      * this returns 0.25 while {@link #raw(StatKey)} still exposes 175.
+     * @return ordinary critical probability in [0,1], using effective chance rather than raw Overload chance
      */
     public double ordinaryCritProbability() {
         return Math.min(1.0, effective(StatKey.CRIT_CHANCE) / 100.0);

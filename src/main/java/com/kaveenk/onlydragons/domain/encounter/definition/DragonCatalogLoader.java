@@ -30,6 +30,11 @@ public final class DragonCatalogLoader {
     /**
      * Captures immutable item/combat/phase catalogs. Rejects empty profile lists, duplicate profile
      * family IDs (even across revisions) and unknown phase compatibility references before use.
+     * @param items nonnull exact-revision item catalog/router for inert bindings
+     * @param combat nonempty combat policies with distinct profile-family IDs
+     * @param phases nonempty phase policies with distinct IDs and known combat compatibility
+     * @throws NullPointerException if a required catalog or value is null
+     * @throws IllegalArgumentException for empty, duplicate or unresolved profile references
      */
     public DragonCatalogLoader(ItemRegistry items, List<CombatProfile> combat, List<PhaseProfile> phases) {
         this.items = Objects.requireNonNull(items);
@@ -45,6 +50,8 @@ public final class DragonCatalogLoader {
     /**
      * Creates the loader for combat-calibration/v1 and the inert test-dragon-phase-contract/v1
      * using the supplied exact item-catalog router; it does not adopt a live registry.
+     * @param items exact trusted item catalog/router for sample table bindings
+     * @return loader with combat-calibration/v1 and the inert test phase contract
      */
     public static DragonCatalogLoader calibration(ItemRegistry items) {
         var combat = CombatProfile.calibration();
@@ -56,6 +63,9 @@ public final class DragonCatalogLoader {
      * Loads both bundled properties resources and closes both streams. Missing inputs reject
      * with IllegalArgumentException; I/O failure is wrapped in IllegalStateException. Returns a
      * complete immutable candidate without modifying a registry.
+     * @return complete validated immutable bundled catalog candidate, without registry adoption
+     * @throws IllegalArgumentException if a bundled resource is missing or content is invalid
+     * @throws IllegalStateException if reading a bundled resource fails
      */
     public DragonCatalog bundled() {
         try (var dragons = DragonCatalogLoader.class.getResourceAsStream("/encounters/test-dragon-v1.properties");

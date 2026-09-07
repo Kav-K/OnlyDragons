@@ -86,6 +86,11 @@ public final class CombatEncounter {
     /**
      * Creates a full-health generation without catalog provenance. Null inputs, blank variant or
      * a target that is not at full positive HP reject; retain this instance only for this generation.
+     * @param target nonnull full-positive-health initial target and generation
+     * @param variantId nonblank variant identity retained in completion
+     * @param profile nonnull immutable encounter damage policy
+     * @throws NullPointerException if a required input is null
+     * @throws IllegalArgumentException if the variant is blank or the target is not at full positive HP
      */
     public CombatEncounter(TargetState target, String variantId, CombatProfile profile) {
         this(target, variantId, profile, Optional.empty());
@@ -117,15 +122,18 @@ public final class CombatEncounter {
 
     /**
      * Returns the current immutable domain HP value; a retained older value never follows later commits.
+     * @return current immutable HP/defense snapshot, which does not update previously retained values
      */
     public TargetState target() { checkThread(); return target; }
     /**
      * Returns the frozen lethal completion, or empty before defeat and after nonlethal end.
      * Ending a defeated encounter does not erase its existing completion.
+     * @return frozen lethal result, or empty before defeat or after a nonlethal end
      */
     public Optional<EncounterResult> completion() { checkThread(); return Optional.ofNullable(completion); }
     /**
      * Returns an immutable copy of every accepted hit in commit order, including accepted zeros.
+     * @return immutable copy of all accepted hits in commit order, including accepted zeros
      */
     public List<DamageResult> impacts() { checkThread(); return List.copyOf(accepted.values()); }
     /**
@@ -133,6 +141,9 @@ public final class CombatEncounter {
      * <p>
      * Returns the newest limit accepted hits in their original commit order; zero returns empty.
      * A negative limit rejects. This call does not remove claims, parent data or history.
+     * @param limit nonnegative maximum number of newest accepted hits; zero requests none
+     * @return immutable bounded tail in original commit order, without deleting authoritative history
+     * @throws IllegalArgumentException if limit is negative
      */
     public List<DamageResult> recentImpacts(int limit) {
         checkThread(); if (limit < 0) throw new IllegalArgumentException("Negative impact limit");
@@ -140,6 +151,7 @@ public final class CombatEncounter {
     }
     /**
      * Returns an immutable full-precision totals snapshot; map iteration order is unspecified.
+     * @return immutable full-precision per-owner totals snapshot with unspecified map order
      */
     public Map<UUID, EncounterResult.Contribution> contributions() { checkThread(); return Map.copyOf(contributions); }
     /**
@@ -149,17 +161,26 @@ public final class CombatEncounter {
     public void end() { checkThread(); ended = true; }
     /**
      * Returns the total successful commits, starting at zero and increasing for accepted zero damage too.
+     * @return number of successful commits, including accepted zero-damage hits
      */
     public long acceptedOrdinal() { checkThread(); return acceptedOrdinal; }
     /**
      * Returns the accepted commit stamp for an impact ID, or empty for unknown/rejected IDs.
      * No stamp is minted by inspection.
+     * @param impact accepted impact UUID to inspect
+     * @return existing commit stamp, or empty for unknown/rejected IDs
      */
     public Optional<EncounterResult.CommitStamp> stamp(UUID impact) { checkThread(); return Optional.ofNullable(stamps.get(impact)); }
 
     /**
      * Convenience physical entry with no active pre-hit Tempo. Delegates all acceptance and commit
      * checks to the overload with explicit state; it does not sample live buffs.
+     * @param shot immutable captured physical attack
+     * @param impact physical identity and adapter-observed commit request
+     * @param modifiers named additive and multiplicative attack contributions
+     * @param effectiveFerocity effective Ferocity used for this physical evaluation
+     * @param adapterRejection optional adapter veto, preserved as an explicit rejection
+     * @return accepted or rejected immutable result using an empty pre-hit Tempo state
      */
     public DamageResult physical(ShotContext shot, PhysicalImpact impact, DamageModifiers modifiers,
                                  double effectiveFerocity, Optional<DamageResult.RejectionReason> adapterRejection) {
@@ -286,6 +307,9 @@ public final class CombatEncounter {
     /**
      * Returns the full immutable HP policy bound to an accepted physical parent. Unknown IDs
      * throw IllegalArgumentException; consumers retain this exact value across later buff changes.
+     * @param parentImpactId UUID of an accepted physical parent
+     * @return the complete HP-policy snapshot frozen for that parent
+     * @throws IllegalArgumentException if no accepted physical-parent policy exists
      */
     public ProcHealthSnapshot procHealthSnapshot(UUID parentImpactId) {
         checkThread();
@@ -315,6 +339,8 @@ public final class CombatEncounter {
      * <p>
      * Derives a UTF-8 name UUID from encounter, projectile, target and impact ordinal. Pure and
      * thread-independent; neither tick nor part label can turn duplicate delivery into a new hit.
+     * @param key encounter/projectile/target/ordinal physical identity
+     * @return deterministic name UUID independent of delivery tick and part display label
      */
     public static UUID physicalId(PhysicalImpact.Key key) {
         String value = "physical:" + key.encounterId() + ":" + key.projectileId() + ":" + key.targetId() + ":" + key.impactOrdinal();

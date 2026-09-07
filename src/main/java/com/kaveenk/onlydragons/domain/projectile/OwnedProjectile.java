@@ -14,6 +14,10 @@ import java.util.UUID;
 public record OwnedProjectile(ShotContext shot, UUID sessionToken, TracerProfile tracerProfile, long groupLaunchTick) {
     /**
      * Validates mandatory captures and grace origin; no live registry or session is consulted.
+     * @param shot nonnull immutable arrow snapshot
+     * @param sessionToken nonnull captured lifecycle token, matched separately from owner UUID
+     * @param tracerProfile nonnull trusted immutable steering calibration selected at admission
+     * @param groupLaunchTick nonnegative original primary tick, no later than this arrow's launch
      */
     public OwnedProjectile {
         Objects.requireNonNull(shot); Objects.requireNonNull(sessionToken); Objects.requireNonNull(tracerProfile);
@@ -21,6 +25,8 @@ public record OwnedProjectile(ShotContext shot, UUID sessionToken, TracerProfile
     }
     /**
      * Legacy capture using CALIBRATION_V1 and the shot's own launch tick as the group grace origin.
+     * @param shot nonnull immutable arrow snapshot
+     * @param sessionToken nonnull captured lifecycle token, matched separately from owner UUID
      */
     public OwnedProjectile(ShotContext shot, UUID sessionToken) {
         this(shot, sessionToken, TracerProfile.CALIBRATION_V1, shot.launchTick());
@@ -29,6 +35,9 @@ public record OwnedProjectile(ShotContext shot, UUID sessionToken, TracerProfile
      * Copies session/profile/original grace tick to a child whose group, encounter and parent UUID
      * match this arrow. The caller creates a valid offensive child via {@link FiringRules#child};
      * this method does not independently compare all offensive fields.
+     * @param child valid offensive child capture produced from this physical parent
+     * @return child ownership carrying the same session, profile and original-group launch tick
+     * @throws IllegalArgumentException if group, encounter or parent UUID does not match
      */
     public OwnedProjectile child(ShotContext child) {
         if (!child.shotId().equals(shot.shotId()) || !child.encounterId().equals(shot.encounterId())

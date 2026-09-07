@@ -33,6 +33,10 @@ public final class ItemRegistry {
                                List<StatModifier> statModifiers) {
         /**
          * Copies both lists; constructing this DTO directly does not perform registry resolution.
+         * @param instance exact validated immutable input identity/selections
+         * @param definition retained trusted definition
+         * @param enchantments immutable validated ID-sorted descriptors
+         * @param statModifiers immutable canonical definition/enchant/roll contributions, excluding base damage
          */
         public ResolvedItem {
             enchantments = List.copyOf(enchantments);
@@ -45,6 +49,7 @@ public final class ItemRegistry {
          * <p>
          * Returns a fresh offensive projection preserving identity/mode/base with the complete resolved
          * modifier/enchant lists. No stat resolution or random roll is performed here.
+         * @return new weapon projection containing complete resolved definition/enchant/roll modifiers exactly once
          */
         public WeaponDefinition resolvedWeapon() {
             WeaponDefinition base = definition.weapon();
@@ -103,6 +108,9 @@ public final class ItemRegistry {
      * Exact revision routing; catalogs must have disjoint item IDs and cannot nest routers.
      * <p>
      * Compatibility wrapper over the ordered flat-catalog constructor; no nested router is admitted.
+     * @param primary first concrete catalog; its label becomes the router revision
+     * @param expanded later concrete catalog with a distinct revision and disjoint item IDs
+     * @throws IllegalArgumentException if catalogs are nested, revisions repeat or grant IDs overlap
      */
     public ItemRegistry(ItemRegistry primary, ItemRegistry expanded) {
         this(List.of(primary, expanded));
@@ -115,6 +123,9 @@ public final class ItemRegistry {
      * item IDs. Later catalogs replace aggregate enchant descriptors only; resolving an existing
      * instance still uses its exact original catalog. revision() is the first catalog label,
      * not an identity for the aggregate content. All candidate maps are built before publication.
+     * @param concreteCatalogs nonempty ordered concrete catalogs with distinct revisions and disjoint item IDs
+     * @throws IllegalArgumentException if empty, nested, revision-duplicate or grant-ID ambiguous
+     * @throws NullPointerException if the list or a catalog is null
      */
     public ItemRegistry(List<ItemRegistry> concreteCatalogs) {
         if (concreteCatalogs.isEmpty()) throw new IllegalArgumentException("Missing catalogs");
@@ -142,6 +153,9 @@ public final class ItemRegistry {
      * <p>
      * Returns the exact concrete revision or throws REVISION_MISMATCH; no nearest-version fallback.
      * A concrete catalog returns itself only for its own exact label.
+     * @param requestedRevision exact concrete catalog revision label
+     * @return matching immutable concrete catalog, never a nearest-version fallback
+     * @throws ItemValidationException with REVISION_MISMATCH when no exact route exists
      */
     public ItemRegistry catalog(String requestedRevision) {
         if (catalogs.isEmpty() && revision.equals(requestedRevision)) return this;
@@ -153,21 +167,27 @@ public final class ItemRegistry {
     /**
      * Returns immutable descriptors for inspection; in a router, later catalogs win duplicate
      * enchant IDs. Resolve old item compatibility through its concrete catalog, not this aggregate.
+     * @return immutable inspection descriptors; later catalogs win aggregate duplicate enchant IDs
      */
     public Map<String, EnchantDefinition> enchantments() { return enchants; }
 
     /**
      * Returns the concrete label, or the first concrete label for a router; it is not a content hash.
+     * @return concrete revision, or the first concrete catalog label of a router; not a content hash
      */
     public String revision() { return revision; }
     /**
      * Returns immutable grant-ID definitions; a router contains all disjoint catalog definitions.
      * Map iteration order is unspecified.
+     * @return immutable disjoint grant-ID definitions with unspecified map iteration order
      */
     public Map<String, ItemDefinition> definitions() { return items; }
     /**
      * Looks up a strict lowercase ID in the descriptor view; malformed IDs and unknown enchants
      * throw typed rejection. This does not establish availability or compatibility for an old item.
+     * @param id strict lowercase enchant identifier
+     * @return descriptor from this inspection view, without independently proving availability
+     * @throws ItemValidationException if the ID is malformed or unknown
      */
     public EnchantDefinition enchant(String id) {
         var definition = enchants.get(ItemValidationException.id(id));
@@ -181,6 +201,9 @@ public final class ItemRegistry {
      * Selects a definition, allocates a new UUID and validates its default enchants with no rolls.
      * Returns only an immutable item value; inventory grant, material encoding and capacity belong
      * to the adapter. Unknown definition/schema/revision problems throw typed validation failures.
+     * @param definitionId trusted exact grant definition ID
+     * @return validated immutable item with a fresh UUID, default enchants and no rolls
+     * @throws ItemValidationException if definition or identity validation fails
      */
     public ItemInstance create(String definitionId) {
         if (!catalogs.isEmpty()) {
@@ -200,6 +223,11 @@ public final class ItemRegistry {
      * Validates the original first, then returns a fully validated replacement preserving UUID,
      * definition/schema/revision and catalog. Empty selections remove effects; defaults are not merged.
      * Failure leaves the immutable original unchanged; no inventory or persistence write occurs.
+     * @param original existing immutable item, validated before editing
+     * @param levels complete replacement enchant-level map; empty removes all selections
+     * @param rolledIds complete replacement trusted roll IDs; empty removes all rolls
+     * @return validated replacement preserving original UUID, definition and catalog identity
+     * @throws ItemValidationException if original identity or any replacement selection fails validation
      */
     public ItemInstance edit(ItemInstance original, Map<String, Integer> levels, List<String> rolledIds) {
         resolve(original);

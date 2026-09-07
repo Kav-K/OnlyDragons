@@ -74,6 +74,12 @@ public record DamageResult(UUID impactId, Optional<UUID> parentImpactId, Physica
                           double requestedHealthDamage, double actualHealthDamage, double contributionDamage) {
         /**
          * Rejects invalid amounts and actual HP exceeding requested HP; stores full precision.
+         * @param rawOffense finite nonnegative offense before mitigation
+         * @param mitigatedDamage finite nonnegative offense after defense, before cap
+         * @param cappedDamage finite nonnegative per-hit capped basis
+         * @param requestedHealthDamage finite nonnegative HP request after the selected fraction
+         * @param actualHealthDamage finite nonnegative HP loss no greater than the request
+         * @param contributionDamage finite nonnegative ledger credit, not clipped to remaining HP
          */
         public Amounts {
             DomainChecks.nonNegative(rawOffense, "rawOffense");
@@ -91,6 +97,19 @@ public record DamageResult(UUID impactId, Optional<UUID> parentImpactId, Physica
     /**
      * Validates identities/ancestry and freezes diagnostics. Rejections must have zero actual HP
      * and credit; construction alone cannot establish that a parent or collision really exists.
+     * @param impactId nonnull stable identity of this physical hit or virtual child
+     * @param parentImpactId nonnull optional accepted parent impact; required for FEROCITY/FIRE
+     * @param origin nonnull original physical key, retained by virtual children
+     * @param ownerId nonnull captured shooter UUID, independent of current login
+     * @param shotId nonnull accepted trigger/group identity
+     * @param kind nonnull physical or virtual source classification
+     * @param tick nonnegative receiver commit/evaluation game tick
+     * @param mechanic nonnull retained encounter policy identity
+     * @param amounts nonnull independent HP and score amounts
+     * @param crit nonnull captured ordinary crit, inherited by children
+     * @param effectiveFerocity finite nonnegative diagnostic value
+     * @param modifierBreakdown copied sorted map of nonblank names to finite diagnostic values
+     * @param rejectionReason nonnull optional rejection; empty means accepted, including zero damage
      */
     public DamageResult {
         Objects.requireNonNull(impactId, "impactId");
@@ -118,6 +137,7 @@ public record DamageResult(UUID impactId, Optional<UUID> parentImpactId, Physica
 
     /**
      * Returns true when no rejection reason is present; an accepted zero hit still consumes a commit ordinal.
+     * @return true when no rejection reason is present, including accepted zero-damage results
      */
     public boolean accepted() { return rejectionReason.isEmpty(); }
 }

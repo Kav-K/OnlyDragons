@@ -9,6 +9,8 @@ public final class StatSnapshotFactory {
     private final StatResolver resolver;
     /**
      * Retains a resolver for the nonnull immutable profile; does not allocate snapshot revisions.
+     * @param profile nonnull immutable stat policy used for all snapshots from this factory
+     * @throws NullPointerException if profile is null
      */
     public StatSnapshotFactory(StatProfile profile) { resolver = new StatResolver(profile); }
 

@@ -15,6 +15,10 @@ public final class DragonDefinitionRegistry {
     /**
      * Loads bundled content through a nonnull loader before the registry becomes usable.
      * Bootstrap failures propagate; no partially initialized current catalog is published.
+     * @param loader nonnull loader that must successfully validate bundled content before publication
+     * @throws NullPointerException if loader is null
+     * @throws IllegalArgumentException if bundled content is missing or invalid
+     * @throws IllegalStateException if bundled resource I/O fails
      */
     public DragonDefinitionRegistry(DragonCatalogLoader loader) {
         this.loader = Objects.requireNonNull(loader);
@@ -24,6 +28,7 @@ public final class DragonDefinitionRegistry {
     /**
      * Returns the current immutable catalog through a volatile read; readers need no lock and
      * retained snapshots remain valid after later replacement.
+     * @return current immutable catalog; retained older snapshots remain valid after replacement
      */
     public DragonCatalog snapshot() { return current; }
 

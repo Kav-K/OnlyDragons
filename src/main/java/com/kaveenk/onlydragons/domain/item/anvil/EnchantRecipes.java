@@ -25,12 +25,17 @@ public final class EnchantRecipes {
 
     /**
      * Retains the nonnull immutable catalog/router; no live inventory or scheduler state is held.
+     * @param registry nonnull immutable exact-revision item catalog/router
+     * @throws NullPointerException if registry is null
      */
     public EnchantRecipes(ItemRegistry registry) { this.registry = Objects.requireNonNull(registry); }
 
     /**
      * Resolves the nonnull book in its exact declared catalog and checks availability and explicit
      * level-table membership. Returns the trusted descriptor; invalid references/table selections reject.
+     * @param book nonnull book carrying an exact catalog revision, enchant ID and level
+     * @return trusted available descriptor supporting the exact book level
+     * @throws IllegalArgumentException if catalog/ID resolution fails or the enchant/level is unavailable
      */
     public EnchantDefinition validate(EnchantBook book) {
         var enchant = registry.catalog(book.catalogRevision()).enchant(book.enchantId());
@@ -66,6 +71,11 @@ public final class EnchantRecipes {
      * Validates both books; IDs must match, but catalog labels may differ. The result retains
      * the left catalog and must improve within that catalog's explicit table. Rename adds one XP
      * level when the adapter reports a real change; no output item is granted.
+     * @param left validated left book whose catalog controls the improved result
+     * @param right validated right book of the same enchant ID
+     * @param rename whether the adapter observed a real rename, adding one XP level
+     * @return improved book value and XP-level cost without a native inventory grant
+     * @throws IllegalArgumentException if references differ, the resulting level is unsupported or no improvement exists
      */
     public Combined combine(EnchantBook left, EnchantBook right, boolean rename) {
         var enchant = validate(left);
@@ -80,6 +90,10 @@ public final class EnchantRecipes {
     /**
      * Returns resulting level×2 for ordinary or ×4 for ultimate, in XP levels. The level must
      * exist in the descriptor table; this helper does not independently check availability.
+     * @param enchant trusted descriptor supplying explicit levels and ordinary/ultimate kind
+     * @param level resulting level that must occur in that descriptor table
+     * @return XP levels: two times ordinary level or four times ultimate level, excluding rename
+     * @throws IllegalArgumentException if the resulting level is absent from the table
      */
     public static int cost(EnchantDefinition enchant, int level) {
         if (!enchant.levelModifiers().containsKey(level)) throw new IllegalArgumentException("Invalid cost level");
@@ -90,6 +104,10 @@ public final class EnchantRecipes {
      * Rejects null, ISO control characters, section sign and input length above 50 UTF-16 code
      * units before stripping surrounding whitespace. Returns plain stripped text, possibly empty;
      * the adapter decides whether it differs from the existing name.
+     * @param name nonnull unformatted rename input, at most 50 UTF-16 code units before stripping
+     * @return plain stripped name, possibly empty
+     * @throws NullPointerException if name is null
+     * @throws IllegalArgumentException if input is too long or contains ISO controls or section sign
      */
     public static String rename(String name) {
         Objects.requireNonNull(name);

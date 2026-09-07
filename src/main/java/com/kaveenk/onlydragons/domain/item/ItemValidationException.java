@@ -25,6 +25,9 @@ public final class ItemValidationException extends IllegalArgumentException {
 
     /**
      * Creates a rejection with a nonnull stable code and diagnostic message (which may be null).
+     * @param code nonnull stable rejection category
+     * @param message diagnostic message, possibly null
+     * @throws NullPointerException if code is null
      */
     public ItemValidationException(Code code, String message) {
         super(message);
@@ -33,6 +36,7 @@ public final class ItemValidationException extends IllegalArgumentException {
 
     /**
      * Returns the stable rejection category; callers should not parse the human-readable message.
+     * @return stable rejection category for programmatic handling without message parsing
      */
     public Code code() { return code; }
 

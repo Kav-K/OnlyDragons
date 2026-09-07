@@ -29,10 +29,12 @@ public final class ShortbowLoadouts {
 
     /**
      * Returns the immutable published kit order; granting/slot-capacity checks belong to the command adapter.
+     * @return immutable definitions in published kit order, with no inventory side effects
      */
     public static List<ItemDefinition> definitions() { return DEFINITIONS; }
     /**
      * Returns immutable IDs in kit order, not sorted catalog-map order.
+     * @return immutable grant IDs in the same published kit order
      */
     public static List<String> ids() { return DEFINITIONS.stream().map(item -> item.weapon().id()).toList(); }
 
@@ -42,6 +44,8 @@ public final class ShortbowLoadouts {
      * Recognizes the exact held definition revision and one of seven IDs. The historical method
      * name is not the steering policy: {@link com.kaveenk.onlydragons.domain.projectile.homing.TracerProfile}
      * currently routes these trusted definitions to aimed v3, with level-zero guidance inert.
+     * @param trusted registry-resolved weapon definition, never a raw display/PDC claim
+     * @return true for an exact held-kit revision and one of its declared IDs; actual steering comes from TracerProfile
      */
     public static boolean returningTracer(WeaponDefinition trusted) {
         return trusted.revision().equals(REVISION)

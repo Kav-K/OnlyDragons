@@ -19,6 +19,11 @@ public record FireCommand(UUID id, DamageResult source, int level, double vulner
     /**
      * Rejects virtual/rejected sources, unsupported levels, invalid vulnerability or backdated due time.
      * The encounter separately verifies exact source and captured Flame level.
+     * @param id nonnull strike identity for idempotency
+     * @param source nonnull accepted PHYSICAL/DUPLEX result, retained in full
+     * @param level captured Flame I or II
+     * @param vulnerability finite current multiplier in [1,1.5], sampled once at drain
+     * @param dueTick game tick no earlier than source.tick(); late execution is allowed
      */
     public FireCommand {
         Objects.requireNonNull(id); Objects.requireNonNull(source);
