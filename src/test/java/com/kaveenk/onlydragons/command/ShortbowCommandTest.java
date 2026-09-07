@@ -10,12 +10,24 @@ import org.junit.jupiter.api.*;
 import org.mockbukkit.mockbukkit.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * MockBukkit permission, atomic grant and help-routing tests for the declared shortbow kit. Exact inventory totals and registered completion/output are checked; cadence, held use and visible pullback require real Paper/client evidence.
+ */
 class ShortbowCommandTest {
     private ServerMock server;
     private OnlyDragonsPlugin plugin;
+    /**
+     * Creates a fresh isolated MockBukkit boundary and the collaborators used by this class's oracles.
+     */
     @BeforeEach void setup() { server = MockBukkit.mock(); plugin = MockBukkit.load(OnlyDragonsPlugin.class); }
+    /**
+     * Releases the mock server/plugin lifecycle after each test so scheduler and static Bukkit state cannot leak between cases.
+     */
     @AfterEach void close() { MockBukkit.unmock(); }
 
+    /**
+     * Denied players receive no kit and no completion; console player-only execution reports the boundary.
+     */
     @Test void permissionAndPlayerOnlyBoundariesAreEnforced() {
         var player = server.addPlayer();
         server.dispatchCommand(player, "onlydragons dev shortbow kit");
@@ -25,6 +37,9 @@ class ShortbowCommandTest {
         assertEquals("This command requires a player.", server.getConsoleSender().nextMessage().replace("§7", ""));
     }
 
+    /**
+     * Insufficient capacity leaves the full snapshot unchanged; success retains old contents and grants declared identities plus exactly 512 arrows.
+     */
     @Test void kitRejectsWithoutPartialGrantAndPreservesExistingContents() {
         var player = server.addPlayer(); player.setOp(true);
         for (int i = 0; i < 22; i++) player.getInventory().setItem(i, new ItemStack(Material.STONE, 64));
@@ -46,6 +61,9 @@ class ShortbowCommandTest {
         assertEquals(List.of("list", "kit", "help"), plugin.getCommand("onlydragons").tabComplete(player, "onlydragons", new String[]{"dev", "shortbow", ""}));
     }
 
+    /**
+     * Checks the executable setup order and tier/proc text while requiring every declared loadout ID to be listed.
+     */
     @Test void helpOrdersSetupKitSpawnThenSafePositionAndListLabelsGuarantee() {
         var sender = server.getConsoleSender();
         server.dispatchCommand(sender, "onlydragons dev shortbow help");
@@ -61,6 +79,10 @@ class ShortbowCommandTest {
         for (String id : ShortbowLoadouts.ids()) assertTrue(text.contains(id));
     }
 
+    /**
+     * Drains console responses in order without replacing their diagnostic content.
+     * @return newline-separated message text
+     */
     private String messages() {
         StringBuilder result = new StringBuilder(); String message;
         while ((message = server.getConsoleSender().nextMessage()) != null) result.append(message).append('\n');

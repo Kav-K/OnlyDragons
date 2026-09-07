@@ -62,24 +62,95 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-/** Classic Paper server-thread composition boundary. No combat engine or target HP mutation. */
+/**
+ * Sole owner of real arrows, accepted firing groups and first-collision claims.
+ * All operations and returned live Bukkit objects belong to the classic Paper server
+ * thread. Equipment is refreshed at fire admission, then immutable shot values survive
+ * later swaps and session expiry. This class suppresses native arrow damage but never
+ * computes combat damage or mutates target HP: one receiver consumes settled claims.
+ * The first collision is terminal even when subsequently vetoed. Retirement precedes
+ * receiver invocation, making reentrant accounting unable to claim the same arrow again.
+ * @see OwnedBowListener
+ * @see com.kaveenk.onlydragons.paper.encounter.ManagedCombatService
+ * @see ArrowContinuity
+ */
 public final class OwnedBowService implements AutoCloseable {
+    /**
+     * Diagnostic retirement cause, not an accounting verdict; HIT includes rejected managed collisions.
+     */
     public enum Retirement {
         HIT, MISS, FAILED_LAUNCH, REMOVED, ARENA_EXIT, OWNER_DEATH, RESET, DISABLE
     }
 
+    /**
+     * Bounded diagnostic journal entry; not a replacement for the immutable accounting ledger.
+     * @param kind lifecycle operation
+     * @param projectileId real native arrow UUID
+     * @param ownerId captured shooter UUID
+     * @param tick unsigned Bukkit tick at observation
+     * @param detail operation-specific diagnostic text
+     */
     public record Trace(String kind, UUID projectileId, UUID ownerId, long tick, String detail) {}
+    /**
+     * Immutable admission projection without a live World reference.
+     * @param encounterId unique generation
+     * @param worldId world identity
+     * @param bounds admitted block-coordinate box
+     * @param mechanic captured encounter policy revision
+     */
     public record AdmittedArena(UUID encounterId, UUID worldId, TracerRules.Box bounds, MechanicRevision mechanic) {}
+    /**
+     * Immutable registered-target projection used to discover actual native dragon parts.
+     * @param encounterId admitted generation
+     * @param targetId logical accounting target
+     * @param entityId live native parent identity
+     * @param bounds enclosing admitted arena in block coordinates
+     */
     public record AdmittedTarget(UUID encounterId, UUID targetId, UUID entityId, TracerRules.Box bounds) {}
+    /**
+     * Server-owned admission; copied bounds and exact World identity define membership.
+     * @param id encounter generation
+     * @param world Bukkit world owned by the server thread
+     * @param bounds copied admission box
+     * @param mechanic immutable policy revision
+     */
     private record Arena(UUID id, World world, BoundingBox bounds, MechanicRevision mechanic) {
+        /**
+         * Checks world identity before applying Bukkit box containment.
+         * @param location live block-coordinate position
+         * @return true only inside this world and admitted box
+         */
         boolean contains(Location location) {
             return world.equals(location.getWorld()) && bounds.contains(location.toVector());
         }
     }
 
+    /**
+     * Registration binds one logical target to its live native parent.
+     * @param id logical target UUID
+     * @param encounter admitted generation
+     * @param entity native parent, read only on the server thread
+     */
     private record Target(UUID id, UUID encounter, LivingEntity entity) {}
+    /**
+     * One queued native input; its final event result and captured identity are rechecked next tick.
+     * @param event dispatch object retained to observe final item-use denial
+     * @param session generation token at input
+     * @param tick input tick
+     * @param weapon complete item instance at input
+     * @param slot selected zero-based hotbar slot
+     */
     private record Input(PlayerInteractEvent event, UUID session, long tick, ItemInstance weapon, int slot) {}
+    /**
+     * Held-use identity; subsequent shots refresh stats without silently adopting a swapped item.
+     * @param session live player token
+     * @param weapon full captured item instance
+     * @param slot selected zero-based hotbar slot
+     */
     private record Hold(UUID session, ItemInstance weapon, int slot) {}
+    /**
+     * One provisional primary/optional Duplex child reservation and exactly-once ordinary-ammo charge. Native events remain referenced until later settlement so late launch cancellation is visible.
+     */
     private static final class Group {
         final UUID id, owner, session;
         final Arena arena;
@@ -94,6 +165,14 @@ public final class OwnedBowService implements AutoCloseable {
         boolean debitOutstanding;
         QuiverFlameProfile.Quiver quiver;
         boolean physicalRetirement;
+        /**
+         * Creates an unsettled reservation; a non-null ammo token represents a refundable debit.
+         * @param id group identity
+         * @param owner shooter UUID
+         * @param session firing admission token
+         * @param arena current admitted generation
+         * @param ammo one ordinary arrow, or null when no survival debit exists
+         */
         Group(UUID id, UUID owner, UUID session, Arena arena, ItemStack ammo) {
             this.id = id;
             this.owner = owner;
@@ -104,6 +183,9 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Immutable collision-time facts plus final-dispatch veto references. It does not remain an authority after retirement; accounting receives a SettledHit value.
+     */
     private static final class Candidate {
         final OwnedProjectile owned;
         final ProjectileHitEvent event;
@@ -113,6 +195,14 @@ public final class OwnedBowService implements AutoCloseable {
         final Vector3 position;
         final boolean supportedPhase;
         boolean nativeVeto;
+        /**
+         * Captures physical position and phase before another event or tick can move the target.
+         * @param owned immutable shot provenance
+         * @param event real hit dispatch retained for its final cancellation
+         * @param target exact registered target object
+         * @param part native part UUID, or null for a parent/nonmultipart hit
+         * @param tick actual collision tick
+         */
         Candidate(OwnedProjectile owned, ProjectileHitEvent event, Target target, UUID part, long tick) {
             this.owned = owned;
             this.event = event;
@@ -146,6 +236,15 @@ public final class OwnedBowService implements AutoCloseable {
     private BukkitTask task;
     private boolean closed;
 
+    /**
+     * Constructs the bounded registry and continuity broker; call start after wiring listeners/receiver.
+     * @throws NullPointerException if a required collaborator is null
+     * @throws IllegalArgumentException if capacity is invalid
+     * @param plugin scheduler and ticket owner
+     * @param equipment authoritative equipment refresher
+     * @param capacity maximum combined emitted/reserved arrow slots, validated by ArrowRegistry
+     * @param random source for captured crit, Overload and Quiver rolls
+     */
     public OwnedBowService(JavaPlugin plugin, EquipmentStatsService equipment, int capacity, RandomSource random) {
         this.plugin = Objects.requireNonNull(plugin);
         this.equipment = Objects.requireNonNull(equipment);
@@ -154,6 +253,10 @@ public final class OwnedBowService implements AutoCloseable {
         continuity = new ArrowContinuity(plugin);
     }
 
+    /**
+     * Starts the sole one-tick firing/claim/continuity task.
+     * @throws IllegalStateException if off the server thread, closed or already started
+     */
     public void start() {
         check();
         if (task != null) {
@@ -162,7 +265,15 @@ public final class OwnedBowService implements AutoCloseable {
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);
     }
 
-    /** Admission exists independently of any target. Bounds are copied; overlapping arenas reject. */
+    /**
+     * Admits a targetless firing arena after reserving its possible ticket footprint. Overlapping same-world boxes are rejected before adoption.
+     * @throws IllegalArgumentException for duplicate, empty, overlapping or over-capacity admission
+     * @throws IllegalStateException if closed or off the server thread
+     * @param id unique generation UUID
+     * @param world native world
+     * @param bounds nonempty arena box, defensively copied
+     * @param mechanic immutable mechanic revision
+     */
     public void openEncounter(UUID id, World world, BoundingBox bounds, MechanicRevision mechanic) {
         check();
         Objects.requireNonNull(id);
@@ -177,6 +288,14 @@ public final class OwnedBowService implements AutoCloseable {
         Bukkit.getOnlinePlayers().stream().filter(p -> arena.contains(p.getLocation())).forEach(this::activate);
     }
 
+    /**
+     * Adds one valid living parent to an already admitted arena; does not create a combat engine.
+     * @throws IllegalArgumentException for dead, invalid, outside or duplicate targets
+     * @throws NullPointerException if the arena is not admitted
+     * @param encounterId admitted generation
+     * @param targetId unique logical target UUID
+     * @param entity live native parent inside the arena
+     */
     public void registerTarget(UUID encounterId, UUID targetId, LivingEntity entity) {
         check();
         Arena arena = requireArena(encounterId);
@@ -186,13 +305,20 @@ public final class OwnedBowService implements AutoCloseable {
         targets.put(entity.getUniqueId(), new Target(Objects.requireNonNull(targetId), encounterId, entity));
     }
 
+    /**
+     * Removes native target registration without ending the arena or removing the entity.
+     * @param entityId native parent UUID; absent registrations are harmless
+     */
     public void unregisterTarget(UUID entityId) {
         check();
         targets.remove(entityId);
     }
 
-    /** Exactly one accounting receiver. Delivery follows physical registry/entity retirement; consume the
-    * immutable delivered claim and currentSession/isCurrentSession, never require a live projectile lookup. */
+    /**
+     * Installs the single settled-claim consumer. Claims are terminal before this potentially reentrant callback runs.
+     * @throws IllegalStateException if a receiver is already installed, closed or off-thread
+     * @param receiver non-null accounting consumer
+     */
     public void receiver(Consumer<SettledHit> receiver) {
         check();
         if (this.receiver != null) {
@@ -201,7 +327,11 @@ public final class OwnedBowService implements AutoCloseable {
         this.receiver = Objects.requireNonNull(receiver);
     }
 
-    /** Bootstrap-owned native protection survives closed physical admission until backend removal. */
+    /**
+     * Installs post-admission native-damage protection, such as a defeated dragon still animating.
+     * @throws IllegalStateException if already installed, closed or off-thread
+     * @param protection non-null predicate of native parent UUID
+     */
     public void retainedProtection(Predicate<UUID> protection) {
         check();
         if (retainedProtection != null) {
@@ -210,6 +340,10 @@ public final class OwnedBowService implements AutoCloseable {
         retainedProtection = Objects.requireNonNull(protection);
     }
 
+    /**
+     * Detaches only the exact installed predicate, allowing its owner to close without removing another owner.
+     * @param protection installed predicate identity
+     */
     public void clearRetainedProtection(Predicate<UUID> protection) {
         thread();
         if (retainedProtection == protection) {
@@ -217,6 +351,10 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Detaches only the exact installed receiver; cleanup is permitted after service closure.
+     * @param receiver installed callback identity
+     */
     public void clearReceiver(Consumer<SettledHit> receiver) {
         thread();
         if (this.receiver == receiver) {
@@ -224,38 +362,70 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Looks up current firing admission without creating a new session.
+     * @param owner player UUID
+     * @return current token, or empty outside an active admission
+     */
     public Optional<UUID> currentSession(UUID owner) {
         thread();
         return Optional.ofNullable(sessions.get(owner));
     }
 
+    /**
+     * Tests token equality without refreshing player membership.
+     * @param owner player UUID
+     * @param token captured token, possibly null
+     * @return true only for a non-null current token
+     */
     public boolean isCurrentSession(UUID owner, UUID token) {
         thread();
         return token.equals(sessions.get(owner));
     }
 
+    /**
+     * Snapshots emitted immutable shot records; callers cannot mutate the registry through this list.
+     * @return current immutable projectile values
+     */
     public List<OwnedProjectile> projectiles() {
         thread();
         return registry.snapshot();
     }
 
+    /**
+     * Finds immutable provenance while an arrow remains registered.
+     * @param id native arrow UUID
+     * @return registered value, or empty after retirement
+     */
     public Optional<OwnedProjectile> projectile(UUID id) {
         thread();
         return registry.lookup(id);
     }
 
-    /** Live entity access for T07 steering, on the server thread only. Never transfers ownership. */
+    /**
+     * Exposes a live native arrow for server-thread observation; ownership and retirement remain here.
+     * @param id native arrow UUID
+     * @return owned entity reference, or empty when absent
+     */
     public Optional<Arrow> arrow(UUID id) {
         thread();
         return Optional.ofNullable(entities.get(id));
     }
 
-    /** Defensive values only; no mutable arena maps, bounds, or target entities escape. */
+    /**
+     * Snapshots target-independent admissions for cooperating adapters.
+     * @return immutable arena value list
+     */
     public List<AdmittedArena> admittedArenas() {
         thread();
         return arenas.values().stream().map(a -> new AdmittedArena(a.id(), a.world().getUID(), box(a.bounds()), a.mechanic())).toList();
     }
 
+    /**
+     * Snapshots currently registered native parents and their arena bounds.
+     * @param encounter admitted generation UUID
+     * @return immutable target projections for continuity acquisition
+     */
     public List<AdmittedTarget> admittedTargets(UUID encounter) {
         thread();
         Arena arena = arenas.get(encounter);
@@ -266,41 +436,73 @@ public final class OwnedBowService implements AutoCloseable {
                 .map(t -> new AdmittedTarget(encounter, t.id(), t.entity().getUniqueId(), box(arena.bounds()))).toList();
     }
 
+    /**
+     * Returns the shared continuity/ticket owner; consumers must use distinct demand identities.
+     * @return service-owned continuity adapter, never a new task
+     */
     public ArrowContinuity continuity() {
         thread();
         return continuity;
     }
 
+    /**
+     * Reads combined registry occupancy for admission diagnostics.
+     * @return emitted plus reserved arrow slots
+     */
     public int capacityUsed() {
         thread();
         return registry.used();
     }
 
+    /**
+     * Reads capacity promised to unsettled groups.
+     * @return reserved arrow slots
+     */
     public int reservedCapacity() {
         thread();
         return registry.reserved();
     }
 
+    /**
+     * Counts firing groups awaiting final launch/ammo settlement.
+     * @return number of unsettled groups
+     */
     public int pendingGroups() {
         thread();
         return groups.size();
     }
 
+    /**
+     * Counts first collisions waiting for final-dispatch veto inspection.
+     * @return number of unsettled physical claims
+     */
     public int pendingClaims() {
         thread();
         return candidates.size();
     }
 
+    /**
+     * Reports ownership of the single scheduler task.
+     * @return one while a task handle exists, otherwise zero
+     */
     public int taskCount() {
         thread();
         return task == null ? 0 : 1;
     }
 
+    /**
+     * Copies the bounded lifecycle journal; at most 512 newest entries are retained.
+     * @return immutable chronological diagnostic list
+     */
     public List<Trace> trace() {
         thread();
         return List.copyOf(traces);
     }
 
+    /**
+     * Reconciles current physical arena membership, replacing stale admission only for a living player inside an admitted box.
+     * @param player current native player
+     */
     public void activate(Player player) {
         check();
         UUID owner = player.getUniqueId();
@@ -314,7 +516,12 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
-    /** A stale token cannot clear the replacement session. Airborne arrows survive quit, but not delayed emission. */
+    /**
+     * Invalidates only the matching generation. Quit/leave cancels pending children while retaining an already launched primary and its charge; death can remove all matching airborne arrows.
+     * @param owner player UUID
+     * @param token expected session generation
+     * @param removeAirborne true for destructive owner-death cleanup, false for quit/leave
+     */
     public void clearSession(UUID owner, UUID token, boolean removeAirborne) {
         check();
         if (!sessions.remove(owner, token)) {
@@ -342,6 +549,10 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Cleans every arrow/group of the dead owner even if arena departure already removed its session. Refunds enter death drops when inventory is not kept.
+     * @param event real player-death event used as the refund destination
+     */
     void ownerDied(PlayerDeathEvent event) {
         check();
         refundDeath = event;
@@ -365,6 +576,10 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Ends firing admission if this native parent is still registered.
+     * @param entity actual dead parent
+     */
     void targetDied(LivingEntity entity) {
         check();
         Target target = targets.get(entity.getUniqueId());
@@ -373,6 +588,10 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Retires this arena's groups/arrows, sessions, targets and broker reservation. Retained native-protection ownership is separately managed.
+     * @param id generation UUID; absent admissions are harmless
+     */
     public void endEncounter(UUID id) {
         check();
         arenas.remove(id);
@@ -396,6 +615,10 @@ public final class OwnedBowService implements AutoCloseable {
         continuity.tickets().endArena(id);
     }
 
+    /**
+     * Admits a real main-hand ordinary-bow release at HIGHEST after refreshed identity, force, permission and prior-cancellation checks. Shortbow native release is suppressed; accepted release is rechecked next tick.
+     * @param event native bow event, including cancelled events
+     */
     void drawn(EntityShootBowEvent event) {
         check();
         if (!(event.getEntity() instanceof Player player)) {
@@ -444,6 +667,10 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Captures the primary launch event for later veto inspection and clears native damage/fire/critical effects on owned arrows.
+     * @param event native projectile launch event
+     */
     void launched(ProjectileLaunchEvent event) {
         check();
         var owned = registry.lookup(event.getEntity().getUniqueId());
@@ -457,6 +684,10 @@ public final class OwnedBowService implements AutoCloseable {
         suppress((Arrow) event.getEntity());
     }
 
+    /**
+     * Queues one captured main-hand shortbow input per player; does not cancel or claim native interaction authority.
+     * @param event real interaction whose final item-use result is inspected next tick
+     */
     void interact(PlayerInteractEvent event) {
         check();
         if (event.getHand() != EquipmentSlot.HAND || arena(event.getPlayer().getLocation()) == null) {
@@ -471,12 +702,20 @@ public final class OwnedBowService implements AutoCloseable {
                 valid.item().instance(), event.getPlayer().getInventory().getHeldItemSlot()));
     }
 
+    /**
+     * Drops queued/held use immediately while preserving cooldowns and independently owned airborne groups.
+     * @param owner player UUID
+     */
     void stopUsing(UUID owner) {
         check();
         inputs.remove(owner);
         holds.remove(owner);
     }
 
+    /**
+     * Claims the first real collision at LOWEST. Misses retire immediately; a managed collision waits one tick for final cancellation and phase/target validation.
+     * @param event native physical hit event
+     */
     void hit(ProjectileHitEvent event) {
         check();
         UUID id = event.getEntity().getUniqueId();
@@ -495,6 +734,10 @@ public final class OwnedBowService implements AutoCloseable {
         record("claim", owned.get(), "target=" + target.id());
     }
 
+    /**
+     * Records cancellation already present before this listener as an additional veto, then suppresses native damage for every owned arrow. Later arbitrary cancellation setters are not attributed to external plugins.
+     * @param event native entity damage dispatch
+     */
     void damage(EntityDamageByEntityEvent event) {
         check();
         if (!(event.getDamager() instanceof Arrow arrow) || registry.lookup(arrow.getUniqueId()).isEmpty()) {
@@ -509,7 +752,10 @@ public final class OwnedBowService implements AutoCloseable {
         event.setCancelled(true);
     }
 
-    /** All native damage to registered managed targets is inert; settlement remains the one authority. */
+    /**
+     * Suppresses native HP damage on admitted or retained managed parents, including multipart hits; this cancellation is not itself physical-hit acceptance.
+     * @param event native damage event of any cause
+     */
     void protectTarget(EntityDamageEvent event) {
         check();
         Entity entity = event.getEntity();
@@ -520,6 +766,9 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Reconciles sessions, due groups, final physical claims, queued/held input and native continuity in that order. Snapshot iteration permits synchronous lifecycle callbacks to remove ownership safely.
+     */
     private void tick() {
         if (closed) {
             return;
@@ -611,12 +860,23 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Refreshes equipment and compares the full item instance plus selected slot before reusing held input.
+     * @param player current native player
+     * @param weapon captured complete instance
+     * @param slot captured hotbar slot
+     * @return true only for the same valid current item and slot
+     */
     private boolean sameInputWeapon(Player player, ItemInstance weapon, int slot) {
         return player.getInventory().getHeldItemSlot() == slot
                 && equipment.refresh(player).fingerprint().mainHand() instanceof ItemReadResult.Valid valid
                 && weapon.equals(valid.item().instance());
     }
 
+    /**
+     * Attempts one public-API native launch after current permission, membership, cooldown, ammo and equipment checks. Cooldown advances only after a valid uncancelled launch.
+     * @param player current firing player
+     */
     private void shortbow(Player player) {
         if (!player.isOnline() || player.isDead() || !player.hasPermission("onlydragons.fire")) {
             return;
@@ -651,6 +911,15 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Reserves primary/child capacity before recording a survival charge. Native bows supply the debit token; shortbows remove one matching ordinary arrow here.
+     * @param player current shooter
+     * @param arena admitted generation
+     * @param item resolved captured weapon
+     * @param consumable native consumable or ordinary-arrow template
+     * @param nativeDebit true when native bow processing owns consumption
+     * @return unsettled group, or null when admission, capacity or ammo fails
+     */
     private Group reserve(Player player, Arena arena, ItemRegistry.ResolvedItem item, ItemStack consumable, boolean nativeDebit) {
         activate(player);
         UUID token = sessions.get(player.getUniqueId());
@@ -696,6 +965,16 @@ public final class OwnedBowService implements AutoCloseable {
         return group;
     }
 
+    /**
+     * Freezes gear, stats, rolls, session and Tracer profile once for the physical group; descendants inherit the captured primary provenance.
+     * @param player shooter
+     * @param arrow actual native primary
+     * @param group reserved group receiving the Quiver roll
+     * @param item resolved weapon snapshot
+     * @param inspection accepted-fire stats snapshot
+     * @param force native draw force or full shortbow force
+     * @return immutable primary provenance
+     */
     private OwnedProjectile capture(Player player, Arrow arrow, Group group, ItemRegistry.ResolvedItem item,
             EquipmentStatsService.Inspection inspection, double force) {
         ShotContext shot = new ShotContext(group.arena.id(), group.id, arrow.getUniqueId(), 0, Optional.empty(),
@@ -711,6 +990,12 @@ public final class OwnedBowService implements AutoCloseable {
                 TracerProfile.forDefinition(item.definition().weapon()), shot.launchTick());
     }
 
+    /**
+     * Registers one actual entity and removes native damage, pickup and persistence authority before later settlement.
+     * @param arrow native entity
+     * @param owned immutable matching provenance
+     * @param group reservation collecting emitted UUIDs
+     */
     private void own(Arrow arrow, OwnedProjectile owned, Group group) {
         suppress(arrow);
         arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
@@ -721,12 +1006,20 @@ public final class OwnedBowService implements AutoCloseable {
         record("emitted", owned, "parent=" + owned.shot().parentProjectileId().map(UUID::toString).orElse("primary"));
     }
 
+    /**
+     * Clears native arrow damage, critical and fire effects; plugin accounting remains the only managed damage authority.
+     * @param arrow owned native entity
+     */
     private static void suppress(Arrow arrow) {
         arrow.setDamage(0);
         arrow.setCritical(false);
         arrow.setFireTicks(0);
     }
 
+    /**
+     * Observes final launch events and live-session admission before creating at most one delayed Duplex child at the captured launch transform. Success settles one shared ammo charge; failure retires/refunds the group.
+     * @param group due provisional group
+     */
     private void settleGroup(Group group) {
         if (!groups.containsKey(group.id)) {
             return;
@@ -774,6 +1067,10 @@ public final class OwnedBowService implements AutoCloseable {
         record("accepted-group", group.primary, "children=" + (group.duplex > 0 ? 1 : 0));
     }
 
+    /**
+     * Builds a value claim with collision and actual settlement ticks, retires ownership, then invokes the single receiver even for explicit rejection.
+     * @param candidate first collision retained through completed native dispatch
+     */
     private void settle(Candidate candidate) {
         UUID id = candidate.owned.shot().projectileId();
         if (!candidates.containsKey(id)) {
@@ -791,6 +1088,11 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Checks physical cancellation before pre-own native veto, generation/target identity, both collision/current phases and current arena membership.
+     * @param candidate captured collision plus final event state
+     * @return first explicit rejection, or empty for physical acceptance
+     */
     private Optional<SettledHit.Rejection> rejection(Candidate candidate) {
         if (candidate.event.isCancelled()) {
             return Optional.of(SettledHit.Rejection.PHYSICAL_VETO);
@@ -819,6 +1121,11 @@ public final class OwnedBowService implements AutoCloseable {
         return Optional.empty();
     }
 
+    /**
+     * Applies the calibrated public dragon phase policy; ordinary living targets have no dragon-phase restriction.
+     * @param target living native parent
+     * @return true for non-dragons or HOVER, CIRCLING and SEARCH_FOR_BREATH_ATTACK_TARGET
+     */
     public static boolean phaseAllowed(LivingEntity target) {
         return !(target instanceof EnderDragon dragon) || switch (dragon.getPhase()) {
             case HOVER, CIRCLING, SEARCH_FOR_BREATH_ATTACK_TARGET -> true;
@@ -826,13 +1133,22 @@ public final class OwnedBowService implements AutoCloseable {
         };
     }
 
+    /**
+     * Reads final native cancellation and replacement of the captured primary.
+     * @param group provisional native launch references
+     * @return true when a retained event rejects the original launch
+     */
     private boolean launchVetoed(Group group) {
         return group.bowEvent != null && (group.bowEvent.isCancelled()
                 || !group.bowEvent.getProjectile().getUniqueId().equals(group.primary.shot().projectileId()))
                 || group.launchEvent != null && group.launchEvent.isCancelled();
     }
 
-    /** A separate later player lifecycle event can observe completed native launch dispatch before our next tick. */
+    /**
+     * A later player lifecycle event can observe completed native launch dispatch before the next service tick. Recognizes actual valid/collided primaries without inventing a PlayerQuit timing guarantee.
+     * @param group provisional group
+     * @return true when a non-vetoed captured primary has real physical evidence
+     */
     private boolean primaryLaunched(Group group) {
         if (group.primary == null || launchVetoed(group)) {
             return false;
@@ -842,6 +1158,10 @@ public final class OwnedBowService implements AutoCloseable {
                 || arrow != null && arrow.isValid();
     }
 
+    /**
+     * Cancels future children after session exit while finalizing the launched primary's single charge and retaining valid airborne entities.
+     * @param group launched group with ended session
+     */
     private void cancelDelayed(Group group) {
         acceptAmmo(group);
         groups.remove(group.id);
@@ -855,6 +1175,10 @@ public final class OwnedBowService implements AutoCloseable {
         record("delayed-cancelled", group.primary, "session ended; launched primary/debit retained");
     }
 
+    /**
+     * Idempotently removes a provisional group, retires its emitted entities and restores an unaccepted outstanding charge.
+     * @param group failed or stale reservation
+     */
     private void fail(Group group) {
         if (groups.remove(group.id) == null) {
             return;
@@ -868,6 +1192,10 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Commits one group charge and applies its captured Quiver saving once; later failure cannot refund it again.
+     * @param group captured, not-yet-accepted firing group
+     */
     private void acceptAmmo(Group group) {
         if (group.accepted) {
             return;
@@ -883,6 +1211,10 @@ public final class OwnedBowService implements AutoCloseable {
         // The accepted charge is final; cancellation cannot refund it again.
     }
 
+    /**
+     * Clears the refund token before inventory/drop callbacks. Death uses the event drops; a full live inventory drops overflow at the player.
+     * @param group outstanding single-arrow debit
+     */
     private void restoreDebit(Group group) {
         if (!group.debitOutstanding) {
             return;
@@ -895,6 +1227,11 @@ public final class OwnedBowService implements AutoCloseable {
                 .forEach(stack -> player.getWorld().dropItem(player.getLocation(), stack));
     }
 
+    /**
+     * Removes registry claim, candidate, continuity demand and native entity together; repeated retirement has no second receiver/accounting effect.
+     * @param id native arrow UUID
+     * @param reason diagnostic terminal cause
+     */
     private void retire(UUID id, Retirement reason) {
         var owned = registry.lookup(id);
         owned.ifPresent(value -> {
@@ -913,6 +1250,12 @@ public final class OwnedBowService implements AutoCloseable {
         owned.ifPresent(value -> record("retired", value, reason.name()));
     }
 
+    /**
+     * Appends one observation while evicting the oldest entry at the fixed 512-entry bound.
+     * @param kind lifecycle operation
+     * @param owned non-null captured provenance
+     * @param detail diagnostic text
+     */
     private void record(String kind, OwnedProjectile owned, String detail) {
         if (traces.size() == 512) {
             traces.removeFirst();
@@ -920,47 +1263,97 @@ public final class OwnedBowService implements AutoCloseable {
         traces.addLast(new Trace(kind, owned.shot().projectileId(), owned.shot().ownerId(), now(), detail));
     }
 
+    /**
+     * Determines whether native Infinity already prevents ordinary-arrow consumption.
+     * @param bow native bow, possibly null
+     * @param consumable native consumable, possibly null
+     * @return true only for ordinary arrows and native Infinity
+     */
     private static boolean nativeInfinity(ItemStack bow, ItemStack consumable) {
         return bow != null && consumable != null && consumable.getType() == Material.ARROW
                 && bow.containsEnchantment(Enchantment.INFINITY);
     }
 
+    /**
+     * Restores the native release charge for a suppressed/vetoed survival event, excluding creative and Infinity consumption.
+     * @param player shooter
+     * @param consumable native item, possibly null/air
+     * @param bow native bow used to detect Infinity
+     */
     private void refundNative(Player player, ItemStack consumable, ItemStack bow) {
         if (player.getGameMode() != GameMode.CREATIVE && consumable != null && !consumable.getType().isAir()
                 && !nativeInfinity(bow, consumable))
             player.getInventory().addItem(consumable.asQuantity(1)).values().forEach(stack -> player.getWorld().dropItem(player.getLocation(), stack));
     }
 
+    /**
+     * Sends transient firing rejection feedback without changing inventory or chat history.
+     * @param player recipient
+     * @param message plain diagnostic text
+     */
     private void feedback(Player player, String message) {
         player.sendActionBar(Component.text(message));
     }
 
+    /**
+     * Resolves a required admission rather than silently creating one.
+     * @throws NullPointerException if no admission exists
+     * @param id generation UUID
+     * @return current admission
+     */
     private Arena requireArena(UUID id) {
         return Objects.requireNonNull(arenas.get(id), "Encounter not admitted");
     }
 
+    /**
+     * Finds the admitted nonoverlapping arena containing a position.
+     * @param location native world and position
+     * @return matching arena, or null outside all admissions
+     */
     private Arena arena(Location location) {
         return arenas.values().stream().filter(a -> a.contains(location)).findFirst().orElse(null);
     }
 
+    /**
+     * Copies mutable Bukkit bounds into immutable domain coordinates.
+     * @param bounds Bukkit block-coordinate box
+     * @return value box
+     */
     private static TracerRules.Box box(BoundingBox bounds) {
         return new TracerRules.Box(vector(bounds.getMin()), vector(bounds.getMax()));
     }
 
+    /**
+     * Copies a mutable Bukkit vector across the domain boundary.
+     * @param value Bukkit coordinates or velocity
+     * @return immutable vector with unchanged components
+     */
     private static Vector3 vector(Vector value) {
         return new Vector3(value.getX(), value.getY(), value.getZ());
     }
 
+    /**
+     * Widens the current unsigned Bukkit tick without using wall-clock time.
+     * @return tick in the unsigned 32-bit Bukkit range
+     */
     private static long now() {
         return Integer.toUnsignedLong(Bukkit.getCurrentTick());
     }
 
+    /**
+     * Rejects access outside the classic Paper primary thread.
+     * @throws IllegalStateException if called off-thread
+     */
     private static void thread() {
         if (!Bukkit.isPrimaryThread()) {
             throw new IllegalStateException("Firing requires server thread");
         }
     }
 
+    /**
+     * Requires the owning thread and an open service before new work.
+     * @throws IllegalStateException if off-thread or closed
+     */
     private void check() {
         thread();
         if (closed) {
@@ -968,6 +1361,9 @@ public final class OwnedBowService implements AutoCloseable {
         }
     }
 
+    /**
+     * Idempotently fails pending groups, retires arrows, closes continuity/tickets and cancels the sole task before clearing all admission/callback state. Call on the server thread; this does not own encounter HP or native dragon removal.
+     */
     @Override public void close() {
         thread();
         if (closed) {

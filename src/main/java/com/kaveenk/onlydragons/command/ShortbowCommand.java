@@ -11,15 +11,34 @@ import java.util.Locale;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-/** Shortbow rehearsal discovery and grants; existing dragon controls own arena setup/spawn. */
+/**
+ * Discoverable training-kit commands; existing dragon controls own setup and spawn.
+ * Server-thread execution reports declared calibration cadence rather than sampling
+ * live shot timing, and delegates all inventory writes to {@link ShortbowKitService}.
+ */
 public final class ShortbowCommand {
     private final ShortbowKitService kits;
+    /**
+     * Binds the command to its existing authority; does not register listeners or tasks.
+     * @param kits empty-slot-only kit grant service
+     */
     public ShortbowCommand(ShortbowKitService kits) { this.kits = kits; }
 
+    /**
+     * Tests routing only; this does not authorize execution.
+     * @param args root arguments without a leading slash
+     * @return true when the namespace belongs to this delegate
+     */
     public boolean handles(String[] args) {
         return args.length >= 2 && args[0].equalsIgnoreCase("dev") && args[1].equalsIgnoreCase("shortbow");
     }
 
+    /**
+     * Handles help/list/kit after calibration permission checks. Only kit requires a
+     * player; insufficient empty storage leaves the inventory untouched.
+     * @param sender requester and feedback recipient
+     * @param args root arguments beginning with dev shortbow; omitted action shows help
+     */
     public void execute(CommandSender sender, String[] args) {
         if (!sender.hasPermission("onlydragons.calibration")) {
             say(sender, "You do not have permission to use calibration tools."); return;
@@ -38,6 +57,11 @@ public final class ShortbowCommand {
         }
     }
 
+    /**
+     * Displays declared loadout defaults and tick-based cadence; development bonuses
+     * and later book edits may change the actual held snapshot.
+     * @param sender authorized requester receiving the catalog explanation
+     */
     private void list(CommandSender sender) {
         sender.sendMessage(PresentationFormatter.heading("Training bows · calibration"));
         for (var definition : ShortbowLoadouts.definitions()) {
@@ -57,6 +81,11 @@ public final class ShortbowCommand {
         say(sender, "Grant one: /onlydragons dev loadout <id>. Inspect equipped values with /onlydragons stats explain; bonuses and book edits may change defaults.");
     }
 
+    /**
+     * Explains the operator sequence without automatically configuring an arena,
+     * teleporting a player or spawning a target.
+     * @param sender authorized requester receiving the setup instructions
+     */
     private void help(CommandSender sender) {
         say(sender, "Usage: /onlydragons dev shortbow [list|kit|help]");
         say(sender, "1. /onlydragons dev dragon status · setup only if unconfigured: /onlydragons dev dragon setup minecraft:overworld 0 100 0 24 test_dragon");
@@ -65,10 +94,21 @@ public final class ShortbowCommand {
         say(sender, "4. Enter only after the operator confirms a safe standing pad inside that configured cube. See dev/shortbow-play.md for positioning commands.");
     }
 
+    /**
+     * Offers help/list/kit only to a sender allowed to use calibration tools.
+     * @param sender requester used for permission filtering
+     * @param args nonempty root arguments including the partial token
+     * @return non-null candidate list, possibly empty; candidates are not prefix-filtered here
+     */
     public List<String> complete(CommandSender sender, String[] args) {
         if (!sender.hasPermission("onlydragons.calibration") || !args[0].equalsIgnoreCase("dev")) return List.of();
         if (args.length == 2) return List.of("shortbow");
         return handles(args) && args.length == 3 ? List.of("list", "kit", "help") : List.of();
     }
+    /**
+     * Sends semantic command text through the shared Adventure formatter.
+     * @param sender command recipient
+     * @param text plain semantic content; formatting does not change command state
+     */
     private static void say(CommandSender sender, String text) { sender.sendMessage(PresentationFormatter.message(text)); }
 }

@@ -11,21 +11,34 @@ import org.mockbukkit.mockbukkit.ServerMock;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import net.kyori.adventure.text.Component;
 
+/**
+ * MockBukkit composition smoke tests for registered commands, permissions, configuration and the join listener. Explicitly dispatched events test registration/routing, not authenticated native login or real Paper lifecycle timing.
+ */
 class OnlyDragonsPluginTest {
     private ServerMock server;
     private OnlyDragonsPlugin plugin;
 
+    /**
+     * Creates a fresh isolated MockBukkit boundary and the collaborators used by this class's oracles.
+     */
     @BeforeEach
     void setUp() {
         server = MockBukkit.mock();
         plugin = MockBukkit.load(OnlyDragonsPlugin.class);
     }
 
+    /**
+     * Releases the mock server/plugin lifecycle after each test so scheduler and static Bukkit state cannot leak between cases.
+     */
     @AfterEach
     void tearDown() {
         MockBukkit.unmock();
     }
 
+    /**
+     * Adds Alex and discards join messages so command assertions observe only their own response.
+     * @return new mock player with an empty message queue
+     */
     private PlayerMock player() {
         PlayerMock player = server.addPlayer("Alex");
         while (player.nextMessage() != null) {
@@ -33,6 +46,9 @@ class OnlyDragonsPluginTest {
         return player;
     }
 
+    /**
+     * Checks enable defaults and plugin-manager disable on the actual composition root.
+     */
     @Test
     void enablesWithDefaultConfigurationAndDisablesCleanly() {
         assertTrue(plugin.isEnabled());
@@ -41,6 +57,9 @@ class OnlyDragonsPluginTest {
         assertFalse(plugin.isEnabled());
     }
 
+    /**
+     * Verifies ordinary players can reach the registered status handler.
+     */
     @Test
     void statusWorksForAnOrdinaryPlayer() {
         var player = player();
@@ -48,6 +67,9 @@ class OnlyDragonsPluginTest {
         assertTrue(player.nextMessage().startsWith("OnlyDragons ready | version "));
     }
 
+    /**
+     * Checks the configured alias routes its empty argument list to status.
+     */
     @Test
     void aliasAndDefaultActionWork() {
         var player = player();
@@ -55,6 +77,9 @@ class OnlyDragonsPluginTest {
         assertTrue(player.nextMessage().contains("OnlyDragons ready"));
     }
 
+    /**
+     * Denial retains an unsaved in-memory value, proving reload did not execute.
+     */
     @Test
     void ordinaryPlayerCannotReloadConfiguration() {
         var player = player();
@@ -64,6 +89,9 @@ class OnlyDragonsPluginTest {
         assertEquals("Unsaved value", plugin.getConfig().getString("welcome-message"));
     }
 
+    /**
+     * Saves a changed template and verifies reload replaces the greeting service behavior.
+     */
     @Test
     void operatorCanReloadPersistedConfiguration() {
         var player = player();
@@ -75,6 +103,9 @@ class OnlyDragonsPluginTest {
         assertEquals("New hello Alex", plugin.greetings().welcome("Alex"));
     }
 
+    /**
+     * Dispatches a synthetic join through the plugin manager and asserts the exact configured greeting.
+     */
     @Test
     void welcomeMessageIsDeliveredByRegisteredListener() {
         var player = player();
@@ -82,6 +113,9 @@ class OnlyDragonsPluginTest {
         assertEquals("Welcome, Alex! Your development plugin is running.", player.nextMessage());
     }
 
+    /**
+     * Compares exact completion lists before/after operator permission and for invalid argument depth.
+     */
     @Test
     void completionRespectsPermissionsAndPrefix() {
         var player = player();
@@ -93,6 +127,9 @@ class OnlyDragonsPluginTest {
         assertEquals(List.of(), command.tabComplete(player, "onlydragons", new String[] { "reload", "" }));
     }
 
+    /**
+     * Checks unknown input returns the registered root usage rather than executing another handler.
+     */
     @Test
     void unknownSubcommandShowsUsage() {
         var player = player();
