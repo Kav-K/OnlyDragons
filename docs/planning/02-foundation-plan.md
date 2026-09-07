@@ -293,6 +293,31 @@ and [enchant catalog](../../src/main/resources/enchants/README.md) for consumer
 instructions. Authenticated inventory/rename/visual checks remain separate
 from the synthetic real-Paper round-trip scenario.
 
+### T02c books and native anvil transactions (GH-69)
+
+In progress on the issue branch, following the owner-selected checkpoint costs.
+`EnchantRecipes` validates one-enchant books, combines only improving same-ID
+levels, and replaces the complete bow enchant map through its original catalog.
+`EnchantTarget` separates item category and active slot; no armor target is enabled.
+Ordinary/ultimate costs are 2/4 times resulting level, plus one for an actual plain
+rename (50-character bound); rename-only costs one. Caps, no-ops and conflicting
+ultimates reject. Rewards remain disabled.
+
+`WeaponItemCodec.edit` clones the left stack, validates unchanged identity/catalog/
+rolls, rewrites only the owned root and generated lore, and decodes the final clone.
+Durability, prior work, custom names, applicable native enchants and foreign data
+survive. Books use a strict separate PDC root; generated Roman-level lore/glint
+never supplies authority. `PresentationFormatter` supplies readable signed stats.
+
+The synchronous anvil service freezes exact inputs/name/output/cost per current
+view. Prepare never charges; deferred repair rechecks the session, inputs and final
+prepare-event result. LOWEST/HIGHEST extraction checks reject changed offers and
+unsupported destinations; native extraction alone consumes XP and one right book.
+A next-tick observer records successful native completion, retaining an unchanged
+canceled offer for retry. Close/quit/disable invalidate offers and callbacks.
+The bounded protocol ANVIL extension keeps existing window-0 validation strict.
+[Development book/anvil rehearsal](../../dev/enchant-books-play.md).
+
 ## 5. Shot ownership, snapshots, and swapping
 
 Each accepted trigger receives a `shotId`. Every real arrow has its own projectile UUID and ordinal; a Duplex child also references its parent. Record owner UUID, weapon instance/definition, immutable gear stats, enchant levels, mechanic revision, launch tick, launch position, and initial velocity.

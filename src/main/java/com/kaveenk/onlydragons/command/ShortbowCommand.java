@@ -49,7 +49,7 @@ public final class ShortbowCommand {
                     + " ticks/trigger (" + PresentationFormatter.number(20.0 / FiringRules.cooldown(speed)) + "/s at 20 TPS)";
             say(sender, weapon.id() + " · " + definition.displayName() + " · " + mode + "; F " + PresentationFormatter.number(ferocity));
             if (!weapon.enchantments().isEmpty()) say(sender, "  " + String.join(", ", weapon.enchantments().stream()
-                    .map(e -> PresentationFormatter.label(e.id()) + " " + e.level()).toList()));
+                    .map(e -> PresentationFormatter.label(e.id()) + " " + PresentationFormatter.roman(e.level())).toList()));
         }
         say(sender, "Defaults: damage 100, crit chance 0%, crit damage 50%. One primary/trigger; Duplex adds one child next tick at 20% damage, no extra ammo.");
         say(sender, "Combined bows: returning Tracer V (40-block acquisition), Quiver X (50% ammo saving), Flame II. Tempo starts at 25 Ferocity and builds on hits.");

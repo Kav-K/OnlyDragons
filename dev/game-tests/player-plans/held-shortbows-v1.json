@@ -119,6 +119,68 @@
               "args": {}
             },
             {
+              "id": "anvil-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "anvil-open",
+              "action": "interactBlock",
+              "args": {
+                "insideBlock": false,
+                "face": "north",
+                "cursorZ": 0,
+                "cursorY": 0.5,
+                "cursorX": 0.5,
+                "hand": "main",
+                "z": 3,
+                "x": 0,
+                "y": 100
+              }
+            },
+            {
+              "id": "anvil-name",
+              "action": "anvilRename",
+              "args": {
+                "name": "Returning Swift"
+              }
+            },
+            {
+              "id": "anvil-collect",
+              "action": "anvilClick",
+              "args": {
+                "button": "left",
+                "slot": 2
+              }
+            },
+            {
+              "id": "anvil-store",
+              "action": "anvilClick",
+              "args": {
+                "button": "left",
+                "slot": 30
+              }
+            },
+            {
+              "id": "anvil-close",
+              "action": "anvilClose",
+              "args": {}
+            },
+            {
+              "id": "booked-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "booked-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
               "id": "callback-use",
               "action": "useItem",
               "args": {

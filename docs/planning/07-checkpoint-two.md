@@ -37,6 +37,11 @@ MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDr
 Held-fire and book requirements retain empty completion/evidence and remain
 unaccepted. V3 IQ/Flame-unavailable controls remain preserved.
 
+The lead is combining the completed feature candidates and their independent
+focused evidence. The [combined validation record](evidence/checkpoint2-held-books.md)
+adds a real held-bow → anvil → edited-bow interaction to the existing fixture;
+the full 47-case cohort, current CI, acceptance and Windows deployment are pending.
+
 T10 retains every prior dependency and additionally consumes T08d, T08e, T05b
 and T06b. T06b brings T03b/T06c transitively. Anvil application is independent of
 prefire, so T02c is not an artificial prerequisite for T10. T11 still requires

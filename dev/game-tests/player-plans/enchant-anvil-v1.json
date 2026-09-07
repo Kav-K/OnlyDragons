@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "planId": "enchant-anvil-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "first",
+          "steps": [
+            {
+              "id": "denied-book",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book power 1"
+              }
+            },
+            {
+              "id": "open",
+              "action": "interactBlock",
+              "args": {
+                "x": 0,
+                "y": 100,
+                "z": 0,
+                "face": "north",
+                "hand": "main",
+                "cursorX": 0.5,
+                "cursorY": 0.5,
+                "cursorZ": 0,
+                "insideBlock": false
+              }
+            },
+            {
+              "id": "grant-snipe",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book snipe 4"
+              }
+            },
+            {
+              "id": "input-bow",
+              "action": "anvilClick",
+              "args": {
+                "slot": 30,
+                "button": "left"
+              }
+            },
+            {
+              "id": "place-bow",
+              "action": "anvilClick",
+              "args": {
+                "slot": 0,
+                "button": "left"
+              }
+            },
+            {
+              "id": "input-book",
+              "action": "anvilClick",
+              "args": {
+                "slot": 31,
+                "button": "left"
+              }
+            },
+            {
+              "id": "place-book",
+              "action": "anvilClick",
+              "args": {
+                "slot": 1,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-snipe",
+              "action": "anvilRename",
+              "args": {
+                "name": "Upgraded bow"
+              }
+            },
+            {
+              "id": "collect-snipe",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "store-snipe",
+              "action": "anvilClick",
+              "args": {
+                "slot": 38,
+                "button": "left"
+              }
+            },
+            {
+              "id": "grant-dragon-tracer",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book dragon_tracer 5"
+              }
+            },
+            {
+              "id": "name-dragon-tracer",
+              "action": "anvilRename",
+              "args": {
+                "name": "Kept bow"
+              }
+            },
+            {
+              "id": "collect-dragon-tracer",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "right"
+              }
+            },
+            {
+              "id": "store-dragon-tracer",
+              "action": "anvilClick",
+              "args": {
+                "slot": 38,
+                "button": "left"
+              }
+            },
+            {
+              "id": "grant-vicious",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book vicious 5"
+              }
+            },
+            {
+              "id": "name-vicious",
+              "action": "anvilRename",
+              "args": {
+                "name": "Kept bow"
+              }
+            },
+            {
+              "id": "collect-vicious",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "shift-left"
+              }
+            },
+            {
+              "id": "grant-overload",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book overload 5"
+              }
+            },
+            {
+              "id": "name-overload",
+              "action": "anvilRename",
+              "args": {
+                "name": "Kept bow"
+              }
+            },
+            {
+              "id": "collect-overload",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "store-overload",
+              "action": "anvilClick",
+              "args": {
+                "slot": 38,
+                "button": "left"
+              }
+            },
+            {
+              "id": "grant-gravity",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book gravity 6"
+              }
+            },
+            {
+              "id": "name-gravity",
+              "action": "anvilRename",
+              "args": {
+                "name": "Kept bow"
+              }
+            },
+            {
+              "id": "collect-gravity",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "right"
+              }
+            },
+            {
+              "id": "store-gravity",
+              "action": "anvilClick",
+              "args": {
+                "slot": 38,
+                "button": "left"
+              }
+            },
+            {
+              "id": "grant-infinite-quiver",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book infinite_quiver 10"
+              }
+            },
+            {
+              "id": "name-infinite-quiver",
+              "action": "anvilRename",
+              "args": {
+                "name": "Kept bow"
+              }
+            },
+            {
+              "id": "collect-infinite-quiver",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "shift-left"
+              }
+            },
+            {
+              "id": "grant-flame",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book flame 2"
+              }
+            },
+            {
+              "id": "name-flame",
+              "action": "anvilRename",
+              "args": {
+                "name": "Kept bow"
+              }
+            },
+            {
+              "id": "collect-flame",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "store-flame",
+              "action": "anvilClick",
+              "args": {
+                "slot": 38,
+                "button": "left"
+              }
+            },
+            {
+              "id": "grant-duplex",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book duplex 5"
+              }
+            },
+            {
+              "id": "name-duplex",
+              "action": "anvilRename",
+              "args": {
+                "name": "Kept bow"
+              }
+            },
+            {
+              "id": "collect-duplex",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "right"
+              }
+            },
+            {
+              "id": "store-duplex",
+              "action": "anvilClick",
+              "args": {
+                "slot": 38,
+                "button": "left"
+              }
+            },
+            {
+              "id": "grant-fatal-tempo",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book fatal_tempo 5"
+              }
+            },
+            {
+              "id": "name-fatal-tempo",
+              "action": "anvilRename",
+              "args": {
+                "name": "Kept bow"
+              }
+            },
+            {
+              "id": "collect-fatal-tempo",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "shift-left"
+              }
+            },
+            {
+              "id": "grant-power",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev book power 7"
+              }
+            },
+            {
+              "id": "name-power",
+              "action": "anvilRename",
+              "args": {
+                "name": "Kept bow"
+              }
+            },
+            {
+              "id": "collect-power",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "store-power",
+              "action": "anvilClick",
+              "args": {
+                "slot": 38,
+                "button": "left"
+              }
+            },
+            {
+              "id": "close",
+              "action": "anvilClose",
+              "args": {}
+            },
+            {
+              "id": "use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -63,6 +63,10 @@
     {
       "command": "onlydragons dev shortbow kit",
       "expect": "This command requires a player\\."
+    },
+    {
+      "command": "onlydragons dev book power 1",
+      "expect": "This command requires a player\\."
     }
   ]
 }

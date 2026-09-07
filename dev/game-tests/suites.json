@@ -231,6 +231,24 @@
       "expectation": "positive",
       "testPlayer": "protocol-actions-v1",
       "scenarioTimeout": 180
+    },
+    "enchant-anvil": {
+      "scenarioId": "enchant-anvil",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 240
+    },
+    "anvil-boundaries": {
+      "scenarioId": "anvil-boundaries",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 240
+    },
+    "anvil-lifecycle": {
+      "scenarioId": "anvil-lifecycle",
+      "expectation": "positive",
+      "testPlayer": "protocol-actions-v1",
+      "scenarioTimeout": 240
     }
   },
   "suites": {
@@ -269,7 +287,10 @@
       "quiver-ammo",
       "owned-flame",
       "held-shortbows",
-      "held-combat"
+      "held-combat",
+      "enchant-anvil",
+      "anvil-boundaries",
+      "anvil-lifecycle"
     ],
     "harness-controls": [
       "deliberate-failure",
@@ -326,7 +347,10 @@
       "quiver-ammo",
       "owned-flame",
       "held-shortbows",
-      "held-combat"
+      "held-combat",
+      "enchant-anvil",
+      "anvil-boundaries",
+      "anvil-lifecycle"
     ]
   },
   "areas": {
@@ -399,7 +423,10 @@
         "quiver-ammo",
         "owned-flame",
         "held-shortbows",
-        "held-combat"
+        "held-combat",
+        "enchant-anvil",
+        "anvil-boundaries",
+        "anvil-lifecycle"
       ],
       "affects": [
         "stats",
@@ -613,7 +640,10 @@
         "quiver-ammo",
         "owned-flame",
         "held-shortbows",
-        "held-combat"
+        "held-combat",
+        "enchant-anvil",
+        "anvil-boundaries",
+        "anvil-lifecycle"
       ],
       "affects": []
     },
@@ -812,6 +842,30 @@
       "cases": [
         "held-shortbows",
         "held-combat"
+      ],
+      "affects": []
+    },
+    "enchant-anvil": {
+      "paths": [
+        "src/main/java/com/kaveenk/onlydragons/domain/item/anvil/*",
+        "src/main/java/com/kaveenk/onlydragons/paper/item/anvil/*",
+        "src/main/java/com/kaveenk/onlydragons/command/BookCommand.java",
+        "src/test/java/com/kaveenk/onlydragons/domain/item/anvil/*",
+        "src/test/java/com/kaveenk/onlydragons/paper/item/codec/AnvilItemsTest.java",
+        "dev/player-client/src/main/java/com/kaveenk/onlydragons/playerclient/AnvilState.java",
+        "dev/player-client/src/test/java/com/kaveenk/onlydragons/playerclient/AnvilStateTest.java",
+        "scripts/agent-tests/anvil_observation.py",
+        "scripts/agent-tests/test_anvil_observation.py",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/enchant/EnchantAnvilScenario.java",
+        "dev/game-tests/player-plans/enchant-anvil-v1.json",
+        "dev/game-tests/src/main/java/com/kaveenk/onlydragons/gametests/enchant/AnvilBoundaryScenario.java",
+        "dev/game-tests/player-plans/anvil-boundaries-v1.json",
+        "dev/game-tests/player-plans/anvil-lifecycle-v1.json"
+      ],
+      "cases": [
+        "enchant-anvil",
+        "anvil-boundaries",
+        "anvil-lifecycle"
       ],
       "affects": []
     }

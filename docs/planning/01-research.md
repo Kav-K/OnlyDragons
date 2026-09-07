@@ -347,6 +347,17 @@ anvil opening requires separate event/view and received-screen evidence. Keep
 that combined GH68/GH69 check and full-client input feel pending. [T06b evidence](evidence/t06b-held-shortbows.md)
 records actual server tests separately from this client inspection.
 
+## T02c native anvil API inspection
+
+**Source inspected, 7 September 2026:** pinned Paper `a2a42c5` calls
+`PrepareAnvilEvent` before resetting repair cost on some native rejection paths.
+The custom candidate therefore rechecks the same offer and final event result
+before next-tick cost repair. Public `AnvilView` supplies cost and right-input
+consumption setters. Native result extraction is the sole XP/input debit authority;
+no manual second debit is permitted. [Pinned patch](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/patches/sources/net/minecraft/world/inventory/AnvilMenu.java.patch).
+This is API/source evidence, not final transaction acceptance or an upstream game
+balance claim; [T02c iteration status](03-agent-tasks-and-validation.md#t02c--custom-enchant-books-and-xp-cost-anvils-gh-69).
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

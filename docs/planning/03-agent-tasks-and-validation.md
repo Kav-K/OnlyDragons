@@ -152,6 +152,31 @@ is accepted. Human/full-client/Windows-final-deployment and M1–M5 remain pendi
 
 MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; the lead released and dispatched T06b/#68 and T02c/#69. Their existing prerequisites and feature gates remain unchanged.
 
+### T02c — Custom enchant books and XP-cost anvils (GH-69)
+
+**In progress**, `symphony/gh-69`, dispatched by the owner from accepted main
+`2158a51572d65e7e8856ec77f44b3decc982450c`; [current dispatch and settled contracts](https://github.com/Kav-K/OnlyDragons/issues/69#issuecomment-5565338834).
+T03b/T08d/T06c and MAINT-82 are integrated. GH68 owns the common hold-release
+reconciliation; this entry records the feature's actual resumed state.
+
+Implemented candidate: strict ten-enchant books/command, pure compatibility and
+cost recipes, metadata-preserving bow edits, native-debit anvil service/listener,
+readable item presentation and bounded protocol anvil observations/actions.
+[Contract](02-foundation-plan.md#t02c-books-and-native-anvil-transactions-gh-69).
+Build passed 311 production tests with no failures/errors/skips; the first client
+build and focused Python replay checks passed. These remain iteration evidence.
+Paper iteration `82fc5bd9c0c74c26b0774f461b5b9478` passed all ten command/preview/
+native XP/metadata transactions, then failed the collected-bow firing stage because
+the fixture shot origin intersected its placed anvil. Both owned JVMs cleaned up
+without force; the incomplete client exited 1. The firing setup is moved clear.
+No complete Paper or acceptance pass is claimed from that run.
+
+Next: fresh all-ten, compatibility and lifecycle cases on clean committed inputs,
+received-preview/XP/conservation replay and affected cross-feature regressions.
+Final combined cohort/review/current CI remains lead-owned under dispatch.
+Authenticated clients, GUI/lore appearance, Windows smoke and human feel remain
+unrun. No milestone or reward/armor behavior is enabled.
+
 ### MAINT-82 — Catalog and combat lifecycle readability
 
 **Complete**, [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83), merged at
@@ -174,7 +199,8 @@ the lead owns final combined new-tier→real-anvil opening with native view and
 received ANVIL packet, complete regression, current CI and acceptance. Worker
 focused evidence passes313 production tests and five Paper cases/264 assertions
 on clean571cdb35 with strict raw/JUnit/artifact/cleanup replay. Static/no-weakening
-checks pass; the44-case combined receipt and task acceptance remain pending.
+checks pass; the [lead combined interaction and 47-case receipt](evidence/checkpoint2-held-books.md)
+and task acceptance remain pending.
 No `held-shortbow-loadouts` completion yet;
 authenticated-client visuals/input feel, Windows smoke and milestones remain pending.
 

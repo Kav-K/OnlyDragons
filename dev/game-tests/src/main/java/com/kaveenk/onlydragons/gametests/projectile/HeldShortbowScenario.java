@@ -4,7 +4,10 @@ import com.kaveenk.onlydragons.gametests.*;
 import com.kaveenk.onlydragons.gametests.fixtures.PlayerFixture;
 import com.kaveenk.onlydragons.domain.MechanicRevision;
 import com.kaveenk.onlydragons.domain.item.*;
+import com.kaveenk.onlydragons.domain.item.anvil.EnchantBook;
 import com.kaveenk.onlydragons.domain.projectile.*;
+import com.kaveenk.onlydragons.paper.item.anvil.EnchantBookCodec;
+import com.kaveenk.onlydragons.paper.item.codec.ItemReadResult;
 import com.kaveenk.onlydragons.paper.item.codec.WeaponItemCodec;
 import com.kaveenk.onlydragons.paper.projectile.*;
 import java.util.*;
@@ -12,8 +15,10 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.view.AnvilView;
 import org.bukkit.util.BoundingBox;
 
 /** Single real use packet and observed native hold. The deployed service has a bounded test capacity/random port. */
@@ -27,6 +32,10 @@ public final class HeldShortbowScenario implements Scenario, Listener {
     private final List<Map<String,Object>> trials = new ArrayList<>();
     private final ItemRegistry catalog = CalibrationLoadouts.compatibleRegistry();
     private final WeaponItemCodec codec = new WeaponItemCodec(catalog);
+    private AnvilView anvilView;
+    private ItemStack anvilOriginal, anvilExpected;
+    private int anvilOpens, anvilCloses, anvilClicks, anvilShots, anvilAmmo;
+    private long anvilCommits, anvilOpenedAt, anvilClosedAt;
 
     public void start(ScenarioContext context) throws Exception {
         c = context; c.mechanicRevision("held-shortbows-v1"); players = new PlayerFixture(c);
@@ -120,10 +129,119 @@ public final class HeldShortbowScenario implements Scenario, Listener {
             c.later(12,()->{
                 c.check("same_uuid_edit_stops_hold",List.of(count,arrows),List.of(emissions.size(),ammo()));
                 c.check("old_shot_keeps_unenchanted_snapshot",true,emissions.stream().allMatch(p->p.shot().enchantments().isEmpty()));
-                release("edit",this::callbackStop);
+                release("edit",this::anvilRoundTrip);
             });
         });
     }
+    /** Cross-feature check: actual screen input and native extraction on a newly trusted tier. */
+    private void anvilRoundTrip() {
+        reset("swift_shortbow_v4",64);
+        var support = world.getBlockAt(0,99,3);
+        var block = world.getBlockAt(0,100,3);
+        var oldSupport = support.getBlockData();
+        var oldBlock = block.getBlockData();
+        c.cleanup("held-placed-anvil", () -> {
+            if (players.allOnline()) player().closeInventory();
+            block.setBlockData(oldBlock); support.setBlockData(oldSupport);
+        });
+        support.setType(Material.STONE); block.setType(Material.ANVIL);
+        hold("anvil", () -> {
+            players.request("alpha","anvil-open");
+            players.await("actual held-to-anvil open",100,
+                    () -> anvilOpens == 1 && player().getOpenInventory() instanceof AnvilView,
+                    () -> {
+                        anvilView = (AnvilView) player().getOpenInventory();
+                        anvilShots = emissions.size(); anvilAmmo = ammo();
+                        c.check("held_anvil_real_placed_view",true,
+                                anvilView.getTopInventory().getLocation() != null
+                                && anvilView.getTopInventory().getLocation().getBlock().equals(block));
+                        c.later(12, () -> {
+                            c.check("held_anvil_open_stops_shots_and_ammo",List.of(anvilShots,anvilAmmo),
+                                    List.of(emissions.size(),ammo()));
+                            stageAnvilBook();
+                        });
+                    });
+        });
+    }
+    private void stageAnvilBook() {
+        anvilOriginal = player().getInventory().getItemInMainHand().clone();
+        // Labelled server setup moves the existing bow; extraction and close use real client packets.
+        player().getInventory().setItem(0,null);
+        anvilView.getTopInventory().setItem(0,anvilOriginal.clone());
+        anvilView.getTopInventory().setItem(1,new EnchantBookCodec(catalog)
+                .encode(new EnchantBook("calibration-items-v4","dragon_tracer",5)));
+        player().setLevel(30); player().setExp(.375f);
+        anvilCommits = c.production().anvils().metrics().committed();
+        resyncAnvil(() -> {
+            players.request("alpha","anvil-name");
+            players.await("new-tier native book preview",100,
+                    () -> "Returning Swift".equals(anvilView.getRenameText())
+                            && anvilView.getRepairCost() == 11 && !empty(anvilView.getTopInventory().getItem(2)),
+                    () -> {
+                        c.check("held_anvil_preview_free",true,player().getLevel() == 30
+                                && player().getExp() == .375f
+                                && anvilOriginal.equals(anvilView.getTopInventory().getItem(0)));
+                        anvilExpected = anvilView.getTopInventory().getItem(2).clone();
+                        resyncAnvil(() -> {
+                            int before = anvilClicks;
+                            players.request("alpha","anvil-collect");
+                            players.await("actual new-tier result extraction",100,
+                                    () -> anvilClicks > before && empty(anvilView.getTopInventory().getItem(0))
+                                            && !empty(player().getItemOnCursor()),
+                                    () -> c.later(3,this::anvilCollected));
+                        });
+                    });
+        });
+    }
+    private void anvilCollected() {
+        var original = ((ItemReadResult.Valid) codec.decode(anvilOriginal)).item().instance();
+        var edited = ((ItemReadResult.Valid) codec.decode(player().getItemOnCursor())).item().instance();
+        c.check("held_anvil_native_cost_and_conservation",true,
+                anvilExpected.equals(player().getItemOnCursor())
+                && empty(anvilView.getTopInventory().getItem(0)) && empty(anvilView.getTopInventory().getItem(1))
+                && player().getLevel() == 19 && player().getExp() == .375f
+                && c.production().anvils().metrics().committed() == anvilCommits + 1);
+        c.check("held_anvil_preserves_new_tier_identity",true,original.identity().equals(edited.identity())
+                && original.registryRevision().equals(edited.registryRevision())
+                && original.rolledModifierIds().equals(edited.rolledModifierIds())
+                && edited.enchantLevels().equals(Map.of("dragon_tracer",5)));
+        resyncAnvil(() -> {
+            players.request("alpha","anvil-store");
+            players.await("collected tier stored by real click",100,
+                    () -> empty(player().getItemOnCursor())
+                            && anvilExpected.equals(player().getInventory().getItemInMainHand()),
+                    () -> resyncAnvil(() -> {
+                        players.request("alpha","anvil-close");
+                        players.await("actual native anvil close",100,
+                                () -> anvilCloses == 1 && !(player().getOpenInventory() instanceof AnvilView),
+                                () -> c.later(12,this::fireCollectedTier));
+                    }));
+        });
+    }
+    private void fireCollectedTier() {
+        c.check("held_anvil_close_does_not_resume_old_press",List.of(anvilShots,anvilAmmo),
+                List.of(emissions.size(),ammo()));
+        players.request("alpha","booked-use");
+        players.await("new press fires collected tier",100,
+                () -> player().isHandRaised() && emissions.size() > anvilShots,
+                () -> {
+                    var shot = emissions.get(anvilShots);
+                    var edited = ((ItemReadResult.Valid) codec.decode(anvilExpected)).item().instance();
+                    c.check("held_anvil_collected_shot_keeps_enchant_and_return_profile",true,
+                            shot.shot().weapon().equals(edited.identity())
+                            && shot.tracerProfile().revision().equals("tracer-return/v2")
+                            && shot.shot().enchantments().stream().anyMatch(e -> e.id().equals("dragon_tracer") && e.level() == 5));
+                    c.check("held_anvil_prior_arrows_keep_original_snapshot",true,
+                            emissions.subList(0,anvilShots).stream().allMatch(p -> p.shot().enchantments().isEmpty()));
+                    c.observe("heldAnvil",Map.of("openedAtTick",anvilOpenedAt,"closedAtTick",anvilClosedAt,
+                            "shotsAtOpen",anvilShots,"ammoAtOpen",anvilAmmo,"cost",11,
+                            "collectedProjectile",shot.shot().projectileId().toString(),
+                            "setup","server moves existing bow and supplies one book; protocol owns extraction/store/close"));
+                    release("booked",this::callbackStop);
+                });
+    }
+    private void resyncAnvil(Runnable next) { player().updateInventory(); c.later(5,next::run); }
+    private static boolean empty(ItemStack item) { return item == null || item.getType().isAir(); }
     private void callbackStop() {
         reset("swift_shortbow_v4",64); openDuringLaunch=true;
         hold("callback",()->c.later(12,()->{
@@ -259,4 +377,17 @@ public final class HeldShortbowScenario implements Scenario, Listener {
     @EventHandler(priority=EventPriority.MONITOR) public void command(PlayerCommandPreprocessEvent e) { if(e.getPlayer().getUniqueId().equals(players.identity("alpha")))commands++; }
     @EventHandler(priority=EventPriority.MONITOR) public void slot(PlayerItemHeldEvent e) { if(e.getPlayer().getUniqueId().equals(players.identity("alpha")))slots++; }
     @EventHandler(priority=EventPriority.MONITOR) public void death(PlayerDeathEvent e) { if(e.getPlayer().getUniqueId().equals(players.identity("alpha")))deaths++; }
+    @EventHandler(priority=EventPriority.MONITOR,ignoreCancelled=true) public void anvilOpen(InventoryOpenEvent e) {
+        if(e.getPlayer().getUniqueId().equals(players.identity("alpha")) && e.getView() instanceof AnvilView) {
+            anvilOpens++; anvilOpenedAt = Integer.toUnsignedLong(Bukkit.getCurrentTick());
+        }
+    }
+    @EventHandler(priority=EventPriority.MONITOR) public void anvilClose(InventoryCloseEvent e) {
+        if(e.getPlayer().getUniqueId().equals(players.identity("alpha")) && e.getView() instanceof AnvilView) {
+            anvilCloses++; anvilClosedAt = Integer.toUnsignedLong(Bukkit.getCurrentTick());
+        }
+    }
+    @EventHandler(priority=EventPriority.MONITOR) public void anvilClick(InventoryClickEvent e) {
+        if(e.getWhoClicked().getUniqueId().equals(players.identity("alpha")) && e.getView() instanceof AnvilView) anvilClicks++;
+    }
 }
