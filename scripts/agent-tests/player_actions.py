@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import entity_motion
+import anvil_observation
 
 import hashlib
 import json
@@ -122,6 +123,15 @@ def validate_arguments(action, args):
     elif action == 'inventoryClick':
         _object(args, 'slot', 'button')
         _integer(args['slot'], 5, 45); _choice(args['button'], ('left', 'right'))
+    elif action == 'anvilClick':
+        _object(args, 'slot', 'button')
+        _integer(args['slot'], 0, 38); _choice(args['button'], ('left', 'right', 'shift-left', 'shift-right', 'drop', 'hotbar-1'))
+    elif action == 'anvilRename':
+        _object(args, 'name')
+        require(isinstance(args['name'], str) and len(args['name'].encode('utf-16-le')) <= 100
+                and all(ord(c) >= 32 and not 127 <= ord(c) <= 159 and c != '§' for c in args['name']), 'Invalid anvil name')
+    elif action == 'anvilClose':
+        _object(args)
     elif action == 'reconnect':
         _object(args, 'delayMillis'); _integer(args['delayMillis'], 100, 5000)
     elif action == 'interactBlock':
@@ -215,6 +225,9 @@ PACKETS = {
     'swapHands': ['ServerboundPlayerActionPacket'],
     'dropItem': ['ServerboundPlayerActionPacket'],
     'inventoryClick': ['ServerboundContainerClickPacket'],
+    'anvilClick': ['ServerboundContainerClickPacket'],
+    'anvilRename': ['ServerboundRenameItemPacket'],
+    'anvilClose': ['ServerboundContainerClosePacket'],
     'swing': ['ServerboundSwingPacket'],
     'attackEntity': ['ServerboundAttackPacket'],
     'interactBlock': ['ServerboundUseItemOnPacket'],
@@ -335,13 +348,14 @@ def validate_report(report, plan, plan_sha256, run_id, pins, start, end):
         previous_finish = begin
         reconnect_delay = 0
         for expected_session, session in zip(expected_actor['sessions'], sessions):
-            _object({k: v for k, v in _ui_session_fields(session, plan).items() if k != 'entityMotion'}, 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
+            _object({k: v for k, v in _ui_session_fields(session, plan).items() if k not in ('entityMotion', 'anvil')}, 'id', 'startedAtEpochMs', 'completedAtEpochMs', 'loginReceived',
                     'playerLoadedSent', 'teleportsAcknowledged', 'steps', 'messages', 'bindings', 'inventorySnapshots',
                     'inventoryConfirmations',
                     'disconnected', 'passed', 'error')
             require(session['id'] == expected_session['id'], 'Wrong or reordered actor session')
             session_start, session_end = _times(session, previous_finish + reconnect_delay, finish)
             entity_motion.validate(session.get('entityMotion', []), session_start, session_end)
+            anvil_observation.validate(session, expected_session, session_start, session_end)
             require(session['loginReceived'] is True and session['playerLoadedSent'] is True
                     and session['disconnected'] is True and session['passed'] is True
                     and session['error'] == '', 'Incomplete/failed actor session or disconnect')
@@ -372,6 +386,8 @@ def validate_report(report, plan, plan_sha256, run_id, pins, start, end):
                     keys.extend(('containerId', 'stateId', 'inventorySnapshotSequence',
                                  'inventorySnapshotReceivedAtEpochMs', 'inventorySnapshotSha256',
                                  'inventoryConfirmationSequence'))
+                elif expected_step['action'].startswith('anvil'):
+                    keys.extend(anvil_observation.ACTION_FIELDS)
                 _object(step, *keys)
                 require(step['id'] == expected_step['id'] and step['action'] == expected_step['action'],
                         'Wrong, duplicate or reordered action step')
@@ -430,6 +446,8 @@ def _server_journal(scenario_report, player_report, plan, aborted=False):
     effect. Scenario-specific assertions must independently test that behavior.
     """
     validate_plan(plan)
+    if not aborted:
+        anvil_observation.validate_feature(scenario_report, player_report)
     if aborted:
         _abort_plan(plan)
     require(isinstance(scenario_report, dict) and isinstance(player_report, dict), 'Missing fixture evidence')

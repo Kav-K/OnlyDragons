@@ -2,8 +2,9 @@
 
 Scope: [GH-82](https://github.com/Kav-K/OnlyDragons/issues/82), dispatched from
 accepted PR81 main `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`.
-In review in [draft PR #83](https://github.com/Kav-K/OnlyDragons/pull/83).
-Worker verification is complete; no maintenance acceptance is claimed.
+Accepted and merged in [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83).
+The worker handoff below retains its original tested revisions and scope; the
+subsequent lead acceptance is recorded separately.
 The [T06c acceptance reconciliation](t06c-focused-paper.md#accepted-hosted-cohort)
 records only the lead's accepted facts, preserving the original failed artifact.
 
@@ -132,3 +133,13 @@ The lead must resume T06b/#68 and T02c/#69 after this single cleanup PR is accep
 and merged, publishing the actual main and API continuity. Both stay planned
 under a temporary implementation hold, with all existing feature prerequisites
 and required fixtures. Held-fire/books playtesting remains the next objective.
+
+## Lead acceptance
+
+PR83 merged at `2158a51572d65e7e8856ec77f44b3decc982450c`; issue82 is closed
+completed. [The lead acceptance](https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809)
+records fresh full42-case/48-boot suite34082923431, strict original replay,
+MAINT-82 checkpoint, independent reviews and final-head CI34082803590, all passed
+on final reviewed head `5d86693c476f70afba66877d5d779cc697f46176`.
+The temporary hold is released and68/69 dispatched. Earlier failed/historical
+records retain their identities. No new gameplay, human or M1–M5 acceptance.

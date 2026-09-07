@@ -33,9 +33,14 @@ complete through combined [PR #76](https://github.com/Kav-K/OnlyDragons/pull/76)
 failed iterations retain their original identities and scope.
 
 T06c/#70 is complete through [PR #81](https://github.com/Kav-K/OnlyDragons/pull/81), merged at `53164f85a0ba3f36d16f242429f3a0a7c5a403a7`, accepting exactly `quiver-flame-integration`; [accepted evidence](evidence/t06c-focused-paper.md#accepted-hosted-cohort).
-T06b/#68 and T02c/#69 remain planned under the lead's temporary MAINT-82 implementation hold. The lead must resume both after this single maintenance PR is accepted and merged; their existing prerequisites and feature gates remain unchanged.
+MAINT-82 is accepted and merged through [PR #83](https://github.com/Kav-K/OnlyDragons/pull/83) at `2158a51572d65e7e8856ec77f44b3decc982450c`; the lead released and dispatched T06b/#68 and T02c/#69. Their existing prerequisites and feature gates remain unchanged.
 Held-fire and book requirements retain empty completion/evidence and remain
 unaccepted. V3 IQ/Flame-unavailable controls remain preserved.
+
+The lead is combining the completed feature candidates and their independent
+focused evidence. The [combined validation record](evidence/checkpoint2-held-books.md)
+adds a real held-bow → anvil → edited-bow interaction to the existing fixture;
+the full 47-case cohort, current CI, acceptance and Windows deployment are pending.
 
 T10 retains every prior dependency and additionally consumes T08d, T08e, T05b
 and T06b. T06b brings T03b/T06c transitively. Anvil application is independent of

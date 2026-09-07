@@ -326,6 +326,41 @@ these historical inputs do not validate changed MAINT-82 source.
 The [quiver-fire profile](02-foundation-plan.md#t06c-ammunition-and-owned-fire-contract-gh-70)
 is owner-selected OnlyDragons balance, with no new upstream mechanic claim.
 
+## Pinned client held-use semantics (T06b)
+
+Inspection of Mojang's official26.2 client binary, SHA1
+`2dc72797acbc1b63fc16a11c4ac393605f453754` (39,193,383 bytes), establishes the
+input distinction used by the fixture. Provenance: [official version metadata](https://piston-meta.mojang.com/v1/packages/3592ebc61c6b6c33bb8228fe5a9e90221df0be68/26.2.json).
+`javap -p -c` of the unobfuscated `Minecraft.handleKeybinds` shows that while
+LocalPlayer.isUsingItem is true, the client consumes click queues and releases
+when keyUse is no longer down; the trailing startUseItem branch requires
+!isUsingItem. `MultiPlayerGameMode.releaseUsingItem` sends RELEASE_USE_ITEM.
+The inventory key creates InventoryScreen; `Gui.setScreen` releases mouse/key
+mappings via KeyMapping.releaseAll, feeding that same native release path.
+This is pinned binary evidence, not a report of an authenticated human rehearsal.
+
+A faithful bounded protocol hold therefore sends one use, observes Paper's
+native main-hand raised state for a measured tick interval, then sends release.
+Repeated use packets alone do not establish a human hold. Ordinary client
+inventory opening is not necessarily a server InventoryOpenEvent; real server
+anvil opening requires separate event/view and received-screen evidence. Keep
+that combined GH68/GH69 check and full-client input feel pending. [T06b evidence](evidence/t06b-held-shortbows.md)
+records actual server tests separately from this client inspection.
+
+## T02c native anvil API inspection
+
+**Source inspected, 7 September 2026:** pinned Paper `a2a42c5` calls
+`PrepareAnvilEvent` before resetting repair cost on some native rejection paths.
+The custom candidate therefore rechecks the same offer and final event result
+before next-tick cost repair. Public `AnvilView` supplies cost and right-input
+consumption setters. Native result extraction is the sole XP/input debit authority;
+no manual second debit is permitted. [Pinned patch](https://github.com/PaperMC/Paper/blob/a2a42c5b12249aaba42a347327fd930a1f94af06/paper-server/patches/sources/net/minecraft/world/inventory/AnvilMenu.java.patch).
+This is API/source evidence, not final transaction acceptance or an upstream game
+balance claim; [T02c iteration status](03-agent-tasks-and-validation.md#t02c--custom-enchant-books-and-xp-cost-anvils-gh-69).
+
+The clean T02c focused runs now corroborate native extraction, received costs/XP,
+conservation and collected-bow effects; [bounded evidence and remaining gates](evidence/t02c-enchant-anvil.md).
+
 ## Decisions still open
 
 1. **Resolved during review:** the user confirmed one ultimate enchant per bow, with swapping supported.

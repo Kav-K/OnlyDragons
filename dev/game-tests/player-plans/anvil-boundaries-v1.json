@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "planId": "anvil-boundaries-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "first",
+          "steps": [
+            {
+              "id": "open",
+              "action": "interactBlock",
+              "args": {
+                "x": 0,
+                "y": 100,
+                "z": 0,
+                "face": "north",
+                "hand": "main",
+                "cursorX": 0.5,
+                "cursorY": 0.5,
+                "cursorZ": 0,
+                "insideBlock": false
+              }
+            },
+            {
+              "id": "name-combine",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-combine",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-stack-right",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-stack-right",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-legacy-common",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-legacy-common",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-legacy-v2-denied",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-legacy-v2-denied",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-legacy-v3-denied",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-legacy-v3-denied",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-ultimate-conflict",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-ultimate-conflict",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-max-level",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-max-level",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-lower-noop",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-lower-noop",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-wrong-book",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-wrong-book",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-spoof-book",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-spoof-book",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-stack-left",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-stack-left",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "end-close",
+              "action": "anvilClose",
+              "args": {}
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

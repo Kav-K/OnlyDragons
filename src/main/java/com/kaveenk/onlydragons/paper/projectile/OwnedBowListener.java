@@ -3,6 +3,7 @@ package com.kaveenk.onlydragons.paper.projectile;
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 
 /** Event routing only; service owns state, suppression and the single scheduler. */
@@ -19,6 +20,18 @@ public final class OwnedBowListener implements Listener {
     }
     @EventHandler(priority = EventPriority.MONITOR)
     public void stop(PlayerStopUsingItemEvent event) { service.stopUsing(event.getPlayer().getUniqueId()); }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void slot(PlayerItemHeldEvent event) { service.stopUsing(event.getPlayer().getUniqueId()); }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void swap(PlayerSwapHandItemsEvent event) { service.stopUsing(event.getPlayer().getUniqueId()); }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void drop(PlayerDropItemEvent event) { service.stopUsing(event.getPlayer().getUniqueId()); }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void inventory(InventoryOpenEvent event) { service.stopUsing(event.getPlayer().getUniqueId()); }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void inventoryClick(InventoryClickEvent event) { service.stopUsing(event.getWhoClicked().getUniqueId()); }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void inventoryDrag(InventoryDragEvent event) { service.stopUsing(event.getWhoClicked().getUniqueId()); }
     @EventHandler(priority = EventPriority.LOWEST)
     public void hit(ProjectileHitEvent event) { service.hit(event); }
     @EventHandler(priority = EventPriority.HIGHEST)

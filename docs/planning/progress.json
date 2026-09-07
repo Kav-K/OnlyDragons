@@ -208,7 +208,7 @@
       },
       "reviewedRevision": "f4178ba53f4db1d75ff7d58503411a8bfe44d943",
       "mergedRevision": "25891c0f1c04a9df5ec796d8ba972f62c8c9cd50",
-      "notice": "PR #52 merged at 25891c0 after the complete 24-case f4178ba cohort, independent raw replay/review, actual-main T06/combined task checkpoints and current CI. Owned firing passed 115 assertion rows; the repaired equipment case passed 25. See evidence/t06-suite.md for exact identities and preserved failed iteration. Bounded firing/physical claims are complete; T08 accounting, successor dispatch and M1\u2013M5 remain separate."
+      "notice": "PR #52 merged at 25891c0 after the complete 24-case f4178ba cohort, independent raw replay/review, actual-main T06/combined task checkpoints and current CI. Owned firing passed 115 assertion rows; the repaired equipment case passed 25. See evidence/t06-suite.md for exact identities and preserved failed iteration. Bounded firing/physical claims are complete; T08 accounting, successor dispatch and M1–M5 remain separate."
     },
     "T07": {
       "status": "complete",
@@ -228,7 +228,7 @@
       },
       "reviewedRevision": "576e394181a2dde740ed5b4c5ceac231afaedf81",
       "mergedRevision": "2c0be584247a0fbaa409e21565f7289cc27daa06",
-      "notice": "PR #56 merged at 2c0be58 after the complete 26-case 576e394 cohort, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions and its cleanup control met the exact expected abort; retained firing passed 115. See evidence/t07-suite.md. Exactly P07/P10 are accepted; T08 accounting, T10 rehearsal and M1\u2013M5 remain separate."
+      "notice": "PR #56 merged at 2c0be58 after the complete 26-case 576e394 cohort, independent raw replay/review, actual-main T07/combined checkpoints and current CI. Tracer passed 57 assertions and its cleanup control met the exact expected abort; retained firing passed 115. See evidence/t07-suite.md. Exactly P07/P10 are accepted; T08 accounting, T10 rehearsal and M1–M5 remain separate."
     },
     "T08": {
       "status": "complete",
@@ -263,7 +263,7 @@
       },
       "reviewedRevision": "24ddf86eaa2fa870e90ae2d1face3ebd3f79a494",
       "mergedRevision": "3505d6cc58cd2cf9b09c2d21ac38ec6eca3f4c45",
-      "notice": "PR #57 merged at 3505d6c after the complete 28-case 24ddf86 cohort, independent raw replay/review, unchanged-input c0e6b2e replay, original/latest-main checkpoints and current CI. Exactly five T08 requirements complete; see evidence/t08-suite.md. Human/client observations, managed-dragon controls and M1\u2013M5 remain separate."
+      "notice": "PR #57 merged at 3505d6c after the complete 28-case 24ddf86 cohort, independent raw replay/review, unchanged-input c0e6b2e replay, original/latest-main checkpoints and current CI. Exactly five T08 requirements complete; see evidence/t08-suite.md. Human/client observations, managed-dragon controls and M1–M5 remain separate."
     },
     "T10": {
       "status": "blocked",
@@ -337,7 +337,7 @@
           "revision": "854287c4017f284b9263d54affd57fca02c033df"
         }
       },
-      "notice": "PR #60 merged at 889a3db after the complete hosted cohort, independent raw/source review, strict replay, actual-main checkpoint and current CI. Exactly managed-dragon-development complete; evidence/t08a-suite.md. Ranking and M1\u2013M5 remain separate.",
+      "notice": "PR #60 merged at 889a3db after the complete hosted cohort, independent raw/source review, strict replay, actual-main checkpoint and current CI. Exactly managed-dragon-development complete; evidence/t08a-suite.md. Ranking and M1–M5 remain separate.",
       "reviewedRevision": "854287c4017f284b9263d54affd57fca02c033df",
       "mergedRevision": "889a3db3ca7d43ebdd98bae262a61cccf20cca3a"
     },
@@ -493,16 +493,16 @@
       "reviewedRevision": "1b3c2f9be99bcfc6e941d7e563f1c15dd91c9589"
     },
     "T06b": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged. Temporary lead implementation hold during MAINT-82; lead must resume after cleanup acceptance and merge. No prerequisite or evidence is removed."
+      "notice": "In review: draft PR84 https://github.com/Kav-K/OnlyDragons/pull/84. Runtime571cdb35 integrates main2158a515. Build313/6/33 tests, five focused Paper cases264 assertions and strict per-case raw/JUnit/artifact/cleanup replay pass; static/no-weakening pass. Records build/reports/gh68-focused-replay; durable docs/planning/evidence/t06b-held-shortbows.md. No complete suite receipt or held-shortbow-loadouts acceptance: lead owns combined lore/Roman formatting, native+received anvil interaction, full regression/current CI/task acceptance. Human/Windows gates pending; rewards disabled."
     },
     "T02c": {
-      "status": "planned",
+      "status": "active",
       "completedRequirements": [],
       "evidence": {},
-      "notice": "Checkpoint 2 registration only; no implementation, accepted fixture or completion claimed. Follow integrated dependencies and lead assignment. Real rewards remain disabled; existing milestone gates are unchanged. Temporary lead implementation hold during MAINT-82; lead must resume after cleanup acceptance and merge. No prerequisite or evidence is removed."
+      "notice": "In review: draft PR85, clean runtime4ed3d2d integrated with main2158a51. Three focused Paper runs/132 assertions and original replays pass; see evidence/t02c-enchant-anvil.md. Final combined cohort/receipt/new-tier interaction/task acceptance/CI/review remain lead-owned under issue69 dispatch. No milestone or human gate accepted; rewards and armor disabled."
     },
     "T06c": {
       "status": "complete",
@@ -520,10 +520,58 @@
       "notice": "Exactly T06c accepted after PR81 fresh 42-case cohort, strict replay, independent review, task checkpoint and current CI. See docs/planning/evidence/t06c-focused-paper.md#accepted-hosted-cohort. Failed run34074476010 remains failed. Human/full-client/Windows-final-deployment/M1-M5 remain unaccepted; rewards disabled."
     },
     "MAINT-82": {
-      "status": "active",
-      "completedRequirements": [],
-      "evidence": {},
-      "notice": "In review: draft PR83 https://github.com/Kav-K/OnlyDragons/pull/83 from accepted main53164f85. Clean inputs7ae38e3 pass worker builds303/6/33, Python288/bridge25, static/no-weakening, focused Paper25/115/61 and strict focused replay. Lead complete final-head hosted cohort/replay/review/current CI and acceptance pending. No completed requirements claimed. See docs/planning/evidence/maintenance-82.md."
+      "status": "complete",
+      "completedRequirements": [
+        "item-codec",
+        "equipment-service",
+        "expanded-bow-enchantments",
+        "firing-input",
+        "quiver-flame-integration",
+        "managed-dragon-development",
+        "suite-baseline",
+        "checkpoint-unit-checks",
+        "bridge-unit-checks"
+      ],
+      "evidence": {
+        "item-codec": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "equipment-service": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "expanded-bow-enchantments": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "firing-input": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "quiver-flame-integration": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "managed-dragon-development": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "suite-baseline": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "checkpoint-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        },
+        "bridge-unit-checks": {
+          "url": "https://github.com/Kav-K/OnlyDragons/pull/83#issuecomment-5565312809",
+          "revision": "5d86693c476f70afba66877d5d779cc697f46176"
+        }
+      },
+      "notice": "Accepted PR83; full42-case/48-boot hosted suite34082923431, strict replay, checkpoint, independent review and final-head CI34082803590 passed. Acceptance5565312809. Original worker evidence retained in docs/planning/evidence/maintenance-82.md. No gameplay/human/milestone advancement.",
+      "mergedRevision": "2158a51572d65e7e8856ec77f44b3decc982450c"
     }
   },
   "milestones": {

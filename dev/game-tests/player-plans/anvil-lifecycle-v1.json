@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 1,
+  "planId": "anvil-lifecycle-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "first",
+          "steps": [
+            {
+              "id": "open",
+              "action": "interactBlock",
+              "args": {
+                "x": 0,
+                "y": 100,
+                "z": 0,
+                "face": "north",
+                "hand": "main",
+                "cursorX": 0.5,
+                "cursorY": 0.5,
+                "cursorZ": 0,
+                "insideBlock": false
+              }
+            },
+            {
+              "id": "name-insufficient",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-insufficient",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-full",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-full",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-drop",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-drop",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "drop"
+              }
+            },
+            {
+              "id": "name-hotbar",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-hotbar",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "hotbar-1"
+              }
+            },
+            {
+              "id": "name-cancel",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-cancel",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "collect-retry",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "collect-replay",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-stale",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-stale",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-stale-ordinary",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-stale-ordinary",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-prepare-veto",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-prepare-veto",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-rename-only",
+              "action": "anvilRename",
+              "args": {
+                "name": "Renamed item"
+              }
+            },
+            {
+              "id": "collect-rename-only",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-creative",
+              "action": "anvilRename",
+              "args": {
+                "name": "Boundary item"
+              }
+            },
+            {
+              "id": "collect-creative",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "name-vanilla",
+              "action": "anvilRename",
+              "args": {
+                "name": "Vanilla blade"
+              }
+            },
+            {
+              "id": "collect-vanilla",
+              "action": "anvilClick",
+              "args": {
+                "slot": 2,
+                "button": "left"
+              }
+            },
+            {
+              "id": "close-inputs",
+              "action": "anvilClose",
+              "args": {}
+            },
+            {
+              "id": "reopen",
+              "action": "interactBlock",
+              "args": {
+                "x": 0,
+                "y": 100,
+                "z": 0,
+                "face": "north",
+                "hand": "main",
+                "cursorX": 0.5,
+                "cursorY": 0.5,
+                "cursorZ": 0,
+                "insideBlock": false
+              }
+            },
+            {
+              "id": "reconnect",
+              "action": "reconnect",
+              "args": {
+                "delayMillis": 250
+              }
+            }
+          ]
+        },
+        {
+          "id": "second",
+          "steps": [
+            {
+              "id": "open-service-close",
+              "action": "interactBlock",
+              "args": {
+                "x": 0,
+                "y": 100,
+                "z": 0,
+                "face": "north",
+                "hand": "main",
+                "cursorX": 0.5,
+                "cursorY": 0.5,
+                "cursorZ": 0,
+                "insideBlock": false
+              }
+            },
+            {
+              "id": "quit",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

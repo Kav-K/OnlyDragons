@@ -1,0 +1,317 @@
+{
+  "schemaVersion": 1,
+  "planId": "held-shortbows-v1",
+  "targets": [],
+  "actors": [
+    {
+      "id": "alpha",
+      "sessions": [
+        {
+          "id": "s1",
+          "steps": [
+            {
+              "id": "denied",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev shortbow kit"
+              }
+            },
+            {
+              "id": "help",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev shortbow help"
+              }
+            },
+            {
+              "id": "list",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev shortbow list"
+              }
+            },
+            {
+              "id": "kit",
+              "action": "command",
+              "args": {
+                "command": "onlydragons dev shortbow kit"
+              }
+            },
+            {
+              "id": "swift-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "swift-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "volley-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "volley-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "mixed-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "mixed-left",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "mixed-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "swap-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "crossbow-slot",
+              "action": "selectSlot",
+              "args": {
+                "slot": 1
+              }
+            },
+            {
+              "id": "bow-slot",
+              "action": "selectSlot",
+              "args": {
+                "slot": 0
+              }
+            },
+            {
+              "id": "swap-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "edit-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "edit-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "anvil-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "anvil-open",
+              "action": "interactBlock",
+              "args": {
+                "insideBlock": false,
+                "face": "north",
+                "cursorZ": 0,
+                "cursorY": 0.5,
+                "cursorX": 0.5,
+                "hand": "main",
+                "z": 3,
+                "x": 0,
+                "y": 100
+              }
+            },
+            {
+              "id": "anvil-name",
+              "action": "anvilRename",
+              "args": {
+                "name": "Returning Swift"
+              }
+            },
+            {
+              "id": "anvil-collect",
+              "action": "anvilClick",
+              "args": {
+                "button": "left",
+                "slot": 2
+              }
+            },
+            {
+              "id": "anvil-store",
+              "action": "anvilClick",
+              "args": {
+                "button": "left",
+                "slot": 30
+              }
+            },
+            {
+              "id": "anvil-close",
+              "action": "anvilClose",
+              "args": {}
+            },
+            {
+              "id": "booked-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "booked-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "callback-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "callback-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "capacity-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "capacity-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "empty",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "last-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "last-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "veto",
+              "action": "swing",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "exit-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "exit-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "target-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "target-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "reset-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "reset-release",
+              "action": "releaseUse",
+              "args": {}
+            },
+            {
+              "id": "death-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "respawn",
+              "action": "respawn",
+              "args": {}
+            },
+            {
+              "id": "quit-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "reconnect",
+              "action": "reconnect",
+              "args": {
+                "delayMillis": 250
+              }
+            }
+          ]
+        },
+        {
+          "id": "s2",
+          "steps": [
+            {
+              "id": "disable-use",
+              "action": "useItem",
+              "args": {
+                "hand": "main"
+              }
+            },
+            {
+              "id": "end",
+              "action": "disconnect",
+              "args": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -293,6 +293,31 @@ and [enchant catalog](../../src/main/resources/enchants/README.md) for consumer
 instructions. Authenticated inventory/rename/visual checks remain separate
 from the synthetic real-Paper round-trip scenario.
 
+### T02c books and native anvil transactions (GH-69)
+
+In progress on the issue branch, following the owner-selected checkpoint costs.
+`EnchantRecipes` validates one-enchant books, combines only improving same-ID
+levels, and replaces the complete bow enchant map through its original catalog.
+`EnchantTarget` separates item category and active slot; no armor target is enabled.
+Ordinary/ultimate costs are 2/4 times resulting level, plus one for an actual plain
+rename (50-character bound); rename-only costs one. Caps, no-ops and conflicting
+ultimates reject. Rewards remain disabled.
+
+`WeaponItemCodec.edit` clones the left stack, validates unchanged identity/catalog/
+rolls, rewrites only the owned root and generated lore, and decodes the final clone.
+Durability, prior work, custom names, applicable native enchants and foreign data
+survive. Books use a strict separate PDC root; generated Roman-level lore/glint
+never supplies authority. `PresentationFormatter` supplies readable signed stats.
+
+The synchronous anvil service freezes exact inputs/name/output/cost per current
+view. Prepare never charges; deferred repair rechecks the session, inputs and final
+prepare-event result. LOWEST/HIGHEST extraction checks reject changed offers and
+unsupported destinations; native extraction alone consumes XP and one right book.
+A next-tick observer records successful native completion, retaining an unchanged
+canceled offer for retry. Close/quit/disable invalidate offers and callbacks.
+The bounded protocol ANVIL extension keeps existing window-0 validation strict.
+[Development book/anvil rehearsal](../../dev/enchant-books-play.md).
+
 ## 5. Shot ownership, snapshots, and swapping
 
 Each accepted trigger receives a `shotId`. Every real arrow has its own projectile UUID and ordinal; a Duplex child also references its parent. Record owner UUID, weapon instance/definition, immutable gear stats, enchant levels, mechanic revision, launch tick, launch position, and initial velocity.
@@ -1028,6 +1053,34 @@ starter greeting/configuration and connected reload/status calibration does not
 satisfy that future feature gate. Human profiles and single-boot contracts remain
 unchanged; [runner details](../../dev/agent-paper-tests.md#same-profile-restart-fixtures)
 define the fixed evidence envelope.
+
+## T06b held shortbow calibration (GH-68)
+
+Owner-selected development data adds seven exact `held-shortbows-v1` definitions
+into the consumer-capable v4 registry, preserving all27 prior identities/values.
+[The quickstart table](../../dev/shortbow-play.md#published-development-calibration)
+is the calibration reference: drawn training; Swift AS100/5 ticks; Volley
+AS400/2 ticks; plain F0/F25/F100 controls; separate Tracer V+Duplex V and
+Tracer V+Fatal Tempo V bows, both baseF25, Infinite Quiver X and Flame II.
+All seven select returning Tracer v2 through trusted ID/revision; Tracer0 is inert.
+F100 guarantees one extra damage hit before buffs, not a visible projectile.
+
+The existing SHORTBOW loop remains the sole input/cooldown/ammo authority.
+A pending input and active hold capture the complete validated item instance
+and selected slot. Release, slot/hand/drop/inventory activity invalidates input;
+session/arena/target/death/quit/reset/disable retain their existing cleanup.
+Copied entries must still be current before dispatch. A synchronous launch
+callback that invalidates input must not reinstall the old hold. Invalidation
+preserves the shared cooldown and already accepted/airborne group ownership.
+
+`dev shortbow help/list/kit` uses the existing calibration permission. Kit grants
+seven bows and512 ordinary arrows only with15 empty storage slots. Setup remains
+an explicit dragon command; the first-use flow configures only when unconfigured,
+grants, spawns training orbit100000HP, checks status, then uses an operator-verified
+safe position. GH69 owns shared lore/book/anvil formatting and consumes resolved
+WeaponDefinition mode/modifiers plus FiringRules cadence. The lead combines those
+sources and verifies native anvil opening with matching received ANVIL metadata.
+No rewards, balance-table replacement or milestone acceptance is introduced.
 
 ## 13. Milestones and completion gates
 

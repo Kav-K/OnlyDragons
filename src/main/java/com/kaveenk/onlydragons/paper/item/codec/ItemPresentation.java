@@ -2,6 +2,7 @@ package com.kaveenk.onlydragons.paper.item.codec;
 
 import com.kaveenk.onlydragons.domain.item.ItemRegistry;
 import com.kaveenk.onlydragons.domain.item.WeaponDefinition;
+import com.kaveenk.onlydragons.application.PresentationFormatter;
 import java.util.ArrayList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,13 +15,19 @@ public final class ItemPresentation {
 
     static void apply(ItemMeta meta, ItemRegistry.ResolvedItem item, ItemRegistry registry) {
         meta.displayName(line(item.definition().displayName(), NamedTextColor.AQUA));
+        refreshLore(meta, item, registry);
+    }
+
+    public static void refreshLore(ItemMeta meta, ItemRegistry.ResolvedItem item, ItemRegistry registry) {
         var lore = new ArrayList<Component>();
-        lore.add(line("Weapon damage: " + item.definition().weapon().baseDamage(), NamedTextColor.GRAY));
+        lore.add(line(item.definition().weapon().firingMode() == WeaponDefinition.FiringMode.SHORTBOW
+                ? "Instant bow · hold right-click" : "Draw and release", NamedTextColor.GRAY));
+        lore.add(line("Weapon Damage: " + PresentationFormatter.number(item.definition().weapon().baseDamage()), NamedTextColor.GRAY));
         for (var modifier : item.statModifiers()) {
-            lore.add(line(modifier.key().id() + ": " + modifier.amount() + " (" + modifier.operation() + ")", NamedTextColor.GRAY));
+            lore.add(line(PresentationFormatter.statModifier(modifier), NamedTextColor.GRAY));
         }
         for (var enchant : item.enchantments()) {
-            lore.add(line(registry.enchant(enchant.id()).displayName() + " " + enchant.level(),
+            lore.add(line(registry.catalog(item.instance().registryRevision()).enchant(enchant.id()).displayName() + " " + PresentationFormatter.roman(enchant.level()),
                     enchant.kind() == WeaponDefinition.EnchantmentKind.ULTIMATE ? NamedTextColor.LIGHT_PURPLE : NamedTextColor.BLUE));
         }
         meta.lore(lore);

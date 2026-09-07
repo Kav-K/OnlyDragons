@@ -11,6 +11,26 @@ import net.kyori.adventure.text.format.TextDecoration;
 public final class PresentationFormatter {
     private PresentationFormatter() {}
 
+    public static String roman(int level) {
+        if (level < 1 || level > 10) throw new IllegalArgumentException("Display level must be I–X");
+        return new String[]{"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"}[level - 1];
+    }
+
+    public static String statModifier(com.kaveenk.onlydragons.domain.stats.StatModifier modifier) {
+        String amount = number(modifier.amount());
+        String value = switch (modifier.operation()) {
+            case MULTIPLIER -> "×" + amount;
+            case ADDITIVE_PERCENT -> (modifier.amount() >= 0 ? "+" : "") + amount + "%";
+            case FLAT -> (modifier.amount() >= 0 ? "+" : "") + amount
+                    + switch (modifier.key()) {
+                        case CRIT_CHANCE, CRIT_DAMAGE, ATTACK_SPEED -> "%";
+                        case MAX_HEALTH -> " HP";
+                        default -> "";
+                    };
+        };
+        return label(modifier.key().id()) + ": " + value;
+    }
+
     public static String number(double value) {
         if (!Double.isFinite(value)) throw new IllegalArgumentException("Nonfinite display value");
         return new DecimalFormat("#,##0.##", DecimalFormatSymbols.getInstance(Locale.ROOT)).format(value == 0 ? 0 : value);

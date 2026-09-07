@@ -14,16 +14,22 @@ public final class DevCommand implements CommandExecutor, TabCompleter {
     private final StatsCommand stats;
     private final PracticeCommand practice;
     private final DragonCommand dragons;
+    private final ShortbowCommand shortbows;
+    private final BookCommand books;
 
     public DevCommand(OnlyDragonsPlugin plugin) {
         this.plugin = plugin;
         this.stats = new StatsCommand(plugin.equipment());
         this.practice = new PracticeCommand(plugin);
         this.dragons = new DragonCommand(plugin.dragons());
+        this.shortbows = new ShortbowCommand(new com.kaveenk.onlydragons.paper.item.equipment.ShortbowKitService(plugin.equipment()));
+        this.books = new BookCommand(com.kaveenk.onlydragons.domain.item.CalibrationLoadouts.fireRegistry());
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (shortbows.handles(args)) { shortbows.execute(sender, args); return true; }
+        if (books.handles(args)) { books.execute(sender, args); return true; }
         if (dragons.handles(args)) { dragons.execute(sender, args); return true; }
         if (args.length > 0 && practice.handles(args)) { practice.execute(sender, args); return true; }
         String action = args.length == 0 ? "status" : args[0].toLowerCase(Locale.ROOT);
@@ -58,7 +64,10 @@ public final class DevCommand implements CommandExecutor, TabCompleter {
             options = available;
         } else {
             var combined = new java.util.ArrayList<>(stats.complete(sender, args));
-            combined.addAll(practice.complete(sender, args)); combined.addAll(dragons.complete(sender, args)); options = combined;
+            combined.addAll(practice.complete(sender, args)); combined.addAll(dragons.complete(sender, args));
+            combined.addAll(shortbows.complete(sender, args));
+            combined.addAll(books.complete(sender, args));
+            options = combined;
         }
         String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
         return options.stream().filter(option -> option.startsWith(prefix)).toList();

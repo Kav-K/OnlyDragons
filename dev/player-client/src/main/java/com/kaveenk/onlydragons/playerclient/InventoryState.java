@@ -94,6 +94,10 @@ final class InventoryState {
         invalidate("World changed before a new full player-inventory snapshot");
     }
     void requireSettled() { ActionSession.check(!pending, "Inventory click has not received a full server resynchronization"); }
+    void clientClosedContainer() {
+        ActionSession.check(openContainer > 0 && !pending, "No settled container to close");
+        openContainer = 0; invalidate("Client close awaits full player-inventory resynchronization");
+    }
     List<Map<String, Object>> snapshots() { return List.copyOf(snapshots); }
     List<Map<String, Object>> confirmations() { return List.copyOf(confirmations); }
     private void invalidate(String reason) { ready = false; unavailable = reason; }

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FireCatalogTest {
     @Test void flatRouterKeepsThreeExactHistoriesAndEnablesOnlyNewItems() {
         var router=CalibrationLoadouts.compatibleRegistry();
-        assertEquals(Set.of("ordinary_v4","shortbow_v4","quiver_v4","flame_v4","duplex_flame_v4","tempo_flame_v4"),CalibrationLoadouts.fireRegistry().definitions().keySet());
+        assertEquals(Set.of("ordinary_v4","shortbow_v4","quiver_v4","flame_v4","duplex_flame_v4","tempo_flame_v4", "drawn_training_v4", "swift_shortbow_v4", "volley_shortbow_v4", "volley_ferocity25_v4", "volley_ferocity100_v4", "volley_duplex_v4", "volley_tempo_v4"),CalibrationLoadouts.fireRegistry().definitions().keySet());
         for(var concrete:List.of(CalibrationLoadouts.registry(),CalibrationLoadouts.expandedRegistry(),CalibrationLoadouts.fireRegistry()))
             for(var id:concrete.definitions().keySet()) {
                 var item=concrete.create(id);assertEquals(concrete.resolve(item),router.resolve(item));

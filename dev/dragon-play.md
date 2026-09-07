@@ -17,8 +17,10 @@ needs only OnlyDragons; the game-test companion and protocol client are test too
    must fit world height/border, and identifiers/numbers must validate. Setup is
    rejected while a development encounter is active. Invalid candidates or failed
    atomic persistence retain the prior arena. Other config.yml settings survive.
-5. Move into that cube and use `/onlydragons dev kit ordinary`, equip the bow,
-   then `/onlydragons dev dragon spawn`. The bounded orbiting HOVER dragon has
+5. Follow the [shortbow rehearsal](shortbow-play.md) for **kit → training orbit
+   spawn → status → operator-verified safe positioning** before entering. It
+   supplies seven named modern bows and512 arrows. The ordinary
+   `/onlydragons dev dragon spawn` remains available: its bounded HOVER dragon has
    1,000 domain HP, zero defense and the immutable `test_dragon` Tempo v2 selection.
    Use `spawn training` for 100,000 HP, or `spawn calibration` for the preserved
    v1 full-HP Ferocity profile. Standard and training procs use 100% HP without
@@ -30,7 +32,8 @@ needs only OnlyDragons; the game-test companion and protocol client are test too
    selects the stationary legacy fixture. `spawn training stationary` keeps the
    longer training fight still; omitting motion selects orbit for every command mode.
    This direct spawn remains separate from the future countdown/hatch workflow.
-6. Shoot the actual dragon parts with full draws. Ordinary arrows remove/credit
+6. Shoot the actual dragon parts: draw the training bow, or hold right-click on
+   an instant tier. Ordinary unbuffed full-damage arrows remove/credit
    100 each. `/onlydragons combat last` explains the captured hit. Dragon `status`
    shows generation/native UUID, selected revisions, domain state, native outcome,
    animation ticks, motion revision/state and separate HP/credit. Dragon `result` inspects the frozen
@@ -96,8 +99,8 @@ This bow captures `tracer-return/v2`: acquisition8 blocks per Tracer level, same
 target retention8 blocks farther, at most18 degrees of turning per tick, and the
 first3 ticks from the original volley launch remain ballistic. Duplex inherits
 that origin. Obstruction, unsupported phases and retired generations lose the
-lock. Steering preserves current speed and native drag/gravity. Existing bows
-retain `tracer-continuity/v1`; the new preset does not rewrite them.
+lock. Steering preserves current speed and native drag/gravity. The seven modern held-shortbow presets also select returning v2; older bows
+retain their existing profiles. No preset rewrites another item identity.
 
 Review perceived smoothness, returning-volley visibility and aiming in the full
 client. Headless received-motion packets establish network movement only.
