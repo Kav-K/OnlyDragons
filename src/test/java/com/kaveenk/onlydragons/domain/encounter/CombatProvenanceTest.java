@@ -8,16 +8,29 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests atomic receiver-tick/ordinal provenance across interleaved owners, zeros, rounded-away
+ * credit, overkill and failure. Uses the real domain encounter with direct synthetic impacts.
+ * The ordinal-overflow case reflects only into this pure domain object's private counter to
+ * reach an otherwise infeasible bound; it performs no Paper/server-internal reflection.
+ */
 class CombatProvenanceTest {
     final UUID generation = UUID.randomUUID(), target = UUID.randomUUID(), a = UUID.randomUUID(), b = UUID.randomUUID();
     final CombatProfile profile = CombatProfile.calibration();
     CombatEncounter encounter(double hp) { return new CombatEncounter(new TargetState(generation, target, hp, hp, 0), "dummy", profile); }
+    /**
+     * Captures explicit noncritical damage with fresh arrow/group IDs and no enchants or Tempo.
+     */
     ShotContext shot(UUID owner, double damage) {
         var stats = new StatResolver(StatProfile.calibration()).resolve("captured", Map.of(StatKey.WEAPON_DAMAGE, damage), ModifierSources.empty()).snapshot();
         return new ShotContext(generation, UUID.randomUUID(), UUID.randomUUID(), 0, Optional.empty(), owner,
                 new WeaponIdentity(UUID.randomUUID(), "ordinary", 1, "v1"), stats, List.of(), profile.mechanic(), 0,
                 new Vector3(0,0,0), new Vector3(0,0,1), CritOutcome.NORMAL, 1, 1);
     }
+    /**
+     * Submits direct settled domain input at the caller's tick; this is the commit-order oracle,
+     * not a native event observation.
+     */
     DamageResult hit(CombatEncounter c, ShotContext s, long tick, DamageModifiers modifiers) {
         return c.physical(s, new PhysicalImpact(new PhysicalImpact.Key(generation, s.projectileId(), target, 0), s.ownerId(), tick,
                 new Vector3(0,0,8), Optional.empty()), modifiers, 0, Optional.empty());
