@@ -24,6 +24,14 @@ Confidence labels below mean:
 
 ## 1. Encounter structure
 
+The [current community Summoning Eye reference](https://hypixelskyblock.minecraft.wiki/w/Summoning_Eye)
+was checked on 7 September 2026: it describes insertion into End Portal Frames
+and eight eyes per summon. This is descriptive evidence, not Hypixel's private
+transaction implementation. The user's [OnlyDragons altar decisions](08-eye-altar.md)
+independently select first-party eyes, up to eight per player, owner withdrawal
+before lock, and durable failed-summon refunds. No acquisition/drop probabilities
+or cross-inventory atomicity guarantees are inferred from that reference.
+
 The ordinary encounter uses eight Summoning Eyes and an egg-hatching sequence. The community reference lists **seven regular variants**, rather than five:
 
 | Variant | HP | Selection chance |

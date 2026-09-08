@@ -18,6 +18,17 @@ checkpoint remain pending. Windows smoke, authenticated-client readability and
 visuals are unrun. Next dependency: finish those automated gates and hand off a
 draft PR; the separately owned eye adapter may add topics after integration.
 
+**Current user priority — commands and eye placement:** [#101](https://github.com/Kav-K/OnlyDragons/issues/101)
+is dispatched through Symphony for backward-compatible command consolidation and
+permission-aware `/onlydragons help`, including stale Tracer text #96. The user
+explicitly brings scoped altar implementation ahead of the remaining T10 rehearsal;
+[T11a/#102](https://github.com/Kav-K/OnlyDragons/issues/102) starts with first-party
+eye identity and the durable transaction/refund core. T11b follows with actual
+frame inputs, shared hatch and recovery. [Confirmed decisions and staged gates](08-eye-altar.md)
+are the current scope authority. No M3 or other human milestone is accepted by this
+reprioritization; original T11 retains final integrated acceptance. The human server
+is stopped, and feature agents use only the isolated runner. Each small PR must
+leave coherent source contracts, evidence and manual takeover instructions.
 
 **Manual Cursor development:** use the [development quick start](../../dev/cursor-development.md)
 for the existing checkout. Ctrl+Shift+B builds/tests and starts or restarts the

@@ -2309,6 +2309,18 @@
         "held-shortbows",
         "held-combat"
       ]
+    },
+    "eye-transaction-core": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "First-party eye identity, durable serial/slot/refund transitions and recovery; not live frame input or inventory delivery.",
+      "fixtures": []
+    },
+    "eye-altar-runtime": {
+      "kind": "automated",
+      "availability": "deferred",
+      "description": "Real eight-frame inputs, one shared hatch, inventory/refund conservation and ledger-bound Paper restart recovery.",
+      "fixtures": []
     }
   },
   "tasks": {
@@ -2456,6 +2468,12 @@
     ],
     "T07b": [
       "aimed-dragon-tracer"
+    ],
+    "T11a": [
+      "eye-transaction-core"
+    ],
+    "T11b": [
+      "eye-altar-runtime"
     ]
   },
   "paperCases": {

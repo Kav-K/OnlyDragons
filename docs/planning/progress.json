@@ -599,7 +599,9 @@
     },
     "T07b": {
       "status": "complete",
-      "completedRequirements": ["aimed-dragon-tracer"],
+      "completedRequirements": [
+        "aimed-dragon-tracer"
+      ],
       "evidence": {
         "aimed-dragon-tracer": {
           "url": "https://github.com/Kav-K/OnlyDragons/pull/92#issuecomment-5576314511",
@@ -609,6 +611,16 @@
       "mergedRevision": "c3fc8f305b2f23a556deccd4b7724bf8f0f5b9f2",
       "reviewedRevision": "8ce67877a4ea28c2074c033eb3b0e49009fdc131",
       "notice": "Exactly aimed-dragon-tracer accepted through PR92 after hosted run34164498855 attempt1: all48 cases across54 clean Paper boots, original strict replay, T07b checkpoint, independent source/raw review and current Windows/Linux CI. Windows17-command smoke passed separately. See evidence/t07b-aimed-tracer.md. Earlier failed/focused runs retain their original identities. Human aiming/visuals and M1-M5 remain unaccepted; T06d stays user-deferred and rewards disabled."
+    },
+    "T11a": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {}
+    },
+    "T11b": {
+      "status": "planned",
+      "completedRequirements": [],
+      "evidence": {}
     }
   },
   "milestones": {
