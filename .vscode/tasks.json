@@ -15,7 +15,7 @@
       ],
       "group": {
         "kind": "build",
-        "isDefault": true
+        "isDefault": false
       },
       "problemMatcher": [
         "$javac"
@@ -111,6 +111,7 @@
     },
     {
       "label": "Minecraft: Play (build + start server)",
+      "detail": "Ctrl+Shift+B: build, test and install the plugin, then start or restart the development server.",
       "type": "process",
       "command": "powershell.exe",
       "args": [
@@ -121,6 +122,10 @@
         "${workspaceFolder}/scripts/Lab.ps1",
         "play"
       ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
       "problemMatcher": [],
       "presentation": {
         "panel": "dedicated",

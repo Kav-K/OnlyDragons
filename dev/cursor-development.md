@@ -9,7 +9,8 @@ terminals. The server/client target is Minecraft Java 26.2, Paper build 121.
 
 | Action | Cursor command or terminal equivalent |
 | --- | --- |
-| Build the plugin and run its tests | **Ctrl+Shift+B** → `Minecraft: Build and test` |
+| Build, test, install and start the server | **Ctrl+Shift+B** → `Minecraft: Play (build + start server)` |
+| Build/test without starting a server | Tasks: Run Task → `Minecraft: Build and test` |
 | Run one Java test | Testing sidebar, or **Run Test** above its method/class |
 | Build and start the human server | Tasks: Run Task → `Minecraft: Play (build + start server)`; `./mcdev.cmd play` |
 | Install edits in the running server | `Minecraft: Restart after edits`; `./mcdev.cmd restart` |
@@ -19,6 +20,10 @@ terminals. The server/client target is Minecraft Java 26.2, Paper build 121.
 | Stop and save the world | `Minecraft: Stop server`; `./mcdev.cmd stop` |
 
 Connect an authenticated **Minecraft Java 26.2** client to **127.0.0.1:25565**.
+Ctrl+Shift+B starts the server when stopped. If a managed server is already
+running, the Play pipeline saves/stops it, builds/tests the plugin, installs the
+new artifact and starts again. This makes source edits available without a
+separate deployment step. A failed build stops the pipeline before startup.
 The Minecraft launcher is separate from the server task. Play/restart/F5 use the
 existing managed lab handoff: they save and stop other development servers
 managed by this lab before starting this project. Closing a task terminal or
@@ -57,6 +62,10 @@ For actual Paper integration, reuse the committed
 [runner commands](agent-paper-tests.md). Those isolated tests use disposable
 profiles; the human Play world is separate. The standard smoke task checks
 startup/commands/shutdown, not a full gameplay scenario.
+
+The default editor build task is a human Play operation. Unattended agents keep
+using the explicit wrapper build and isolated runner under AGENTS.md; this
+shortcut does not authorize them to start or restart the human server.
 
 The build reports are `build/reports/tests/test/index.html` and
 `build/reports/jacoco/test/html/index.html`. Generate production API HTML with
