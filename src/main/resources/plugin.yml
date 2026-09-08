@@ -6,7 +6,7 @@ description: Main workspace for Minecraft Java plugin development.
 commands:
   onlydragons:
     description: Inspect stats, grant calibration gear, and manage plugin configuration.
-    usage: /onlydragons [status|reload|stats|combat|dev]
+    usage: /onlydragons [help [topic]|status|reload|stats|combat|dragon|bow|book|practice|dev]
     aliases: [mcdev]
     permission: onlydragons.use
 permissions:

@@ -25,6 +25,16 @@ out of the current scope. See the
 [foundation plan](docs/planning/02-foundation-plan.md), [mechanic research](docs/planning/01-research.md)
 and [delivery ledger](docs/planning/03-agent-tasks-and-validation.md) for exact acceptance and remaining gates.
 
+## Commands
+
+Use `/onlydragons help [topic]` for permission-aware help and the
+[player command guide](dev/commands.md) for exact syntax. Short routes are
+`dragon ...`, `bow [help|list|kit|give <id>]`, `book <enchant> <level>` and
+`practice ...`. Existing `dev ...` routes and `/mcdev` remain available.
+The three grants are distinct: `bow kit` gives seven training bows and 512 arrows,
+`practice kit <loadout>` gives one bow and 64 arrows, and `bow give <id>` gives
+one loadout without arrows. Advanced stat bonuses remain in `help dev`.
+
 ## Agent development with Codex and Cursor
 
 Both clients use [AGENTS.md](AGENTS.md) and the [agent workflow](dev/agent-workflow.md)
