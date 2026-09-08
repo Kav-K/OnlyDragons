@@ -51,11 +51,12 @@ public final class BookCommand {
     }
     /**
      * Returns catalog enchant IDs or legal levels; the root router performs prefix filtering.
-     * @param sender requester used for permission filtering
+     * @param sender requester used for permission and player-only filtering
      * @param args nonempty root arguments including the partial token
      * @return non-null candidate list, possibly empty; candidates are not prefix-filtered here
      */
     public List<String> complete(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) return List.of();
         if (!sender.hasPermission("onlydragons.calibration") || args.length < 2 || !args[0].equalsIgnoreCase("dev")) return List.of();
         if (args.length == 2) return List.of("book");
         if (!handles(args)) return List.of();

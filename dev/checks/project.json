@@ -67,6 +67,34 @@
     {
       "command": "onlydragons dev book power 1",
       "expect": "This command requires a player\\."
+    },
+    {
+      "command": "onlydragons help dragon",
+      "expect": "/onlydragons dragon setup.*player/console"
+    },
+    {
+      "command": "onlydragons bow list",
+      "expect": "aimed Tracer V.*20-block acquisition"
+    },
+    {
+      "command": "onlydragons bow give ordinary",
+      "expect": "This command requires a player"
+    },
+    {
+      "command": "onlydragons dragon status",
+      "expect": "Arena .*dragon IDLE"
+    },
+    {
+      "command": "onlydragons book power 1",
+      "expect": "This command requires a player"
+    },
+    {
+      "command": "onlydragons practice kit ordinary",
+      "expect": "This command requires a player"
+    },
+    {
+      "command": "mcdev",
+      "expect": "OnlyDragons ready"
     }
   ]
 }

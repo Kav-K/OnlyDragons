@@ -116,11 +116,12 @@ public final class StatsCommand {
     }
     /**
      * Lists permitted stat/development subcommands and trusted loadout/stat identifiers.
-     * @param sender requester used for permission filtering
+     * @param sender requester used for permission and player-only filtering
      * @param args nonempty root arguments including the partial token
      * @return non-null candidate list, possibly empty; candidates are not prefix-filtered here
      */
     public List<String> complete(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) return List.of();
         if (args[0].equalsIgnoreCase("stats")) return sender.hasPermission("onlydragons.stats") && args.length == 2
                 ? List.of("explain") : List.of();
         if (!args[0].equalsIgnoreCase("dev") || !sender.hasPermission("onlydragons.calibration")) return List.of();

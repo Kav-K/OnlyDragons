@@ -122,11 +122,12 @@ public final class PracticeCommand {
     }
     /**
      * Suggests existing loadouts and explicit calibration modes without applying them.
-     * @param sender requester used for permission filtering
+     * @param sender requester used for permission and player-only filtering
      * @param args nonempty root arguments including the partial token
      * @return non-null candidate list, possibly empty; candidates are not prefix-filtered here
      */
     public List<String> complete(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) return List.of();
         if (args[0].equalsIgnoreCase("combat")) return sender.hasPermission("onlydragons.combat") && args.length == 2 ? List.of("last") : List.of();
         if (!args[0].equalsIgnoreCase("dev") || !sender.hasPermission("onlydragons.practice")) return List.of();
         if (args.length == 2) return List.of("kit", "dummy", "scenario", "reset");

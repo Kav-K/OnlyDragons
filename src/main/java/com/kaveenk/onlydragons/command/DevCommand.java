@@ -11,6 +11,7 @@ import org.bukkit.command.TabCompleter;
 
 /**
  * Synchronous root-command router shared by the primary name and its aliases.
+ * Short routes translate to legacy arguments before dispatch. Help is read-only.
  * Specific development namespaces run before generic stats/dev handling. Each
  * delegate enforces its own permission and player-only boundary.
  * @see OnlyDragonsPlugin#onEnable()
@@ -47,6 +48,20 @@ public final class DevCommand implements CommandExecutor, TabCompleter {
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("help")) {
+            if (args.length > 2) sender.sendMessage(Component.text("Usage: /" + label + " help [topic]"));
+            else CommandGuide.show(sender, args.length == 2 ? args[1] : "");
+            return true;
+        }
+        if (args.length > 0 && args[0].equalsIgnoreCase("bow")
+                && (args.length == 1 || args.length == 2 && args[1].equalsIgnoreCase("help"))) {
+            CommandGuide.show(sender, "bow"); return true;
+        }
+        if (args.length > 0 && args[0].equalsIgnoreCase("practice")
+                && (args.length < 2 || !List.of("kit", "dummy", "scenario", "reset").contains(args[1].toLowerCase(Locale.ROOT)))) {
+            CommandGuide.show(sender, "practice"); return true;
+        }
+        args = CommandGuide.translate(args);
         if (shortbows.handles(args)) { shortbows.execute(sender, args); return true; }
         if (books.handles(args)) { books.execute(sender, args); return true; }
         if (dragons.handles(args)) { dragons.execute(sender, args); return true; }
@@ -64,7 +79,7 @@ public final class DevCommand implements CommandExecutor, TabCompleter {
                 plugin.reloadSettings();
                 sender.sendMessage(Component.text("OnlyDragons configuration reloaded."));
             }
-            default -> sender.sendMessage(Component.text("Usage: /" + label + " [status|reload|stats|combat|dev]"));
+            default -> sender.sendMessage(Component.text("Usage: /" + label + " [help [topic]|status|reload|stats|combat|dragon|bow|book|practice|dev]"));
         }
         return true;
     }
@@ -79,24 +94,27 @@ public final class DevCommand implements CommandExecutor, TabCompleter {
      */
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 0) return List.of();
+        if (args.length == 0 || !sender.hasPermission("onlydragons.use")) return List.of();
         List<String> options;
-        if (args.length == 1) {
-            var available = new java.util.ArrayList<String>();
-            available.add("status");
-            if (sender.hasPermission("onlydragons.admin")) available.add("reload");
-            if (sender.hasPermission("onlydragons.stats")) available.add("stats");
-            if (sender.hasPermission("onlydragons.combat")) available.add("combat");
-            if (sender.hasPermission("onlydragons.calibration") || sender.hasPermission("onlydragons.practice")) available.add("dev");
-            options = available;
+        if (args.length == 1) options = CommandGuide.topics(sender);
+        else if (args[0].equalsIgnoreCase("help")) options = args.length == 2 ? CommandGuide.topics(sender) : List.of();
+        else if (args[0].equalsIgnoreCase("practice") && args.length == 2) {
+            options = sender instanceof org.bukkit.entity.Player && sender.hasPermission("onlydragons.practice")
+                    ? List.of("kit", "dummy", "scenario", "reset") : List.of();
+        } else if (args[0].equalsIgnoreCase("practice")
+                && !List.of("kit", "dummy", "scenario", "reset").contains(args[1].toLowerCase(Locale.ROOT))) options = List.of();
+        else if (args[0].equalsIgnoreCase("bow") && args.length == 2) {
+            options = !sender.hasPermission("onlydragons.calibration") ? List.of()
+                    : sender instanceof org.bukkit.entity.Player ? List.of("help", "list", "kit", "give") : List.of("help", "list");
         } else {
-            var combined = new java.util.ArrayList<>(stats.complete(sender, args));
-            combined.addAll(practice.complete(sender, args)); combined.addAll(dragons.complete(sender, args));
-            combined.addAll(shortbows.complete(sender, args));
-            combined.addAll(books.complete(sender, args));
+            var routed = CommandGuide.translate(args);
+            var combined = new java.util.ArrayList<>(stats.complete(sender, routed));
+            combined.addAll(practice.complete(sender, routed)); combined.addAll(dragons.complete(sender, routed));
+            combined.addAll(shortbows.complete(sender, routed));
+            combined.addAll(books.complete(sender, routed));
             options = combined;
         }
         String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
-        return options.stream().filter(option -> option.startsWith(prefix)).toList();
+        return options.stream().filter(option -> option.startsWith(prefix)).distinct().toList();
     }
 }

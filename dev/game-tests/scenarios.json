@@ -290,7 +290,7 @@
     ]
   },
   "equipment-player": {
-    "mechanicRevision": "equipment-player-v2",
+    "mechanicRevision": "equipment-player-v3",
     "testPlayerMode": "protocol-calibration",
     "requiredPlayerMessages": [
       {
@@ -328,6 +328,14 @@
       {
         "id": "bonus-replacement",
         "exact": "Session bonus replaced for ferocity. Clears on death, quit or dev clear."
+      },
+      {
+        "id": "command-help-stats",
+        "containsAll": [
+          "/onlydragons stats [explain]",
+          "Inspect equipment totals or their sources.",
+          "[player only]"
+        ]
       }
     ],
     "requiredAssertions": [
@@ -377,7 +385,8 @@
       "owned_listeners_removed",
       "owned_entities_removed",
       "owned_tasks_cancelled",
-      "owned_chunk_tickets_removed"
+      "owned_chunk_tickets_removed",
+      "help_preserves_inventory"
     ]
   },
   "protocol-player-soak": {

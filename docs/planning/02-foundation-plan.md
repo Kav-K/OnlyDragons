@@ -1142,3 +1142,18 @@ No rewards, balance-table replacement or milestone acceptance is introduced.
 | M5: progression | Gear/eyes acquisition, enchanting flow, personal rewards | Durable grants/consumption, reward eligibility, and economy balance tested. |
 
 The first implementation should concentrate on **M0 and M1**. M2 is split into independent work packages once the shared contracts settle. M4/M5 remain planned dependencies, not prerequisites for verifying stats and bows. Detailed ownership and acceptance cases are in the [task and validation plan](03-agent-tasks-and-validation.md).
+
+## Bounded command usability (GH-101)
+
+The root command provides permission- and sender-aware `help [topic]`. Immutable
+command descriptions supply discovery; short routes translate to the existing
+handlers: `dragon` → `dev dragon`, `bow` → `dev shortbow`, `bow give` →
+`dev loadout`, `book` → `dev book`, and the four `practice` actions → their
+existing `dev` actions. Delegates retain validation and mutation authority.
+Unknown practice actions cannot enter the generic dev namespace. Empty root
+status, `/mcdev`, legacy routes and per-action permissions remain supported.
+Training kit, practice kit and single-loadout grants remain distinct; advanced
+session bonuses stay in dev help. The [command guide](../../dev/commands.md)
+records exact syntax and availability. GH-96's current Tracer description uses
+aimed v3 without changing any profile identity or calibration. This checkpoint
+adds no altar actions and accepts no gameplay milestone.

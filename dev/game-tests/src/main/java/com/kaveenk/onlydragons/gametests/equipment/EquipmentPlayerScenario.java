@@ -44,7 +44,7 @@ public final class EquipmentPlayerScenario implements Scenario {
      * @param context server-thread report and cleanup owner
      */
     @Override public void start(ScenarioContext context) {
-        context.mechanicRevision("equipment-player-v2");
+        context.mechanicRevision("equipment-player-v3");
         context.check("server_thread", true, Bukkit.isPrimaryThread());
         context.check("production_enabled", true, context.production().isEnabled());
         context.check("disposable_protocol_mode", "protocol-calibration", System.getProperty("onlydragons.test.playerMode", ""));
@@ -153,10 +153,12 @@ public final class EquipmentPlayerScenario implements Scenario {
             player.teleport(new Location(player.getWorld(), 0.5, 100, 0.5, 0, 0));
             player.getInventory().clear(); player.getInventory().setHeldItemSlot(0);
             c.check("nonop_calibration_denied", false, player.hasPermission("onlydragons.calibration"));
-            player.performCommand("onlydragons dev loadout ordinary");
+            player.performCommand("onlydragons help stats");
+            c.check("help_preserves_inventory", true, player.getInventory().isEmpty());
+            player.performCommand("onlydragons bow give ordinary");
             c.check("denied_player_grant_has_no_item", true, player.getInventory().isEmpty());
             permitted(() -> {
-                player.performCommand("onlydragons dev loadout ordinary");
+                player.performCommand("onlydragons bow give ordinary");
                 player.performCommand("onlydragons dev loadout ferocity_500");
                 var ordinary = valid(player.getInventory().getItem(0));
                 var capped = valid(player.getInventory().getItem(1));

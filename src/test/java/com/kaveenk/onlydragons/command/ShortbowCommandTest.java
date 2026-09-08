@@ -76,6 +76,8 @@ class ShortbowCommandTest {
         assertTrue(text.contains("5 ticks/trigger (4/s at 20 TPS)"));
         assertTrue(text.contains("2 ticks/trigger (10/s at 20 TPS)"));
         assertTrue(text.contains("one guaranteed extra hit"));
+        assertTrue(text.contains("aimed Tracer V (v3: 20-block acquisition, 30-degree launch half-angle)"));
+        assertFalse(text.contains("40-block"));
         for (String id : ShortbowLoadouts.ids()) assertTrue(text.contains(id));
     }
 

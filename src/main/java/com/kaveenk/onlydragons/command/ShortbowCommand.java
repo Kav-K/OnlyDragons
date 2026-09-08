@@ -76,7 +76,7 @@ public final class ShortbowCommand {
                     .map(e -> PresentationFormatter.label(e.id()) + " " + PresentationFormatter.roman(e.level())).toList()));
         }
         say(sender, "Defaults: damage 100, crit chance 0%, crit damage 50%. One primary/trigger; Duplex adds one child next tick at 20% damage, no extra ammo.");
-        say(sender, "Combined bows: returning Tracer V (40-block acquisition), Quiver X (50% ammo saving), Flame II. Tempo starts at 25 Ferocity and builds on hits.");
+        say(sender, "Combined bows: aimed Tracer V (v3: 20-block acquisition, 30-degree launch half-angle), Quiver X (50% ammo saving), Flame II. Tempo starts at 25 Ferocity and builds on hits.");
         say(sender, "25 Ferocity = 25% extra hit; 100 Ferocity = one guaranteed extra hit before buffs. No Vicious bonus in these defaults.");
         say(sender, "Grant one: /onlydragons dev loadout <id>. Inspect equipped values with /onlydragons stats explain; bonuses and book edits may change defaults.");
     }
@@ -103,7 +103,7 @@ public final class ShortbowCommand {
     public List<String> complete(CommandSender sender, String[] args) {
         if (!sender.hasPermission("onlydragons.calibration") || !args[0].equalsIgnoreCase("dev")) return List.of();
         if (args.length == 2) return List.of("shortbow");
-        return handles(args) && args.length == 3 ? List.of("list", "kit", "help") : List.of();
+        return handles(args) && args.length == 3 ? (sender instanceof Player ? List.of("list", "kit", "help") : List.of("list", "help")) : List.of();
     }
     /**
      * Sends semantic command text through the shared Adventure formatter.

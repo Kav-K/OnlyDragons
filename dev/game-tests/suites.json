@@ -557,7 +557,9 @@
         "src/main/resources/plugin.yml",
         "src/main/resources/config.yml",
         "src/test/java/com/kaveenk/onlydragons/OnlyDragonsPluginTest.java",
-        "src/test/java/com/kaveenk/onlydragons/service/GreetingServiceTest.java"
+        "src/test/java/com/kaveenk/onlydragons/service/GreetingServiceTest.java",
+        "src/main/java/com/kaveenk/onlydragons/command/CommandGuide.java",
+        "src/test/java/com/kaveenk/onlydragons/command/CommandGuideTest.java"
       ],
       "cases": [
         "lifecycle-calibration",

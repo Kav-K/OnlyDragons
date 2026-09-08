@@ -6,6 +6,19 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
+**GH-101 command usability — In progress.** Bounded command/help work adds
+permission/sender-aware topics and short aliases while preserving existing
+handlers, grants and gameplay values; includes GH-96's stale Tracer text fix.
+Owner scope is commands/descriptor, command tests/guides and focused existing
+fixture coverage. Build and root Javadoc passed locally (333 tests, no failures
+or skips). Equipment-player v3 adds received help and short-route grant/denial
+checks while retaining its legacy grant and lifecycle checks. Initial static
+checkpoint is valid; final committed/main-integrated Paper suite and strict
+checkpoint remain pending. Windows smoke, authenticated-client readability and
+visuals are unrun. Next dependency: finish those automated gates and hand off a
+draft PR; the separately owned eye adapter may add topics after integration.
+
+
 **Manual Cursor development:** use the [development quick start](../../dev/cursor-development.md)
 for the existing checkout. Ctrl+Shift+B builds/tests and starts or restarts the
 human server; the separate Build and test task keeps build-only behavior.
