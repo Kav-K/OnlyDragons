@@ -265,6 +265,29 @@
       "scope": "New immutable aimed Tracer profile for the seven held-shortbow definitions, preserving explicit legacy calibrations and every existing arrow captured profile. Use the exact first calibration in issue #90 and the linked foundation contract; captured launch direction/position gates both acquisition and retention. Preserve native motion, collisions, line of sight, bounds and generation/UUID ownership; no automatic hits or combat/ammo changes.",
       "acceptance": "Direction/radius/finite-vector boundary tests and one narrow actual-Paper scenario comparing aimed moving-target assistance with side/behind/out-of-range misses. Verify post-shot player turning cannot authorize an originally off-axis shot, obstruction/lost lock, retained profile identity and owned cleanup. Targeted human aiming feel remains separate.",
       "coordination": "Issue #90. One small PR after lead assignment. Keep the lead-selected calibration distinct from user-approved final balance. Report a concrete public-source flaw before substituting another policy. Coordinate trusted loadout/profile routing with T06d without combining the two mechanics."
+    },
+    {
+      "id": "T11a",
+      "title": "First-party Summoning Eye and durable transaction/refund core",
+      "dependsOn": [
+        "T02",
+        "T08a"
+      ],
+      "scope": "User-prioritized core in docs/planning/08-eye-altar.md: durable serial/revision, issuance, eight-slot ownership/lock and offline-safe refund claims. No live frame/hatch adapter.",
+      "acceptance": "Core/domain/store and real Paper codec/service evidence; duplicate usable value rejected, recoverable pre-active reservations, bounded storage lifecycle. Live input/delivery and two-boot gameplay remain T11b.",
+      "coordination": "Issue #102; separate from #101 command ownership. Publish stable Java API early. Original T10/M3 and integrated T11 acceptance remain pending."
+    },
+    {
+      "id": "T11b",
+      "title": "Playable eight-frame altar, shared hatch and refund recovery",
+      "dependsOn": [
+        "T11a",
+        "T08a",
+        "T08b"
+      ],
+      "scope": "User-prioritized development altar per docs/planning/08-eye-altar.md. Consume T11a core and integrated #101 help; eight frames, owner withdrawal, one lock/hatch, durable refunds and restart recovery.",
+      "acceptance": "Real protocol frame/item inputs, conservation, final-slot contention, shared dragon generation, failed spawn/reset/offline/full-inventory paths and exact ledger-bound two-boot recovery. Human appearance/feel and T10/M3 remain separate.",
+      "coordination": "Dispatch only after T11a and command #101 merge. Preserve stopped human server and existing combat/arrow authority. No acquired eye sources or real reward grants."
     }
   ]
 }

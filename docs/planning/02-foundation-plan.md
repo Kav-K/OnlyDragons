@@ -993,6 +993,14 @@ The rehearsal is complete only when UUID traces demonstrate that pre-spawn arrow
 
 ## 11. Later encounter and progression boundaries
 
+**7 September implementation-order update:** the user explicitly requested eye
+placement now. The [T11a/T11b contract](08-eye-altar.md) authorizes the development
+altar in small stages before remaining T10 rehearsal. It records the newly
+confirmed frame, item, ownership and refund rules. The earlier ordering below
+describes the original milestone sequence; T10/M3 evidence remains required for
+final encounter acceptance, but no longer blocks these scoped implementation
+stages. Actual rewards and unselected acquisition content stay disabled/deferred.
+
 The [6 September encounter expansion proposal](05-encounter-expansion.md) scopes
 development spawn controls, result presentation, type/loot definitions and eye
 placement. It records unresolved product choices separately; its proposed work
