@@ -7,7 +7,9 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 ## Current delivery status
 
 **Manual Cursor development:** use the [development quick start](../../dev/cursor-development.md)
-for the existing checkout. F5 rebuilds and restarts with debugging before attaching;
+for the existing checkout. Ctrl+Shift+B builds/tests and starts or restarts the
+human server; the separate Build and test task keeps build-only behavior.
+F5 rebuilds and restarts with debugging before attaching;
 Java import/refresh and watcher exclusions keep ignored agent workspaces and
 server/cache trees out of normal editing. This editor maintenance changes no
 mechanics or milestone gates. Review and local build/debug evidence belong to

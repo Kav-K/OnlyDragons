@@ -62,7 +62,7 @@ New projects default to `com.kaveenk.<lowercase-plugin-name>` (for example, `com
 In the new project:
 
 1. Edit `src/main/java` for behavior, `src/main/resources/plugin.yml` for metadata/commands/permissions, and `config.yml` for defaults. The plugin version is in `build.gradle.kts`.
-2. Add behavior tests under `src/test/java`. Use Command Palette → **Tasks: Run Build Task** to build and test.
+2. Add behavior tests under `src/test/java`. Use Command Palette → **Tasks: Run Task → Minecraft: Build and test** for a build without starting Paper.
 3. Update `dev/checks/project.json` when replacing the starter commands. Run `.\mcdev smoke` for an actual server test.
 4. Run `.\mcdev play`, open the matching Minecraft Java client, and connect to **127.0.0.1:25565**.
 5. After edits, run `.\mcdev restart` and reconnect. When finished, run `.\mcdev stop`.
@@ -97,7 +97,8 @@ The server runs in the background. Closing a terminal, cancelling the log task, 
 
 | Action | Shortcut or task |
 | --- | --- |
-| Build and tests | Tasks: Run Build Task |
+| Build, test and start/restart for play | Ctrl+Shift+B / Tasks: Run Build Task |
+| Build and tests only | Tasks: Run Task → Minecraft: Build and test |
 | Individual tests | Testing sidebar / Run Test above a test |
 | Build and start for human testing | Minecraft: Play (build + start server) |
 | Rebuild and restart | Minecraft: Restart after edits |
