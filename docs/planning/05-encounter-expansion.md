@@ -169,6 +169,11 @@ Retain the existing dependency chain through T04/T05/T06/T07/T08 and the added T
 
 ### Existing #13/T11 — Gated eight-eye altar
 
+**Superseding implementation order, 7 September:** the user now requests eye
+placement. [T11a/T11b](08-eye-altar.md) may implement the confirmed development
+slice before T10/M3 acceptance. The original dispatch wording below continues to
+govern final integrated T11/M4 acceptance, not these newly assigned stages.
+
 **Dispatch gate:** #12 integrated **and M3 explicitly accepted with its human prefire evidence**. Preserve the current `requiredMilestones`/manual gate. Planning the interaction is permissible; implementation is not silently pulled ahead of it.
 
 **Owner:** summon transaction/state-machine owner plus a thin Paper interaction/animation adapter. Consume D1's verified hatch path. A separate placement ledger supplies eye provenance and includes qualified eye-only placers if the chosen eligibility policy requires them; do not reinterpret the combat ledger's current zeros.
