@@ -63,6 +63,7 @@
     },
     {
       "label": "Minecraft: Start debug server",
+      "detail": "Build and restart the managed development server with loopback debugging before F5 attaches.",
       "type": "process",
       "command": "powershell.exe",
       "args": [
@@ -71,18 +72,10 @@
         "Bypass",
         "-File",
         "${workspaceFolder}/scripts/Lab.ps1",
-        "run",
+        "restart",
         "-DebugServer"
       ],
-      "isBackground": true,
-      "problemMatcher": {
-        "base": "$javac",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": ".*Starting.*",
-          "endsPattern": "^MCDEV_READY.*"
-        }
-      },
+      "problemMatcher": ["$javac"],
       "presentation": {
         "panel": "dedicated",
         "reveal": "always"

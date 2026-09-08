@@ -6,6 +6,13 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
+**Manual Cursor development:** use the [development quick start](../../dev/cursor-development.md)
+for the existing checkout. F5 rebuilds and restarts with debugging before attaching;
+Java import/refresh and watcher exclusions keep ignored agent workspaces and
+server/cache trees out of normal editing. This editor maintenance changes no
+mechanics or milestone gates. Review and local build/debug evidence belong to
+its maintenance PR; gameplay task acceptance below remains separate.
+
 **Source documentation maintenance:** [PR98](https://github.com/Kav-K/OnlyDragons/pull/98)
 delivers the user-requested whole-code contract pass after T07b completion:
 208 maintained Java files and 62 operational/build scripts, plus a consistent

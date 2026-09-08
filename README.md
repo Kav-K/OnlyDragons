@@ -39,6 +39,10 @@ decisions, delivery status and unaccepted gates.
 
 ## Create a new plugin
 
+To continue developing **this existing plugin**, use the
+[Cursor development quick start](dev/cursor-development.md). It covers the exact
+workspace, build/test, Play/restart, F5 debugging and source entry points.
+
 Open `OnlyDragons.code-workspace` in Cursor. In its terminal, run:
 
 ```powershell
@@ -100,9 +104,14 @@ The server runs in the background. Closing a terminal, cancelling the log task, 
 | Console command / logs / stop | Minecraft: Server command / Server logs / Stop server |
 | Actual Paper smoke test | Minecraft: Real server smoke test |
 | Another plugin or version | Minecraft: Play another plugin or version / Test another plugin or version |
-| Start with breakpoints | F5 → Paper: Start and debug (F5) |
+| Rebuild/restart with breakpoints | F5 → Paper: Start and debug (F5) |
 | Attach to a debug server | Paper: Attach to running server |
 | Review newer releases | Minecraft: Check for upgrades |
+
+F5 waits for a fresh build and debug-enabled restart before attaching. It works
+after an ordinary Play session and uses the newly built plugin's line numbers.
+Use **Paper: Attach to running server** to attach again without rebuilding when
+the server already has debugging enabled. Stopping the debugger leaves Paper running.
 
 **Minecraft entries are workspace tasks, not top-level command-palette commands.** To find them:
 

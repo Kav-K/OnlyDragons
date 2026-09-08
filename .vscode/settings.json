@@ -1,4 +1,6 @@
 {
+    "java.import.exclusions": ["**/node_modules/**", "**/.metadata/**", "**/archetype-resources/**", "**/META-INF/maven/**", "**/.symphony/**", "**/.serena/**", "**/run/**", "**/.gradle/**", "**/build/**"],
+    "java.project.resourceFilters": ["node_modules", "\\.git", "\\.symphony", "\\.serena", "run", "\\.gradle"],
     "java.jdt.ls.java.home":  "C:\\Users\\Kaveen\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-25.0.4.1+1",
     "java.configuration.runtimes":  [
                                         {
@@ -25,11 +27,15 @@
                           "**/bin":  true
                       },
     "files.watcherExclude":  {
+                                 "**/.symphony/**": true,
+                                 "**/.serena/**": true,
                                  "**/run/**":  true,
                                  "**/build/**":  true,
                                  "**/.gradle/**":  true
                              },
     "search.exclude":  {
+                           "**/.symphony/**": true,
+                           "**/.serena/**": true,
                            "**/.gradle":  true,
                            "**/build":  true,
                            "**/run":  true
