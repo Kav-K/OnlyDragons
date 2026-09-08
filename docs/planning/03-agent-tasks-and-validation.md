@@ -6,17 +6,21 @@ Design authority: [foundation plan](02-foundation-plan.md). Evidence: [research 
 
 ## Current delivery status
 
-**GH-101 command usability — In progress.** Bounded command/help work adds
-permission/sender-aware topics and short aliases while preserving existing
-handlers, grants and gameplay values; includes GH-96's stale Tracer text fix.
-Owner scope is commands/descriptor, command tests/guides and focused existing
-fixture coverage. Build and root Javadoc passed locally (333 tests, no failures
-or skips). Equipment-player v3 adds received help and short-route grant/denial
-checks while retaining its legacy grant and lifecycle checks. Initial static
-checkpoint is valid; final committed/main-integrated Paper suite and strict
-checkpoint remain pending. Windows smoke, authenticated-client readability and
-visuals are unrun. Next dependency: finish those automated gates and hand off a
-draft PR; the separately owned eye adapter may add topics after integration.
+**GH-101 command usability — In review, [PR #105](https://github.com/Kav-K/OnlyDragons/pull/105).**
+Permission/sender-aware help and short aliases preserve the existing handlers,
+grants and gameplay values; includes GH-96's stale Tracer text fix. Frozen
+runtime `aad2c76` includes main `83d8af0`. Build passed with 333 production,
+six companion and 37 client tests (zero failures/errors/skips); root/companion
+Javadoc and initial/post-main static checkpoints passed. Equipment-player v3
+run `35b017f84a2a49d098ad315f330f3943` passed 48 required assertions and nine
+received-message checks, with clean server/client shutdown. Commands use public
+API dispatch; received messages are real packet output, not client-command input.
+[Exact evidence and remaining gates](evidence/gh101-command-help.md).
+The lead reviewed the frozen command source and owns the pending full hosted
+cohort, strict receipt checkpoint and current CI. Windows smoke and authenticated
+client/readability/visual gates remain unrun. No selector or milestone was weakened.
+Next dependency: lead verification/review; the separately owned eye adapter may
+add implemented topics after this PR integrates.
 
 **Current user priority — commands and eye placement:** [#101](https://github.com/Kav-K/OnlyDragons/issues/101)
 is dispatched through Symphony for backward-compatible command consolidation and
